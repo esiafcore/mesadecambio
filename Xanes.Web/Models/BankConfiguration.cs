@@ -9,5 +9,9 @@ public class BankConfiguration:IEntityTypeConfiguration<Bank>
     {
         builder.HasKey(x => x.Id);
 
+        builder.HasIndex(x => new { x.CompanyId, x.Code }
+                , "banks_idx_2010")
+            .IsUnique();
+
     }
 }

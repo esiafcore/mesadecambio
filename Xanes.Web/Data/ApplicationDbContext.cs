@@ -14,8 +14,10 @@ public class ApplicationDbContext: DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration<Bank>(new BankConfiguration());
+        modelBuilder.ApplyConfiguration<Currency>(new CurrencyConfiguration());
+
     }
 
     public virtual DbSet<Bank> Banks {get;set;}
-
+    public virtual DbSet<Currency> Currencies { get; set; }
 }
