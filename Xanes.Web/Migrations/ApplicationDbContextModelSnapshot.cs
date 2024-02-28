@@ -26,149 +26,184 @@ namespace Xanes.Web.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<Guid?>("BankAccountExcludeUId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("bankaccountexcludeuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("code");
 
                     b.Property<decimal>("ComisionBancariaPorcentaje")
                         .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("comisionbancariaporcentaje");
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("companyid");
 
                     b.Property<bool>("IsCompany")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("iscompany");
 
                     b.Property<string>("LogoBank")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("logobank");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
-                        .HasColumnType("nvarchar(75)");
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("name");
 
                     b.Property<int>("OrderPriority")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("orderpriority");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_banks");
 
                     b.HasIndex(new[] { "CompanyId", "Code" }, "banks_idx_2010")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_banks_companyid_code");
 
-                    b.ToTable("Banks");
+                    b.ToTable("banks", (string)null);
                 });
 
             modelBuilder.Entity("Xanes.Web.Models.Currency", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
                         .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                        .HasColumnType("nvarchar(5)")
+                        .HasColumnName("abbreviation");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("code");
 
                     b.Property<string>("CodeIso")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("nvarchar(15)")
+                        .HasColumnName("codeiso");
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("companyid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("name");
 
                     b.Property<string>("NameFor")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("namefor");
 
                     b.Property<string>("NameForSingular")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("nameforsingular");
 
                     b.Property<string>("NameSingular")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("namesingular");
 
                     b.Property<int>("Numeral")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("numeral");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_currencies");
 
                     b.HasIndex(new[] { "CompanyId", "CodeIso" }, "currencies_idx_2010")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_currencies_companyid_codeiso");
 
                     b.HasIndex(new[] { "CompanyId", "Code" }, "currencies_idx_2020")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_currencies_companyid_code");
 
                     b.HasIndex(new[] { "CompanyId", "Abbreviation" }, "currencies_idx_2030")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_currencies_companyid_abbreviation");
 
                     b.HasIndex(new[] { "CompanyId", "Numeral" }, "currencies_idx_2040")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_currencies_companyid_numeral");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("currencies", (string)null);
                 });
 
             modelBuilder.Entity("Xanes.Web.Models.QuotationType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("code");
 
                     b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("companyid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(75)
-                        .HasColumnType("nvarchar(75)");
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("name");
 
                     b.Property<int>("Numeral")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("numeral");
 
                     b.Property<short>("OrderSequence")
-                        .HasColumnType("smallint");
+                        .HasColumnType("smallint")
+                        .HasColumnName("ordersequence");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_quotationstypes");
 
                     b.HasIndex(new[] { "CompanyId", "Code" }, "quotationstypes_idx_2010")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_quotationstypes_companyid_code");
 
                     b.HasIndex(new[] { "CompanyId", "Numeral" }, "quotationstypes_idx_2020")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_quotationstypes_companyid_numeral");
 
-                    b.ToTable("QuotationsTypes");
+                    b.ToTable("quotationstypes", (string)null);
                 });
 #pragma warning restore 612, 618
         }
