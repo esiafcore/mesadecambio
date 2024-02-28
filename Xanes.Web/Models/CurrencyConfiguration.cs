@@ -21,6 +21,9 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
                 , "currencies_idx_2030")
             .IsUnique();
 
+        builder.HasIndex(x => new { x.CompanyId, x.Numeral }
+                , "currencies_idx_2040")
+            .IsUnique();
     }
 
 }
