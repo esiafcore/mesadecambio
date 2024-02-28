@@ -1,22 +1,52 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-
+using Xanes.Web.Abstractions;
 namespace Xanes.Web.Models;
 
-public class Bank
+public class Bank: Entity,ICloneable
 {
-    [Key]
-    public int Id { get; set; }
-    [Required]
-    public int CompanyId { get; set; }
-    [Required]
+    [StringLength(25)]
+    [Required()]
     public string Code { get; set; } = null!;
-    [Required]
+
+    [StringLength(75)]
+    [Required()]
     public string Name { get; set; } = null!;
-    public decimal BankingCommissionPercentage { get; set; }
+
+    [Required()]
+    [Precision(18, 2)]
+    public decimal ComisionBancariaPorcentaje { get; set; }
+
     public Guid? BankAccountExcludeUId { get; set; }
-    [Required]
+
+    [Required()]
     public bool IsCompany { get; set; }
+
+    [Required()]
     public int OrderPriority { get; set; }
-    public string LogoBank { get; set; } = null!;
+
+    public string? LogoBank { get; set; }
+
+    #region ICloneable Members
+
+    public virtual object Clone()
+    {
+        Bank obj = new Bank
+        {
+            Id = Id,
+            CompanyId = CompanyId,
+            Code = Code,
+            Name = Name,
+            ComisionBancariaPorcentaje = ComisionBancariaPorcentaje,
+            BankAccountExcludeUId = BankAccountExcludeUId,
+            IsCompany = IsCompany,
+            OrderPriority = OrderPriority,
+            LogoBank = LogoBank
+        };
+        return obj;
+    }
+
+    #endregion
+
+
 }
