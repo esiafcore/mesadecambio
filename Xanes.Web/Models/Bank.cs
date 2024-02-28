@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Web.Abstractions;
 namespace Xanes.Web.Models;
 
+[Table("banks", Schema = "bco")]
 public class Bank: Entity,ICloneable
 {
     [StringLength(25)]
