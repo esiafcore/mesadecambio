@@ -17,6 +17,6 @@ public class BankController : Controller
     {
         //var dataList = _db.Banks.ToList();
         List<Bank> dataList = _db.Banks.ToList();
-        return View();
+        return View(dataList);
     }
 }

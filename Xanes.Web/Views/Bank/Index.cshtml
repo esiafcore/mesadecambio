@@ -1,1 +1,25 @@
-﻿<h1>Banks List</h1>
+﻿@model List<Bank>
+<h1>Banks List</h1>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>% Comisión</th>
+            <th>Es Compañía</th>
+            <th>Orden</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var itm in Model.OrderBy(x => x.OrderPriority).ThenBy(x => x.Code))
+        {
+            <tr>
+                <td>@itm.Code</td>
+                <td>@itm.Name</td>
+                <td>@itm.ComisionBancariaPorcentaje</td>
+                <td>@itm.IsCompany</td>
+                <td>@itm.OrderPriority</td>
+            </tr>
+        }
+    </tbody>
+</table>
