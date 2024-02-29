@@ -8,6 +8,7 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
     public void Configure(EntityTypeBuilder<Currency> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
 
         builder.HasIndex(x => new {x.CompanyId, x.CodeIso }
             ,"currencies_idx_2010")

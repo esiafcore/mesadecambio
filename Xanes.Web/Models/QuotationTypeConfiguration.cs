@@ -8,6 +8,7 @@ public class QuotationTypeConfiguration : IEntityTypeConfiguration<QuotationType
     public void Configure(EntityTypeBuilder<QuotationType> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
 
         builder.HasIndex(x => new { x.CompanyId, x.Code }
                 , "quotationstypes_idx_2010")
