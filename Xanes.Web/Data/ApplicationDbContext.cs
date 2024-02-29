@@ -17,6 +17,8 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfiguration<Currency>(new CurrencyConfiguration());
         modelBuilder.ApplyConfiguration<QuotationType>(new QuotationTypeConfiguration());
         modelBuilder.ApplyConfiguration<CustomerType>(new CustomerTypeConfiguration());
+
+
     }
 
     public virtual DbSet<Bank> Banks {get;set;}
