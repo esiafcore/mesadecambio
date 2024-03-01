@@ -30,7 +30,7 @@ public class BankController : Controller
         {
             OrderPriority = 1,
             BankingCommissionPercentage = 0,
-            CompanyId = _companyId,
+            CompanyId = 0,
         };
 
         return View(obj);
@@ -39,6 +39,10 @@ public class BankController : Controller
     [HttpPost]
     public IActionResult Create(Bank obj)
     {
+        if (obj.CompanyId != _companyId)
+        {
+            ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+        }
         //Datos son validos
         if (ModelState.IsValid) {
             _db.Banks.Add(obj);
