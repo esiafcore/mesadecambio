@@ -7,10 +7,14 @@ namespace Xanes.Web.Controllers;
 public class BankController : Controller
 {
     private readonly ApplicationDbContext _db;
+    private readonly IConfiguration _configuration;
+    private readonly int _companyId;
 
-    public BankController(ApplicationDbContext db)
+    public BankController(ApplicationDbContext db,IConfiguration configuration)
     {
         _db = db;
+        _configuration = configuration;
+        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
     // GET
     public IActionResult Index()
@@ -21,14 +25,27 @@ public class BankController : Controller
 
     public IActionResult Create()
     {
-        return View();
+        //Setear valor por defecto
+        var obj = new Bank()
+        {
+            OrderPriority = 1,
+            BankingCommissionPercentage = 0,
+            CompanyId = _companyId,
+        };
+
+        return View(obj);
     }
 
     [HttpPost]
     public IActionResult Create(Bank obj)
     {
-        _db.Banks.Add(obj);
-        _db.SaveChanges();
-        return RedirectToAction("Index","Bank");
+        //Datos son validos
+        if (ModelState.IsValid) {
+            _db.Banks.Add(obj);
+            _db.SaveChanges();
+            return RedirectToAction("Index", "Bank");
+        }
+
+        return View(obj);
     }
 }

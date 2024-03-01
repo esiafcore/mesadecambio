@@ -1,43 +1,51 @@
 ﻿@model Bank
 
 <form method="post">
+    <input hidden asp-for="CompanyId" />
+
     <div class="border p-3 mt-4">
         <div class="row pb2">
             <h2 class="text-primary">Create Bank</h2>
             <hr />
         </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Code" class="ps-0"></label>
+            <input asp-for="Code" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Name" class="ps-0"></label>
+            <input asp-for="Name" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="BankingCommissionPercentage" class="ps-0"></label>
+            <input asp-for="BankingCommissionPercentage" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="IsCompany" class="ps-0"></label>
+            <input asp-for="IsCompany" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="IsCompany" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="OrderPriority" class="ps-0"></label>
+            <input asp-for="OrderPriority" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="OrderPriority" class="text-danger"></span>
+        </div>
 
-        <div class="row mb-3 p-1">
-            <label asp-for="Code" class="p-0"></label>
-            <input asp-for="Code" type="text" class="form-control" />
-        </div>
-        <div class="row mb-3 p-1">
-            <label asp-for="Name" class="p-0"></label>
-            <input asp-for="Name" type="text" class="form-control" />
-        </div>
-        <div class="row mb-3 p-1">
-            <label asp-for="BankingCommissionPercentage" class="p-0"></label>
-            <input asp-for="BankingCommissionPercentage" type="text" class="form-control" />
-        </div>
-        <div class="row mb-3 p-1">
-            <label asp-for="IsCompany" class="p-0"></label>
-            <input asp-for="IsCompany" type="text" class="form-control" />
-        </div>
-        <div class="row mb-3 p-1">
-            <label asp-for="OrderPriority" class="p-0"></label>
-            <input asp-for="OrderPriority" type="text" class="form-control" />
+        <div class="row mb-1 p-1">
+            <label asp-for="BankAccountExcludeUId" class="ps-0"></label>
+            <input asp-for="BankAccountExcludeUId" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
         </div>
 
-        <div class="row mb-3 p-1">
-            <label asp-for="BankAccountExcludeUId" class="p-0"></label>
-            <input asp-for="BankAccountExcludeUId" type="text" class="form-control" />
+        <div class="row mb-1 p-1">
+            <label asp-for="LogoBank" class="ps-0"></label>
+            <input asp-for="LogoBank" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="LogoBank" class="text-danger"></span>
         </div>
-
-        <div class="row mb-3 p-1">
-            <label asp-for="LogoBank" class="p-0"></label>
-            <input asp-for="LogoBank" type="text" class="form-control" />
-        </div>
-        <div class="row">
+        <div class="row p-1">
             <div class="col-6 col-md-3">
                 <button type="submit" class="btn btn-primary form-control">Create</button>
             </div>

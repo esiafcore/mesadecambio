@@ -9,6 +9,10 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
+        builder.Property(x => x.IsCompany).ValueGeneratedOnAdd().HasDefaultValue(false);
+        builder.Property(x => x.OrderPriority).ValueGeneratedOnAdd().HasDefaultValue(1);
+        builder.Property(x => x.BankingCommissionPercentage).ValueGeneratedOnAdd().HasDefaultValue(0);
+
 
         builder.HasIndex(x => new { x.CompanyId, x.Code }
                 , "banks_idx_2010")

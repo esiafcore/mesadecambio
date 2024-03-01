@@ -8,32 +8,35 @@ namespace Xanes.Web.Models;
 [Table("banks", Schema = "bco")]
 public class Bank: Entity,ICloneable
 {
-    [StringLength(25)]
-    [Required()]
+    [MaxLength(25,ErrorMessage="Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage ="El campo {0} es requerido")]
     [DisplayName(displayName:"Código")]
     public string Code { get; set; } = null!;
 
-    [StringLength(75)]
-    [Required()]
+    [MaxLength(75,ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     [DisplayName(displayName: "Nombre")]
     public string Name { get; set; } = null!;
 
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     [Precision(18, 2)]
     [DisplayName(displayName: "% Comisión Bancaria")]
+    [Range(0, 100, ErrorMessage = "Rango del campo {0} debe estar entre {1} y {2}")]
     public decimal BankingCommissionPercentage { get; set; }
 
     [DisplayName(displayName: "Uid Cta Bancaria Excluida")]
     public Guid? BankAccountExcludeUId { get; set; }
 
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     [DisplayName(displayName: "Es Compañía")]
     public bool IsCompany { get; set; }
 
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     [DisplayName(displayName: "Orden Prioridad")]
+    [Range(1,100, ErrorMessage = "Rango del campo {0} debe estar entre {1} y {2}")]
     public int OrderPriority { get; set; }
 
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [DisplayName(displayName: "Logo Banco")]
     public string? LogoBank { get; set; }
 
