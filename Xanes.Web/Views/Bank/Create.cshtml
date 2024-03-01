@@ -3,12 +3,12 @@
 <form method="post">
     <input hidden asp-for="CompanyId" />
 
-    <div class="border p-3 mt-4">
-        <div class="row pb2">
-            <h2 class="text-primary">Create Bank</h2>
+    <div class="border pb-3 px-3 mt-2">
+        <div class="row pb-1">
+            <h3 class="text-primary">Create Bank</h3>
             <hr />
         </div>
-        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="row mb-1 p-1">
             <label asp-for="Code" class="ps-0"></label>
             <input asp-for="Code" type="text" class="form-control px-2 py-1" />
