@@ -15,13 +15,20 @@ public class BankController : Controller
     // GET
     public IActionResult Index()
     {
-        //var dataList = _db.Banks.ToList();
-        List<Bank> dataList = _db.Banks.ToList();
-        return View(dataList);
+        var objList = _db.Banks.ToList();
+        return View(objList);
     }
 
     public IActionResult Create()
     {
         return View();
+    }
+
+    [HttpPost]
+    public IActionResult Create(Bank obj)
+    {
+        _db.Banks.Add(obj);
+        _db.SaveChanges();
+        return RedirectToAction("Index","Bank");
     }
 }
