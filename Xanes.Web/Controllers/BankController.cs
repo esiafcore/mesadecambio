@@ -19,4 +19,9 @@ public class BankController : Controller
         List<Bank> dataList = _db.Banks.ToList();
         return View(dataList);
     }
+
+    public IActionResult Create()
+    {
+        return View();
+    }
 }

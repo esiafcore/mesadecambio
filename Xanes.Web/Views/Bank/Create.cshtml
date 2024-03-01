@@ -1,0 +1,51 @@
+﻿@model Bank
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb2">
+            <h2 class="text-primary">Create Bank</h2>
+            <hr />
+        </div>
+
+        <div class="row mb-3 p-1">
+            <label class="p-0">Código</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="row mb-3 p-1">
+            <label class="p-0">Nombre</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="row mb-3 p-1">
+            <label class="p-0">% Comision</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="row mb-3 p-1">
+            <label class="p-0">Es Compañía</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="row mb-3 p-1">
+            <label class="p-0">Display Order</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="row mb-3 p-1">
+            <label class="p-0">Bank Account Exclude</label>
+            <input type="text" class="form-control" />
+        </div>
+
+        <div class="row mb-3 p-1">
+            <label class="p-0">Logo</label>
+            <input type="text" class="form-control" />
+        </div>
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Create</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Bank" asp-action="Index" class="btn btn-outline-secondary border form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
