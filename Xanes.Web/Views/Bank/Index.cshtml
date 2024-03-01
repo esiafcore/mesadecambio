@@ -1,25 +1,39 @@
 ﻿@model List<Bank>
-<h1>Banks List</h1>
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>% Comisión</th>
-            <th>Es Compañía</th>
-            <th>Orden</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var itm in Model.OrderBy(x => x.OrderPriority).ThenBy(x => x.Code))
-        {
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">
+                Bank List
+            </h2>
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="" asp-action="" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create New Bank
+            </a>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
             <tr>
-                <td>@itm.Code</td>
-                <td>@itm.Name</td>
-                <td>@itm.ComisionBancariaPorcentaje</td>
-                <td>@itm.IsCompany</td>
-                <td>@itm.OrderPriority</td>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>% Comisión</th>
+                <th>Es Compañía</th>
+                <th>Orden</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var itm in Model.OrderBy(x => x.OrderPriority).ThenBy(x => x.Code))
+            {
+                <tr>
+                    <td>@itm.Code</td>
+                    <td>@itm.Name</td>
+                    <td>@itm.ComisionBancariaPorcentaje</td>
+                    <td>@itm.IsCompany</td>
+                    <td>@itm.OrderPriority</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
