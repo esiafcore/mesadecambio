@@ -35,10 +35,10 @@
                     <td>@itm.OrderPriority</td>
                     <td>
                         <div class="btn-group" role="group">
-                            <a asp-controller="Bank" asp-action="Edit" class="btn btn-primary py-1 px-2 my-0 mx-2">
+                            <a asp-controller="Bank" asp-action="Edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
                                 <i class="bi bi-pencil-square"></i> Edit
                             </a>
-                            <a asp-controller="Bank" asp-action="Delete" class="btn btn-danger py-1 px-2 my-0 mx-2">
+                            <a asp-controller="Bank" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
                                 <i class="bi bi-trash-fill"></i> Delete
                             </a>
                         </div>

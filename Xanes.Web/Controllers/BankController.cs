@@ -63,4 +63,55 @@ public class BankController : Controller
 
         return View(obj);
     }
+
+    public IActionResult Edit(int? id)
+    {
+        if ((id == null) || (id == 0))
+        {
+            return NotFound();
+        }
+
+        //Setear valor por defecto
+        //var obj = _db.Banks
+        //    .FirstOrDefault(x => x.Id == id);
+
+        var obj = _db.Banks
+            .Find(id);
+
+        if (obj == null)
+        {
+            return NotFound();
+        }
+
+        return View(obj);
+    }
+
+    [HttpPost]
+    public IActionResult Edit(Bank obj)
+    {
+        if (obj.CompanyId != _companyId)
+        {
+            ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+        }
+
+        if (obj.Name.Trim().ToLower() == ".")
+        {
+            ModelState.AddModelError("name", "Nombre no puede ser .");
+        }
+
+        if (obj.Code.Trim().ToLower() == ".")
+        {
+            ModelState.AddModelError("code", "Código no puede ser .");
+        }
+
+        //Datos son validos
+        if (ModelState.IsValid)
+        {
+            _db.Banks.Add(obj);
+            _db.SaveChanges();
+            return RedirectToAction("Index", "Bank");
+        }
+
+        return View(obj);
+    }
 }
