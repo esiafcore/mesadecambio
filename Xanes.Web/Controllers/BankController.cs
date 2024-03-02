@@ -59,6 +59,7 @@ public class BankController : Controller
         if (ModelState.IsValid) {
             _db.Banks.Add(obj);
             _db.SaveChanges();
+            TempData["success"] = "Bank created successfully";
             return RedirectToAction("Index", "Bank");
         }
 
@@ -92,6 +93,7 @@ public class BankController : Controller
     {
         //Validar que codigo no está repetido
         var objExists = _db.Banks
+            .AsNoTracking()
             .FirstOrDefault(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower());
         if ((objExists != null) && (objExists.Id != obj.Id))
         {
@@ -102,6 +104,7 @@ public class BankController : Controller
         {
             _db.Banks.Update(obj);
             _db.SaveChanges();
+            TempData["success"] = "Bank updated successfully";
             return RedirectToAction("Index", "Bank");
         }
 
@@ -137,6 +140,7 @@ public class BankController : Controller
             return NotFound();
         }
         _db.Banks.Where(x => x.Id == id).ExecuteDelete();
+        TempData["success"] = "Bank deleted successfully";
         return RedirectToAction("Index", "Bank");
     }
 
