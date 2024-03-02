@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Xanes.Web.Data;
 using Xanes.Web.Models;
 
@@ -106,4 +107,41 @@ public class BankController : Controller
 
         return View(obj);
     }
+
+    public IActionResult Delete(int? id)
+    {
+        if ((id == null) || (id == 0))
+        {
+            return NotFound();
+        }
+
+        //Setear valor por defecto
+        //var obj = _db.Banks
+        //    .FirstOrDefault(x => x.Id == id);
+
+        var obj = _db.Banks
+            .Find(id);
+
+        if (obj == null)
+        {
+            return NotFound();
+        }
+
+        return View(obj);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    public IActionResult DeletePost(int? id)
+    {
+        //Validar que codigo no está repetido
+        bool isrowExist = _db.Banks.Any(x => x.Id == id);
+
+        if (!isrowExist)
+        {
+            return NotFound();
+        }
+        _db.Banks.Where(x => x.Id == id).ExecuteDelete();
+        return RedirectToAction("Index", "Bank");
+    }
+
 }
