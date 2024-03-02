@@ -1,5 +1,54 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model Bank
+
+<form method="post">
+    <input hidden asp-for="Id" />
+    <input hidden asp-for="CompanyId" />
+
+    <div class="border pb-3 px-3 mt-2">
+        <div class="row pb-1">
+            <h3 class="text-primary">Delete Bank</h3>
+            <hr />
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Code" class="ps-0"></label>
+            <input asp-for="Code" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Name" class="ps-0"></label>
+            <input asp-for="Name" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="BankingCommissionPercentage" class="ps-0"></label>
+            <input asp-for="BankingCommissionPercentage" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="IsCompany" class="ps-0"></label>
+            <input asp-for="IsCompany" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="OrderPriority" class="ps-0"></label>
+            <input asp-for="OrderPriority" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+
+        <div class="row mb-1 p-1">
+            <label asp-for="BankAccountExcludeUId" class="ps-0"></label>
+            <input asp-for="BankAccountExcludeUId" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+
+        <div class="row mb-1 p-1">
+            <label asp-for="LogoBank" class="ps-0"></label>
+            <input asp-for="LogoBank" disabled type="text" class="form-control px-2 py-1" />
+        </div>
+        <div class="row p-1">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Delete</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Bank" asp-action="Index" class="btn btn-outline-secondary border form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+

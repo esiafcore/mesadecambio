@@ -31,7 +31,7 @@ public class BankController : Controller
         {
             OrderPriority = 1,
             BankingCommissionPercentage = 0,
-            CompanyId = 0,
+            CompanyId = _companyId
         };
 
         return View(obj);
