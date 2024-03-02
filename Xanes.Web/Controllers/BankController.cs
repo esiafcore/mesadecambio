@@ -89,25 +89,10 @@ public class BankController : Controller
     [HttpPost]
     public IActionResult Edit(Bank obj)
     {
-        if (obj.CompanyId != _companyId)
-        {
-            ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
-        }
-
-        if (obj.Name.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("name", "Nombre no puede ser .");
-        }
-
-        if (obj.Code.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("code", "Código no puede ser .");
-        }
-
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _db.Banks.Add(obj);
+            _db.Banks.Update(obj);
             _db.SaveChanges();
             return RedirectToAction("Index", "Bank");
         }

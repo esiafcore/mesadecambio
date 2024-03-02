@@ -1,1 +1,67 @@
-﻿
+﻿@model Bank
+
+<form method="post">
+    <input hidden asp-for="Id" />
+    <input hidden asp-for="CompanyId" />
+
+    <div class="border pb-3 px-3 mt-2">
+        <div class="row pb-1">
+            <h3 class="text-primary">Edit Bank</h3>
+            <hr />
+        </div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Code" class="ps-0"></label>
+            <input asp-for="Code" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="Code" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="Name" class="ps-0"></label>
+            <input asp-for="Name" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="BankingCommissionPercentage" class="ps-0"></label>
+            <input asp-for="BankingCommissionPercentage" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="IsCompany" class="ps-0"></label>
+            <input asp-for="IsCompany" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="IsCompany" class="text-danger"></span>
+        </div>
+        <div class="row mb-1 p-1">
+            <label asp-for="OrderPriority" class="ps-0"></label>
+            <input asp-for="OrderPriority" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="OrderPriority" class="text-danger"></span>
+        </div>
+
+        <div class="row mb-1 p-1">
+            <label asp-for="BankAccountExcludeUId" class="ps-0"></label>
+            <input asp-for="BankAccountExcludeUId" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
+        </div>
+
+        <div class="row mb-1 p-1">
+            <label asp-for="LogoBank" class="ps-0"></label>
+            <input asp-for="LogoBank" type="text" class="form-control px-2 py-1" />
+            <span asp-validation-for="LogoBank" class="text-danger"></span>
+        </div>
+        <div class="row p-1">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Update</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-controller="Bank" asp-action="Index" class="btn btn-outline-secondary border form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
