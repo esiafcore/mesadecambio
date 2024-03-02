@@ -115,10 +115,6 @@ public class BankController : Controller
             return NotFound();
         }
 
-        //Setear valor por defecto
-        //var obj = _db.Banks
-        //    .FirstOrDefault(x => x.Id == id);
-
         var obj = _db.Banks
             .Find(id);
 
