@@ -89,6 +89,13 @@ public class BankController : Controller
     [HttpPost]
     public IActionResult Edit(Bank obj)
     {
+        //Validar que codigo no está repetido
+        var objExists = _db.Banks
+            .FirstOrDefault(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower());
+        if ((objExists != null) && (objExists.Id != obj.Id))
+        {
+            ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+        }
         //Datos son validos
         if (ModelState.IsValid)
         {
