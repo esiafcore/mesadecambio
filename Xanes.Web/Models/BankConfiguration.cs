@@ -26,7 +26,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 Code = "BAC",
                 Name = "Banco de America Central",
                 BankingCommissionPercentage = 0,
-                BankAccountExcludeUId = new Guid("234F2AD8-2A98-E911-B070-4CCC6A8AD00B"),
+                BankAccountExcludeUId = new Guid("9f8a706a-f0c4-4bb0-9159-d9f0af666152"),
                 IsCompany = false,
                 OrderPriority = 0,
                 LogoBank = "/Content/images/Bank/BacLogo.png"
@@ -39,7 +39,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 Code = "FICOHSA",
                 Name = "FICOHSA",
                 BankingCommissionPercentage = 0,
-                BankAccountExcludeUId = new Guid("530E22A8-2C98-E911-B070-4CCC6A8AD00B"),
+                BankAccountExcludeUId = new Guid("bbcf016d-4cdd-43b7-99b0-bea2375ce2ce"),
                 IsCompany = false,
                 OrderPriority = 0,
                 LogoBank = "/Content/images/Bank/FicohsaLogo.png"
