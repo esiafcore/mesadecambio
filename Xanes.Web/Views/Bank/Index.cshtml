@@ -1,10 +1,5 @@
 ﻿@model List<Bank>
-
-@if(TempData["success"] != null)
-{
-    <h2 class="text-success">@TempData["success"]</h2>
-}
-
+<partial name="_Notification" />
 <div class="container">
     <div class="row align-items-center pb-3 px-3 mt-2">
         <div class="col-6">
