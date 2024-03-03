@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xanes.Web", "Xanes.Web\Xanes.Web.csproj", "{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Web", "Xanes.Web\Xanes.Web.csproj", "{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xanes.Pages", "Xanes.Pages\Xanes.Pages.csproj", "{2C93CBB9-EF1F-4737-9753-40DB875145AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
