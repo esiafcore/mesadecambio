@@ -5,6 +5,7 @@ using Xanes.Pages.Models;
 
 namespace Xanes.Pages.Pages.Banks
 {
+    [BindProperties]
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _db;
@@ -27,6 +28,13 @@ namespace Xanes.Pages.Pages.Banks
                 BankingCommissionPercentage = 0,
                 CompanyId = _companyId
             };
+        }
+
+        public IActionResult OnPost()
+        {
+            _db.Banks.Add(Bank);
+            _db.SaveChanges();
+            return RedirectToPage("Index");
         }
     }
 }
