@@ -9,7 +9,7 @@
             </h3>
         </div>
         <div class="col-6 text-end">
-            <a asp-page="banks/create" class="btn btn-primary">
+            <a asp-page="/banks/create" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Create New Bank
             </a>
         </div>
@@ -37,10 +37,10 @@
                 <td>@itm.OrderPriority</td>
                 <td>
                     <div class="btn-group" role="group">
-                        <a asp-page="banks/edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
+                        <a asp-page="/banks/edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
                             <i class="bi bi-pencil-square"></i> Edit
                         </a>
-                        <a asp-page="banks/delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
+                        <a asp-page="/banks/delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
                             <i class="bi bi-trash-fill"></i> Delete
                         </a>
                     </div>
