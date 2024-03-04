@@ -36,6 +36,7 @@ public class DeleteModel : PageModel
         }
         _db.Banks.Remove(obj);
         _db.SaveChanges();
+        TempData["success"] = "Bank deleted successfully";
         return RedirectToPage("Index");
     }
 

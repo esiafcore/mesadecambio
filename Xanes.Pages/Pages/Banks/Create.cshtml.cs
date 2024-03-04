@@ -34,6 +34,7 @@ public class CreateModel : PageModel
     {
         _db.Banks.Add(Bank);
         _db.SaveChanges();
+        TempData["success"] = "Bank created successfully";
         return RedirectToPage("Index");
     }
 }

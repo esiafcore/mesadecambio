@@ -35,6 +35,7 @@ public class EditModel : PageModel
         {
             _db.Banks.Update(Bank);
             _db.SaveChanges();
+            TempData["success"] = "Bank updated successfully";
             return RedirectToPage("Index");
         }
         return Page();
