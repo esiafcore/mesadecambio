@@ -6,34 +6,37 @@ using Xanes.Pages.Models;
 namespace Xanes.Pages.Pages.Banks;
 
 [BindProperties]
-public class CreateModel : PageModel
+public class DeleteModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
     public Bank Bank { get; set; }
-    public CreateModel(ApplicationDbContext db, IConfiguration configuration)
+    public DeleteModel(ApplicationDbContext db, IConfiguration configuration)
     {
         _db = db;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
-
-    public void OnGet()
+    public void OnGet(int? id)
     {
-        //Setear valor por defecto
-        Bank = new Bank()
+        Bank = new Bank();
+        if ((id != null) && (id != 0))
         {
-            OrderPriority = 1,
-            BankingCommissionPercentage = 0,
-            CompanyId = _companyId
-        };
+            Bank = _db.Banks.Find(id);
+        }
     }
 
     public IActionResult OnPost()
     {
-        _db.Banks.Add(Bank);
+        Bank obj = _db.Banks.Find(Bank.Id);
+        if (obj == null)
+        {
+            return NotFound();
+        }
+        _db.Banks.Remove(obj);
         _db.SaveChanges();
         return RedirectToPage("Index");
     }
+
 }
