@@ -1,4 +1,4 @@
-﻿namespace Xanes.Web.Abstractions;
+﻿namespace Xanes.Models.Abstractions;
 
 public abstract class Entity
 {

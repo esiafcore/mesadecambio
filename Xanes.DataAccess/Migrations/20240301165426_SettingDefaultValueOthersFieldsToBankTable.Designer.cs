@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.Web.Migrations
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301163841_ChangeStringLengthForMaxLengthToBankTable")]
-    partial class ChangeStringLengthForMaxLengthToBankTable
+    [Migration("20240301165426_SettingDefaultValueOthersFieldsToBankTable")]
+    partial class SettingDefaultValueOthersFieldsToBankTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,8 +39,10 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("bankaccountexcludeuid");
 
                     b.Property<decimal>("BankingCommissionPercentage")
+                        .ValueGeneratedOnAdd()
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m)
                         .HasColumnName("bankingcommissionpercentage");
 
                     b.Property<string>("Code")
@@ -56,7 +58,9 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("companyid");
 
                     b.Property<bool>("IsCompany")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
+                        .HasDefaultValue(false)
                         .HasColumnName("iscompany");
 
                     b.Property<string>("LogoBank")
@@ -71,7 +75,9 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("name");
 
                     b.Property<int>("OrderPriority")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasDefaultValue(1)
                         .HasColumnName("orderpriority");
 
                     b.HasKey("Id")

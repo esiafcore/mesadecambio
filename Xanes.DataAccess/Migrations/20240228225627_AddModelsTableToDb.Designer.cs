@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.Web.Migrations
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240229015949_SeedBankTable")]
-    partial class SeedBankTable
+    [Migration("20240228225627_AddModelsTableToDb")]
+    partial class AddModelsTableToDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,9 +50,7 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("comisionbancariaporcentaje");
 
                     b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<bool>("IsCompany")
@@ -81,87 +79,6 @@ namespace Xanes.Web.Migrations
                         .HasDatabaseName("ix_banks_companyid_code");
 
                     b.ToTable("banks", "bco");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BankAccountExcludeUId = new Guid("234f2ad8-2a98-e911-b070-4ccc6a8ad00b"),
-                            Code = "BAC",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/BacLogo.png",
-                            Name = "Banco de America Central",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 5,
-                            BankAccountExcludeUId = new Guid("530e22a8-2c98-e911-b070-4ccc6a8ad00b"),
-                            Code = "FICOHSA",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/FicohsaLogo.png",
-                            Name = "FICOHSA",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "BDF",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/BdfLogo.png",
-                            Name = "Banco de Finanza",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Code = "LAFISE",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/LafiseLogo.png",
-                            Name = "Bancentro",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Code = "ATLANT",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/AtlantidaLogo.png",
-                            Name = "ATLANTIDA",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Code = "BANPRO",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/BanproLogo.png",
-                            Name = "BANPRO",
-                            OrderPriority = 0
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Code = "AVANZ",
-                            ComisionBancariaPorcentaje = 0m,
-                            CompanyId = 1,
-                            IsCompany = false,
-                            LogoBank = "/Content/images/Bank/AvanzLogo.png",
-                            Name = "AVANZ",
-                            OrderPriority = 0
-                        });
                 });
 
             modelBuilder.Entity("Xanes.Web.Models.Currency", b =>
@@ -192,9 +109,7 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("codeiso");
 
                     b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")
@@ -263,9 +178,7 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("code");
 
                     b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")
@@ -308,9 +221,7 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("code");
 
                     b.Property<int>("CompanyId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")

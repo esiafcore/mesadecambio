@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

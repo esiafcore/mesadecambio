@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Xanes.Web.Models;
+using Xanes.DataAccess.Configuration;
+using Xanes.Models;
 
-namespace Xanes.Web.Data;
+namespace Xanes.DataAccess.Data;
 
 public class ApplicationDbContext: DbContext
 {

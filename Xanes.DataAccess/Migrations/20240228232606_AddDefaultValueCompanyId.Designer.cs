@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.Web.Migrations
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240228232606_AddDefaultValueCompanyId")]

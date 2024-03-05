@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Xanes.Web.Data;
-using Xanes.Web.Models;
+using Xanes.DataAccess.Data;
+using Xanes.Models;
 
 namespace Xanes.Web.Controllers;
 

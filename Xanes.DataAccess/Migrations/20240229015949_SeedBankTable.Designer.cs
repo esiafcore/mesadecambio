@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.Web.Migrations
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301165426_SettingDefaultValueOthersFieldsToBankTable")]
-    partial class SettingDefaultValueOthersFieldsToBankTable
+    [Migration("20240229015949_SeedBankTable")]
+    partial class SeedBankTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,18 +38,16 @@ namespace Xanes.Web.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("bankaccountexcludeuid");
 
-                    b.Property<decimal>("BankingCommissionPercentage")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m)
-                        .HasColumnName("bankingcommissionpercentage");
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)")
                         .HasColumnName("code");
+
+                    b.Property<decimal>("ComisionBancariaPorcentaje")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("comisionbancariaporcentaje");
 
                     b.Property<int>("CompanyId")
                         .ValueGeneratedOnAdd()
@@ -58,14 +56,11 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("companyid");
 
                     b.Property<bool>("IsCompany")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
-                        .HasDefaultValue(false)
                         .HasColumnName("iscompany");
 
                     b.Property<string>("LogoBank")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("logobank");
 
                     b.Property<string>("Name")
@@ -75,9 +70,7 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("name");
 
                     b.Property<int>("OrderPriority")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasDefaultValue(1)
                         .HasColumnName("orderpriority");
 
                     b.HasKey("Id")
@@ -94,8 +87,8 @@ namespace Xanes.Web.Migrations
                         {
                             Id = 1,
                             BankAccountExcludeUId = new Guid("234f2ad8-2a98-e911-b070-4ccc6a8ad00b"),
-                            BankingCommissionPercentage = 0m,
                             Code = "BAC",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/BacLogo.png",
@@ -106,8 +99,8 @@ namespace Xanes.Web.Migrations
                         {
                             Id = 5,
                             BankAccountExcludeUId = new Guid("530e22a8-2c98-e911-b070-4ccc6a8ad00b"),
-                            BankingCommissionPercentage = 0m,
                             Code = "FICOHSA",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/FicohsaLogo.png",
@@ -117,8 +110,8 @@ namespace Xanes.Web.Migrations
                         new
                         {
                             Id = 2,
-                            BankingCommissionPercentage = 0m,
                             Code = "BDF",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/BdfLogo.png",
@@ -128,8 +121,8 @@ namespace Xanes.Web.Migrations
                         new
                         {
                             Id = 3,
-                            BankingCommissionPercentage = 0m,
                             Code = "LAFISE",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/LafiseLogo.png",
@@ -139,8 +132,8 @@ namespace Xanes.Web.Migrations
                         new
                         {
                             Id = 4,
-                            BankingCommissionPercentage = 0m,
                             Code = "ATLANT",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/AtlantidaLogo.png",
@@ -150,8 +143,8 @@ namespace Xanes.Web.Migrations
                         new
                         {
                             Id = 6,
-                            BankingCommissionPercentage = 0m,
                             Code = "BANPRO",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/BanproLogo.png",
@@ -161,8 +154,8 @@ namespace Xanes.Web.Migrations
                         new
                         {
                             Id = 7,
-                            BankingCommissionPercentage = 0m,
                             Code = "AVANZ",
+                            ComisionBancariaPorcentaje = 0m,
                             CompanyId = 1,
                             IsCompany = false,
                             LogoBank = "/Content/images/Bank/AvanzLogo.png",

@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Xanes.Models;
 
-namespace Xanes.Web.Models;
+namespace Xanes.DataAccess.Configuration;
 
 public class BankConfiguration : IEntityTypeConfiguration<Bank>
 {
@@ -13,6 +14,8 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
         builder.Property(x => x.OrderPriority).ValueGeneratedOnAdd().HasDefaultValue(1);
         builder.Property(x => x.BankingCommissionPercentage).ValueGeneratedOnAdd().HasDefaultValue(0);
 
+        builder.Property(b => b.BankingCommissionPercentage)
+            .HasPrecision(18, 2);
 
         builder.HasIndex(x => new { x.CompanyId, x.Code }
                 , "banks_idx_2010")

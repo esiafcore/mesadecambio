@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Xanes.Web.Abstractions;
+using Xanes.Models.Abstractions;
 
-namespace Xanes.Web.Models;
+
+namespace Xanes.Models;
 
 [Table("currencies", Schema = "cnf")]
 public class Currency : Entity, ICloneable

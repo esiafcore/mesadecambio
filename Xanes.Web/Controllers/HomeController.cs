@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Xanes.Web.Models;
+using Xanes.Models;
 
 namespace Xanes.Web.Controllers;
 public class HomeController : Controller

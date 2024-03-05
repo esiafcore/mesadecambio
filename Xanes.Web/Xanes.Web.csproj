@@ -18,4 +18,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Xanes.DataAccess\Xanes.DataAccess.csproj" />
+    <ProjectReference Include="..\Xanes.Models\Xanes.Models.csproj" />
+    <ProjectReference Include="..\Xanes.Utility\Xanes.Utility.csproj" />
+  </ItemGroup>
+
 </Project>

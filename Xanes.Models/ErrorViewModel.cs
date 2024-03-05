@@ -1,4 +1,4 @@
-namespace Xanes.Web.Models;
+namespace Xanes.Models;
 
 public class ErrorViewModel
 {

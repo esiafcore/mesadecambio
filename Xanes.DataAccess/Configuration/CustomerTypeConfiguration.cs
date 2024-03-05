@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Xanes.Models;
 
-namespace Xanes.Web.Models;
-
+namespace Xanes.DataAccess.Configuration;
 public class CustomerTypeConfiguration : IEntityTypeConfiguration<CustomerType>
 {
     public void Configure(EntityTypeBuilder<CustomerType> builder)

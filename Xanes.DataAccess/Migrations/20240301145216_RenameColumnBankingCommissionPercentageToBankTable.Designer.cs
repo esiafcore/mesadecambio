@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Xanes.Web.Data;
+using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.Web.Migrations
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240228225627_AddModelsTableToDb")]
-    partial class AddModelsTableToDb
+    [Migration("20240301145216_RenameColumnBankingCommissionPercentageToBankTable")]
+    partial class RenameColumnBankingCommissionPercentageToBankTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,19 +38,21 @@ namespace Xanes.Web.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("bankaccountexcludeuid");
 
+                    b.Property<decimal>("BankingCommissionPercentage")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("bankingcommissionpercentage");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)")
                         .HasColumnName("code");
 
-                    b.Property<decimal>("ComisionBancariaPorcentaje")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("comisionbancariaporcentaje");
-
                     b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<bool>("IsCompany")
@@ -79,6 +81,87 @@ namespace Xanes.Web.Migrations
                         .HasDatabaseName("ix_banks_companyid_code");
 
                     b.ToTable("banks", "bco");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BankAccountExcludeUId = new Guid("234f2ad8-2a98-e911-b070-4ccc6a8ad00b"),
+                            BankingCommissionPercentage = 0m,
+                            Code = "BAC",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/BacLogo.png",
+                            Name = "Banco de America Central",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BankAccountExcludeUId = new Guid("530e22a8-2c98-e911-b070-4ccc6a8ad00b"),
+                            BankingCommissionPercentage = 0m,
+                            Code = "FICOHSA",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/FicohsaLogo.png",
+                            Name = "FICOHSA",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BankingCommissionPercentage = 0m,
+                            Code = "BDF",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/BdfLogo.png",
+                            Name = "Banco de Finanza",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BankingCommissionPercentage = 0m,
+                            Code = "LAFISE",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/LafiseLogo.png",
+                            Name = "Bancentro",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BankingCommissionPercentage = 0m,
+                            Code = "ATLANT",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/AtlantidaLogo.png",
+                            Name = "ATLANTIDA",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BankingCommissionPercentage = 0m,
+                            Code = "BANPRO",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/BanproLogo.png",
+                            Name = "BANPRO",
+                            OrderPriority = 0
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BankingCommissionPercentage = 0m,
+                            Code = "AVANZ",
+                            CompanyId = 1,
+                            IsCompany = false,
+                            LogoBank = "/Content/images/Bank/AvanzLogo.png",
+                            Name = "AVANZ",
+                            OrderPriority = 0
+                        });
                 });
 
             modelBuilder.Entity("Xanes.Web.Models.Currency", b =>
@@ -109,7 +192,9 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("codeiso");
 
                     b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")
@@ -178,7 +263,9 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("code");
 
                     b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")
@@ -221,7 +308,9 @@ namespace Xanes.Web.Migrations
                         .HasColumnName("code");
 
                     b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasDefaultValue(1)
                         .HasColumnName("companyid");
 
                     b.Property<string>("Name")

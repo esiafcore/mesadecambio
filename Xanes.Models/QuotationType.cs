@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Xanes.Web.Abstractions;
+using Xanes.Models.Abstractions;
 
-namespace Xanes.Web.Models;
 
-[Table("customerstypes", Schema = "cxc")]
-public class CustomerType : Entity, ICloneable
+namespace Xanes.Models;
+
+[Table("quotationstypes", Schema = "fac")]
+public class QuotationType : Entity, ICloneable
 {
     [Required()]
     public int Numeral { get; set; }
@@ -18,15 +19,19 @@ public class CustomerType : Entity, ICloneable
     [Required()]
     public string Name { get; set; } = null!;
 
+    [Required()]
+    public short OrderSequence { get; set; }
+
     public object Clone()
     {
-        var obj = new CustomerType
+        var obj = new QuotationType
         {
             Id = Id,
             CompanyId = CompanyId,
             Numeral = Numeral,
             Code = Code,
-            Name = Name
+            Name = Name,
+            OrderSequence = OrderSequence
         };
         return obj;
     }
