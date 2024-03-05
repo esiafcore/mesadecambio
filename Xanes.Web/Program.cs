@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Xanes.DataAccess.Data;
+using Xanes.DataAccess.Repository;
+using Xanes.DataAccess.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseLowerCaseNamingConvention();
+    //options.UseLowerCaseNamingConvention();
 });
+
+builder.Services.AddScoped<IBankRepository,BankRepository>();
 
 
 var app = builder.Build();

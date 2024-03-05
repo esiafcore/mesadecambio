@@ -10,10 +10,14 @@ public class ApplicationDbContext: DbContext
     {
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.UseLowerCaseNamingConvention();
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfiguration<Bank>(new BankConfiguration());
         modelBuilder.ApplyConfiguration<Currency>(new CurrencyConfiguration());
         modelBuilder.ApplyConfiguration<QuotationType>(new QuotationTypeConfiguration());

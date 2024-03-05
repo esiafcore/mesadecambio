@@ -12,7 +12,7 @@ using Xanes.DataAccess.Data;
 namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240305031046_AddModelsToDbAndSeedTable")]
+    [Migration("20240305042826_AddModelsToDbAndSeedTable")]
     partial class AddModelsToDbAndSeedTable
     {
         /// <inheritdoc />

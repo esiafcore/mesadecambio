@@ -15,17 +15,22 @@ public class Repository<T> : IRepository<T> where T : class
         _db = db;
         this.dbSet = _db.Set<T>();
     }
+
+    public T Get(Expression<Func<T, bool>> filter, bool isTracking = true)
+    {
+        IQueryable<T> query = dbSet;
+        if (!isTracking)
+            query = query.AsNoTracking();
+
+        query = query.Where(filter);
+        return query.FirstOrDefault();
+    }
+
     public void Add(T entity)
     {
         dbSet.Add(entity);
     }
 
-    public T Get(Expression<Func<T, bool>> filter)
-    {
-        IQueryable<T> query = dbSet;
-        query = query.Where(filter);
-        return query.FirstOrDefault();
-    }
 
     public IEnumerable<T> GetAll()
     {
@@ -35,7 +40,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public void Remove(T entity)
     {
-        dbSet.Add(entity);
+        dbSet.Remove(entity);
     }
 
     public void RemoveRange(IEnumerable<T> entities)

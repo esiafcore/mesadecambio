@@ -1,26 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xanes.DataAccess.Data;
+using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 
 namespace Xanes.Web.Controllers;
 
 public class BankController : Controller
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IBankRepository _repo;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
 
-    public BankController(ApplicationDbContext db,IConfiguration configuration)
+    public BankController(IBankRepository repo,IConfiguration configuration)
     {
-        _db = db;
+        _repo = repo;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
     // GET
     public IActionResult Index()
     {
-        var objList = _db.Banks.ToList();
+        var objList = _repo.GetAll().ToList();
         return View(objList);
     }
 
@@ -57,8 +58,8 @@ public class BankController : Controller
 
         //Datos son validos
         if (ModelState.IsValid) {
-            _db.Banks.Add(obj);
-            _db.SaveChanges();
+            _repo.Add(obj);
+            _repo.Save();
             TempData["success"] = "Bank created successfully";
             return RedirectToAction("Index", "Bank");
         }
@@ -73,12 +74,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        //Setear valor por defecto
-        //var obj = _db.Banks
-        //    .FirstOrDefault(x => x.Id == id);
-
-        var obj = _db.Banks
-            .Find(id);
+        var obj = _repo.Get(x => x.Id == id,isTracking:false);
 
         if (obj == null)
         {
@@ -92,9 +88,9 @@ public class BankController : Controller
     public IActionResult Edit(Bank obj)
     {
         //Validar que codigo no está repetido
-        var objExists = _db.Banks
-            .AsNoTracking()
-            .FirstOrDefault(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower());
+        var objExists = _repo
+            .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(),isTracking: false);
+
         if ((objExists != null) && (objExists.Id != obj.Id))
         {
             ModelState.AddModelError("", $"Código {obj.Code} ya existe");
@@ -102,8 +98,8 @@ public class BankController : Controller
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _db.Banks.Update(obj);
-            _db.SaveChanges();
+            _repo.Update(obj);
+            _repo.Save();
             TempData["success"] = "Bank updated successfully";
             return RedirectToAction("Index", "Bank");
         }
@@ -118,8 +114,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _db.Banks
-            .Find(id);
+        var obj = _repo.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
@@ -132,14 +127,14 @@ public class BankController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        //Validar que codigo no está repetido
-        bool isrowExist = _db.Banks.Any(x => x.Id == id);
+        var obj = _repo.Get(x => x.Id == id, isTracking: false);
 
-        if (!isrowExist)
+        if (obj == null)
         {
             return NotFound();
         }
-        _db.Banks.Where(x => x.Id == id).ExecuteDelete();
+        _repo.Remove(obj);
+        _repo.Save();
         TempData["success"] = "Bank deleted successfully";
         return RedirectToAction("Index", "Bank");
     }
