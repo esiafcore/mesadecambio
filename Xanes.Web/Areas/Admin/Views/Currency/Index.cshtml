@@ -1,0 +1,52 @@
+﻿@model List<Currency>
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row align-items-center">
+            <div class="col-8 text-center">
+                <h3 class="text-white py-1">Monedas</h3>
+            </div>
+            <div class="col-4 text-end">
+                <a asp-controller="Currency" asp-action="Create" class="btn btn-info">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body px-3 py-1">
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Numero</th>
+                    <th>Código ISO</th>
+                    <th>Símbolo</th>
+                    <th>Nombre</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var itm in Model.OrderBy(x => x.Numeral).ThenBy(x => x.CodeIso))
+                {
+                    <tr>
+                        <td>@itm.Numeral</td>
+                        <td>@itm.CodeIso</td>
+                        <td>@itm.Abbreviation</td>
+                        <td>@itm.Name</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-controller="Currency" asp-action="Edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-controller="Currency" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
+                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

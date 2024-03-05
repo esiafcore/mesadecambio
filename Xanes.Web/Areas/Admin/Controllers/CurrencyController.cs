@@ -3,34 +3,32 @@ using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
-
 [Area("Admin")]
-public class BankController : Controller
+public class CurrencyController : Controller
 {
     private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
 
-    public BankController(IUnitOfWork uow, IConfiguration configuration)
+    public CurrencyController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+
     }
-    // GET
     public IActionResult Index()
     {
-        var objList = _uow.Bank.GetAll().ToList();
+        var objList = _uow.Currency.GetAll().ToList();
         return View(objList);
     }
 
     public IActionResult Create()
     {
         //Setear valor por defecto
-        var obj = new Bank()
+        var obj = new Currency()
         {
-            OrderPriority = 1,
-            BankingCommissionPercentage = 0,
+            Numeral = 0,
             CompanyId = _companyId
         };
 
@@ -38,7 +36,7 @@ public class BankController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(Bank obj)
+    public IActionResult Create(Currency obj)
     {
         if (obj.CompanyId != _companyId)
         {
@@ -55,13 +53,18 @@ public class BankController : Controller
             ModelState.AddModelError("code", "Código no puede ser .");
         }
 
+        if (obj.CodeIso.Trim().ToLower() == ".")
+        {
+            ModelState.AddModelError("code", "Código no puede ser .");
+        }
+
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _uow.Bank.Add(obj);
+            _uow.Currency.Add(obj);
             _uow.Save();
-            TempData["success"] = "Bank created successfully";
-            return RedirectToAction("Index", "Bank");
+            TempData["success"] = "Currency created successfully";
+            return RedirectToAction("Index", "Currency");
         }
 
         return View(obj);
@@ -74,7 +77,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Currency.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
@@ -85,23 +88,33 @@ public class BankController : Controller
     }
 
     [HttpPost]
-    public IActionResult Edit(Bank obj)
+    public IActionResult Edit(Currency obj)
     {
         //Validar que codigo no está repetido
-        var objExists = _uow.Bank
+        var objExists = _uow.Currency
             .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
 
         if (objExists != null && objExists.Id != obj.Id)
         {
             ModelState.AddModelError("", $"Código {obj.Code} ya existe");
         }
+
+        //Validar que codigo ISO no está repetido
+        objExists = _uow.Currency
+            .Get(x => x.CodeIso.Trim().ToLower() == obj.CodeIso.Trim().ToLower(), isTracking: false);
+
+        if (objExists != null && objExists.Id != obj.Id)
+        {
+            ModelState.AddModelError("", $"Código ISO {obj.CodeIso} ya existe");
+        }
+
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _uow.Bank.Update(obj);
+            _uow.Currency.Update(obj);
             _uow.Save();
-            TempData["success"] = "Bank updated successfully";
-            return RedirectToAction("Index", "Bank");
+            TempData["success"] = "Currency updated successfully";
+            return RedirectToAction("Index", "Currency");
         }
 
         return View(obj);
@@ -114,7 +127,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Currency.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
@@ -127,16 +140,15 @@ public class BankController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Currency.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
             return NotFound();
         }
-        _uow.Bank.Remove(obj);
+        _uow.Currency.Remove(obj);
         _uow.Save();
-        TempData["success"] = "Bank deleted successfully";
+        TempData["success"] = "Currency deleted successfully";
         return RedirectToAction("Index", "Bank");
     }
-
 }
