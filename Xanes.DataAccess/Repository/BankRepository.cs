@@ -18,8 +18,4 @@ public class BankRepository : Repository<Bank>, IBankRepository
         _db.Banks.Update(obj);
     }
 
-    public void Save()
-    {
-        _db.SaveChanges();
-    }
 }
