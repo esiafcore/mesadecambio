@@ -12,7 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
     //options.UseLowerCaseNamingConvention();
 });
 
-builder.Services.AddScoped<IBankRepository,BankRepository>();
+builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 
 
 var app = builder.Build();

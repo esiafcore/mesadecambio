@@ -8,20 +8,20 @@ namespace Xanes.Web.Controllers;
 
 public class BankController : Controller
 {
-    private readonly IBankRepository _repo;
+    private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
 
-    public BankController(IBankRepository repo,IConfiguration configuration)
+    public BankController(IUnitOfWork uow, IConfiguration configuration)
     {
-        _repo = repo;
+        _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
     // GET
     public IActionResult Index()
     {
-        var objList = _repo.GetAll().ToList();
+        var objList = _uow.Bank.GetAll().ToList();
         return View(objList);
     }
 
@@ -58,8 +58,8 @@ public class BankController : Controller
 
         //Datos son validos
         if (ModelState.IsValid) {
-            _repo.Add(obj);
-            _repo.Save();
+            _uow.Bank.Add(obj);
+            _uow.Save();
             TempData["success"] = "Bank created successfully";
             return RedirectToAction("Index", "Bank");
         }
@@ -74,7 +74,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _repo.Get(x => x.Id == id,isTracking:false);
+        var obj = _uow.Bank.Get(x => x.Id == id,isTracking:false);
 
         if (obj == null)
         {
@@ -88,7 +88,7 @@ public class BankController : Controller
     public IActionResult Edit(Bank obj)
     {
         //Validar que codigo no está repetido
-        var objExists = _repo
+        var objExists = _uow.Bank
             .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(),isTracking: false);
 
         if ((objExists != null) && (objExists.Id != obj.Id))
@@ -98,8 +98,8 @@ public class BankController : Controller
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _repo.Update(obj);
-            _repo.Save();
+            _uow.Bank.Update(obj);
+            _uow.Save();
             TempData["success"] = "Bank updated successfully";
             return RedirectToAction("Index", "Bank");
         }
@@ -114,7 +114,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _repo.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
@@ -127,14 +127,14 @@ public class BankController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _repo.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
             return NotFound();
         }
-        _repo.Remove(obj);
-        _repo.Save();
+        _uow.Bank.Remove(obj);
+        _uow.Save();
         TempData["success"] = "Bank deleted successfully";
         return RedirectToAction("Index", "Bank");
     }
