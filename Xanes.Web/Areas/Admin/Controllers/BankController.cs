@@ -4,8 +4,9 @@ using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 
-namespace Xanes.Web.Controllers;
+namespace Xanes.Web.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class BankController : Controller
 {
     private readonly IUnitOfWork _uow;
@@ -57,7 +58,8 @@ public class BankController : Controller
         }
 
         //Datos son validos
-        if (ModelState.IsValid) {
+        if (ModelState.IsValid)
+        {
             _uow.Bank.Add(obj);
             _uow.Save();
             TempData["success"] = "Bank created successfully";
@@ -69,12 +71,12 @@ public class BankController : Controller
 
     public IActionResult Edit(int? id)
     {
-        if ((id == null) || (id == 0))
+        if (id == null || id == 0)
         {
             return NotFound();
         }
 
-        var obj = _uow.Bank.Get(x => x.Id == id,isTracking:false);
+        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
 
         if (obj == null)
         {
@@ -89,9 +91,9 @@ public class BankController : Controller
     {
         //Validar que codigo no está repetido
         var objExists = _uow.Bank
-            .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(),isTracking: false);
+            .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
 
-        if ((objExists != null) && (objExists.Id != obj.Id))
+        if (objExists != null && objExists.Id != obj.Id)
         {
             ModelState.AddModelError("", $"Código {obj.Code} ya existe");
         }
@@ -109,7 +111,7 @@ public class BankController : Controller
 
     public IActionResult Delete(int? id)
     {
-        if ((id == null) || (id == 0))
+        if (id == null || id == 0)
         {
             return NotFound();
         }

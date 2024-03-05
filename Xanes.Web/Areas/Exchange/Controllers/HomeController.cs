@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Xanes.Models;
 
-namespace Xanes.Web.Controllers;
+namespace Xanes.Web.Areas.Exchange.Controllers;
+
+[Area("Exchange")]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
