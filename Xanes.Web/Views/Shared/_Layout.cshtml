@@ -25,10 +25,18 @@
                             <a class="nav-link" asp-area="Exchange" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bank</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" asp-area="Exchange" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bank</a>
+                                <a class="dropdown-item" href="#">Monedas</a>
+                                <a class="dropdown-item" href="#">Tipos de Clientes</a>
+                                <a class="dropdown-item" href="#">Tipos de Transacción</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Tipos de Cambios</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
