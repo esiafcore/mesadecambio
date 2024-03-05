@@ -1,54 +1,63 @@
 ﻿@model Bank
 
-<form method="post">
-    <input hidden asp-for="Id" />
-    <input hidden asp-for="CompanyId" />
-
-    <div class="border pb-3 px-3 mt-2">
-        <div class="row pb-1">
-            <h3 class="text-primary">Delete Bank</h3>
-            <hr />
-        </div>
-        <div class="row mb-1 p-1">
-            <label asp-for="Code" class="ps-0"></label>
-            <input asp-for="Code" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-        <div class="row mb-1 p-1">
-            <label asp-for="Name" class="ps-0"></label>
-            <input asp-for="Name" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-        <div class="row mb-1 p-1">
-            <label asp-for="BankingCommissionPercentage" class="ps-0"></label>
-            <input asp-for="BankingCommissionPercentage" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-        <div class="row mb-1 p-1">
-            <label asp-for="IsCompany" class="ps-0"></label>
-            <input asp-for="IsCompany" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-        <div class="row mb-1 p-1">
-            <label asp-for="OrderPriority" class="ps-0"></label>
-            <input asp-for="OrderPriority" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-
-        <div class="row mb-1 p-1">
-            <label asp-for="BankAccountExcludeUId" class="ps-0"></label>
-            <input asp-for="BankAccountExcludeUId" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-
-        <div class="row mb-1 p-1">
-            <label asp-for="LogoBank" class="ps-0"></label>
-            <input asp-for="LogoBank" disabled type="text" class="form-control px-2 py-1" />
-        </div>
-        <div class="row p-1">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-primary form-control">Delete</button>
-            </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
-                    Back to List
-                </a>
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="text-white py-1">Eliminar Banco</h3>
             </div>
         </div>
     </div>
-</form>
+    <div class="card-body px-3 py-1">
+        <form method="post" class="row">
+            <input hidden asp-for="Id" />
+            <input hidden asp-for="CompanyId" />
+
+            <div class="p-3">
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="Code" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="Code" class="ms-2"></label>
+                </div>
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="Name" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="Name" class="ms-2"></label>
+                </div>
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="BankingCommissionPercentage" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="BankingCommissionPercentage" class="ms-2"></label>
+                </div>
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="IsCompany" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="IsCompany" class="ms-2"></label>
+                </div>
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="OrderPriority" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="OrderPriority" class="ms-2"></label>
+                </div>
+
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="BankAccountExcludeUId" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="BankAccountExcludeUId" class="ms-2"></label>
+                </div>
+
+                <div class="form-floating pb-1 pt-2 col-12">
+                    <input asp-for="LogoBank" disabled type="text" class="form-control border-0 shadow" />
+                    <label asp-for="LogoBank" class="ms-2"></label>
+                </div>
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <button type="submit" class="btn btn-primary form-control">Eliminar</button>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
+                            Regresar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
 

@@ -1,20 +1,31 @@
 ﻿@model List<Bank>
-<div class="container">
-    <div class="row align-items-center pb-3 px-3 mt-2">
-        <div class="col-6">
-            <h3 class="text-primary">
-                Bank List
-            </h3>
-        </div>
-        <div class="col-6 text-end">
-            <a asp-controller="Bank" asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Create New Bank
-            </a>
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row align-items-center">
+            <div class="col-8 text-center">
+                <h3 class="text-white py-1">Bancos</h3>
+            </div>
+            <div class="col-4 text-end">
+                <a asp-controller="Bank" asp-action="Create" class="btn btn-info">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
+            </div>
         </div>
     </div>
-
-    <table class="table table-bordered table-striped">
-        <thead>
+    <div class="card-body px-3 py-1">
+@*         <div class="row align-items-center pb-3 px-3 mt-2">
+            <div class="col-6">
+            </div>
+            <div class="col-6 text-end">
+                <a asp-controller="Bank" asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Create New Bank
+                </a>
+            </div>
+        </div>
+ *@
+        <table class="table table-bordered table-striped">
+            <thead>
             <tr>
                 <th>Código</th>
                 <th>Nombre</th>
@@ -23,8 +34,8 @@
                 <th>Orden</th>
                 <th></th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach (var itm in Model.OrderBy(x => x.OrderPriority).ThenBy(x => x.Code))
             {
                 <tr>
@@ -36,15 +47,17 @@
                     <td>
                         <div class="btn-group" role="group">
                             <a asp-controller="Bank" asp-action="Edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
-                                <i class="bi bi-pencil-square"></i> Edit
+                                <i class="bi bi-pencil-square"></i> Editar
                             </a>
                             <a asp-controller="Bank" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
-                                <i class="bi bi-trash-fill"></i> Delete
+                                <i class="bi bi-trash-fill"></i> Eliminar
                             </a>
                         </div>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
+
