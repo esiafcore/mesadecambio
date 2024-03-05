@@ -41,9 +41,9 @@
                 <tr>
                     <td>@itm.Code</td>
                     <td>@itm.Name</td>
-                    <td>@itm.BankingCommissionPercentage</td>
-                    <td>@itm.IsCompany</td>
-                    <td>@itm.OrderPriority</td>
+                    <td class="text-end">@itm.BankingCommissionPercentage</td>
+                    <td class="text-center">@itm.IsCompany</td>
+                    <td class="text-end">@itm.OrderPriority</td>
                     <td>
                         <div class="btn-group" role="group">
                             <a asp-controller="Bank" asp-action="Edit" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">

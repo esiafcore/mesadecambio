@@ -12,8 +12,8 @@ using Xanes.DataAccess.Data;
 namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240301165426_SettingDefaultValueOthersFieldsToBankTable")]
-    partial class SettingDefaultValueOthersFieldsToBankTable
+    [Migration("20240305031046_AddModelsToDbAndSeedTable")]
+    partial class AddModelsToDbAndSeedTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace Xanes.DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Xanes.Web.Models.Bank", b =>
+            modelBuilder.Entity("Xanes.Models.Bank", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,7 +93,7 @@ namespace Xanes.DataAccess.Migrations
                         new
                         {
                             Id = 1,
-                            BankAccountExcludeUId = new Guid("234f2ad8-2a98-e911-b070-4ccc6a8ad00b"),
+                            BankAccountExcludeUId = new Guid("9f8a706a-f0c4-4bb0-9159-d9f0af666152"),
                             BankingCommissionPercentage = 0m,
                             Code = "BAC",
                             CompanyId = 1,
@@ -105,7 +105,7 @@ namespace Xanes.DataAccess.Migrations
                         new
                         {
                             Id = 5,
-                            BankAccountExcludeUId = new Guid("530e22a8-2c98-e911-b070-4ccc6a8ad00b"),
+                            BankAccountExcludeUId = new Guid("bbcf016d-4cdd-43b7-99b0-bea2375ce2ce"),
                             BankingCommissionPercentage = 0m,
                             Code = "FICOHSA",
                             CompanyId = 1,
@@ -171,7 +171,7 @@ namespace Xanes.DataAccess.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Xanes.Web.Models.Currency", b =>
+            modelBuilder.Entity("Xanes.Models.Currency", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -254,7 +254,7 @@ namespace Xanes.DataAccess.Migrations
                     b.ToTable("currencies", "cnf");
                 });
 
-            modelBuilder.Entity("Xanes.Web.Models.CustomerType", b =>
+            modelBuilder.Entity("Xanes.Models.CustomerType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -299,7 +299,7 @@ namespace Xanes.DataAccess.Migrations
                     b.ToTable("customerstypes", "cxc");
                 });
 
-            modelBuilder.Entity("Xanes.Web.Models.QuotationType", b =>
+            modelBuilder.Entity("Xanes.Models.QuotationType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
