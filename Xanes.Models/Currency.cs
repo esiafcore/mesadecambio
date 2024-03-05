@@ -8,29 +8,29 @@ namespace Xanes.Models;
 [Table("currencies", Schema = "cnf")]
 public class Currency : Entity, ICloneable
 {
-    [StringLength(15)]
-    [Required()]
+    [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     public string CodeIso { get; set; } = null!;
 
-    [StringLength(15)]
-    [Required()]
+    [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     public string Code { get; set; } = null!;
 
-    [StringLength(5)]
-    [Required()]
+    [MaxLength(5, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     public string Abbreviation { get; set; } = null!;
 
-    [StringLength(150)]
-    [Required()]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     public string Name { get; set; } = null!;
-    [StringLength(150)]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     public string NameSingular { get; set; } = null!;
-    [StringLength(150)]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     public string NameFor { get; set; } = null!;
-    [StringLength(150)]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     public string NameForSingular { get; set; } = null!;
 
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
     public int Numeral { get; set; }
 
     public virtual object Clone()

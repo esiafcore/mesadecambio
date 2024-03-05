@@ -7,11 +7,13 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _db;
     public IBankRepository Bank { get; private set; }
+    public ICurrencyRepository Currency { get; private set; }
 
     public UnitOfWork(ApplicationDbContext db)
     {
         _db = db;
         Bank = new BankRepository(_db);
+        Currency = new CurrencyRepository(_db);
     }
 
     public void Save()
