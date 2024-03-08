@@ -9,59 +9,65 @@
         </div>
     </div>
     <div class="card-body px-3 py-1">
-        <form method="post" class="row">
-            <input hidden asp-for="CompanyId" />
-            <div class="p-3">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="Code" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="Code" class="ms-2"></label>
-                    <span asp-validation-for="Code" class="text-danger"></span>
-                </div>
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="Name" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="Name" class="ms-2"></label>
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="BankingCommissionPercentage" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="BankingCommissionPercentage" class="ms-2"></label>
-                    <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
-                </div>
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="IsCompany" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="IsCompany" class="ms-2"></label>
-                    <span asp-validation-for="IsCompany" class="text-danger"></span>
-                </div>
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="OrderPriority" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="OrderPriority" class="ms-2"></label>
-                    <span asp-validation-for="OrderPriority" class="text-danger"></span>
-                </div>
-
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="BankAccountExcludeUId" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="BankAccountExcludeUId" class="ms-2"></label>
-                    <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
-                </div>
-
-                <div class="form-floating pb-1 pt-2 col-12">
-                    <input asp-for="LogoBank" type="text" class="form-control border-0 shadow" />
-                    <label asp-for="LogoBank" class="ms-2"></label>
-                    <span asp-validation-for="LogoBank" class="text-danger"></span>
-                </div>
-                <div class="row pt-2">
-                    <div class="col-6 col-md-3">
-                        <button type="submit" class="btn btn-primary form-control">Crear</button>
+        <div class="row pt-0">
+            <div class="col-md-12">
+                <form method="post" class="row">
+                    <input hidden asp-for="CompanyId" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="Code" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Code" class="ms-2"></label>
+                        <span asp-validation-for="Code" class="text-danger"></span>
                     </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
-                            Regresar
-                        </a>
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="Name" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Name" class="ms-2"></label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
-                </div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="BankingCommissionPercentage" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="BankingCommissionPercentage" class="ms-2"></label>
+                        <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <div class="form-check mt-3 align-items-center">
+                            <input type="checkbox" class="form-check-input" asp-for="IsCompany" />
+                            <label asp-for="IsCompany" class="ms-2">
+                                @Html.DisplayNameFor(m => m.IsCompany)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="OrderPriority" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="OrderPriority" class="ms-2"></label>
+                        <span asp-validation-for="OrderPriority" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="BankAccountExcludeUId" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="BankAccountExcludeUId" class="ms-2"></label>
+                        <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="LogoBank" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="LogoBank" class="ms-2"></label>
+                        <span asp-validation-for="LogoBank" class="text-danger"></span>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-primary form-control">Crear</button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
+                                Regresar
+                            </a>
+                        </div>
+                    </div>
+
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 

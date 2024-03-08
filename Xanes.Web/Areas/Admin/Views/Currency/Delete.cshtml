@@ -1,1 +1,83 @@
-﻿
+﻿@model Currency
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="text-white py-1">Eliminar Moneda</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body px-3 py-1">
+        <div class="row pt-0">
+            <div class="col-md-12">
+                <form method="post" class="row">
+                    <input hidden asp-for="Id" />
+                    <input hidden asp-for="CompanyId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="Numeral" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Numeral" class="ms-2"></label>
+                        <span asp-validation-for="Numeral" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="Abbreviation" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Abbreviation" class="ms-2"></label>
+                        <span asp-validation-for="Abbreviation" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="CodeIso" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="CodeIso" class="ms-2"></label>
+                        <span asp-validation-for="CodeIso" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <input asp-for="Code" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Code" class="ms-2"></label>
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="Name" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Name" class="ms-2"></label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="NameSingular" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="NameSingular" class="ms-2"></label>
+                        <span asp-validation-for="NameSingular" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="NameFor" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="NameFor" class="ms-2"></label>
+                        <span asp-validation-for="NameFor" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating pb-1 pt-2 col-md-12">
+                        <input asp-for="NameForSingular" disabled type="text" class="form-control border-0 shadow" />
+                        <label asp-for="NameForSingular" class="ms-2"></label>
+                        <span asp-validation-for="NameForSingular" class="text-danger"></span>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-primary form-control">Eliminar</button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="Currency" asp-action="Index" class="btn btn-secondary border form-control">
+                                Regresar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

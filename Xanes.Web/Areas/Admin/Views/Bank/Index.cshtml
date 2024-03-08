@@ -33,7 +33,7 @@
                     <td>@itm.Code</td>
                     <td>@itm.Name</td>
                     <td class="text-end">@itm.BankingCommissionPercentage</td>
-                    <td class="text-center">@itm.IsCompany</td>
+                        <td class="text-center">@(itm.IsCompany ? AC.Si : AC.No)</td>
                     <td class="text-end">@itm.OrderPriority</td>
                     <td>
                         <div class="btn-group" role="group">
