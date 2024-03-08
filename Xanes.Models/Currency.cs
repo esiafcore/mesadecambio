@@ -44,7 +44,6 @@ public class Currency : Entity, ICloneable
 
     public virtual object Clone()
     {
-
         var obj = new Currency
         {
             Id = Id,

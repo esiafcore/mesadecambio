@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
 
@@ -8,18 +9,22 @@ namespace Xanes.Models;
 [Table("quotationstypes", Schema = "fac")]
 public class QuotationType : Entity, ICloneable
 {
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [DisplayName(displayName: "Número")]
     public int Numeral { get; set; }
 
-    [StringLength(25)]
-    [Required()]
+    [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [DisplayName(displayName: "Código")]
     public string Code { get; set; } = null!;
 
-    [StringLength(75)]
-    [Required()]
+    [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [DisplayName(displayName: "Nombre")]
     public string Name { get; set; } = null!;
 
-    [Required()]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [DisplayName(displayName: "Orden Secuencia")]
     public short OrderSequence { get; set; }
 
     public object Clone()

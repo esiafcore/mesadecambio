@@ -4,7 +4,7 @@
     <div class="card-header bg-secondary bg-gradient ml-0 py-1">
         <div class="row">
             <div class="col-12 text-center">
-                <h3 class="text-white py-1">Editar Banco</h3>
+                <h3 class="text-white py-1">@(Model.Id != 0 ? "Editar" : "Crear") Banco</h3>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
                     <div class="form-floating pb-1 pt-2 col-md-6">
                         <div class="form-check mt-3 align-items-center">
                             <input type="checkbox" class="form-check-input" asp-for="IsCompany" />
-                            <label asp-for="IsCompany" class="ms-2" >
+                            <label asp-for="IsCompany" class="ms-2">
                                 @Html.DisplayNameFor(m => m.IsCompany)
                             </label>
                         </div>
@@ -59,11 +59,22 @@
                     </div>
                     <div class="row pt-2">
                         <div class="col-6 col-md-3">
-                            <button type="submit" class="btn btn-primary form-control">Actualizar</button>
+                            @if (Model.Id != 0)
+                            {
+                                <button type="submit" class="btn btn-primary form-control">
+                                    <i class="bi bi-disc"></i> Actualizar
+                                </button>                            
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-primary form-control">
+                                    <i class="bi bi-disc"></i> Crear
+                                </button>                            
+                            }
                         </div>
                         <div class="col-6 col-md-3">
                             <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
-                                Regresar
+                                <i class="bi bi-arrow-return-left"></i> Regresar
                             </a>
                         </div>
                     </div>

@@ -1,0 +1,45 @@
+﻿@model List<QuotationType>
+
+<div class="col-md-8 m-0 p-8">
+    <div class="card shadow border-0 mt-1">
+        <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+            <div class="row align-items-center">
+                <div class="col-12 text-center">
+                    <h3 class="text-white py-1">Tipo Transacciones</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body px-3 py-1">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Numero</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Orden</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var itm in Model.OrderBy(x => x.Numeral).ThenBy(x => x.Code))
+                    {
+                        <tr>
+                            <td class="text-center">@itm.Numeral</td>
+                            <td>@itm.Code</td>
+                            <td>@itm.Name</td>
+                            <td class ="text-center">@itm.OrderSequence</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="QuotationType" asp-action="Detail" asp-route-id="@itm.Id" class="btn btn-success py-1 px-2 my-0 mx-2">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -24,86 +24,87 @@ public class BankController : Controller
         return View(objList);
     }
 
-    public IActionResult Create()
-    {
-        //Setear valor por defecto
-        var obj = new Bank()
-        {
-            OrderPriority = 1,
-            BankingCommissionPercentage = 0,
-            CompanyId = _companyId
-        };
-
-        return View(obj);
-    }
-
-    [HttpPost]
-    public IActionResult Create(Bank obj)
-    {
-        if (obj.CompanyId != _companyId)
-        {
-            ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
-        }
-
-        if (obj.Name.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("name", "Nombre no puede ser .");
-        }
-
-        if (obj.Code.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("code", "Código no puede ser .");
-        }
-
-        //Datos son validos
-        if (ModelState.IsValid)
-        {
-            _uow.Bank.Add(obj);
-            _uow.Save();
-            TempData["success"] = "Bank created successfully";
-            return RedirectToAction("Index", "Bank");
-        }
-
-        return View(obj);
-    }
-
-    public IActionResult Edit(int? id)
+    public IActionResult Upsert(int? id)
     {
         if (id == null || id == 0)
         {
-            return NotFound();
+            //create
+            //Setear valor por defecto
+            var obj = new Bank()
+            {
+                OrderPriority = 1,
+                BankingCommissionPercentage = 0,
+                CompanyId = _companyId
+            };
+            return View(obj);
         }
-
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
-
-        if (obj == null)
+        else
         {
-            return NotFound();
-        }
+            //update
+            var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
 
-        return View(obj);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
+        }
     }
 
     [HttpPost]
-    public IActionResult Edit(Bank obj)
+    public IActionResult Upsert(Bank obj)
     {
-        //Validar que codigo no está repetido
-        var objExists = _uow.Bank
-            .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
 
-        if (objExists != null && objExists.Id != obj.Id)
-        {
-            ModelState.AddModelError("", $"Código {obj.Code} ya existe");
-        }
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _uow.Bank.Update(obj);
-            _uow.Save();
-            TempData["success"] = "Bank updated successfully";
-            return RedirectToAction("Index", "Bank");
-        }
+            if (obj.CompanyId != _companyId)
+            {
+                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+            }
 
+            if (obj.Name.Trim().ToLower() == ".")
+            {
+                ModelState.AddModelError("name", "Nombre no puede ser .");
+            }
+
+            if (obj.Code.Trim().ToLower() == ".")
+            {
+                ModelState.AddModelError("code", "Código no puede ser .");
+            }
+
+            if (!ModelState.IsValid) return View(obj);
+
+            //Creando
+            if (obj.Id == 0)
+            {
+                _uow.Bank.Add(obj);
+                _uow.Save();
+                TempData["success"] = "Bank created successfully";
+                return RedirectToAction("Index", "Bank");
+            }
+            else
+            {
+                //Validar que codigo no está repetido
+                var objExists = _uow.Bank
+                    .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
+
+                if (objExists != null && objExists.Id != obj.Id)
+                {
+                    ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+                }
+                //Datos son validos
+                if (ModelState.IsValid)
+                {
+                    _uow.Bank.Update(obj);
+                    _uow.Save();
+                    TempData["success"] = "Bank updated successfully";
+                    return RedirectToAction("Index", "Bank");
+                }
+                return View(obj);
+            }
+        }
         return View(obj);
     }
 
