@@ -23,102 +23,100 @@ public class CurrencyController : Controller
         return View(objList);
     }
 
-    public IActionResult Create()
-    {
-        //Setear valor por defecto
-        var obj = new Currency()
-        {
-            Numeral = 0,
-            CompanyId = _companyId
-        };
-
-        return View(obj);
-    }
-
-    [HttpPost]
-    public IActionResult Create(Currency obj)
-    {
-        if (obj.CompanyId != _companyId)
-        {
-            ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
-        }
-
-        if (obj.Name.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("name", "Nombre no puede ser .");
-        }
-
-        if (obj.Code.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("code", "Código no puede ser .");
-        }
-
-        if (obj.CodeIso.Trim().ToLower() == ".")
-        {
-            ModelState.AddModelError("code", "Código no puede ser .");
-        }
-
-        //Datos son validos
-        if (ModelState.IsValid)
-        {
-            _uow.Currency.Add(obj);
-            _uow.Save();
-            TempData["success"] = "Currency created successfully";
-            return RedirectToAction("Index", "Currency");
-        }
-
-        return View(obj);
-    }
-
-    public IActionResult Edit(int? id)
+    public IActionResult Upsert(int? id)
     {
         if (id == null || id == 0)
         {
-            return NotFound();
+            //Setear valor por defecto
+            var obj = new Currency()
+            {
+                Numeral = 0,
+                CompanyId = _companyId
+            };
+            return View(obj);
         }
-
-        var obj = _uow.Currency.Get(x => x.Id == id, isTracking: false);
-
-        if (obj == null)
+        else
         {
-            return NotFound();
-        }
+            var obj = _uow.Currency.Get(x => x.Id == id, isTracking: false);
 
-        return View(obj);
+            if (obj == null)
+            {
+                return NotFound();
+            }
+            return View(obj);
+        }
     }
 
     [HttpPost]
-    public IActionResult Edit(Currency obj)
+    public IActionResult Upsert(Currency obj)
     {
-        //Validar que codigo no está repetido
-        var objExists = _uow.Currency
-            .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
-
-        if (objExists != null && objExists.Id != obj.Id)
-        {
-            ModelState.AddModelError("", $"Código {obj.Code} ya existe");
-        }
-
-        //Validar que codigo ISO no está repetido
-        objExists = _uow.Currency
-            .Get(x => x.CodeIso.Trim().ToLower() == obj.CodeIso.Trim().ToLower(), isTracking: false);
-
-        if (objExists != null && objExists.Id != obj.Id)
-        {
-            ModelState.AddModelError("", $"Código ISO {obj.CodeIso} ya existe");
-        }
-
         //Datos son validos
         if (ModelState.IsValid)
         {
-            _uow.Currency.Update(obj);
-            _uow.Save();
-            TempData["success"] = "Currency updated successfully";
-            return RedirectToAction("Index", "Currency");
+            if (obj.CompanyId != _companyId)
+            {
+                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+            }
+
+            if (obj.Name.Trim().ToLower() == ".")
+            {
+                ModelState.AddModelError("name", "Nombre no puede ser .");
+            }
+
+            if (obj.Code.Trim().ToLower() == ".")
+            {
+                ModelState.AddModelError("code", "Código no puede ser .");
+            }
+
+            if (obj.CodeIso.Trim().ToLower() == ".")
+            {
+                ModelState.AddModelError("code", "Código no puede ser .");
+            }
+
+            if (!ModelState.IsValid) return View(obj);
+
+            //Creando
+            if (obj.Id == 0)
+            {
+                _uow.Currency.Add(obj);
+                _uow.Save();
+                TempData["success"] = "Currency created successfully";
+                return RedirectToAction("Index", "Currency");
+            }
+            else
+            {
+                //Validar que codigo no está repetido
+                var objExists = _uow.Currency
+                    .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
+
+                if (objExists != null && objExists.Id != obj.Id)
+                {
+                    ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+                }
+
+                //Validar que codigo ISO no está repetido
+                objExists = _uow.Currency
+                    .Get(x => x.CodeIso.Trim().ToLower() == obj.CodeIso.Trim().ToLower(), isTracking: false);
+
+                if (objExists != null && objExists.Id != obj.Id)
+                {
+                    ModelState.AddModelError("", $"Código ISO {obj.CodeIso} ya existe");
+                }
+
+                //Datos son validos
+                if (!ModelState.IsValid) return View(obj);
+
+                _uow.Currency.Update(obj);
+                _uow.Save();
+                TempData["success"] = "Currency updated successfully";
+                return RedirectToAction("Index", "Currency");
+
+            }
         }
 
         return View(obj);
     }
+
 
     public IActionResult Delete(int? id)
     {
