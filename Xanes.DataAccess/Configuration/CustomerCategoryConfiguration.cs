@@ -3,20 +3,22 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Xanes.Models;
 
 namespace Xanes.DataAccess.Configuration;
-public class CustomerTypeConfiguration : IEntityTypeConfiguration<CustomerType>
+
+public class CustomerCategoryConfiguration : IEntityTypeConfiguration<CustomerCategory>
 {
-    public void Configure(EntityTypeBuilder<CustomerType> builder)
+    public void Configure(EntityTypeBuilder<CustomerCategory> builder)
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
-        builder.Property(x => x.Numeral).ValueGeneratedOnAdd().HasDefaultValue(0);
+        builder.Property(x => x.IsBank).ValueGeneratedOnAdd().HasDefaultValue(false);
+
 
         builder.HasIndex(x => new { x.CompanyId, x.Code }
-                , "customerstypes_idx_2010")
+                , "customerscategories_idx_2010")
             .IsUnique();
 
         builder.HasIndex(x => new { x.CompanyId, x.Numeral }
-                , "customerstypes_idx_2020")
+                , "customerscategories_idx_2020")
             .IsUnique();
     }
 }

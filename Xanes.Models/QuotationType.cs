@@ -10,21 +10,21 @@ namespace Xanes.Models;
 public class QuotationType : Entity, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Número")]
+    [Display(Name = "Número")]
     public int Numeral { get; set; }
 
     [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Código")]
+    [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
     [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Nombre")]
+    [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Orden Secuencia")]
+    [Display(Name = "Orden Secuencia")]
     public short OrderSequence { get; set; }
 
     public object Clone()

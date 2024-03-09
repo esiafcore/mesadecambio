@@ -2,11 +2,10 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
 
-
 namespace Xanes.Models;
 
-[Table("customerstypes", Schema = "cxc")]
-public class CustomerType : Entity, ICloneable
+[Table("customerscategories", Schema = "cxc")]
+public class CustomerCategory : Entity, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Número")]
@@ -22,15 +21,20 @@ public class CustomerType : Entity, ICloneable
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Es Banco")]
+    public bool IsBank { get; set; }
+
     public object Clone()
     {
-        var obj = new CustomerType
+        var obj = new CustomerCategory
         {
             Id = Id,
             CompanyId = CompanyId,
             Numeral = Numeral,
             Code = Code,
-            Name = Name
+            Name = Name,
+            IsBank = IsBank
         };
         return obj;
     }

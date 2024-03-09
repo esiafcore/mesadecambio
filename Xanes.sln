@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Models", "Xanes.Model
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Utility", "Xanes.Utility\Xanes.Utility.csproj", "{C51ED910-3D4B-4957-809F-E614C4C1FD45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xanes.eSIAFMapi", "Xanes.eSIAFMapi\Xanes.eSIAFMapi.csproj", "{CFEB3FAA-7ABD-407B-AC7C-3DB21D4E6A64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.eSIAFMapi", "Xanes.eSIAFMapi\Xanes.eSIAFMapi.csproj", "{CFEB3FAA-7ABD-407B-AC7C-3DB21D4E6A64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

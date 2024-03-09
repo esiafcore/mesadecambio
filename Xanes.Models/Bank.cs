@@ -9,12 +9,12 @@ public class Bank : Entity, ICloneable
 {
     [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Código")]
+    [Display(Name ="Código")]
     public string Code { get; set; } = null!;
 
     [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [DisplayName(displayName: "Nombre")]
+    [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
