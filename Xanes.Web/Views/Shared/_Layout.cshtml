@@ -30,11 +30,11 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bank</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="Currency" asp-action="Index">Currency</a>
-                                <a class="dropdown-item" asp-area="Admin" asp-controller="QuotationType" asp-action="Index">Tipo Transación</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bancos</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="Currency" asp-action="Index">Monedas</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#">Tipos de Cambios</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="QuotationType" asp-action="Index">Tipo Transación</a>
+                                <a class="dropdown-item" asp-area="Admin" asp-controller="CustomerCategory" asp-action="Index">Categorias Clientes</a>
                             </div>
                         </li>
                     </ul>

@@ -5,7 +5,7 @@ using Xanes.Models.Abstractions;
 namespace Xanes.Models;
 
 [Table("banks", Schema = "bco")]
-public class Bank : Entity, ICloneable
+public class Bank : EntityInactivated, ICloneable
 {
     [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -52,7 +52,21 @@ public class Bank : Entity, ICloneable
             BankAccountExcludeUId = BankAccountExcludeUId,
             IsCompany = IsCompany,
             OrderPriority = OrderPriority,
-            LogoBank = LogoBank
+            LogoBank = LogoBank,
+
+            IsActive = IsActive,
+            CreatedDate = CreatedDate,
+            CreatedBy = CreatedBy,
+            CreatedIpv4 = CreatedIpv4,
+            CreatedHostName = CreatedHostName,
+            UpdatedDate = UpdatedDate,
+            UpdatedBy = UpdatedBy,
+            UpdatedIpv4 = UpdatedIpv4,
+            UpdatedHostName = UpdatedHostName,
+            InactivatedDate = InactivatedDate,
+            InactivatedBy = InactivatedBy,
+            InactivatedIpv4 = InactivatedIpv4,
+            InactivatedHostName = InactivatedHostName
         };
         return obj;
     }

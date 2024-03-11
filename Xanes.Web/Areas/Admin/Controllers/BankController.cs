@@ -20,7 +20,7 @@ public class BankController : Controller
     // GET
     public IActionResult Index()
     {
-        var objList = _uow.Bank.GetAll().ToList();
+        var objList = _uow.Bank.GetAll(x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
 
@@ -41,7 +41,7 @@ public class BankController : Controller
         else
         {
             //update
-            var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+            var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
@@ -88,7 +88,8 @@ public class BankController : Controller
             {
                 //Validar que codigo no está repetido
                 var objExists = _uow.Bank
-                    .Get(x => x.Code.Trim().ToLower() == obj.Code.Trim().ToLower(), isTracking: false);
+                    .Get(x => (x.CompanyId == _companyId)
+                              & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -115,7 +116,7 @@ public class BankController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -128,7 +129,7 @@ public class BankController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.Bank.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {

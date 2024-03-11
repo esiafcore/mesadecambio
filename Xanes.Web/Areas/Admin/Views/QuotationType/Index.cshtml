@@ -18,6 +18,7 @@
                         <th>Código</th>
                         <th>Nombre</th>
                         <th>Orden</th>
+                        <th>Creado</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -29,6 +30,7 @@
                             <td>@itm.Code</td>
                             <td>@itm.Name</td>
                             <td class ="text-center">@itm.OrderSequence</td>
+                            <td>@itm.CreatedDate.ToLocalTime()</td>
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-controller="QuotationType" asp-action="Detail" asp-route-id="@itm.Id" class="btn btn-success py-1 px-2 my-0 mx-2">

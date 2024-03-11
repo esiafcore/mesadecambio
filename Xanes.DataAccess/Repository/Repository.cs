@@ -32,9 +32,11 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
 
-    public IEnumerable<T> GetAll()
+    public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter)
     {
         IQueryable<T> query = dbSet;
+        if(filter != null)
+            query = query.AsNoTracking();
         return query.ToList();
     }
 

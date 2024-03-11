@@ -5,8 +5,8 @@ using Xanes.Models.Abstractions;
 
 namespace Xanes.Models;
 
-[Table("customerstypes", Schema = "cxc")]
-public class CustomerType : Entity, ICloneable
+[Table("personstypes", Schema = "cnf")]
+public class PersonType : Entity, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Número")]
@@ -24,7 +24,7 @@ public class CustomerType : Entity, ICloneable
 
     public object Clone()
     {
-        var obj = new CustomerType
+        var obj = new PersonType
         {
             Id = Id,
             CompanyId = CompanyId,

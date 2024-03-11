@@ -4,52 +4,74 @@ using Xanes.Models;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
 [Area("Admin")]
-public class CurrencyController : Controller
+
+public class CustomerCategoryController : Controller
 {
     private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
 
-    public CurrencyController(IUnitOfWork uow, IConfiguration configuration)
+    public CustomerCategoryController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
-
     }
     public IActionResult Index()
     {
-        var objList = _uow.Currency.GetAll(x => (x.CompanyId == _companyId)).ToList();
+        var objList = _uow.CustomerCategory.GetAll(x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
+    }
+
+    public IActionResult Detail(int? id)
+    {
+        if (id == null || id == 0)
+        {
+            return NotFound();
+        }
+
+        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
+
+        if (obj == null)
+        {
+            return NotFound();
+        }
+
+        return View(obj);
     }
 
     public IActionResult Upsert(int? id)
     {
         if (id == null || id == 0)
         {
+            //create
             //Setear valor por defecto
-            var obj = new Currency()
+            var obj = new CustomerCategory()
             {
-                Numeral = 0,
-                CompanyId = _companyId
+                CompanyId = _companyId,
+                IsActive = true
             };
             return View(obj);
         }
         else
         {
-            var obj = _uow.Currency.Get(x => (x.Id == id), isTracking: false);
+            //update
+            var obj = _uow.CustomerCategory
+                .Get(x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
                 return NotFound();
             }
+
             return View(obj);
         }
     }
 
     [HttpPost]
-    public IActionResult Upsert(Currency obj)
+    public IActionResult Upsert(CustomerCategory obj)
     {
+
         //Datos son validos
         if (ModelState.IsValid)
         {
@@ -68,9 +90,9 @@ public class CurrencyController : Controller
                 ModelState.AddModelError("code", "Código no puede ser .");
             }
 
-            if (obj.CodeIso.Trim().ToLower() == ".")
+            if (obj.Numeral <= 0)
             {
-                ModelState.AddModelError("code", "Código no puede ser .");
+                ModelState.AddModelError("numeral", "No puede ser cero o menor a cero");
             }
 
             if (!ModelState.IsValid) return View(obj);
@@ -78,47 +100,46 @@ public class CurrencyController : Controller
             //Creando
             if (obj.Id == 0)
             {
-                _uow.Currency.Add(obj);
+                _uow.CustomerCategory.Add(obj);
                 _uow.Save();
-                TempData["success"] = "Currency created successfully";
-                return RedirectToAction("Index", "Currency");
+                TempData["success"] = "Customer Category created successfully";
+                return RedirectToAction("Index", "CustomerCategory");
             }
             else
             {
                 //Validar que codigo no está repetido
-                var objExists = _uow.Currency
+                var objExists = _uow.CustomerCategory
                     .Get(x => (x.CompanyId == _companyId)
-                              & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
+                    & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
                     ModelState.AddModelError("", $"Código {obj.Code} ya existe");
                 }
 
-                //Validar que codigo ISO no está repetido
-                objExists = _uow.Currency
+                //Validar que numeral no está repetido
+                objExists = _uow.CustomerCategory
                     .Get(x => (x.CompanyId == _companyId)
-                              & (x.CodeIso.Trim().ToLower() == obj.CodeIso.Trim().ToLower()), isTracking: false);
+                              & (x.Numeral == obj.Numeral), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
-                    ModelState.AddModelError("", $"Código ISO {obj.CodeIso} ya existe");
+                    ModelState.AddModelError("", $"Número {obj.Numeral} ya existe");
                 }
 
                 //Datos son validos
-                if (!ModelState.IsValid) return View(obj);
-
-                _uow.Currency.Update(obj);
-                _uow.Save();
-                TempData["success"] = "Currency updated successfully";
-                return RedirectToAction("Index", "Currency");
-
+                if (ModelState.IsValid)
+                {
+                    _uow.CustomerCategory.Update(obj);
+                    _uow.Save();
+                    TempData["success"] = "Customer Category updated successfully";
+                    return RedirectToAction("Index", "CustomerCategory");
+                }
+                return View(obj);
             }
         }
-
         return View(obj);
     }
-
 
     public IActionResult Delete(int? id)
     {
@@ -127,7 +148,7 @@ public class CurrencyController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Currency.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -140,15 +161,16 @@ public class CurrencyController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.Currency.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
             return NotFound();
         }
-        _uow.Currency.Remove(obj);
+        _uow.CustomerCategory.Remove(obj);
         _uow.Save();
-        TempData["success"] = "Currency deleted successfully";
-        return RedirectToAction("Index", "Currency");
+        TempData["success"] = "Customer Category deleted successfully";
+        return RedirectToAction("Index", "CustomerCategory");
     }
+
 }

@@ -4,7 +4,7 @@ namespace Xanes.DataAccess.Repository.IRepository;
 
 public interface IRepository<T> where T : class
 {
-    IEnumerable<T> GetAll();
+    IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter);
     T Get(Expression<Func<T,bool>> filter, bool isTracking=true);
     void Add(T entity);
     //Decisión personal. Tener fuera el método Update

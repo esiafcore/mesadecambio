@@ -5,7 +5,7 @@ using Xanes.Models.Abstractions;
 namespace Xanes.Models;
 
 [Table("customerscategories", Schema = "cxc")]
-public class CustomerCategory : Entity, ICloneable
+public class CustomerCategory : EntityInactivated, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Número")]

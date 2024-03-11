@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Xanes.Models\Xanes.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Shared\" />
+  </ItemGroup>
+
 </Project>

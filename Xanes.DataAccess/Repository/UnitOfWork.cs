@@ -11,12 +11,15 @@ public class UnitOfWork : IUnitOfWork
     public ICurrencyRepository Currency { get; private set; }
 
     public IQuotationTypeRepository QuotationType { get; private set; }
+    public ICustomerCategoryRepository CustomerCategory { get; private set; }
+
     public UnitOfWork(ApplicationDbContext db)
     {
         _db = db;
         Bank = new BankRepository(_db);
         Currency = new CurrencyRepository(_db);
         QuotationType = new QuotationTypeRepository(_db);
+        CustomerCategory = new CustomerCategoryRepository(_db);
     }
 
     public void Save()

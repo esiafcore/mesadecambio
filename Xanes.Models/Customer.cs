@@ -6,7 +6,7 @@ using Xanes.Models.Abstractions;
 namespace Xanes.Models;
 
 [Table("customers", Schema = "cxc")]
-public class Customer:Entity, ICloneable
+public class Customer: EntityInactivated, ICloneable
 {
 
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
@@ -53,7 +53,7 @@ public class Customer:Entity, ICloneable
     [Display(Name = "Id Tipo")]
     [ForeignKey(nameof(TypeTrx))]
     public int TypeId { get; set; }
-    public virtual CustomerType TypeTrx { get; set; } = null!;
+    public virtual PersonType TypeTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Es Banco")]

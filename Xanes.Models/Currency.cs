@@ -7,7 +7,7 @@ using Xanes.Models.Abstractions;
 namespace Xanes.Models;
 
 [Table("currencies", Schema = "cnf")]
-public class Currency : Entity, ICloneable
+public class Currency : EntityInactivated, ICloneable
 {
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -33,10 +33,10 @@ public class Currency : Entity, ICloneable
     public string NameSingular { get; set; } = null!;
     [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [DisplayName(displayName: "Nombre Foráneo")]
-    public string NameFor { get; set; } = null!;
+    public string NameForeign { get; set; } = null!;
     [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [DisplayName(displayName: "Nombre Foráneo en Singular")]
-    public string NameForSingular { get; set; } = null!;
+    public string NameForeignSingular { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [DisplayName(displayName: "Número")]
@@ -53,8 +53,8 @@ public class Currency : Entity, ICloneable
             Abbreviation = Abbreviation,
             Name = Name,
             NameSingular = NameSingular,
-            NameFor = NameFor,
-            NameForSingular = NameForSingular,
+            NameForeign = NameForeign,
+            NameForeignSingular = NameForeignSingular,
             Numeral = Numeral
         };
         return obj;

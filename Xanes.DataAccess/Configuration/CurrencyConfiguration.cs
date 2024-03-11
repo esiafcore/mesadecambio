@@ -26,6 +26,51 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Currency>
         builder.HasIndex(x => new { x.CompanyId, x.Numeral }
                 , "currencies_idx_2040")
             .IsUnique();
+
+        builder.HasData(
+            new Currency
+            {
+                Id = 1,
+                CompanyId = 1,
+                Numeral = 1,
+                CodeIso = "NIO",
+                Code = "COR",
+                Abbreviation = "C$",
+                Name = "CORDOBAS",
+                NameSingular = "CORDOBA",
+                NameForeign = "CORDOBAS",
+                NameForeignSingular = "CORDOBA",
+                IsActive = true
+            },
+            new Currency
+            {
+                Id = 2,
+                CompanyId = 1,
+                Numeral = 2,
+                CodeIso = "USD",
+                Code = "USD",
+                Abbreviation = "U$",
+                Name = "DOLARES",
+                NameSingular = "DOLAR",
+                NameForeign = "DOLLARS",
+                NameForeignSingular = "DOLLAR",
+                IsActive = true
+            },
+            new Currency
+            {
+                Id = 4,
+                CompanyId = 1,
+                Numeral = 4,
+                CodeIso = "EUR",
+                Code = "EUR",
+                Abbreviation ="\u20ac",
+                Name = "EUROS",
+                NameSingular = "EURO",
+                NameForeign = "EUROS",
+                NameForeignSingular = "EURO",
+                IsActive = true
+            }
+            );
     }
 
 }

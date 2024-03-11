@@ -17,7 +17,8 @@ public class QuotationTypeController : Controller
     }
     public IActionResult Index()
     {
-        var objList = _uow.QuotationType.GetAll().ToList();
+        var objList = _uow.QuotationType
+            .GetAll(x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
 
@@ -28,7 +29,7 @@ public class QuotationTypeController : Controller
             return NotFound();
         }
 
-        var obj = _uow.QuotationType.Get(x => x.Id == id, isTracking: false);
+        var obj = _uow.QuotationType.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
