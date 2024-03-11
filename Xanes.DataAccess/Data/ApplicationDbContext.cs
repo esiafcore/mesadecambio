@@ -32,6 +32,8 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfiguration<PersonType>(new PersonTypeConfiguration());
         modelBuilder.ApplyConfiguration<CustomerCategory>(new CustomerCategoryConfiguration());
         modelBuilder.ApplyConfiguration<Customer>(new CustomerConfiguration());
+        modelBuilder.ApplyConfiguration<IdentificationType>(new IdentificationTypeConfiguration());
+
     }
 
     public virtual DbSet<Bank> Banks {get;set;}
@@ -40,5 +42,5 @@ public class ApplicationDbContext: DbContext
     public virtual DbSet<PersonType> PersonsTypes { get; set; }
     public virtual DbSet<CustomerCategory> CustomersCategories { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
-
+    public virtual DbSet<IdentificationType> IdentificationsTypes { get; set; }
 }

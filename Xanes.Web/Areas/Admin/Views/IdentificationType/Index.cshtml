@@ -1,0 +1,59 @@
+﻿@model List<IdentificationType>
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row align-items-center">
+            <div class="col-8 text-center">
+                <h3 class="text-white py-1">Tipos de Identificación</h3>
+            </div>
+            <div class="col-4 text-end">
+                <a asp-controller="IdentificationType" asp-action="Upsert" class="btn btn-info">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body px-3 py-1">
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Es Juridico</th>
+                    <th>Está Activo</th>
+                    <th>Creado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var itm in Model.OrderBy(x => x.Numeral).ThenBy(x => x.Code))
+                {
+                    <tr>
+                        <td>@itm.Numeral</td>
+                        <td>@itm.Code</td>
+                        <td>@itm.Name</td>
+                        <td class="text-center">@(itm.IsLegal ? AC.Si : AC.No)</td>
+                        <td class="text-center">@(itm.IsActive ? AC.Si : AC.No)</td>
+                        <td>@itm.CreatedDate.ToLocalTime()</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-controller="IdentificationType" asp-action="Detail" asp-route-id="@itm.Id" class="btn btn-success py-1 px-2 my-0 mx-1">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <a asp-controller="IdentificationType" asp-action="Upsert" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-1">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-controller="IdentificationType" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-1">
+                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

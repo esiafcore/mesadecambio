@@ -13,6 +13,8 @@ public class UnitOfWork : IUnitOfWork
     public IQuotationTypeRepository QuotationType { get; private set; }
     public ICustomerCategoryRepository CustomerCategory { get; private set; }
 
+    public IIdentificationTypeRepository IdentificationType { get; private set; }
+
     public UnitOfWork(ApplicationDbContext db)
     {
         _db = db;
@@ -20,6 +22,7 @@ public class UnitOfWork : IUnitOfWork
         Currency = new CurrencyRepository(_db);
         QuotationType = new QuotationTypeRepository(_db);
         CustomerCategory = new CustomerCategoryRepository(_db);
+        IdentificationType = new IdentificationTypeRepository(_db);
     }
 
     public void Save()

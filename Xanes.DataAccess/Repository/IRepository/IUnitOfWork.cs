@@ -6,6 +6,7 @@ public interface IUnitOfWork
     ICurrencyRepository Currency { get; } 
     IQuotationTypeRepository QuotationType { get; }
     ICustomerCategoryRepository CustomerCategory { get; }
+    IIdentificationTypeRepository IdentificationType { get; }
 
     void Save();
 }

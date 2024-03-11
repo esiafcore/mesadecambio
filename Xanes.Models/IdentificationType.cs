@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations;
 using Xanes.Models.Abstractions;
 
 namespace Xanes.Models;
-
+[Table("identificationstypes", Schema = "cnf")]
 public class IdentificationType : EntityInactivated, ICloneable
 {
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Tipo Persona")]
-    public int PersonTypeId { get; set; }
+    [Display(Name = "Numeral Identificación")]
+    public int Numeral { get; set; }
 
     [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
-    [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
@@ -42,7 +42,7 @@ public class IdentificationType : EntityInactivated, ICloneable
     public string SubstitutionExpressionNumber { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Máxica Longitud Identificación")]
+    [Display(Name = "Máxima Longitud Identificación")]
     public short IdentificationMaxLength { get; set; }
 
 
@@ -55,7 +55,7 @@ public class IdentificationType : EntityInactivated, ICloneable
             CompanyId = CompanyId,
             Code = Code,
             Name = Name,
-            PersonTypeId = PersonTypeId,
+            Numeral = Numeral,
             IsLegal = IsLegal,
             IsForeign = IsForeign,
             RegularExpressionNumber = RegularExpressionNumber,
