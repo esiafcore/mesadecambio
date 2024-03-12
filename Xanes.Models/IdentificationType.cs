@@ -31,15 +31,15 @@ public class IdentificationType : EntityInactivated, ICloneable
 
     [Display(Name = "Expresión Regular")]
     [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string RegularExpressionNumber { get; set; } = null!;
+    public string? RegularExpressionNumber { get; set; }
 
     [Display(Name = "Regex Formateo")]
     [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string FormatExpressionNumber { get; set; } = null!;
+    public string? FormatExpressionNumber { get; set; }
 
     [Display(Name = "Regex Sustitución")]
     [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string SubstitutionExpressionNumber { get; set; } = null!;
+    public string? SubstitutionExpressionNumber { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Máxima Longitud Identificación")]

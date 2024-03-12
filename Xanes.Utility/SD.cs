@@ -27,7 +27,7 @@ public static class SD
     }
 
     [Flags]
-    public enum IdentificationTypeNumber : short
+    public enum IdentificationTypeNumber : int
     {
         RUC = 1,
         CEDU = 2,

@@ -21,7 +21,7 @@ public class IdentificationTypeController : Controller
     public IActionResult Index()
     {
         var objList = _uow.IdentificationType
-            .GetAll(x => (x.CompanyId == _companyId)).ToList();
+            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
 
@@ -32,7 +32,8 @@ public class IdentificationTypeController : Controller
             return NotFound();
         }
 
-        var obj = _uow.IdentificationType.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.IdentificationType
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -51,7 +52,11 @@ public class IdentificationTypeController : Controller
             var obj = new IdentificationType()
             {
                 CompanyId = _companyId,
-                IsActive = true
+                IsActive = true,
+                RegularExpressionNumber = string.Empty,
+                FormatExpressionNumber = string.Empty,
+                SubstitutionExpressionNumber = string.Empty,
+                IdentificationMaxLength = 0
             };
             return View(obj);
         }
@@ -59,7 +64,7 @@ public class IdentificationTypeController : Controller
         {
             //update
             var obj = _uow.IdentificationType
-                .Get(x => (x.Id == id), isTracking: false);
+                .Get(filter: x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
@@ -104,15 +109,15 @@ public class IdentificationTypeController : Controller
             {
                 _uow.IdentificationType.Add(obj);
                 _uow.Save();
-                TempData["success"] = "Customer Category created successfully";
-                return RedirectToAction("Index", "CustomerCategory");
+                TempData["success"] = "Identification Type created successfully";
+                return RedirectToAction("Index", "IdentificationType");
             }
             else
             {
                 //Validar que codigo no está repetido
                 var objExists = _uow.CustomerCategory
-                    .Get(x => (x.CompanyId == _companyId)
-                    & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -121,8 +126,8 @@ public class IdentificationTypeController : Controller
 
                 //Validar que numeral no está repetido
                 objExists = _uow.CustomerCategory
-                    .Get(x => (x.CompanyId == _companyId)
-                              & (x.Numeral == obj.Numeral), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Numeral == obj.Numeral), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -150,7 +155,8 @@ public class IdentificationTypeController : Controller
             return NotFound();
         }
 
-        var obj = _uow.IdentificationType.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.IdentificationType
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -163,7 +169,8 @@ public class IdentificationTypeController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.IdentificationType.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.IdentificationType
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {

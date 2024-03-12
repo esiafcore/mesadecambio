@@ -18,7 +18,8 @@ public class CustomerCategoryController : Controller
     }
     public IActionResult Index()
     {
-        var objList = _uow.CustomerCategory.GetAll(x => (x.CompanyId == _companyId)).ToList();
+        var objList = _uow.CustomerCategory
+            .GetAll(filter:x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
 
@@ -29,7 +30,8 @@ public class CustomerCategoryController : Controller
             return NotFound();
         }
 
-        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.CustomerCategory
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -56,7 +58,7 @@ public class CustomerCategoryController : Controller
         {
             //update
             var obj = _uow.CustomerCategory
-                .Get(x => (x.Id == id), isTracking: false);
+                .Get(filter: x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
@@ -108,8 +110,8 @@ public class CustomerCategoryController : Controller
             {
                 //Validar que codigo no está repetido
                 var objExists = _uow.CustomerCategory
-                    .Get(x => (x.CompanyId == _companyId)
-                    & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -118,8 +120,8 @@ public class CustomerCategoryController : Controller
 
                 //Validar que numeral no está repetido
                 objExists = _uow.CustomerCategory
-                    .Get(x => (x.CompanyId == _companyId)
-                              & (x.Numeral == obj.Numeral), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Numeral == obj.Numeral), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -147,7 +149,8 @@ public class CustomerCategoryController : Controller
             return NotFound();
         }
 
-        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.CustomerCategory
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
@@ -160,7 +163,8 @@ public class CustomerCategoryController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.CustomerCategory.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.CustomerCategory
+            .Get(filter: x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
