@@ -32,11 +32,22 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
 
-    public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter)
+    public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
     {
         IQueryable<T> query = dbSet;
-        if(filter != null)
-            query = query.AsNoTracking();
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
+            foreach (var includeProp in includeProperties
+                         .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProp);
+            }
+        }
         return query.ToList();
     }
 

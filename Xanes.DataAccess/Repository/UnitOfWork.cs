@@ -14,6 +14,7 @@ public class UnitOfWork : IUnitOfWork
     public ICustomerCategoryRepository CustomerCategory { get; private set; }
 
     public IIdentificationTypeRepository IdentificationType { get; private set; }
+    public ICustomerRepository Customer { get; private set; }
 
     public UnitOfWork(ApplicationDbContext db)
     {
@@ -23,6 +24,7 @@ public class UnitOfWork : IUnitOfWork
         QuotationType = new QuotationTypeRepository(_db);
         CustomerCategory = new CustomerCategoryRepository(_db);
         IdentificationType = new IdentificationTypeRepository(_db);
+        Customer = new CustomerRepository(_db);
     }
 
     public void Save()

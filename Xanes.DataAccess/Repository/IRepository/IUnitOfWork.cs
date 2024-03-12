@@ -7,6 +7,7 @@ public interface IUnitOfWork
     IQuotationTypeRepository QuotationType { get; }
     ICustomerCategoryRepository CustomerCategory { get; }
     IIdentificationTypeRepository IdentificationType { get; }
+    ICustomerRepository Customer { get; }
 
     void Save();
 }

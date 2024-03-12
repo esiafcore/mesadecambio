@@ -2,9 +2,8 @@
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 
-namespace Xanes.Web.Areas.Admin.Controllers;
-[Area("Admin")]
-
+namespace Xanes.Web.Areas.Customer.Controllers;
+[Area("Customer")]
 public class CustomerCategoryController : Controller
 {
     private readonly IUnitOfWork _uow;
@@ -172,5 +171,4 @@ public class CustomerCategoryController : Controller
         TempData["success"] = "Customer Category deleted successfully";
         return RedirectToAction("Index", "CustomerCategory");
     }
-
 }

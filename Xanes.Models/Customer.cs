@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 using Xanes.Models.Abstractions;
 
 namespace Xanes.Models;
@@ -8,6 +7,26 @@ namespace Xanes.Models;
 [Table("customers", Schema = "cxc")]
 public class Customer: EntityInactivated, ICloneable
 {
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id Categoria")]
+    [ForeignKey(nameof(CategoryTrx))]
+    public int CategoryId { get; set; }
+    public virtual CustomerCategory CategoryTrx { get; set; } = null!;
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Número Categoria")]
+    public int CategoryNumeral { get; set; }
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id Tipo Persona")]
+    [ForeignKey(nameof(TypeTrx))]
+    public int TypeId { get; set; }
+    public virtual PersonType TypeTrx { get; set; } = null!;
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Número Tipo Persona")]
+    public int TypeNumeral { get; set; }
 
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -44,18 +63,6 @@ public class Customer: EntityInactivated, ICloneable
     public string CommercialName { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Categoria")]
-    [ForeignKey(nameof(CategoryTrx))]
-    public int CategoryId { get; set; }
-    public virtual CustomerCategory CategoryTrx { get; set; } = null!;
-
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Tipo")]
-    [ForeignKey(nameof(TypeTrx))]
-    public int TypeId { get; set; }
-    public virtual PersonType TypeTrx { get; set; } = null!;
-
-    [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Es Banco")]
     public bool IsBank { get; set; }
 
@@ -69,6 +76,10 @@ public class Customer: EntityInactivated, ICloneable
         {
             Id = Id,
             CompanyId = CompanyId,
+            CategoryId = CategoryId,
+            CategoryNumeral = CategoryNumeral,
+            TypeId = TypeId,
+            TypeNumeral = TypeNumeral,
             Code = Code,
             Identificationnumber = Identificationnumber,
             FirstName = FirstName,
@@ -77,10 +88,23 @@ public class Customer: EntityInactivated, ICloneable
             SecondSurname = SecondSurname,
             BusinessName = BusinessName,
             CommercialName = CommercialName,
-            CategoryId = CategoryId,
-            TypeId = TypeId,
             IsBank = IsBank,
-            IsSystemRow = IsSystemRow
+            IsSystemRow = IsSystemRow,
+
+            IsActive = IsActive,
+            CreatedDate = CreatedDate,
+            CreatedBy = CreatedBy,
+            CreatedIpv4 = CreatedIpv4,
+            CreatedHostName = CreatedHostName,
+            UpdatedDate = UpdatedDate,
+            UpdatedBy = UpdatedBy,
+            UpdatedIpv4 = UpdatedIpv4,
+            UpdatedHostName = UpdatedHostName,
+            InactivatedDate = InactivatedDate,
+            InactivatedBy = InactivatedBy,
+            InactivatedIpv4 = InactivatedIpv4,
+            InactivatedHostName = InactivatedHostName
+
         };
         return obj;
     }
