@@ -24,14 +24,14 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                 , "customers_idx_2030")
             .IsUnique();
 
-        builder.HasOne(x => x.CategoryTrx)
-            .WithMany()
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired(true);
+        //builder.HasOne(x => x.CategoryTrx)
+        //    .WithMany()
+        //    .OnDelete(DeleteBehavior.NoAction)
+        //    .IsRequired(true);
 
-        builder.HasOne(x => x.TypeTrx)
-            .WithMany()
-            .OnDelete(DeleteBehavior.NoAction)
-            .IsRequired(true);
+        //builder.HasOne(x => x.TypeTrx)
+        //    .WithMany()
+        //    .OnDelete(DeleteBehavior.NoAction)
+        //    .IsRequired(true);
     }
 }
