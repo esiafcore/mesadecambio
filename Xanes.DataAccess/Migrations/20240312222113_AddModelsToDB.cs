@@ -126,6 +126,42 @@ namespace Xanes.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "identificationstypes",
+                schema: "cnf",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    numeral = table.Column<int>(type: "int", nullable: false),
+                    code = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
+                    name = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    islegal = table.Column<bool>(type: "bit", nullable: false),
+                    isforeign = table.Column<bool>(type: "bit", nullable: false),
+                    regularexpressionnumber = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    formatexpressionnumber = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    substitutionexpressionnumber = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
+                    identificationmaxlength = table.Column<short>(type: "smallint", nullable: false),
+                    companyid = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
+                    isactive = table.Column<bool>(type: "bit", nullable: false),
+                    createddate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    createdby = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    createdipv4 = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: false),
+                    createdhostname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    updateddate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    updatedby = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    updatedipv4 = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: true),
+                    updatedhostname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    inactivateddate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    inactivatedby = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    inactivatedipv4 = table.Column<string>(type: "nvarchar(75)", maxLength: 75, nullable: true),
+                    inactivatedhostname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_identificationstypes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "personstypes",
                 schema: "cnf",
                 columns: table => new
@@ -183,6 +219,10 @@ namespace Xanes.DataAccess.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    categoryid = table.Column<int>(type: "int", nullable: false),
+                    categorynumeral = table.Column<int>(type: "int", nullable: false),
+                    typeid = table.Column<int>(type: "int", nullable: false),
+                    typenumeral = table.Column<int>(type: "int", nullable: false),
                     code = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     identificationnumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     firstname = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
@@ -191,8 +231,6 @@ namespace Xanes.DataAccess.Migrations
                     secondsurname = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     businessname = table.Column<string>(type: "nvarchar(550)", maxLength: 550, nullable: false),
                     commercialname = table.Column<string>(type: "nvarchar(550)", maxLength: 550, nullable: false),
-                    categoryid = table.Column<int>(type: "int", nullable: false),
-                    typeid = table.Column<int>(type: "int", nullable: false),
                     isbank = table.Column<bool>(type: "bit", nullable: false),
                     issystemrow = table.Column<bool>(type: "bit", nullable: false),
                     companyid = table.Column<int>(type: "int", nullable: false, defaultValue: 1),
@@ -233,13 +271,13 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "bankaccountexcludeuid", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "logobank", "name", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 1, new Guid("9f8a706a-f0c4-4bb0-9159-d9f0af666152"), "BAC", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7271), "", "", null, null, null, null, true, "/Content/images/Bank/BacLogo.png", "Banco de America Central", null, null, null, null },
-                    { 2, null, "BDF", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7294), "", "", null, null, null, null, true, "/Content/images/Bank/BdfLogo.png", "Banco de Finanza", null, null, null, null },
-                    { 3, null, "LAFISE", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7295), "", "", null, null, null, null, true, "/Content/images/Bank/LafiseLogo.png", "Bancentro", null, null, null, null },
-                    { 4, null, "ATLANT", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7297), "", "", null, null, null, null, true, "/Content/images/Bank/AtlantidaLogo.png", "ATLANTIDA", null, null, null, null },
-                    { 5, new Guid("bbcf016d-4cdd-43b7-99b0-bea2375ce2ce"), "FICOHSA", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7290), "", "", null, null, null, null, true, "/Content/images/Bank/FicohsaLogo.png", "FICOHSA", null, null, null, null },
-                    { 6, null, "BANPRO", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7299), "", "", null, null, null, null, true, "/Content/images/Bank/BanproLogo.png", "BANPRO", null, null, null, null },
-                    { 7, null, "AVANZ", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7304), "", "", null, null, null, null, true, "/Content/images/Bank/AvanzLogo.png", "AVANZ", null, null, null, null }
+                    { 1, new Guid("9f8a706a-f0c4-4bb0-9159-d9f0af666152"), "BAC", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8606), "", "", null, null, null, null, true, "/Content/images/Bank/BacLogo.png", "Banco de America Central", null, null, null, null },
+                    { 2, null, "BDF", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8628), "", "", null, null, null, null, true, "/Content/images/Bank/BdfLogo.png", "Banco de Finanza", null, null, null, null },
+                    { 3, null, "LAFISE", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8630), "", "", null, null, null, null, true, "/Content/images/Bank/LafiseLogo.png", "Bancentro", null, null, null, null },
+                    { 4, null, "ATLANT", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8632), "", "", null, null, null, null, true, "/Content/images/Bank/AtlantidaLogo.png", "ATLANTIDA", null, null, null, null },
+                    { 5, new Guid("bbcf016d-4cdd-43b7-99b0-bea2375ce2ce"), "FICOHSA", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8624), "", "", null, null, null, null, true, "/Content/images/Bank/FicohsaLogo.png", "FICOHSA", null, null, null, null },
+                    { 6, null, "BANPRO", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8633), "", "", null, null, null, null, true, "/Content/images/Bank/BanproLogo.png", "BANPRO", null, null, null, null },
+                    { 7, null, "AVANZ", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8635), "", "", null, null, null, null, true, "/Content/images/Bank/AvanzLogo.png", "AVANZ", null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -248,9 +286,9 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "abbreviation", "code", "codeiso", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "name", "nameforeign", "nameforeignsingular", "namesingular", "numeral", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 1, "C$", "COR", "NIO", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1431), "", "", null, null, null, null, true, "CORDOBAS", "CORDOBAS", "CORDOBA", "CORDOBA", 1, null, null, null, null },
-                    { 2, "U$", "USD", "USD", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1437), "", "", null, null, null, null, true, "DOLARES", "DOLLARS", "DOLLAR", "DOLAR", 2, null, null, null, null },
-                    { 4, "€", "EUR", "EUR", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1440), "", "", null, null, null, null, true, "EUROS", "EUROS", "EURO", "EURO", 4, null, null, null, null }
+                    { 1, "C$", "COR", "NIO", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2533), "", "", null, null, null, null, true, "CORDOBAS", "CORDOBAS", "CORDOBA", "CORDOBA", 1, null, null, null, null },
+                    { 2, "U$", "USD", "USD", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2567), "", "", null, null, null, null, true, "DOLARES", "DOLLARS", "DOLLAR", "DOLAR", 2, null, null, null, null },
+                    { 4, "€", "EUR", "EUR", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2578), "", "", null, null, null, null, true, "EUROS", "EUROS", "EURO", "EURO", 4, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -259,8 +297,8 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "isbank", "name", "numeral", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 1, "BAN", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8288), "", "", null, null, null, null, true, true, "Bancos", 1, null, null, null, null },
-                    { 2, "FIN", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8294), "", "", null, null, null, null, true, true, "Financieras", 2, null, null, null, null }
+                    { 1, "BAN", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9685), "", "", null, null, null, null, true, true, "Bancos", 1, null, null, null, null },
+                    { 2, "FIN", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9697), "", "", null, null, null, null, true, true, "Financieras", 2, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -269,14 +307,28 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "name", "numeral", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 3, "IND", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8296), "", "", null, null, null, null, true, "Industrias", 3, null, null, null, null },
-                    { 4, "ONG", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8297), "", "", null, null, null, null, true, "ONG", 4, null, null, null, null },
-                    { 5, "UNI", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8299), "", "", null, null, null, null, true, "Universidades", 5, null, null, null, null },
-                    { 6, "COM", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8300), "", "", null, null, null, null, true, "Comercial", 6, null, null, null, null },
-                    { 7, "FAM", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8302), "", "", null, null, null, null, true, "Farmacias", 7, null, null, null, null },
-                    { 8, "TEC", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8303), "", "", null, null, null, null, true, "Tecnológicos", 8, null, null, null, null },
-                    { 9, "OTR", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8305), "", "", null, null, null, null, true, "Otros", 9, null, null, null, null },
-                    { 10, "SER", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8306), "", "", null, null, null, null, true, "Servicios", 10, null, null, null, null }
+                    { 3, "IND", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9699), "", "", null, null, null, null, true, "Industrias", 3, null, null, null, null },
+                    { 4, "ONG", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9701), "", "", null, null, null, null, true, "ONG", 4, null, null, null, null },
+                    { 5, "UNI", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9702), "", "", null, null, null, null, true, "Universidades", 5, null, null, null, null },
+                    { 6, "COM", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9704), "", "", null, null, null, null, true, "Comercial", 6, null, null, null, null },
+                    { 7, "FAM", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9705), "", "", null, null, null, null, true, "Farmacias", 7, null, null, null, null },
+                    { 8, "TEC", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9706), "", "", null, null, null, null, true, "Tecnológicos", 8, null, null, null, null },
+                    { 9, "OTR", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9708), "", "", null, null, null, null, true, "Otros", 9, null, null, null, null },
+                    { 10, "SER", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9709), "", "", null, null, null, null, true, "Servicios", 10, null, null, null, null }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "cnf",
+                table: "identificationstypes",
+                columns: new[] { "id", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "formatexpressionnumber", "identificationmaxlength", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "isforeign", "islegal", "name", "numeral", "regularexpressionnumber", "substitutionexpressionnumber", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
+                values: new object[,]
+                {
+                    { 1, "RUC", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8774), "", "", "$1", (short)14, null, null, null, null, true, false, true, "Registro Único Cotnribuyente", 1, "([J0-9]\\\\d{12}[a-zA-Z0-9])", "$1", null, null, null, null },
+                    { 2, "CEDU", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8781), "", "", "$1-$2-$3", (short)14, null, null, null, null, true, false, false, "Cédula de Identificación", 2, "(\\d{3})-*?(\\d{6})-*?(\\d{4}\\w{1})", "$1$2$3", null, null, null, null },
+                    { 3, "DIMEX", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8784), "", "", "", (short)0, null, null, null, null, false, true, false, "Documento de Identidad Migratorio para Extranjeros", 4, "", "", null, null, null, null },
+                    { 4, "NITE", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8786), "", "", "", (short)0, null, null, null, null, false, false, false, "Número de Identificación Tributaria Especial", 8, "", "", null, null, null, null },
+                    { 5, "DIDI", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8788), "", "", "", (short)0, null, null, null, null, false, true, false, "Documento de Identificación para Diplomático", 16, "", "", null, null, null, null },
+                    { 6, "PASS", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8790), "", "", "", (short)0, null, null, null, null, true, true, false, "Pasaporte", 32, "", "", null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -285,8 +337,8 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "name", "numeral", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 1, "NAT", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(5894), "", "", "Natural", 1, null, null, null, null },
-                    { 2, "JUR", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(5902), "", "", "Jurídico", 2, null, null, null, null }
+                    { 1, "NAT", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(7015), "", "", "Natural", 1, null, null, null, null },
+                    { 2, "JUR", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(7019), "", "", "Jurídico", 2, null, null, null, null }
                 });
 
             migrationBuilder.InsertData(
@@ -295,9 +347,22 @@ namespace Xanes.DataAccess.Migrations
                 columns: new[] { "id", "code", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "name", "numeral", "ordersequence", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
                 values: new object[,]
                 {
-                    { 1, "COM", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3574), "", "", "COMPRA", 1, (short)10, null, null, null, null },
-                    { 2, "VTA", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3580), "", "", "VENTA", 2, (short)20, null, null, null, null },
-                    { 3, "TRF", 1, "", new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3582), "", "", "TRANSFERENCIA", 4, (short)30, null, null, null, null }
+                    { 1, "COM", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4577), "", "", "COMPRA", 1, (short)10, null, null, null, null },
+                    { 2, "VTA", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4585), "", "", "VENTA", 2, (short)20, null, null, null, null },
+                    { 3, "TRF", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4587), "", "", "TRANSFERENCIA", 4, (short)30, null, null, null, null }
+                });
+
+            migrationBuilder.InsertData(
+                schema: "cxc",
+                table: "customers",
+                columns: new[] { "id", "businessname", "categoryid", "categorynumeral", "code", "commercialname", "companyid", "createdby", "createddate", "createdhostname", "createdipv4", "firstname", "identificationnumber", "inactivatedby", "inactivateddate", "inactivatedhostname", "inactivatedipv4", "isactive", "isbank", "issystemrow", "lastname", "secondname", "secondsurname", "typeid", "typenumeral", "updatedby", "updateddate", "updatedhostname", "updatedipv4" },
+                values: new object[,]
+                {
+                    { 5805, "MEYLING RAQUEL SANCHEZ ORTIZ", 6, 6, "00799", "MEYLING RAQUEL SANCHEZ ORTIZ", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6380), "", "", "MEYLING", "0012206860039E", null, null, null, null, true, false, false, "SANCHEZ", "RAQUEL", "ORTIZ", 1, 1, null, null, null, null },
+                    { 5806, "INSUMOS SMART NICARAGUA SOCIEDAD ANONIMA", 6, 6, "00800", "INSUMOS SMART NICARAGUA SOCIEDAD ANONIMA", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6377), "", "", "", "J0310000441430", null, null, null, null, true, false, false, "", "", "", 2, 2, null, null, null, null },
+                    { 5807, "JIMMY ALEXANDER SANDOVAL FRANCO", 6, 6, "00801", "JIMMY ALEXANDER SANDOVAL FRANCO", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6374), "", "", "JIMMY", "244686858", null, null, null, null, true, false, false, "SANDOVAL", "ALEXANDER", "FRANCO", 1, 1, null, null, null, null },
+                    { 5808, "MIGUEL FERNANDO RAMIREZ OCON", 6, 6, "00802", "MIGUEL FERNANDO RAMIREZ OCON", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6370), "", "", "MIGUEL", "0013009870051Y", null, null, null, null, true, false, false, "RAMIREZ", "FERNANDO", "OCON", 1, 1, null, null, null, null },
+                    { 5809, "AMERICAN PHARMA", 6, 6, "00803", "AMERICAN PHARMA", 1, "", new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6351), "", "", "", "J0310000122865", null, null, null, null, true, false, false, "", "", "", 2, 2, null, null, null, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -349,10 +414,10 @@ namespace Xanes.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "ix_customers_companyid_identificationnumber",
+                name: "ix_customers_companyid_typeid_identificationnumber",
                 schema: "cxc",
                 table: "customers",
-                columns: new[] { "companyid", "identificationnumber" },
+                columns: new[] { "companyid", "typeid", "identificationnumber" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -372,6 +437,20 @@ namespace Xanes.DataAccess.Migrations
                 name: "ix_customerscategories_companyid_numeral",
                 schema: "cxc",
                 table: "customerscategories",
+                columns: new[] { "companyid", "numeral" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_identificationstypes_companyid_code",
+                schema: "cnf",
+                table: "identificationstypes",
+                columns: new[] { "companyid", "code" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_identificationstypes_companyid_numeral",
+                schema: "cnf",
+                table: "identificationstypes",
                 columns: new[] { "companyid", "numeral" },
                 unique: true);
 
@@ -418,6 +497,10 @@ namespace Xanes.DataAccess.Migrations
             migrationBuilder.DropTable(
                 name: "customers",
                 schema: "cxc");
+
+            migrationBuilder.DropTable(
+                name: "identificationstypes",
+                schema: "cnf");
 
             migrationBuilder.DropTable(
                 name: "quotationstypes",

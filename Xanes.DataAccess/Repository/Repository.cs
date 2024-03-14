@@ -16,9 +16,19 @@ public class Repository<T> : IRepository<T> where T : class
         this.dbSet = _db.Set<T>();
     }
 
-    public T Get(Expression<Func<T, bool>> filter, bool isTracking = true)
+    public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool isTracking = true)
     {
         IQueryable<T> query = dbSet;
+
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
+            foreach (var includeProp in includeProperties
+                         .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProp);
+            }
+        }
+
         if (!isTracking)
             query = query.AsNoTracking();
 
@@ -59,5 +69,18 @@ public class Repository<T> : IRepository<T> where T : class
     public void RemoveRange(IEnumerable<T> entities)
     {
         dbSet.RemoveRange(entities);
+    }
+
+    public bool IsExist(Expression<Func<T, bool>> filter)
+    {
+        IQueryable<T> query = dbSet;
+        return query.Any(filter);
+    }
+
+    public bool RemoveByFilter(Expression<Func<T, bool>> filter)
+    {
+        IQueryable<T> query = dbSet;
+        query = query.Where(filter);
+        return query.ExecuteDelete() > 0;
     }
 }

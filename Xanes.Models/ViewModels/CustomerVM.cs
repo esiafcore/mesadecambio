@@ -5,7 +5,7 @@ namespace Xanes.Models.ViewModels;
 
 public class CustomerVM
 {
-    public Customer Customer { get; set; }
+    public Customer DataModel { get; set; } = null!;
     [ValidateNever]
     public IEnumerable<SelectListItem> CategoryList { get; set; }
     [ValidateNever]

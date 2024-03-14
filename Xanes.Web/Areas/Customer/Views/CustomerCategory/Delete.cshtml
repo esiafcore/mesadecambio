@@ -11,21 +11,23 @@
 
     <div class="card-body px-3 py-1">
         <div class="row pt-0">
-            <partial name="_Detail" />
-            <div class="row">
-                <div class="row pt-2">
-                    <div class="col-6 col-md-3">
-                        <button type="submit" class="btn btn-danger form-control">
-                            <i class="bi bi-trash3-fill"></i> Eliminar
-                        </button>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <a asp-controller="CustomerCategory" asp-action="Index" class="btn btn-secondary border form-control">
-                            <i class="bi bi-arrow-return-left"></i> Regresar
-                        </a>
+            <form method="post" class="row">
+                <partial name="_Detail" />
+                <div class="row">
+                    <div class="row pt-2">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-danger form-control">
+                                <i class="bi bi-trash3-fill"></i> Eliminar
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a asp-controller="CustomerCategory" asp-action="Index" class="btn btn-secondary border form-control">
+                                <i class="bi bi-arrow-return-left"></i> Regresar
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 

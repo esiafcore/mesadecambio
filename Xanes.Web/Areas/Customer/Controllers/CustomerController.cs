@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Xanes.DataAccess.Repository.IRepository;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
@@ -29,7 +30,9 @@ public class CustomerController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Customer.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.Customer.Get(filter: x => (x.Id == id)
+        , includeProperties: "TypeTrx,CategoryTrx"
+        , isTracking: false);
 
         if (obj == null)
         {
@@ -41,36 +44,53 @@ public class CustomerController : Controller
 
     public IActionResult Upsert(int? id)
     {
+        var categoryList = _uow.CustomerCategory
+            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+
+        var typeList = _uow.PersonType
+            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+        Models.Customer obj;
+
         if (id == null || id == 0)
         {
             //create
             //Setear valor por defecto
-            var obj = new Models.Customer()
+            obj = new Models.Customer()
             {
                 CompanyId = _companyId,
+                FirstName = string.Empty,
+                SecondName = string.Empty,
+                LastName = string.Empty,
+                SecondSurname = string.Empty,
                 IsActive = true
             };
-            return View(obj);
         }
         else
         {
             //update
-            var obj = _uow.Customer
-                .Get(x => (x.Id == id), isTracking: false);
+            obj = _uow.Customer
+                .Get(filter: x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
                 return NotFound();
             }
-
-            return View(obj);
         }
+
+        var dataVM = new Models.ViewModels.CustomerVM()
+        {
+            DataModel = obj,
+            CategoryList = categoryList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name}).ToList(),
+            TypeList = typeList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name}).ToList()
+        };
+
+        return View(dataVM);
     }
 
     [HttpPost]
-    public IActionResult Upsert(Models.Customer obj)
+    public IActionResult Upsert(Models.ViewModels.CustomerVM objVM)
     {
-
+        Models.Customer obj = objVM.DataModel;
         //Datos son validos
         if (ModelState.IsValid)
         {
@@ -94,7 +114,7 @@ public class CustomerController : Controller
                 ModelState.AddModelError("code", "Código no puede ser .");
             }
 
-            if (!ModelState.IsValid) return View(obj);
+            if (!ModelState.IsValid) return View(objVM);
 
             //Creando
             if (obj.Id == 0)
@@ -108,8 +128,8 @@ public class CustomerController : Controller
             {
                 //Validar que codigo no está repetido
                 var objExists = _uow.Customer
-                    .Get(x => (x.CompanyId == _companyId)
-                    & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -118,9 +138,9 @@ public class CustomerController : Controller
 
                 //Validar que identificación no está repetido
                 objExists = _uow.Customer
-                    .Get(x => (x.CompanyId == _companyId)
-                              & (x.TypeId == obj.TypeId)
-                              & (x.Identificationnumber.Trim().ToLower() == obj.Identificationnumber.Trim().ToLower()), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.TypeId == obj.TypeId)
+                                      & (x.Identificationnumber.Trim().ToLower() == obj.Identificationnumber.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
@@ -135,10 +155,10 @@ public class CustomerController : Controller
                     TempData["success"] = "Customer updated successfully";
                     return RedirectToAction("Index", "Customer");
                 }
-                return View(obj);
+                return View(objVM);
             }
         }
-        return View(obj);
+        return View(objVM);
     }
 
     public IActionResult Delete(int? id)
@@ -148,7 +168,9 @@ public class CustomerController : Controller
             return NotFound();
         }
 
-        var obj = _uow.Customer.Get(x => (x.Id == id), isTracking: false);
+        var obj = _uow.Customer.Get(filter: x => (x.Id == id)
+            , includeProperties: "TypeTrx,CategoryTrx"
+            , isTracking: false);
 
         if (obj == null)
         {
@@ -161,14 +183,30 @@ public class CustomerController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        var obj = _uow.Customer.Get(x => (x.Id == id), isTracking: false);
+        //var obj = _uow.Customer.Get(filter: x => (x.Id == id), isTracking: false);
 
-        if (obj == null)
+        //if (obj == null)
+        //{
+        //    return NotFound();
+        //}
+        //_uow.Customer.Remove(obj);
+        //_uow.Save();
+        //TempData["success"] = "Customer deleted successfully";
+        //return RedirectToAction("Index", "Customer");
+        if (id == null || id == 0)
         {
             return NotFound();
         }
-        _uow.Customer.Remove(obj);
-        _uow.Save();
+
+        if (!_uow.Customer.IsExist(filter: x => x.Id == id))
+        {
+            return NotFound();
+        }
+
+        if (!_uow.Customer.RemoveByFilter(filter: x => x.Id == id))
+        {
+            return NotFound();
+        }
         TempData["success"] = "Customer deleted successfully";
         return RedirectToAction("Index", "Customer");
     }

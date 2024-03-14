@@ -12,7 +12,7 @@ using Xanes.DataAccess.Data;
 namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240311040520_AddModelsToDB")]
+    [Migration("20240312222113_AddModelsToDB")]
     partial class AddModelsToDB
     {
         /// <inheritdoc />
@@ -162,7 +162,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BAC",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7271),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8606),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -179,7 +179,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FICOHSA",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7290),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8624),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -195,7 +195,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BDF",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7294),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8628),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -211,7 +211,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "LAFISE",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7295),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8630),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -227,7 +227,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "ATLANT",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7297),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8632),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -243,7 +243,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BANPRO",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7299),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8633),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -259,7 +259,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "AVANZ",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 226, DateTimeKind.Utc).AddTicks(7304),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 922, DateTimeKind.Utc).AddTicks(8635),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -425,7 +425,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "NIO",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1431),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2533),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -443,7 +443,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "USD",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1437),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2567),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -461,7 +461,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "EUR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(1440),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(2578),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -491,6 +491,10 @@ namespace Xanes.DataAccess.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int")
                         .HasColumnName("categoryid");
+
+                    b.Property<int>("CategoryNumeral")
+                        .HasColumnType("int")
+                        .HasColumnName("categorynumeral");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -597,6 +601,10 @@ namespace Xanes.DataAccess.Migrations
                         .HasColumnType("int")
                         .HasColumnName("typeid");
 
+                    b.Property<int>("TypeNumeral")
+                        .HasColumnType("int")
+                        .HasColumnName("typenumeral");
+
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
@@ -629,15 +637,137 @@ namespace Xanes.DataAccess.Migrations
                         .IsUnique()
                         .HasDatabaseName("ix_customers_companyid_code");
 
-                    b.HasIndex(new[] { "CompanyId", "Identificationnumber" }, "customers_idx_2020")
+                    b.HasIndex(new[] { "CompanyId", "TypeId", "Identificationnumber" }, "customers_idx_2020")
                         .IsUnique()
-                        .HasDatabaseName("ix_customers_companyid_identificationnumber");
+                        .HasDatabaseName("ix_customers_companyid_typeid_identificationnumber");
 
                     b.HasIndex(new[] { "CompanyId", "Code" }, "customers_idx_2030")
                         .IsUnique()
                         .HasDatabaseName("ix_customers_companyid_code");
 
                     b.ToTable("customers", "cxc");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 5809,
+                            BusinessName = "AMERICAN PHARMA",
+                            CategoryId = 6,
+                            CategoryNumeral = 6,
+                            Code = "00803",
+                            CommercialName = "AMERICAN PHARMA",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6351),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FirstName = "",
+                            Identificationnumber = "J0310000122865",
+                            IsActive = true,
+                            IsBank = false,
+                            IsSystemRow = false,
+                            LastName = "",
+                            SecondName = "",
+                            SecondSurname = "",
+                            TypeId = 2,
+                            TypeNumeral = 2
+                        },
+                        new
+                        {
+                            Id = 5808,
+                            BusinessName = "MIGUEL FERNANDO RAMIREZ OCON",
+                            CategoryId = 6,
+                            CategoryNumeral = 6,
+                            Code = "00802",
+                            CommercialName = "MIGUEL FERNANDO RAMIREZ OCON",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6370),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FirstName = "MIGUEL",
+                            Identificationnumber = "0013009870051Y",
+                            IsActive = true,
+                            IsBank = false,
+                            IsSystemRow = false,
+                            LastName = "RAMIREZ",
+                            SecondName = "FERNANDO",
+                            SecondSurname = "OCON",
+                            TypeId = 1,
+                            TypeNumeral = 1
+                        },
+                        new
+                        {
+                            Id = 5807,
+                            BusinessName = "JIMMY ALEXANDER SANDOVAL FRANCO",
+                            CategoryId = 6,
+                            CategoryNumeral = 6,
+                            Code = "00801",
+                            CommercialName = "JIMMY ALEXANDER SANDOVAL FRANCO",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6374),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FirstName = "JIMMY",
+                            Identificationnumber = "244686858",
+                            IsActive = true,
+                            IsBank = false,
+                            IsSystemRow = false,
+                            LastName = "SANDOVAL",
+                            SecondName = "ALEXANDER",
+                            SecondSurname = "FRANCO",
+                            TypeId = 1,
+                            TypeNumeral = 1
+                        },
+                        new
+                        {
+                            Id = 5806,
+                            BusinessName = "INSUMOS SMART NICARAGUA SOCIEDAD ANONIMA",
+                            CategoryId = 6,
+                            CategoryNumeral = 6,
+                            Code = "00800",
+                            CommercialName = "INSUMOS SMART NICARAGUA SOCIEDAD ANONIMA",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6377),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FirstName = "",
+                            Identificationnumber = "J0310000441430",
+                            IsActive = true,
+                            IsBank = false,
+                            IsSystemRow = false,
+                            LastName = "",
+                            SecondName = "",
+                            SecondSurname = "",
+                            TypeId = 2,
+                            TypeNumeral = 2
+                        },
+                        new
+                        {
+                            Id = 5805,
+                            BusinessName = "MEYLING RAQUEL SANCHEZ ORTIZ",
+                            CategoryId = 6,
+                            CategoryNumeral = 6,
+                            Code = "00799",
+                            CommercialName = "MEYLING RAQUEL SANCHEZ ORTIZ",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(6380),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FirstName = "MEYLING",
+                            Identificationnumber = "0012206860039E",
+                            IsActive = true,
+                            IsBank = false,
+                            IsSystemRow = false,
+                            LastName = "SANCHEZ",
+                            SecondName = "RAQUEL",
+                            SecondSurname = "ORTIZ",
+                            TypeId = 1,
+                            TypeNumeral = 1
+                        });
                 });
 
             modelBuilder.Entity("Xanes.Models.CustomerCategory", b =>
@@ -761,7 +891,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BAN",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8288),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9685),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -775,7 +905,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FIN",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8294),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9697),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -789,7 +919,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "IND",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8296),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9699),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -803,7 +933,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "ONG",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8297),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9701),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -817,7 +947,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "UNI",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8299),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9702),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -831,7 +961,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "COM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8300),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9704),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -845,7 +975,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FAM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8302),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9705),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -859,7 +989,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "TEC",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8303),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9706),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -873,7 +1003,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "OTR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8305),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9708),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -887,13 +1017,265 @@ namespace Xanes.DataAccess.Migrations
                             Code = "SER",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(8306),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(9709),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
                             IsBank = false,
                             Name = "Servicios",
                             Numeral = 10
+                        });
+                });
+
+            modelBuilder.Entity("Xanes.Models.IdentificationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)")
+                        .HasColumnName("code");
+
+                    b.Property<int>("CompanyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasColumnName("companyid");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("createdby");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("createddate");
+
+                    b.Property<string>("CreatedHostName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("createdhostname");
+
+                    b.Property<string>("CreatedIpv4")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("createdipv4");
+
+                    b.Property<string>("FormatExpressionNumber")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasColumnName("formatexpressionnumber");
+
+                    b.Property<short>("IdentificationMaxLength")
+                        .HasColumnType("smallint")
+                        .HasColumnName("identificationmaxlength");
+
+                    b.Property<string>("InactivatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("inactivatedby");
+
+                    b.Property<DateTime?>("InactivatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("inactivateddate");
+
+                    b.Property<string>("InactivatedHostName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("inactivatedhostname");
+
+                    b.Property<string>("InactivatedIpv4")
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("inactivatedipv4");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("isactive");
+
+                    b.Property<bool>("IsForeign")
+                        .HasColumnType("bit")
+                        .HasColumnName("isforeign");
+
+                    b.Property<bool>("IsLegal")
+                        .HasColumnType("bit")
+                        .HasColumnName("islegal");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Numeral")
+                        .HasColumnType("int")
+                        .HasColumnName("numeral");
+
+                    b.Property<string>("RegularExpressionNumber")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasColumnName("regularexpressionnumber");
+
+                    b.Property<string>("SubstitutionExpressionNumber")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)")
+                        .HasColumnName("substitutionexpressionnumber");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("updatedby");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updateddate");
+
+                    b.Property<string>("UpdatedHostName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("updatedhostname");
+
+                    b.Property<string>("UpdatedIpv4")
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("updatedipv4");
+
+                    b.HasKey("Id")
+                        .HasName("pk_identificationstypes");
+
+                    b.HasIndex(new[] { "CompanyId", "Code" }, "identificationstypes_idx_2010")
+                        .IsUnique()
+                        .HasDatabaseName("ix_identificationstypes_companyid_code");
+
+                    b.HasIndex(new[] { "CompanyId", "Numeral" }, "identificationstypes_idx_2020")
+                        .IsUnique()
+                        .HasDatabaseName("ix_identificationstypes_companyid_numeral");
+
+                    b.ToTable("identificationstypes", "cnf");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "RUC",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8774),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "$1",
+                            IdentificationMaxLength = (short)14,
+                            IsActive = true,
+                            IsForeign = false,
+                            IsLegal = true,
+                            Name = "Registro Único Cotnribuyente",
+                            Numeral = 1,
+                            RegularExpressionNumber = "([J0-9]\\\\d{12}[a-zA-Z0-9])",
+                            SubstitutionExpressionNumber = "$1"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "CEDU",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8781),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "$1-$2-$3",
+                            IdentificationMaxLength = (short)14,
+                            IsActive = true,
+                            IsForeign = false,
+                            IsLegal = false,
+                            Name = "Cédula de Identificación",
+                            Numeral = 2,
+                            RegularExpressionNumber = "(\\d{3})-*?(\\d{6})-*?(\\d{4}\\w{1})",
+                            SubstitutionExpressionNumber = "$1$2$3"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "DIMEX",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8784),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "",
+                            IdentificationMaxLength = (short)0,
+                            IsActive = false,
+                            IsForeign = true,
+                            IsLegal = false,
+                            Name = "Documento de Identidad Migratorio para Extranjeros",
+                            Numeral = 4,
+                            RegularExpressionNumber = "",
+                            SubstitutionExpressionNumber = ""
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "NITE",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8786),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "",
+                            IdentificationMaxLength = (short)0,
+                            IsActive = false,
+                            IsForeign = false,
+                            IsLegal = false,
+                            Name = "Número de Identificación Tributaria Especial",
+                            Numeral = 8,
+                            RegularExpressionNumber = "",
+                            SubstitutionExpressionNumber = ""
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "DIDI",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8788),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "",
+                            IdentificationMaxLength = (short)0,
+                            IsActive = false,
+                            IsForeign = true,
+                            IsLegal = false,
+                            Name = "Documento de Identificación para Diplomático",
+                            Numeral = 16,
+                            RegularExpressionNumber = "",
+                            SubstitutionExpressionNumber = ""
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Code = "PASS",
+                            CompanyId = 1,
+                            CreatedBy = "",
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 924, DateTimeKind.Utc).AddTicks(8790),
+                            CreatedHostName = "",
+                            CreatedIpv4 = "",
+                            FormatExpressionNumber = "",
+                            IdentificationMaxLength = (short)0,
+                            IsActive = true,
+                            IsForeign = true,
+                            IsLegal = false,
+                            Name = "Pasaporte",
+                            Numeral = 32,
+                            RegularExpressionNumber = "",
+                            SubstitutionExpressionNumber = ""
                         });
                 });
 
@@ -991,7 +1373,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "NAT",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(5894),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(7015),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "Natural",
@@ -1003,7 +1385,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "JUR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(5902),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(7019),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "Jurídico",
@@ -1107,7 +1489,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "COM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3574),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4577),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "COMPRA",
@@ -1120,7 +1502,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "VTA",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3580),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4585),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "VENTA",
@@ -1133,7 +1515,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "TRF",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 11, 4, 5, 19, 227, DateTimeKind.Utc).AddTicks(3582),
+                            CreatedDate = new DateTime(2024, 3, 12, 22, 21, 12, 923, DateTimeKind.Utc).AddTicks(4587),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "TRANSFERENCIA",

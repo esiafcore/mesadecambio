@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
 
@@ -12,6 +13,7 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Id Categoria")]
     [ForeignKey(nameof(CategoryTrx))]
     public int CategoryId { get; set; }
+    [ValidateNever]
     public virtual CustomerCategory CategoryTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -22,6 +24,7 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Id Tipo Persona")]
     [ForeignKey(nameof(TypeTrx))]
     public int TypeId { get; set; }
+    [ValidateNever]
     public virtual PersonType TypeTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -30,7 +33,7 @@ public class Customer: EntityInactivated, ICloneable
 
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Número")]
+    [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
     [MaxLength(20, ErrorMessage = "Longitud máxima del campo {0} es {1}")]

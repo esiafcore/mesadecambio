@@ -1,1 +1,25 @@
-﻿
+﻿@model Customer
+
+<div class="card shadow border-0 mt-1 col-md-8">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="text-white py-1">Detalle Cliente</h3>
+            </div>
+        </div>
+    </div>
+    <div class="card-body px-3 py-1">
+        <div class="row pt-0">
+            <partial name="_Detail" />
+            <div class="row">
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="Customer" asp-action="Index" class="btn btn-secondary border form-control">
+                            <i class="bi bi-arrow-return-left"></i> Regresar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
