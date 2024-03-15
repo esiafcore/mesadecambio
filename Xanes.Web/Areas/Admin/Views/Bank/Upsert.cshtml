@@ -11,7 +11,7 @@
     <div class="card-body px-3 py-1">
         <div class="row pt-0">
             <div class="col-md-12">
-                <form method="post" class="row">
+                <form method="post" class="row" enctype="multipart/form-data">
                     <input hidden asp-for="Id" />
                     <input hidden asp-for="CompanyId" />
 
@@ -53,9 +53,8 @@
                     </div>
 
                     <div class="form-floating pb-1 pt-2 col-md-12">
-                        <input asp-for="LogoUrl" type="text" class="form-control border-0 shadow" />
+                        <input type="file" asp-for="LogoUrl" class="form-control border-0 shadow" />
                         <label asp-for="LogoUrl" class="ms-2"></label>
-                        <span asp-validation-for="LogoUrl" class="text-danger"></span>
                     </div>
                     <div class="row pt-2">
                         <div class="col-6 col-md-3">
