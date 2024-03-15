@@ -44,11 +44,7 @@ public class CustomerController : Controller
 
     public IActionResult Upsert(int? id)
     {
-        var categoryList = _uow.CustomerCategory
-            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
 
-        var typeList = _uow.PersonType
-            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
         Models.Customer obj;
 
         if (id == null || id == 0)
@@ -77,20 +73,28 @@ public class CustomerController : Controller
             }
         }
 
+        var categorySelectList = _uow.CustomerCategory
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+        var typeSelectList = _uow.PersonType
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
         var dataVM = new Models.ViewModels.CustomerVM()
         {
             DataModel = obj,
-            CategoryList = categoryList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name}).ToList(),
-            TypeList = typeList.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name}).ToList()
+            CategoryList = categorySelectList,
+            TypeList = typeSelectList
         };
 
         return View(dataVM);
     }
 
     [HttpPost]
-    public IActionResult Upsert(Models.ViewModels.CustomerVM objVM)
+    public IActionResult Upsert(Models.ViewModels.CustomerVM objViewModel)
     {
-        Models.Customer obj = objVM.DataModel;
+        Models.Customer obj = objViewModel.DataModel;
         //Datos son validos
         if (ModelState.IsValid)
         {
@@ -114,7 +118,7 @@ public class CustomerController : Controller
                 ModelState.AddModelError("code", "Código no puede ser .");
             }
 
-            if (!ModelState.IsValid) return View(objVM);
+            if (!ModelState.IsValid) return View(objViewModel);
 
             //Creando
             if (obj.Id == 0)
@@ -155,10 +159,35 @@ public class CustomerController : Controller
                     TempData["success"] = "Customer updated successfully";
                     return RedirectToAction("Index", "Customer");
                 }
-                return View(objVM);
+                var categorySelectList = _uow.CustomerCategory
+                    .GetAll(filter: x => (x.CompanyId == _companyId))
+                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+                var typeSelectList = _uow.PersonType
+                    .GetAll(filter: x => (x.CompanyId == _companyId))
+                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+                objViewModel.CategoryList = categorySelectList;
+                objViewModel.TypeList = typeSelectList;
+                return View(objViewModel);
             }
         }
-        return View(objVM);
+        else
+        {
+            var categorySelectList = _uow.CustomerCategory
+                .GetAll(filter: x => (x.CompanyId == _companyId))
+                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+            var typeSelectList = _uow.PersonType
+                .GetAll(filter: x => (x.CompanyId == _companyId))
+                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+            objViewModel.CategoryList = categorySelectList;
+            objViewModel.TypeList = typeSelectList;
+
+            return View(objViewModel);
+
+        }
     }
 
     public IActionResult Delete(int? id)
@@ -183,16 +212,6 @@ public class CustomerController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        //var obj = _uow.Customer.Get(filter: x => (x.Id == id), isTracking: false);
-
-        //if (obj == null)
-        //{
-        //    return NotFound();
-        //}
-        //_uow.Customer.Remove(obj);
-        //_uow.Save();
-        //TempData["success"] = "Customer deleted successfully";
-        //return RedirectToAction("Index", "Customer");
         if (id == null || id == 0)
         {
             return NotFound();
