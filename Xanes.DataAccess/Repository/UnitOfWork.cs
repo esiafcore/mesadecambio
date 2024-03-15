@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IIdentificationTypeRepository IdentificationType { get; private set; }
     public ICustomerRepository Customer { get; private set; }
+    public ICompanyRepository Company { get; }
 
     public IPersonTypeRepository PersonType { get; private set; }
 
@@ -28,6 +29,7 @@ public class UnitOfWork : IUnitOfWork
         IdentificationType = new IdentificationTypeRepository(_db);
         PersonType = new PersonTypeRepository(_db);
         Customer = new CustomerRepository(_db);
+        Company = new CompanyRepository(_db);
     }
 
     public void Save()

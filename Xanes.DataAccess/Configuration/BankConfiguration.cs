@@ -32,7 +32,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = new Guid("9f8a706a-f0c4-4bb0-9159-d9f0af666152"),
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/BacLogo.png"
+                LogoUrl = "/Content/images/Bank/BacLogo.png"
             },
 
             new Bank
@@ -45,7 +45,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = new Guid("bbcf016d-4cdd-43b7-99b0-bea2375ce2ce"),
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/FicohsaLogo.png"
+                LogoUrl = "/Content/images/Bank/FicohsaLogo.png"
             },
             new Bank
             {
@@ -57,7 +57,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = null,
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/BdfLogo.png"
+                LogoUrl = "/Content/images/Bank/BdfLogo.png"
             },
             new Bank
             {
@@ -69,7 +69,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = null,
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/LafiseLogo.png"
+                LogoUrl = "/Content/images/Bank/LafiseLogo.png"
             },
             new Bank
             {
@@ -81,7 +81,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = null,
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/AtlantidaLogo.png"
+                LogoUrl = "/Content/images/Bank/AtlantidaLogo.png"
             },
             new Bank
             {
@@ -93,7 +93,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = null,
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/BanproLogo.png"
+                LogoUrl = "/Content/images/Bank/BanproLogo.png"
             },
             new Bank
             {
@@ -105,7 +105,7 @@ public class BankConfiguration : IEntityTypeConfiguration<Bank>
                 BankAccountExcludeUId = null,
                 IsCompany = false,
                 OrderPriority = 0,
-                LogoBank = "/Content/images/Bank/AvanzLogo.png"
+                LogoUrl = "/Content/images/Bank/AvanzLogo.png"
             }
             );
     }

@@ -36,4 +36,20 @@ public static class SD
         DIDI = 16,
         PASS = 32
     }
+
+    public enum CountryAlpha03 : short
+    {
+        CRI = 188,
+        NIC = 558,
+        PAN = 591,
+        SLV = 222
+    }
+
+    public enum CountryAlpha02 : short
+    {
+        CR = 188,
+        NI = 558,
+        PA = 591,
+        SV = 222
+    }
 }

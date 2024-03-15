@@ -34,9 +34,13 @@ public class Bank : EntityInactivated, ICloneable
     [Range(1, 100, ErrorMessage = "Rango del campo {0} debe estar entre {1} y {2}")]
     public int OrderPriority { get; set; }
 
-    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [DisplayName(displayName: "Logo Banco")]
-    public string? LogoBank { get; set; }
+    [MaxLength(500, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [DisplayName(displayName: "Logo URL")]
+    public string? LogoUrl { get; set; }
+
+    [MaxLength(500, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [DisplayName(displayName: "Logo Local Path")]
+    public string? LogoLocalPath { get; set; }
 
     #region ICloneable Members
 
@@ -52,7 +56,7 @@ public class Bank : EntityInactivated, ICloneable
             BankAccountExcludeUId = BankAccountExcludeUId,
             IsCompany = IsCompany,
             OrderPriority = OrderPriority,
-            LogoBank = LogoBank,
+            LogoUrl = LogoUrl,
 
             IsActive = IsActive,
             CreatedDate = CreatedDate,

@@ -9,6 +9,7 @@ public interface IUnitOfWork
     IIdentificationTypeRepository IdentificationType { get; }
     IPersonTypeRepository PersonType { get; }
     ICustomerRepository Customer { get; }
+    ICompanyRepository Company { get; }
 
     void Save();
 }
