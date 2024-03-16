@@ -65,6 +65,11 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Nombre Comercial")]
     public string CommercialName { get; set; } = null!;
 
+    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [Display(Name = "Dirección Principal")]
+    public string? AddressPrimary { get; set; }
+
+
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Es Banco")]
     public bool IsBank { get; set; }
@@ -91,6 +96,7 @@ public class Customer: EntityInactivated, ICloneable
             SecondSurname = SecondSurname,
             BusinessName = BusinessName,
             CommercialName = CommercialName,
+            AddressPrimary = AddressPrimary,
             IsBank = IsBank,
             IsSystemRow = IsSystemRow,
 

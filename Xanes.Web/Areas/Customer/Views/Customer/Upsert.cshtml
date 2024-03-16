@@ -77,6 +77,11 @@
                         <label asp-for="DataModel.BusinessName" class="ms-2"></label>
                         <span asp-validation-for="DataModel.BusinessName" class="text-danger"></span>
                     </div>
+                    <div class="pb-1 pt-2 col-md-12">
+                        <label asp-for="DataModel.AddressPrimary" class="ms-2 text-muted"></label>
+                        <textarea asp-for="DataModel.AddressPrimary" class="form-control border-0 shadow">
+                        </textarea>
+                    </div>
                     <div class="form-floating pb-1 pt-2 col-md-12">
                         <div class="form-check mt-3 align-items-center">
                             <input type="checkbox" class="form-check-input" asp-for="DataModel.IsBank" />
@@ -95,7 +100,8 @@
                                     @Html.DisplayNameFor(m => m.DataModel.IsActive)
                                 </label>
                             </div>
-                        </div>                    }
+                        </div>
+                    }
                     else
                     {
                         <div class="form-floating pb-1 pt-2 col-md-6">
@@ -136,6 +142,26 @@
 </div>
 
 @section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons lists  table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent ',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            language: 'es_MX',
+            height: 250,
+            min_height: 250,
+            max_height:250,
+            language_url: '/languages/es_MX.js',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ],
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });
+    </script>
+
     @{
         <partial name="_ValidationScriptsPartial" />
         <script src="~/js/Customer/Customer/customerUpsert.js"></script>

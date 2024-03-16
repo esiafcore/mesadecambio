@@ -23,3 +23,40 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons lists  table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent ',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            language:'es_MX',
+            readonly: true,
+            height: 250,
+            min_height: 250,
+            max_height: 250,
+            language_url: '/languages/es_MX.js',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ],
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // console.log("DOMContentLoaded");
+            // tinymce.activeEditor.mode.set('readonly');
+            //Plugins a remover
+            //image, link, media, searchreplace
+            //'anchor autolink charmap codesample emoticons lists  table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+
+            //Toolbar a remover
+            //| link image media table mergetags | removeformat | emoticons charmap
+            //toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent ',
+
+        });
+
+    </script>
+}

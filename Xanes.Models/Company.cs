@@ -57,12 +57,12 @@ public class Company : ICloneable
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
     [Display(Name = "Dirección Principal")]
-    public string AddressPrimary { get; set; } = string.Empty;
+    public string AddressPrimary { get; set; } = null!;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Sitio Web")]
     [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string Website { get; set; } = string.Empty;
+    public string Website { get; set; } = null!;
 
     [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
     public string? ImageSplashUrl { get; set; }
