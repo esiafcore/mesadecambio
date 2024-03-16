@@ -53,7 +53,9 @@
                     </div>
 
                     <div class="form-floating pb-1 pt-2 col-md-12">
-                        <input type="file" asp-for="LogoUrl" class="form-control border-0 shadow" />
+                        <input type="file" name="filelogo"
+                               class="form-control border-0 shadow"
+                               accept="image/png, image/jpeg, image/svg+xml" />
                         <label asp-for="LogoUrl" class="ms-2"></label>
                     </div>
                     <div class="row pt-2">

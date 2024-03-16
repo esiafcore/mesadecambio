@@ -58,20 +58,20 @@ public class BankController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upsert(Bank obj, IFormFile? file)
+    public async Task<IActionResult> Upsert(Bank obj, IFormFile? filelogo)
     {
         //Datos son validos
         if (ModelState.IsValid)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
-            if (file != null)
+            if (filelogo != null)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(filelogo.FileName);
                 string productPath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
 
                 await using var fileStream = new FileStream(Path.Combine(productPath,fileName)
                     ,FileMode.Create);
-                await file.CopyToAsync(fileStream);
+                await filelogo.CopyToAsync(fileStream);
                 obj.LogoUrl = AC.ImagesBankFolder + fileName;
             }
 
