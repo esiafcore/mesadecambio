@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Xanes.DataAccess.Configuration;
-using Xanes.DataAccess.Shared;
 using Xanes.Models;
 
 namespace Xanes.DataAccess.Data;
@@ -11,12 +10,6 @@ public class ApplicationDbContext: DbContext
     {
     }
 
-    //protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-    //{
-    //    base.ConfigureConventions(configurationBuilder);
-    //    configurationBuilder.Properties<DateTime>()
-    //        .HaveConversion(typeof(UtcVAlueConverter));
-    //}
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
