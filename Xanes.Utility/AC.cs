@@ -1,4 +1,6 @@
-﻿namespace Xanes.Utility;
+﻿using static System.Net.Mime.MediaTypeNames;
+
+namespace Xanes.Utility;
 
 public static class AC
 {
@@ -10,5 +12,7 @@ public static class AC
     public const int DecimalExchangeDouble = 8;
     public const string XlsFormatRateExchange = "#,##0.0000";
     public const string XlsFormatNumeric = "#,##0.00";
+
+    public const string ImagesBankFolder = @"images\bank";
 
 }

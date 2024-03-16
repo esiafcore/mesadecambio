@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
+using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
 
@@ -9,12 +10,16 @@ public class BankController : Controller
 {
     private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
     private readonly int _companyId;
 
-    public BankController(IUnitOfWork uow, IConfiguration configuration)
+    public BankController(IUnitOfWork uow, IConfiguration configuration
+        , IWebHostEnvironment webHostEnvironment)
     {
         _uow = uow;
         _configuration = configuration;
+        _webHostEnvironment = webHostEnvironment;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
     // GET
@@ -53,12 +58,23 @@ public class BankController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upsert(Bank obj)
+    public async Task<IActionResult> Upsert(Bank obj, IFormFile? file)
     {
-
         //Datos son validos
         if (ModelState.IsValid)
         {
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            if (file != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                string productPath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
+
+                await using var fileStream = new FileStream(Path.Combine(productPath,fileName)
+                    ,FileMode.Create);
+                await file.CopyToAsync(fileStream);
+                obj.LogoUrl = AC.ImagesBankFolder + fileName;
+            }
+
             if (obj.CompanyId != _companyId)
             {
                 ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
