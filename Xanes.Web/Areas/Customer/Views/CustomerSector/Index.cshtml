@@ -1,0 +1,63 @@
+﻿@model List<CustomerSector>
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row align-items-center">
+            <div class="col-8 text-center">
+                <h3 class="text-white py-1">Sectores Clientes</h3>
+            </div>
+            <div class="col-4 text-end">
+                <a asp-controller="CustomerSector" asp-action="Upsert" class="btn btn-info">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body px-3 py-1">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripcion</th>
+                        <th>Está Activo</th>
+                        <th>Creado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td style="padding-left: @(item.Depthnumber)rem">@item.Name</td>
+                            <td class="text-center">@(item.IsActive ? AC.Si : AC.No)</td>
+                            <td>@item.CreatedDate.ToLocalTime()</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="CustomerSector" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-success py-1 px-2 my-0 mx-2">
+                                        <i class="bi bi-eye"></i> Ver
+                                    </a>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="CustomerSector" asp-action="Upsert" asp-route-parentId="@item.Id" class="btn btn-warning py-1 px-2 my-0 mx-2">
+                                        <i class="bi bi-node-plus"></i> Sub
+                                    </a>
+                                    <a asp-controller="CustomerSector" asp-action="Upsert" asp-route-id="@item.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                    <a asp-controller="CustomerSector" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
+                                        <i class="bi bi-trash-fill"></i> Eliminar
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

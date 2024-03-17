@@ -10,6 +10,6 @@ public interface IUnitOfWork
     IPersonTypeRepository PersonType { get; }
     ICustomerRepository Customer { get; }
     ICompanyRepository Company { get; }
-
+    ICustomerSectorRepository CustomerSector { get; }
     void Save();
 }

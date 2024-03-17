@@ -23,6 +23,7 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfiguration<Currency>(new CurrencyConfiguration());
         modelBuilder.ApplyConfiguration<QuotationType>(new QuotationTypeConfiguration());
         modelBuilder.ApplyConfiguration<PersonType>(new PersonTypeConfiguration());
+        modelBuilder.ApplyConfiguration<CustomerSector>(new CustomerSectorConfiguration());
         modelBuilder.ApplyConfiguration<CustomerCategory>(new CustomerCategoryConfiguration());
         modelBuilder.ApplyConfiguration<Customer>(new CustomerConfiguration());
         modelBuilder.ApplyConfiguration<IdentificationType>(new IdentificationTypeConfiguration());
@@ -34,6 +35,7 @@ public class ApplicationDbContext: DbContext
     public virtual DbSet<Currency> Currencies { get; set; }
     public virtual DbSet<QuotationType> QuotationsTypes { get; set; }
     public virtual DbSet<PersonType> PersonsTypes { get; set; }
+    public virtual DbSet<CustomerSector> CustomersSectors { get; set; }
     public virtual DbSet<CustomerCategory> CustomersCategories { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<IdentificationType> IdentificationsTypes { get; set; }

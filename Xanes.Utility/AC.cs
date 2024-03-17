@@ -12,6 +12,7 @@ public static class AC
     public const int DecimalExchangeDouble = 8;
     public const string XlsFormatRateExchange = "#,##0.0000";
     public const string XlsFormatNumeric = "#,##0.00";
+    public static char SeparationCharCode = '|';
 
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";

@@ -1,0 +1,98 @@
+﻿@model CustomerSector
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h3 class="text-white py-1">@(Model.Id != 0 ? "Editar" : "Crear")  Sector</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body px-3 py-1">
+        <div class="row pt-0">
+            <div class="col-md-12">
+                <form method="post" class="row">
+
+                    <input hidden asp-for="Id" />
+                    <input hidden asp-for="CompanyId" />
+                    <input hidden asp-for="CodePath" />
+                    <input hidden asp-for="IdPath" />
+                    <input hidden asp-for="TypeLevel" />
+                    <input hidden asp-for="Depthnumber" />
+                    <input hidden asp-for="ParentId" />
+                    <input hidden asp-for="SequentialDraftNumber" />
+                    <input hidden asp-for="SequentialNumber" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @if (Model.ParentId != null && Model.ParentId != 0)
+                    {
+                        <div class="form-floating pb-1 pt-2 col-md-12">
+                            <input type="text" readonly="readonly" class="form-control border-0 shadow" value="@($"{Model.ParentTrx.Code} - {Model.ParentTrx.Name}")" />
+                            <label asp-for="ParentId" class="ms-2">Reporta a</label>
+                        </div>
+                    }
+
+
+                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                        @if (Model.Id != 0)
+                        {
+                            <input asp-for="Code" type="text" readonly="readonly" class="form-control border-0 shadow" />
+                        }
+                        else
+                        {
+                            <input asp-for="Code" type="text" class="form-control border-0 shadow" />
+                        }
+                        <label asp-for="Code" class="ms-2"></label>
+                        <span asp-validation-for="Code" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
+                        <input asp-for="Name" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Name" class="ms-2"></label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating pb-1 pt-2 col-md-6">
+                        <div class="form-check mt-3 align-items-center">
+                            <input type="checkbox" class="form-check-input" asp-for="IsActive" />
+                            <label asp-for="IsActive" class="ms-2">
+                                @Html.DisplayNameFor(m => m.IsActive)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="row pt-2">
+                        <div class="col-md-6 col-md-3">
+                            @if (Model.Id != 0)
+                            {
+                                <button type="submit" class="btn btn-primary form-control">
+                                    <i class="bi bi-disc"></i> Actualizar
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-primary form-control">
+                                    <i class="bi bi-disc"></i> Crear
+                                </button>
+                            }
+                        </div>
+                        <div class="col-md-6 col-md-3">
+                            <a asp-controller="CustomerSector" asp-action="Index" class="btn btn-secondary border form-control">
+                                <i class="bi bi-arrow-return-left"></i> Regresar
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+        <script src="~/js/Customer/CustomerSector/customerSectorUpsert.js"></script>
+    }
+}
