@@ -14,72 +14,83 @@
                 <form method="post" class="row" enctype="multipart/form-data">
                     <input hidden asp-for="Id" />
                     <input hidden asp-for="CompanyId" />
+                    <div class="row m-0 p-0">
+                        <div class="col-md-10">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-floating pb-1 pt-2 col-md-12">
+                                <input asp-for="Code" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Code" class="ms-2"></label>
+                                <span asp-validation-for="Code" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating pb-1 pt-2 col-md-12">
+                                <input asp-for="Name" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Name" class="ms-2"></label>
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="form-floating pb-1 pt-2 col-md-6">
+                                    <input asp-for="BankingCommissionPercentage" type="number" class="form-control border-0 shadow" />
+                                    <label asp-for="BankingCommissionPercentage" class="ms-2"></label>
+                                    <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
+                                </div>
+                                <div class="form-floating pb-1 pt-2 col-md-6">
+                                    <input asp-for="OrderPriority" type="text" class="form-control border-0 shadow" />
+                                    <label asp-for="OrderPriority" class="ms-2"></label>
+                                    <span asp-validation-for="OrderPriority" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-floating pb-1 pt-2 col-md-6">
+                                    <input asp-for="BankAccountExcludeUId" type="text" class="form-control border-0 shadow" />
+                                    <label asp-for="BankAccountExcludeUId" class="ms-2"></label>
+                                    <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
+                                </div>
+                                <div class="form-floating pb-1 pt-2 col-md-6">
+                                    <input type="file" name="filelogo"
+                                           class="form-control border-0 shadow"
+                                           accept="image/png, image/jpeg, image/svg+xml" />
+                                    <label asp-for="LogoUrl" class="ms-2"></label>
+                                </div>
+                            </div>
+                            <div class="form-floating pb-1 pt-2 col-md-6">
+                                <div class="form-check mt-3 align-items-center">
+                                    <input type="checkbox" class="form-check-input" asp-for="IsCompany" />
+                                    <label asp-for="IsCompany" class="ms-2">
+                                        @Html.DisplayNameFor(m => m.IsCompany)
+                                    </label>
+                                </div>
+                            </div>
 
+                            <div class="row pt-2">
+                                <div class="col-6 col-md-3">
+                                    @if (Model.Id != 0)
+                                    {
+                                        <button type="submit" class="btn btn-primary form-control">
+                                            <i class="bi bi-disc"></i> Actualizar
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn btn-primary form-control">
+                                            <i class="bi bi-disc"></i> Crear
+                                        </button>
+                                    }
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
+                                        <i class="bi bi-arrow-return-left"></i> Regresar
+                                    </a>
+                                </div>
+                            </div>
 
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-floating pb-1 pt-2 col-md-12">
-                        <input asp-for="Code" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Code" class="ms-2"></label>
-                        <span asp-validation-for="Code" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating pb-1 pt-2 col-md-12">
-                        <input asp-for="Name" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Name" class="ms-2"></label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating pb-1 pt-2 col-md-6">
-                        <input asp-for="BankingCommissionPercentage" type="number" class="form-control border-0 shadow" />
-                        <label asp-for="BankingCommissionPercentage" class="ms-2"></label>
-                        <span asp-validation-for="BankingCommissionPercentage" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating pb-1 pt-2 col-md-6">
-                        <div class="form-check mt-3 align-items-center">
-                            <input type="checkbox" class="form-check-input" asp-for="IsCompany" />
-                            <label asp-for="IsCompany" class="ms-2">
-                                @Html.DisplayNameFor(m => m.IsCompany)
-                            </label>
+                        </div>
+                        <div class="col-md-2">
+                            <img src="@Model.LogoUrl" width="100%" 
+                                 onerror="this.src='http://placehold.it/100x100'"
+                                style="border-radius:5px; border:1px solid #bbb9b9"
+                            />
                         </div>
                     </div>
-                    <div class="form-floating pb-1 pt-2 col-md-6">
-                        <input asp-for="OrderPriority" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="OrderPriority" class="ms-2"></label>
-                        <span asp-validation-for="OrderPriority" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating pb-1 pt-2 col-md-6">
-                        <input asp-for="BankAccountExcludeUId" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="BankAccountExcludeUId" class="ms-2"></label>
-                        <span asp-validation-for="BankAccountExcludeUId" class="text-danger"></span>
-                    </div>
-
-                    <div class="form-floating pb-1 pt-2 col-md-12">
-                        <input type="file" name="filelogo"
-                               class="form-control border-0 shadow"
-                               accept="image/png, image/jpeg, image/svg+xml" />
-                        <label asp-for="LogoUrl" class="ms-2"></label>
-                    </div>
-                    <div class="row pt-2">
-                        <div class="col-6 col-md-3">
-                            @if (Model.Id != 0)
-                            {
-                                <button type="submit" class="btn btn-primary form-control">
-                                    <i class="bi bi-disc"></i> Actualizar
-                                </button>                            
-                            }
-                            else
-                            {
-                                <button type="submit" class="btn btn-primary form-control">
-                                    <i class="bi bi-disc"></i> Crear
-                                </button>                            
-                            }
-                        </div>
-                        <div class="col-6 col-md-3">
-                            <a asp-controller="Bank" asp-action="Index" class="btn btn-secondary border form-control">
-                                <i class="bi bi-arrow-return-left"></i> Regresar
-                            </a>
-                        </div>
-                    </div>
-
                 </form>
             </div>
         </div>

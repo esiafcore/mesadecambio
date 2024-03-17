@@ -52,4 +52,11 @@ public static class SD
         PA = 591,
         SV = 222
     }
+
+    public enum TypeLevel : short
+    {
+        Root = 1,
+        SubLevel = 2,
+        Detail = 4
+    }
 }

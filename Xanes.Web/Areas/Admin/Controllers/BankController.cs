@@ -63,6 +63,7 @@ public class BankController : Controller
         //Datos son validos
         if (ModelState.IsValid)
         {
+            //Trabajar con Logo del Banco
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             if (filelogo != null)
             {
@@ -72,7 +73,7 @@ public class BankController : Controller
                 await using var fileStream = new FileStream(Path.Combine(productPath,fileName)
                     ,FileMode.Create);
                 await filelogo.CopyToAsync(fileStream);
-                obj.LogoUrl = AC.ImagesBankFolder + fileName;
+                obj.LogoUrl = $"\\{AC.ImagesBankFolder}{fileName}";
             }
 
             if (obj.CompanyId != _companyId)
