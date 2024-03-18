@@ -68,13 +68,26 @@ public class BankController : Controller
             if (filelogo != null)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(filelogo.FileName);
-                string productPath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
+                string imagePath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
 
-                await using var fileStream = new FileStream(Path.Combine(productPath,fileName)
+                if (!string.IsNullOrEmpty(obj.LogoUrl))
+                {
+                    //delete the old image
+                    var oldImagePath =
+                        Path.Combine(wwwRootPath, obj.LogoUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                await using var fileStream = new FileStream(Path.Combine(imagePath,fileName)
                     ,FileMode.Create);
                 await filelogo.CopyToAsync(fileStream);
                 obj.LogoUrl = $"\\{AC.ImagesBankFolder}{fileName}";
             }
+
 
             if (obj.CompanyId != _companyId)
             {
