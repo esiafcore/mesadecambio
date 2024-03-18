@@ -118,10 +118,11 @@ public class BankController : Controller
             {
                 //Validar que codigo no está repetido
                 var objExists = _uow.Bank
-                    .Get(x => (x.CompanyId == _companyId)
-                              & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()), isTracking: false);
+                    .Get(filter: x => (x.CompanyId == _companyId)
+                                      & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()),
+                                      isTracking: false);
 
-                if (objExists != null && objExists.Id != obj.Id)
+                if ((objExists != null) && (objExists.Id != obj.Id))
                 {
                     ModelState.AddModelError("", $"Código {obj.Code} ya existe");
                 }
