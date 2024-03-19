@@ -30,6 +30,13 @@
                         <span asp-validation-for="DataModel.CategoryId" class="text-danger"></span>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                        <select asp-for="DataModel.SectorId" asp-items="@Model.SectorList" class="form-select border-0 shadow">
+                            <option disabled selected>--Select Sector--</option>
+                        </select>
+                        <label asp-for="DataModel.SectorId" class="ms-2">Sector</label>
+                        <span asp-validation-for="DataModel.SectorId" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         @if (Model.DataModel.Id != 0)
                         {
                             <input asp-for="DataModel.Code" type="text" readonly="readonly" class="form-control border-0 shadow" />
@@ -45,7 +52,9 @@
                         <label asp-for="DataModel.Identificationnumber" class="ms-2"></label>
                         <span asp-validation-for="DataModel.Identificationnumber" class="text-danger"></span>
                     </div>
-
+                    @* Para completar las 12 columnas *@
+                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                    </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" />
                         <label asp-for="DataModel.FirstName" class="ms-2"></label>
@@ -152,7 +161,7 @@
             language: 'es_MX',
             height: 250,
             min_height: 250,
-            max_height:250,
+            max_height: 250,
             language_url: '/languages/es_MX.js',
             mergetags_list: [
                 { value: 'First.Name', title: 'First Name' },

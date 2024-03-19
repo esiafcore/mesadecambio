@@ -11,5 +11,7 @@ public interface IUnitOfWork
     ICustomerRepository Customer { get; }
     ICompanyRepository Company { get; }
     ICustomerSectorRepository CustomerSector { get; }
+    ICurrencyExchangeRateRepository CurrencyExchangeRate { get; }
+
     void Save();
 }

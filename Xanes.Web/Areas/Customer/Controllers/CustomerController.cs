@@ -19,7 +19,7 @@ public class CustomerController : Controller
     public IActionResult Index()
     {
         var objList = _uow.Customer.GetAll(filter:x => (x.CompanyId == _companyId)
-        ,includeProperties: "TypeTrx,CategoryTrx").ToList();
+        ,includeProperties: "TypeTrx,CategoryTrx,SectorTrx").ToList();
         return View(objList);
     }
 
@@ -31,7 +31,7 @@ public class CustomerController : Controller
         }
 
         var obj = _uow.Customer.Get(filter: x => (x.Id == id)
-        , includeProperties: "TypeTrx,CategoryTrx"
+        , includeProperties: "TypeTrx,CategoryTrx,SectorTrx"
         , isTracking: false);
 
         if (obj == null)
@@ -77,6 +77,10 @@ public class CustomerController : Controller
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
+        var sectorSelectList = _uow.CustomerSector
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
         var typeSelectList = _uow.PersonType
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
@@ -85,7 +89,8 @@ public class CustomerController : Controller
         {
             DataModel = obj,
             CategoryList = categorySelectList,
-            TypeList = typeSelectList
+            TypeList = typeSelectList,
+            SectorList = sectorSelectList
         };
 
         return View(dataVM);
@@ -163,6 +168,10 @@ public class CustomerController : Controller
                     .GetAll(filter: x => (x.CompanyId == _companyId))
                     .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
+                var sectorSelectList = _uow.CustomerSector
+                    .GetAll(filter: x => (x.CompanyId == _companyId))
+                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
                 var typeSelectList = _uow.PersonType
                     .GetAll(filter: x => (x.CompanyId == _companyId))
                     .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
@@ -175,6 +184,10 @@ public class CustomerController : Controller
         else
         {
             var categorySelectList = _uow.CustomerCategory
+                .GetAll(filter: x => (x.CompanyId == _companyId))
+                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+
+            var sectorSelectList = _uow.CustomerSector
                 .GetAll(filter: x => (x.CompanyId == _companyId))
                 .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 

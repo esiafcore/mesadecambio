@@ -12,6 +12,14 @@ public static class SD
     }
 
     [Flags]
+    public enum CurrencyTypeCode : int
+    {
+        MonBas = 1,
+        MonFor = 2,
+        MonXtr = 4
+    }
+
+    [Flags]
     public enum QuotationType : int
     {
         Buy = 1,

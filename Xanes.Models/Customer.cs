@@ -31,6 +31,13 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Número Tipo Persona")]
     public int TypeNumeral { get; set; }
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id Sector")]
+    [ForeignKey(nameof(SectorTrx))]
+    public int SectorId { get; set; } = 1;
+    [ValidateNever]
+    public virtual CustomerSector SectorTrx { get; set; } = null!;
+
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Código")]

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xanes.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using Xanes.DataAccess.Data;
 namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240319021704_AddCurrenciesExchangeRatesModelToDb")]
+    partial class AddCurrenciesExchangeRatesModelToDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BAC",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2238),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8818),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -181,7 +184,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FICOHSA",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2263),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8847),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -197,7 +200,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BDF",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2271),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8852),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -213,7 +216,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "LAFISE",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2274),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8896),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -229,7 +232,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "ATLANT",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2277),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8898),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -245,7 +248,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BANPRO",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2280),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8900),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -261,7 +264,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "AVANZ",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 831, DateTimeKind.Utc).AddTicks(2283),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 605, DateTimeKind.Utc).AddTicks(8902),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -454,7 +457,7 @@ namespace Xanes.DataAccess.Migrations
                             CountryCode = "NIC",
                             CountryNumber = (short)558,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 834, DateTimeKind.Utc).AddTicks(1415),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 608, DateTimeKind.Utc).AddTicks(222),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IdentificationNumber = "J0310000031339",
@@ -623,7 +626,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "NIO",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(61),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(4287),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -641,7 +644,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "USD",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(72),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(4294),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -659,7 +662,7 @@ namespace Xanes.DataAccess.Migrations
                             CodeIso = "EUR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(76),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(4297),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -900,10 +903,6 @@ namespace Xanes.DataAccess.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("secondsurname");
 
-                    b.Property<int>("SectorId")
-                        .HasColumnType("int")
-                        .HasColumnName("sectorid");
-
                     b.Property<int>("TypeId")
                         .HasColumnType("int")
                         .HasColumnName("typeid");
@@ -936,9 +935,6 @@ namespace Xanes.DataAccess.Migrations
 
                     b.HasIndex("CategoryId")
                         .HasDatabaseName("ix_customers_categoryid");
-
-                    b.HasIndex("SectorId")
-                        .HasDatabaseName("ix_customers_sectorid");
 
                     b.HasIndex("TypeId")
                         .HasDatabaseName("ix_customers_typeid");
@@ -1079,7 +1075,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "BAN",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(920),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2630),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1093,7 +1089,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FIN",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(926),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2635),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1107,7 +1103,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "IND",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(929),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2637),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1121,7 +1117,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "ONG",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(931),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2639),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1135,7 +1131,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "UNI",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(933),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2640),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1149,7 +1145,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "COM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(935),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2642),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1163,7 +1159,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "FAM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(938),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2643),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1177,7 +1173,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "TEC",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(940),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2645),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1191,7 +1187,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "OTR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(942),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2646),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1205,7 +1201,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "SER",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(944),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(2648),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IsActive = true,
@@ -1493,7 +1489,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "RUC",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(8979),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8453),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "$1",
@@ -1512,7 +1508,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "CEDU",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(8988),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8466),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "$1-$2-$3",
@@ -1531,7 +1527,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "DIMEX",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(9061),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8469),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "",
@@ -1550,7 +1546,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "NITE",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(9064),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8471),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "",
@@ -1569,7 +1565,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "DIDI",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(9067),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8473),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "",
@@ -1588,7 +1584,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "PASS",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 833, DateTimeKind.Utc).AddTicks(9070),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 607, DateTimeKind.Utc).AddTicks(8476),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             FormatExpressionNumber = "",
@@ -1697,7 +1693,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "NAT",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(5880),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(8535),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "Natural",
@@ -1709,7 +1705,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "JUR",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(5886),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(8541),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "Jurídico",
@@ -1813,7 +1809,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "COM",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(3033),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(6424),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "COMPRA",
@@ -1826,7 +1822,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "VTA",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(3041),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(6430),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "VENTA",
@@ -1839,7 +1835,7 @@ namespace Xanes.DataAccess.Migrations
                             Code = "TRF",
                             CompanyId = 1,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 3, 19, 3, 3, 37, 832, DateTimeKind.Utc).AddTicks(3043),
+                            CreatedDate = new DateTime(2024, 3, 19, 2, 17, 3, 606, DateTimeKind.Utc).AddTicks(6432),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             Name = "TRANSFERENCIA",
@@ -1869,13 +1865,6 @@ namespace Xanes.DataAccess.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_customers_customerscategories_categoryid");
 
-                    b.HasOne("Xanes.Models.CustomerSector", "SectorTrx")
-                        .WithMany()
-                        .HasForeignKey("SectorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_customers_customerssectors_sectorid");
-
                     b.HasOne("Xanes.Models.PersonType", "TypeTrx")
                         .WithMany()
                         .HasForeignKey("TypeId")
@@ -1884,8 +1873,6 @@ namespace Xanes.DataAccess.Migrations
                         .HasConstraintName("fk_customers_personstypes_typeid");
 
                     b.Navigation("CategoryTrx");
-
-                    b.Navigation("SectorTrx");
 
                     b.Navigation("TypeTrx");
                 });

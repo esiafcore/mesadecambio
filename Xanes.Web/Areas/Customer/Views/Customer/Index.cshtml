@@ -23,8 +23,8 @@
                     <th>Razón Social</th>
                     <th>Tipo</th>
                     <th>Categoria</th>
+                    <th>Sector</th>
                     <th>Activo?</th>
-                    <th>Creado</th>
                     <th></th>
                 </tr>
             </thead>
@@ -37,20 +37,26 @@
                         <td>@itm.BusinessName</td>
                         <td>@itm.TypeTrx.Code</td>
                         <td>@itm.CategoryTrx.Code</td>
+                        <td>@itm.SectorTrx.Name.Trim()</td>
                         <td class="text-center">@(itm.IsActive ? AC.Si : AC.No)</td>
-                        <td>@itm.CreatedDate.ToLocalTime()</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a asp-controller="Customer" asp-action="Detail" asp-route-id="@itm.Id" class="btn btn-success py-1 px-2 my-0 mx-2">
-                                    <i class="bi bi-eye"></i> Ver
+                                <a asp-controller="Customer" asp-action="Detail" 
+                                    asp-route-id="@itm.Id" class="btn btn-success py-1 px-3 my-0 mx-2"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
+                                    <i class="bi bi-eye fs-4"></i>
                                 </a>
                             </div>
                             <div class="btn-group" role="group">
-                                <a asp-controller="Customer" asp-action="Upsert" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
-                                    <i class="bi bi-pencil-square"></i> Editar
+                                <a asp-controller="Customer" asp-action="Upsert" 
+                                    asp-route-id="@itm.Id" class="btn btn-primary py-1 px-3 my-0 mx-2"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                                    <i class="bi bi-pencil-square fs-4"></i>
                                 </a>
-                                <a asp-controller="Customer" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
-                                    <i class="bi bi-trash-fill"></i> Eliminar
+                                <a asp-controller="Customer" asp-action="Delete" 
+                                    asp-route-id="@itm.Id" class="btn btn-danger py-1 px-3 my-0 mx-2"
+                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                                    <i class="bi bi-trash-fill fs-4"></i>
                                 </a>
                             </div>
                         </td>
@@ -61,3 +67,8 @@
     </div>
 </div>
 
+@section Scripts {
+    @{
+        <script src="~/js/Customer/Customer/customerIndex.js"></script>
+    }
+}

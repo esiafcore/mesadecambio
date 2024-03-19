@@ -28,7 +28,7 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfiguration<Customer>(new CustomerConfiguration());
         modelBuilder.ApplyConfiguration<IdentificationType>(new IdentificationTypeConfiguration());
         modelBuilder.ApplyConfiguration<Company>(new CompanyConfiguration());
-
+        modelBuilder.ApplyConfiguration<CurrencyExchangeRate>(new CurrencyExchangeRateConfiguration());
     }
 
     public virtual DbSet<Bank> Banks {get;set;}
@@ -40,5 +40,6 @@ public class ApplicationDbContext: DbContext
     public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<IdentificationType> IdentificationsTypes { get; set; }
     public virtual DbSet<Company> Companies { get; set; }
+    public virtual DbSet<CurrencyExchangeRate> CurrenciesExchangeRates { get; set; }
 
 }

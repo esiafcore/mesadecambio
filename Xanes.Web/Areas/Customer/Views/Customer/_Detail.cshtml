@@ -13,10 +13,15 @@
     </div>
 
     <div class="form-floating pb-1 pt-2 col-md-6">
+        <input asp-for="SectorTrx.Name" type="text" readonly="readonly" class="form-control border-0 shadow" />
+        <label asp-for="SectorTrx.Name" class="ms-2">Sector Cliente</label>
+    </div>
+
+    <div class="form-floating pb-1 pt-2 col-md-6">
         <input asp-for="Code" type="text" readonly="readonly" class="form-control border-0 shadow" />
         <label asp-for="Code" class="ms-2"></label>
     </div>
-    <div class="form-floating pb-1 pt-2 col-md-6">
+    <div class="form-floating pb-1 pt-2 col-md-12">
         <input asp-for="Identificationnumber" type="text" readonly="readonly" class="form-control border-0 shadow" />
         <label asp-for="Identificationnumber" class="ms-2"></label>
     </div>

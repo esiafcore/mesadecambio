@@ -1,0 +1,85 @@
+﻿@model CurrencyExchangeRateVM
+
+<div class="card shadow border-0 mt-1 col-12 col-lg-8">
+    <div class="card-header bg-secondary bg-gradient ms-0 py-1">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="text-white py-1">@(Model.DataModel.Id != 0 ? "Editar" : "Crear")  Tipo de Cambio</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body px-3 py-1">
+        <div class="container pt-0">
+            <form method="post" class="row">
+                <input hidden asp-for="DataModel.Id" />
+                <input hidden asp-for="DataModel.CompanyId" />
+                <input hidden asp-for="DataModel.CurrencyType" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- ROW 1 -->
+                <div class="row">
+                    <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                        <input asp-for="DataModel.DateTransa" type="date" class="form-control border-0 shadow" />
+                        <label asp-for="DataModel.DateTransa" class="ms-2"></label>
+                        <span asp-validation-for="DataModel.DateTransa" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                        <input type="text" readonly="readonly" class="form-control border-0 shadow"
+                            value="@Model.DataModel.CurrencyTrx.Abbreviation" />
+                        <label class="ms-2">Moneda</label>
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="row">
+                    <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                        <input asp-for="DataModel.OfficialRate" type="number" class="form-control border-0 shadow text-end" step="any" />
+                        <label asp-for="DataModel.OfficialRate" class="ms-2"></label>
+                        <span asp-validation-for="DataModel.OfficialRate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                        <input asp-for="DataModel.BuyRate" type="number" class="form-control border-0 shadow text-end" step="any" />
+                        <label asp-for="DataModel.BuyRate" class="ms-2"></label>
+                        <span asp-validation-for="DataModel.BuyRate" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                        <input asp-for="DataModel.SellRate" type="number" class="form-control border-0 shadow text-end" step="any" />
+                        <label asp-for="DataModel.SellRate" class="ms-2"></label>
+                        <span asp-validation-for="DataModel.SellRate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- ROW 3 BTNs -->
+                <div class="row pt-2">
+                    <div class="col-6 col-md-3">
+                        @if (Model.DataModel.Id != 0)
+                        {
+                            <button type="submit" class="btn btn-primary form-control">
+                                <i class="bi bi-disc"></i> Actualizar
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary form-control">
+                                <i class="bi bi-disc"></i> Crear
+                            </button>
+                        }
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a asp-controller="CurrencyExchangeRate" asp-action="Index"
+                            asp-route-currencyType="@((short)Model.DataModel.CurrencyType)" class="btn btn-secondary border form-control">
+                            <i class="bi bi-arrow-return-left"></i> Regresar
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

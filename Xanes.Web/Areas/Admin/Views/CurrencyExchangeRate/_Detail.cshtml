@@ -1,0 +1,39 @@
+﻿@model CurrencyExchangeRate
+
+<div class="row">
+    <input hidden asp-for="Id" />
+    <input hidden asp-for="CompanyId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- ROW 1 -->
+    <div class="row">
+        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+            <input asp-for="DateTransa" type="date" class="form-control border-0 shadow" />
+            <label asp-for="DateTransa" class="ms-2"></label>
+        </div>
+
+        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+            <input asp-for="CurrencyId" type="text" readonly="readonly" class="form-control border-0 shadow" value="@Model.CurrencyTrx.Abbreviation" />
+            <label asp-for="CurrencyId" class="ms-2">Moneda</label>
+        </div>
+    </div>
+
+    <!-- ROW 2 -->
+    <div class="row">
+        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+            <input asp-for="OfficialRate" type="number" readonly="readonly" class="form-control border-0 shadow text-end" step="any" />
+            <label asp-for="OfficialRate" class="ms-2"></label>
+        </div>
+
+        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+            <input asp-for="BuyRate" type="number" readonly="readonly" class="form-control border-0 shadow text-end" step="any" />
+            <label asp-for="BuyRate" class="ms-2"></label>
+        </div>
+
+        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+            <input asp-for="SellRate" type="number" readonly="readonly" class="form-control border-0 shadow text-end" step="any" />
+            <label asp-for="SellRate" class="ms-2"></label>
+        </div>
+    </div>
+</div>

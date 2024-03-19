@@ -19,6 +19,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IPersonTypeRepository PersonType { get; private set; }
     public ICustomerSectorRepository CustomerSector { get; private set; }
+    public ICurrencyExchangeRateRepository CurrencyExchangeRate { get; private set; }
 
     public UnitOfWork(ApplicationDbContext db)
     {
@@ -32,6 +33,7 @@ public class UnitOfWork : IUnitOfWork
         Customer = new CustomerRepository(_db);
         Company = new CompanyRepository(_db);
         CustomerSector = new CustomerSectorRepository(_db);
+        CurrencyExchangeRate = new CurrencyExchangeRateRepository(_db);
 
     }
 

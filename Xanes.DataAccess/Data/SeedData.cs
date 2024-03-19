@@ -52,7 +52,8 @@ public class SeedData
                 CommercialName = "AMERICAN PHARMA",
                 IsBank = false,
                 IsSystemRow = false,
-                IsActive = true
+                IsActive = true,
+                SectorId = 1
             },
             new Customer
             {
@@ -72,7 +73,8 @@ public class SeedData
                 CommercialName = "MIGUEL FERNANDO RAMIREZ OCON",
                 IsBank = false,
                 IsSystemRow = false,
-                IsActive = true
+                IsActive = true,
+                SectorId = 1
             },
             new Customer
             {
@@ -92,7 +94,8 @@ public class SeedData
                 CommercialName = "JIMMY ALEXANDER SANDOVAL FRANCO",
                 IsBank = false,
                 IsSystemRow = false,
-                IsActive = true
+                IsActive = true,
+                SectorId = 1
             },
             new Customer
             {
@@ -112,7 +115,8 @@ public class SeedData
                 CommercialName = "INSUMOS SMART NICARAGUA SOCIEDAD ANONIMA",
                 IsBank = false,
                 IsSystemRow = false,
-                IsActive = true
+                IsActive = true,
+                SectorId = 1
             },
             new Customer
             {
@@ -132,8 +136,9 @@ public class SeedData
                 CommercialName = "MEYLING RAQUEL SANCHEZ ORTIZ",
                 IsBank = false,
                 IsSystemRow = false,
-                IsActive = true
-            }        
+                IsActive = true,
+                SectorId = 1
+            }
         };
         return customersList;
     }
