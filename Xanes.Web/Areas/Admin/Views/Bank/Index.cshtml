@@ -14,41 +14,25 @@
         </div>
     </div>
     <div class="card-body px-3 py-1">
-
-        <table class="table table-bordered table-striped">
-            <thead>
-            <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>% Comisión</th>
-                <th>Es Compañía</th>
-                <th>Orden</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var itm in Model.OrderBy(x => x.OrderPriority).ThenBy(x => x.Code))
-            {
+        <div class="table-responsive" id="table-wrapper">
+            <table id="tblData" class="table table-bordered table-striped" style="width:100%">
+                <thead>
                 <tr>
-                    <td>@itm.Code</td>
-                    <td>@itm.Name</td>
-                    <td class="text-end">@itm.BankingCommissionPercentage</td>
-                        <td class="text-center">@(itm.IsCompany ? AC.Si : AC.No)</td>
-                    <td class="text-end">@itm.OrderPriority</td>
-                    <td>
-                        <div class="btn-group" role="group">
-                                <a asp-controller="Bank" asp-action="Upsert" asp-route-id="@itm.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
-                                <i class="bi bi-pencil-square"></i> Editar
-                            </a>
-                            <a asp-controller="Bank" asp-action="Delete" asp-route-id="@itm.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
-                                <i class="bi bi-trash-fill"></i> Eliminar
-                            </a>
-                        </div>
-                    </td>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>% Comisión</th>
+                    <th>Es Compañía</th>
+                    <th>Orden</th>
+                    <th></th>
                 </tr>
-            }
-            </tbody>
-        </table>
+                </thead>
+            </table>
+        </div>
     </div>
 </div>
 
+@section Scripts {
+    @{
+        <script src="~/js/Admin/Bank/bankIndex.js"></script>
+    }
+}

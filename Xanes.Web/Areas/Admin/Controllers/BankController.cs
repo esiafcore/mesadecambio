@@ -82,8 +82,8 @@ public class BankController : Controller
                     }
                 }
 
-                await using var fileStream = new FileStream(Path.Combine(imagePath,fileName)
-                    ,FileMode.Create);
+                await using var fileStream = new FileStream(Path.Combine(imagePath, fileName)
+                    , FileMode.Create);
                 await filelogo.CopyToAsync(fileStream);
                 obj.LogoUrl = $"\\{AC.ImagesBankFolder}{fileName}";
             }
@@ -171,5 +171,14 @@ public class BankController : Controller
         TempData["success"] = "Bank deleted successfully";
         return RedirectToAction("Index", "Bank");
     }
+
+    #region API CALLS
+    public IActionResult GetAll()
+    {
+        var objList = _uow.Bank
+            .GetAll(x => (x.CompanyId == _companyId)).ToList();
+        return Json(new { data = objList });
+    }
+    #endregion
 
 }
