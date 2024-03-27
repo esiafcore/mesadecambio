@@ -1,4 +1,4 @@
-﻿var dataTable;
+﻿let dataTable;
 document.addEventListener("DOMContentLoaded", function () {
     loadDatatable();
 
@@ -17,14 +17,14 @@ function loadDatatable() {
             { data: 'isCompany', "width": "5%" },
             { data: 'orderPriority', "width": "5%" },
             {
-                data: 'id',
-                "render": function (data) {
+                data: null,
+                "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
-                        <a href="/admin/bank/upsert?id=${data}" class="btn btn-primary py-1 px-3 my-0 mx-2"
+                        <a href="/admin/bank/upsert?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-2"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a onClick=Delete('/admin/bank/delete?id=${data}') class="btn btn-danger py-1 px-3 my-0 mx-2" 
+                        <a onClick="fnDeleteRow('/admin/bank/delete?id=${row.id}','${row.code}','${row.name}')" class="btn btn-danger py-1 px-3 my-0 mx-2" 
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
@@ -66,25 +66,43 @@ function loadDatatable() {
     });
 }
 
-function Delete(url) {
-    Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+const fnDeleteRow = async (url,code,rowname) => {
+    let fetchOptions;
+
+    let result = await Swal.fire({
+        title: `&#191;Está seguro de eliminar el Banco?`,
+        html: `${code} ${rowname}<br>Este registro no se podrá recuperar`,
         icon: "warning",
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: url,
-                type: 'DELETE',
-                success: function (data) {
-                    dataTable.ajax.reload();
-                    toastr.success(data.message);
-                }
-            });
-        }
+        reverseButtons: true,
+        confirmButtonText: ButtonsText.Delete,
+        cancelButtonText: ButtonsText.Cancel,
+        confirmButtonColor: ButtonsColor.Cancel,
+        cancelButtonColor: ButtonsColor.Confirm
     });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    fetchOptions = {
+        method: "DELETE"
+    };
+
+    const fetchResponse = await fetch(url, fetchOptions);
+
+    if (fetchResponse.ok) {
+        let jsonResponse = await fetchResponse.json();
+        console.log(jsonResponse);
+
+        if (jsonResponse.isSuccess) {
+            dataTable.ajax.reload();
+            toastr.success(jsonResponse.successMessages);
+        } else {
+            toastr.success(jsonResponse.errorMessages);
+        }
+    }
+    else {
+        console.log(fetchResponse);
+    }
 }

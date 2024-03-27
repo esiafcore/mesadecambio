@@ -11,3 +11,33 @@ const fnEnableTooltip = () => {
         new bootstrap.Tooltip(button); // Se usa 'new bootstrap.Tooltip' para inicializar el tooltip
     });
 };
+
+const ButtonsText = {
+    Confirm: "Confirmar",
+    Cancel: "Cancelar",
+    Closed: "Cerrar",
+    Delete: "Eliminar",
+    Create: "Crear",
+    Link: "Relacionar",
+    Add: "Agregar",
+    CreateVersion: "Crear Nueva Versión",
+    Update: "Actualizar",
+    Save: "Guardar",
+    View: "Visualizar",
+    Approved: "Aprobar",
+    DisAccount: "Descontabilizar",
+    Bill: "Facturar",
+    Void: "Anular",
+    Print: "Imprimir",
+    Balance: "Saldos",
+    Active: "Activar",
+    Inactive: "Inactivar",
+    Accept: "Aceptar",
+    Authorize: "Autorizar",
+    Auxiliary: "Auxiliar"
+}
+
+const ButtonsColor = {
+    Confirm: "#3085d6",
+    Cancel: "#d33"
+}

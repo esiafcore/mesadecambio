@@ -205,7 +205,9 @@ public class BankController : Controller
 
         _uow.Bank.RemoveByFilter(filter: u => (u.Id == rowToBeDeleted.Id));
 
-        return Json(new { success = true, message = "Bank Successfully Removed" });
+        return Json(new { isSuccess = true
+            , successMessages = "Bank Successfully Removed"
+            , errorMessages = string.Empty});
     }
 
     #endregion
