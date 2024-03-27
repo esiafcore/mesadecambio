@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+﻿var dataTable;
+document.addEventListener("DOMContentLoaded", function () {
     loadDatatable();
 
     //Habilitar Tooltip
@@ -6,7 +7,7 @@
 });
 
 function loadDatatable() {
-    let dataTable = new DataTable("#tblData",{
+    dataTable = new DataTable("#tblData",{
         "ajax": { url: '/admin/bank/getall' },
         "dataSrc": 'data',
         "columns": [
@@ -23,7 +24,7 @@ function loadDatatable() {
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a href="/admin/bank/delete?id=${data}" class="btn btn-danger py-1 px-3 my-0 mx-2" 
+                        <a onClick=Delete('/admin/bank/delete?id=${data}') class="btn btn-danger py-1 px-3 my-0 mx-2" 
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
@@ -62,5 +63,28 @@ function loadDatatable() {
             },
 
         ]
+    });
+}
+
+function Delete(url) {
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                success: function (data) {
+                    dataTable.ajax.reload();
+                    toastr.success(data.message);
+                }
+            });
+        }
     });
 }

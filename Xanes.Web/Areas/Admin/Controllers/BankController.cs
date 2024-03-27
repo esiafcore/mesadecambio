@@ -181,6 +181,7 @@ public class BankController : Controller
         return Json(new { data = objList });
     }
 
+    [HttpDelete]
     public IActionResult Delete(int? id)
     {
         var rowToBeDeleted = _uow.Bank.Get(filter:u => (u.Id == id)
@@ -206,6 +207,7 @@ public class BankController : Controller
 
         return Json(new { success = true, message = "Bank Successfully Removed" });
     }
+
     #endregion
 
 }
