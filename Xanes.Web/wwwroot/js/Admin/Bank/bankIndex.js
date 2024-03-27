@@ -21,11 +21,11 @@ function loadDatatable() {
                     return `<div class="btn-group" role="group">
                         <a href="/admin/bank/upsert?id=${data}" class="btn btn-primary py-1 px-3 my-0 mx-2"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
-                            <i class="bi bi-pencil-square fs-4"></i>
+                            <i class="bi bi-pencil-square fs-5"></i>
                         </a>
                         <a href="/admin/bank/delete?id=${data}" class="btn btn-danger py-1 px-3 my-0 mx-2" 
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
-                            <i class="bi bi-trash-fill fs-4"></i>
+                            <i class="bi bi-trash-fill fs-5"></i>
                         </a>
 
                     </div>`

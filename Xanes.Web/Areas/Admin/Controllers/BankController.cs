@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 using Xanes.Utility;
@@ -140,37 +141,37 @@ public class BankController : Controller
         return View(obj);
     }
 
-    public IActionResult Delete(int? id)
-    {
-        if (id == null || id == 0)
-        {
-            return NotFound();
-        }
+    //public IActionResult Delete(int? id)
+    //{
+    //    if (id == null || id == 0)
+    //    {
+    //        return NotFound();
+    //    }
 
-        var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
+    //    var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
-        if (obj == null)
-        {
-            return NotFound();
-        }
+    //    if (obj == null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        return View(obj);
-    }
+    //    return View(obj);
+    //}
 
-    [HttpPost, ActionName("Delete")]
-    public IActionResult DeletePost(int? id)
-    {
-        var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
+    //[HttpPost, ActionName("Delete")]
+    //public IActionResult DeletePost(int? id)
+    //{
+    //    var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
-        if (obj == null)
-        {
-            return NotFound();
-        }
-        _uow.Bank.Remove(obj);
-        _uow.Save();
-        TempData["success"] = "Bank deleted successfully";
-        return RedirectToAction("Index", "Bank");
-    }
+    //    if (obj == null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    _uow.Bank.Remove(obj);
+    //    _uow.Save();
+    //    TempData["success"] = "Bank deleted successfully";
+    //    return RedirectToAction("Index", "Bank");
+    //}
 
     #region API CALLS
     public IActionResult GetAll()
@@ -178,6 +179,32 @@ public class BankController : Controller
         var objList = _uow.Bank
             .GetAll(x => (x.CompanyId == _companyId)).ToList();
         return Json(new { data = objList });
+    }
+
+    public IActionResult Delete(int? id)
+    {
+        var rowToBeDeleted = _uow.Bank.Get(filter:u => (u.Id == id)
+        ,isTracking:false);
+
+        if (rowToBeDeleted == null)
+        {
+            return Json(new { success = false, message = "Bank don´t exist" });
+        }
+
+        if (!string.IsNullOrEmpty(rowToBeDeleted.LogoUrl))
+        {
+            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+                rowToBeDeleted.LogoUrl.TrimStart('\\'));
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+        }
+
+        _uow.Bank.RemoveByFilter(filter: u => (u.Id == rowToBeDeleted.Id));
+
+        return Json(new { success = true, message = "Bank Successfully Removed" });
     }
     #endregion
 
