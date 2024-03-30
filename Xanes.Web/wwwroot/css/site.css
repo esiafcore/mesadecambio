@@ -21,9 +21,9 @@ body {
   margin-bottom: 60px;
 }
 
-.table th {
+.table thead tr th {
     padding: 0.7rem;
-    text-align:center;
+    text-align: center !important;
 }
 
 .table td {
@@ -32,6 +32,10 @@ body {
     padding-top: 0.50rem;
     padding-bottom: 0.50rem;
     align-items: center;
+}
+
+table.dataTable tbody td {
+    vertical-align: middle;
 }
 
 /* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification

@@ -37,32 +37,8 @@ function loadDatatable() {
         "info": false,
         "ordering": true,
         "paging": true,
-        "order": [[1, 'asc'], [0, 'desc']],
-        "columnDefs": [
-            {
-                target: 0,
-                visible: true,
-                searchable: true,
-                orderable: true
-            },
-            {
-                target: 1,
-                orderable: false
-            },
-            {
-                target: 2,
-                orderable: false
-            },
-            {
-                target: 3,
-                orderable: false
-            },
-            {
-                target: 4,
-                orderable: false
-            },
+        "select":true,
 
-        ]
     });
 }
 
@@ -75,10 +51,14 @@ const fnDeleteRow = async (url,code,rowname) => {
         icon: "warning",
         showCancelButton: true,
         reverseButtons: true,
+        focusConfirm: false,
         confirmButtonText: ButtonsText.Delete,
         cancelButtonText: ButtonsText.Cancel,
-        confirmButtonColor: ButtonsColor.Cancel,
-        cancelButtonColor: ButtonsColor.Confirm
+        customClass: {
+            confirmButton: "btn btn-danger px-3 mx-2",
+            cancelButton: "btn btn-primary px-3 mx-2"
+        },
+        buttonsStyling: false
     });
 
     if (!result.isConfirmed) {
