@@ -7,7 +7,7 @@ using static Xanes.Utility.SD;
 namespace Xanes.Models;
 
 [Table("customerssectors", Schema = "cxc")]
-public sealed class CustomerSector : EntityInactivated, ICloneable
+public class CustomerSector : EntityInactivated, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
@@ -35,7 +35,7 @@ public sealed class CustomerSector : EntityInactivated, ICloneable
     [ForeignKey(nameof(ParentTrx))]
     public int? ParentId { get; set; }
     [ValidateNever]
-    public CustomerSector ParentTrx { get; set; } = null!;
+    public virtual CustomerSector ParentTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Nivel del Registro")]

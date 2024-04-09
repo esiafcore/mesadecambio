@@ -23,5 +23,11 @@ public class CurrencyExchangeRateConfiguration : IEntityTypeConfiguration<Curren
         builder.Property(b => b.BuyRate).HasPrecision(18, 8);
         builder.Property(b => b.SellRate).HasPrecision(18, 8);
 
+        builder.HasOne(x => x.CurrencyTrx)
+            .WithMany()
+            .HasForeignKey(x => x.CurrencyId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
+
     }
 }

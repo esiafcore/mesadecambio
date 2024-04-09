@@ -6,7 +6,7 @@ using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
 [Table("currenciesexchangerates", Schema = "cnf")]
-public sealed class CurrencyExchangeRate : Entity, ICloneable
+public class CurrencyExchangeRate : Entity, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Tipo de Registro")]
@@ -17,7 +17,7 @@ public sealed class CurrencyExchangeRate : Entity, ICloneable
     [ForeignKey(nameof(CurrencyTrx))]
     public int CurrencyId { get; set; }
     [ValidateNever]
-    public Currency CurrencyTrx { get; set; } = null!;
+    public virtual Currency CurrencyTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [DataType(DataType.Date)]

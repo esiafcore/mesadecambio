@@ -24,5 +24,22 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                 , "customers_idx_2030")
             .IsUnique();
 
+        builder.HasOne(x => x.CategoryTrx)
+            .WithMany()
+            .HasForeignKey(x => x.CategoryId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
+
+        builder.HasOne(x => x.TypeTrx)
+            .WithMany()
+            .HasForeignKey(x => x.TypeId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
+
+        builder.HasOne(x => x.SectorTrx)
+            .WithMany()
+            .HasForeignKey(x => x.SectorId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
     }
 }
