@@ -141,38 +141,6 @@ public class BankController : Controller
         return View(obj);
     }
 
-    //public IActionResult Delete(int? id)
-    //{
-    //    if (id == null || id == 0)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
-
-    //    if (obj == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    return View(obj);
-    //}
-
-    //[HttpPost, ActionName("Delete")]
-    //public IActionResult DeletePost(int? id)
-    //{
-    //    var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
-
-    //    if (obj == null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    _uow.Bank.Remove(obj);
-    //    _uow.Save();
-    //    TempData["success"] = "Bank deleted successfully";
-    //    return RedirectToAction("Index", "Bank");
-    //}
-
     #region API CALLS
     public IActionResult GetAll()
     {

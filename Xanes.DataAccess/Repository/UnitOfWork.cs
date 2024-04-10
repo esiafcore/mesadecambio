@@ -10,7 +10,6 @@ public class UnitOfWork : IUnitOfWork
     public IBankRepository Bank { get; private set; }
     public ICurrencyRepository Currency { get; private set; }
 
-    public IQuotationTypeRepository QuotationType { get; private set; }
     public ICustomerCategoryRepository CustomerCategory { get; private set; }
 
     public IIdentificationTypeRepository IdentificationType { get; private set; }
@@ -20,13 +19,14 @@ public class UnitOfWork : IUnitOfWork
     public IPersonTypeRepository PersonType { get; private set; }
     public ICustomerSectorRepository CustomerSector { get; private set; }
     public ICurrencyExchangeRateRepository CurrencyExchangeRate { get; private set; }
+    public IQuotationTypeRepository QuotationType { get; private set; }
+    public IQuotationRepository Quotation { get; private set; }
 
     public UnitOfWork(ApplicationDbContext db)
     {
         _db = db;
         Bank = new BankRepository(_db);
         Currency = new CurrencyRepository(_db);
-        QuotationType = new QuotationTypeRepository(_db);
         CustomerCategory = new CustomerCategoryRepository(_db);
         IdentificationType = new IdentificationTypeRepository(_db);
         PersonType = new PersonTypeRepository(_db);
@@ -34,7 +34,8 @@ public class UnitOfWork : IUnitOfWork
         Company = new CompanyRepository(_db);
         CustomerSector = new CustomerSectorRepository(_db);
         CurrencyExchangeRate = new CurrencyExchangeRateRepository(_db);
-
+        QuotationType = new QuotationTypeRepository(_db);
+        Quotation = new QuotationRepository(_db);
     }
 
     public void Save()

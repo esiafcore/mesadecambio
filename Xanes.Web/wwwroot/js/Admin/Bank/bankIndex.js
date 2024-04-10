@@ -73,7 +73,6 @@ const fnDeleteRow = async (url,code,rowname) => {
 
     if (fetchResponse.ok) {
         let jsonResponse = await fetchResponse.json();
-        console.log(jsonResponse);
 
         if (jsonResponse.isSuccess) {
             dataTable.ajax.reload();

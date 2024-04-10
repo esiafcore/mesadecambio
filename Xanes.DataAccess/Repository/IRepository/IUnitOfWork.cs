@@ -4,7 +4,6 @@ public interface IUnitOfWork
 {
     IBankRepository Bank { get; }
     ICurrencyRepository Currency { get; } 
-    IQuotationTypeRepository QuotationType { get; }
     ICustomerCategoryRepository CustomerCategory { get; }
     IIdentificationTypeRepository IdentificationType { get; }
     IPersonTypeRepository PersonType { get; }
@@ -12,6 +11,8 @@ public interface IUnitOfWork
     ICompanyRepository Company { get; }
     ICustomerSectorRepository CustomerSector { get; }
     ICurrencyExchangeRateRepository CurrencyExchangeRate { get; }
+    IQuotationTypeRepository QuotationType { get; }
+    IQuotationRepository Quotation{ get; }
 
     void Save();
 }

@@ -12,6 +12,10 @@ const fnEnableTooltip = () => {
     });
 };
 
+const defaultFormatDate = 'dd/MM/yyyy';
+const defaultDecimalTransa = 2;
+const defaultDecimalExchange = 4;
+
 const ButtonsText = {
     Confirm: "Confirmar",
     Cancel: "Cancelar",

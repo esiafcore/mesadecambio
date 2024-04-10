@@ -17,12 +17,13 @@
     <link href="https://cdn.datatables.net/searchpanes/2.3.0/css/searchPanes.bootstrap5.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/select/2.0.0/css/select.bootstrap5.min.css" rel="stylesheet">
 
+
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow py-1">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Xanes.Web</a>
+                <a class="navbar-brand" asp-area="Exchange" asp-controller="Quotation" asp-action="Index">Xanes.Web</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -87,6 +88,7 @@
     <script src="https://cdn.datatables.net/searchpanes/2.3.0/js/dataTables.searchPanes.min.js"></script>
     <script src="https://cdn.datatables.net/searchpanes/2.3.0/js/searchPanes.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/select/2.0.0/js/dataTables.select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js"></script>
 
     <script src="https://cdn.tiny.cloud/1/akzmg9znat7ux50bkk4656x23p70geihliu1ftghmrft7opi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     @await RenderSectionAsync("Scripts", required: false)
