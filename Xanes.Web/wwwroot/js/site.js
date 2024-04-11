@@ -15,6 +15,9 @@ const fnEnableTooltip = () => {
 const defaultFormatDate = 'dd/MM/yyyy';
 const defaultDecimalTransa = 2;
 const defaultDecimalExchange = 4;
+const paddingLength = 3;
+const paddingChar = '0';
+
 
 const ButtonsText = {
     Confirm: "Confirmar",

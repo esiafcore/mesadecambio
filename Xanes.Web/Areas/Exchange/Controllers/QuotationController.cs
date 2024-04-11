@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using System.Text.Json;
+using Xanes.Models.Shared;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -34,13 +35,24 @@ public class QuotationController : Controller
         return View();
     }
 
-    #region API CALLS
-    public IActionResult GetAll()
+    #region API_CALL
+    public JsonResult GetAll()
     {
+        JsonResultResponse? jsonResponse = new();
+
         var objList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId)
             ,includeProperties: "TypeTrx,CustomerTrx,CurrencyOriginExchangeTrx,CurrencyTransaTrx").ToList();
-        return Json(new { data = objList });
+        if (objList.Count <= 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
     }
 
     [HttpDelete]

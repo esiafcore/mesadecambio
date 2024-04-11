@@ -9,17 +9,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function loadDatatable() {
     dataTable = new DataTable("#tblData", {
+        dataSrc: 'data',
         "ajax": { url: '/exchange/quotation/getall' },
-        "dataSrc": 'data',
         "columns": [
             {
                 data: 'dateTransa', "width": "5%"
                 , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
             },
-            { data: 'typeTrx.code', "width": "2%" },
-            { data: 'numeral', "width": "2%" },
-            { data: 'currencyOriginExchangeTrx.code', "width": "2%" },
-            { data: 'currencyTransaTrx.code', "width": "2%" },
+            {
+                data: 'numeral', "width": "5%"
+                , render: function (data, type, row) {
+                    return `${row.typeTrx.code}-${row.numeral.toString().padStart(paddingLength, paddingChar)}`;
+                }
+            },
+            {
+                data: 'customerTrx.businessName', "width": "30%"
+            },
+            { data: 'currencyOriginExchangeTrx.code', "width": "5%" },
+            { data: 'currencyTransaTrx.code', "width": "5%" },
             {
                 data: 'exchangeRateBuyTransa', "width": "5%"
                 , render: DataTable.render.number(null, null, decimalExchange)
@@ -29,20 +36,20 @@ function loadDatatable() {
                 , render: DataTable.render.number(null, null, decimalExchange)
             },
             {
-                data: 'amountTransa', "width": "5%"
+                data: 'amountTransa', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
             },
             {
-                data: 'amountRevenue', "width": "5%"
+                data: 'amountRevenue', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
             },
             {
-                data: 'amountCost', "width": "5%"
+                data: 'amountCost', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
             },
             {
-                data: null,
-                "render": (data, type, row) => {
+                data: null, "width": "10%"
+                ,"render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
                         <a href="/exchange/quotation/detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-2"
                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
