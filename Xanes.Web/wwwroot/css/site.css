@@ -32,6 +32,7 @@ body {
     padding-top: 0.50rem;
     padding-bottom: 0.50rem;
     align-items: center;
+    font-size: 0.825rem;
 }
 
 table.dataTable tbody td {

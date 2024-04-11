@@ -23,29 +23,34 @@ function loadDatatable() {
                 }
             },
             {
-                data: 'customerTrx.businessName', "width": "30%"
+                data: 'customerTrx.businessName', "width": "38%"
+                , render: DataTable.render.ellipsis(32,false)
             },
             { data: 'currencyOriginExchangeTrx.code', "width": "5%" },
             { data: 'currencyTransaTrx.code', "width": "5%" },
             {
                 data: 'exchangeRateBuyTransa', "width": "5%"
                 , render: DataTable.render.number(null, null, decimalExchange)
+                , orderable: false
             },
             {
                 data: 'exchangeRateSellTransa', "width": "5%"
                 , render: DataTable.render.number(null, null, decimalExchange)
+                , orderable: false
             },
             {
                 data: 'amountTransa', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
             },
             {
-                data: 'amountRevenue', "width": "10%"
+                data: 'amountRevenue', "width": "6%"
                 , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: false
             },
             {
-                data: 'amountCost', "width": "10%"
+                data: 'amountCost', "width": "6%"
                 , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: false
             },
             {
                 data: null, "width": "10%"
