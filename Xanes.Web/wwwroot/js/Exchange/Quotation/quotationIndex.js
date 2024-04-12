@@ -10,24 +10,27 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadDatatable() {
     dataTable = new DataTable("#tblData", {
         dataSrc: 'data',
-        "ajax": { url: '/exchange/quotation/getall' },
-        "columns": [
+        ajax: { url: '/exchange/quotation/getall' },
+        columns: [
             {
                 data: 'dateTransa', "width": "5%"
                 , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
+                , orderable: true
             },
             {
                 data: 'numeral', "width": "5%"
                 , render: function (data, type, row) {
                     return `${row.typeTrx.code}-${row.numeral.toString().padStart(paddingLength, paddingChar)}`;
                 }
+                , orderable: true
             },
             {
                 data: 'customerTrx.businessName', "width": "38%"
                 , render: DataTable.render.ellipsis(32,false)
+                , orderable: true
             },
-            { data: 'currencyOriginExchangeTrx.code', "width": "5%" },
-            { data: 'currencyTransaTrx.code', "width": "5%" },
+            { data: 'currencyOriginExchangeTrx.code', "width": "5%", orderable: false },
+            { data: 'currencyTransaTrx.code', "width": "5%", orderable: false },
             {
                 data: 'exchangeRateBuyTransa', "width": "5%"
                 , render: DataTable.render.number(null, null, decimalExchange)
@@ -41,6 +44,7 @@ function loadDatatable() {
             {
                 data: 'amountTransa', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: true
             },
             {
                 data: 'amountRevenue', "width": "6%"
@@ -53,7 +57,7 @@ function loadDatatable() {
                 , orderable: false
             },
             {
-                data: null, "width": "10%"
+                data: null, "width": "10%", orderable: false
                 ,"render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
                         <a href="/exchange/quotation/detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-2"
@@ -70,15 +74,10 @@ function loadDatatable() {
                         </a>
 
                     </div>`
-                },
-                "width": "15%"
+                }
             }
         ],
-        "info": false,
-        "ordering": true,
-        "paging": true,
-        "select": true,
-
+        searching: true,
     });
 }
 

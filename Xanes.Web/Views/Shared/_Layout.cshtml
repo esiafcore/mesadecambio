@@ -91,6 +91,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/2.0.3/dataRender/ellipsis.js"></script>
     <script src="https://cdn.tiny.cloud/1/akzmg9znat7ux50bkk4656x23p70geihliu1ftghmrft7opi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        Object.assign(DataTable.defaults, {
+            searching: false,
+            ordering: true,
+            paging: true,
+            select: true,
+            lengthMenu: [10, 15, 20, 40, 50],
+            serverSide: false,
+            processing: true,
+            language: {
+                info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                infoFiltered: "(Filtrado de _MAX_ total de entradas)",
+                infoEmpty: "No hay datos para mostrar",
+                lengthMenu: "Mostrar _MENU_ entradas",
+                zeroRecords: "No se encontraron coincidencias",
+                processing: "Procesando...",
+                loadingRecords: "Cargando...",
+                emptyTable: "No hay datos disponibles en la tabla",
+                search: "Buscar",
+                select: {
+                    cells: {
+                        "1": "", //"1 celda seleccionada",
+                        "_": "" //"%d celdas seleccionadas"
+                    },
+                    columns: {
+                        "1": "" , //"1 columna seleccionada",
+                        "_": "" //"%d columnas seleccionadas"
+                    },
+                    rows: {
+                        "1": "", //"1 fila seleccionada",
+                        "_": "" //"%d filas seleccionadas"
+                    }
+                }
+            }
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

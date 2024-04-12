@@ -91,6 +91,18 @@ public class Quotation : Entity, ICloneable
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;
 
+    [Required]
+    [Display(Name = "Conta?")]
+    public bool IsPosted { get; set; }
+
+    [Required]
+    [Display(Name = "Es Desembolso?")]
+    public bool IsLoan { get; set; }
+
+    [Required]
+    [Display(Name = "Es Pago?")]
+    public bool IsPayment { get; set; }
+
 
     public object Clone()
     {
