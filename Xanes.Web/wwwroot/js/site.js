@@ -55,3 +55,8 @@ const ButtonsColor = {
     Confirm: "#3085d6",
     Cancel: "#d33"
 }
+
+const YesNo = {
+    Yes: 'Si',
+    No: 'No'
+}

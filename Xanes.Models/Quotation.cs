@@ -92,8 +92,12 @@ public class Quotation : Entity, ICloneable
     public decimal AmountCost { get; set; } = 0M;
 
     [Required]
-    [Display(Name = "Conta?")]
+    [Display(Name = "Está Contabilizado?")]
     public bool IsPosted { get; set; }
+
+    [Required]
+    [Display(Name = "Está Cerrado?")]
+    public bool IsClosed { get; set; }
 
     [Required]
     [Display(Name = "Es Desembolso?")]

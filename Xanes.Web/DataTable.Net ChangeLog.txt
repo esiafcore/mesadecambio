@@ -1,0 +1,244 @@
+let table = new DataTable('#myTable', {
+    // config options...
+});
+
+let table = new DataTable('#myTable', {
+    responsive: true
+});
+
+
+$(document).ready( function () {
+    $('#myTable').DataTable();
+} );
+
+if you are upgrading from DataTables 1.9 or earlier, you might notice that a capital D is used to initialise the DataTable here. 
+$().DataTable() returns a DataTables API instance, 
+while $().dataTable() will also initialise a DataTable, but returns a jQuery object.
+
+
+{
+    "product": "Toy car",
+    "creator": {
+        "firstName": "Fiona",
+        "lastName": "White"
+    },
+    "created": "2015-11-01",
+    "price": 19.99,
+    "cost": 12.53
+}
+
+{
+    data: 'price',
+    render: function ( data, type, row ) {
+        return '$'+ data;
+    }
+}
+
+{
+    data: 'creator',
+    render: function ( data, type, row ) {
+        return data.firstName +' '+ data.lastName;
+    }
+}
+
+{
+    data: 'created',
+    render: function ( data, type, row ) {
+        var dateSplit = data.split('-');
+        return type === "display" || type === "filter" ?
+            dateSplit[1] +'-'+ dateSplit[2] +'-'+ dateSplit[0] :
+            data;
+    }
+}
+
+{
+    data: null,
+    render: function ( data, type, row ) {
+        return Math.round( ( row.price - row.cost ) / row.price * 100 )+'%';
+    }
+}
+
+Luxon
+	https://datatables.net/examples/datetime/
+
+	Auto-locale display
+	https://datatables.net/examples/datetime/auto-locale-luxon.html
+		columnDefs: [
+			{
+				targets: 4,
+				render: DataTable.render.date()
+			}
+		]
+	
+	Date rendering
+	https://datatables.net/examples/datetime/formatting-luxon.html
+		columnDefs: [
+			{
+				targets: 4,
+				render: DataTable.render.datetime('d MMM yyyy')
+			}
+		]
+	
+	Format transform
+	https://datatables.net/examples/datetime/transform-luxon.html	
+		columnDefs: [
+			{
+				targets: 4,
+				render: DataTable.render.datetime('d MMM yyyy', 'MMM d, yy', 'en')
+			}
+		]
+
+
+Built in types
+https://datatables.net/manual/data/types
+You can use the DataTable.types() method to determine what types are available to tables on the page. By default these are:
+
+num - Plain numbers (e.g. 1, 8432).
+num-fmt - Formatted numbers (e.g. $1'000, 8,000,000).
+html-num - Plain numbers with HTML (e.g. 10).
+html-num-fmt - Formatted numbers with HTML (e.g. _<em>€9.200,00</em>)
+date - Dates in ISO8601 format (e.g. 2151-04-01).
+html - HTML strings (e.g. <i>Tick</i>).
+string - Plain text strings.
+
+Data array location
+https://datatables.net/manual/ajax
+
+1) Simple array of data:
+[
+    {
+        "name": "Tiger Nixon",
+        "position": "System Architect",
+        "salary": "$320,800",
+        "start_date": "2011/04/25",
+        "office": "Edinburgh",
+        "extn": "5421"
+    },
+    ...
+]
+
+
+$('#myTable').DataTable( {
+    ajax: {
+        url: '/api/myData',
+        dataSrc: ''
+    },
+    columns: [ ... ]
+} );
+
+
+2) Object with data property
+
+{
+    "data": [
+        {
+            "name": "Tiger Nixon",
+            "position": "System Architect",
+            "salary": "$320,800",
+            "start_date": "2011/04/25",
+            "office": "Edinburgh",
+            "extn": "5421"
+        },
+        ...
+    ]
+}
+
+$('#myTable').DataTable( {
+    ajax: '/api/myData',
+    columns: [ ... ]
+} );
+ 
+// or!
+ 
+$('#myTable').DataTable( {
+    ajax: {
+        url: '/api/myData',
+        dataSrc: 'data'
+    },
+    columns: [ ... ]
+} );
+	
+3) Object with staff property:
+{
+    "staff": [
+        {
+            "name": "Tiger Nixon",
+            "position": "System Architect",
+            "salary": "$320,800",
+            "start_date": "2011/04/25",
+            "office": "Edinburgh",
+            "extn": "5421"
+        },
+        ...
+    ]
+}
+
+$('#myTable').DataTable( {
+    ajax: {
+        url: '/api/myData',
+        dataSrc: 'staff'
+    },
+    columns: [ ... ]
+} );
+
+
+ajax.dataSrc
+https://datatables.net/reference/option/ajax.dataSrc
+
+
+https://live.datatables.net/
+
+
+columns.className
+		https://datatables.net/reference/option/columns.className
+		
+new DataTable('#myTable', {
+    columns: [{ className: 'my_class' }, null, null, null, null]
+});
+
+
+
+Common options
+Some of the options you might find particularly useful are:
+
+	ajax - Ajax data source configuration
+	data - Javascript sourced data
+	serverSide - Enable server-side processing
+	columns.data - Data source options for a column
+	scrollX - Horizontal scrolling
+	scrollY - Vertical scrolling
+
+
+select.items
+	This option can take one of the following values:
+
+	row - select rows
+	column - select columns
+	cell - select cells
+
+	new DataTable('#myTable', {
+		select: {
+			items: 'column'
+		}
+	});
+
+select.style
+
+	This option can take one of the following values:
+
+	api - Selection can only be performed via the API
+	single - Only a single item can be selected, any other selected items will be automatically deselected when a new item is selected
+	multi - Multiple items can be selected. Selection is performed by simply clicking on the items to be selected
+	os - Operating System (OS) style selection. This is the most comprehensive option and provides complex behaviours such as ctrl/cmd clicking to select / deselect individual items, shift clicking to select ranges and an unmodified click to select a single item.
+	multi+shift - a hybrid between the os style and multi, allowing easy multi-row selection without immediate de-selection when clicking on a row.
+
+	new DataTable('#myTable', {
+		select: {
+			style: 'api'
+		}
+	});
+
+Options
+	https://datatables.net/reference/option/
+
+className: 'bg-secondary bg-opacity-75 bg-gradient'	
