@@ -26,7 +26,7 @@ function loadDatatable() {
             },
             {
                 data: 'customerTrx.businessName', "width": "38%"
-                , render: DataTable.render.ellipsis(32,false)
+                , render: DataTable.render.ellipsis(35,false)
                 , orderable: true
             },
             { data: 'currencyOriginExchangeTrx.code', "width": "5%", orderable: false },
@@ -78,6 +78,8 @@ function loadDatatable() {
             }
         ],
         searching: true,
+        select: selectOptions
+
     });
 }
 

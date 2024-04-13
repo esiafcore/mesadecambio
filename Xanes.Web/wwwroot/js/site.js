@@ -17,7 +17,14 @@ const defaultDecimalTransa = 2;
 const defaultDecimalExchange = 4;
 const paddingLength = 3;
 const paddingChar = '0';
-
+const selectOptions = {
+    info: false,
+    items: 'row',
+    style: 'os',
+    blurable: true,
+    className: 'bg-info bg-opacity-75 bg-gradient'
+}
+//  
 
 const ButtonsText = {
     Confirm: "Confirmar",
