@@ -23,14 +23,17 @@
                         <span asp-validation-for="DataModel.TypeId" class="text-danger"></span>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <select asp-for="DataModel.CategoryId" asp-items="@Model.CategoryList" class="form-select border-0 shadow">
-                            <option disabled selected>--Select Category--</option>
+                        <select asp-for="DataModel.CategoryId" asp-items="@Model.CategoryList"
+                                data-placeholder="Categoría"
+                                class="form-select border-0 shadow select2me">
                         </select>
                         <label asp-for="DataModel.CategoryId" class="ms-2">Categoria</label>
                         <span asp-validation-for="DataModel.CategoryId" class="text-danger"></span>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <select asp-for="DataModel.SectorId" asp-items="@Model.SectorList" class="form-select border-0 shadow">
+                        <select asp-for="DataModel.SectorId" asp-items="@Model.SectorList" 
+                             data-placeholder="Sector"
+                                class="form-select border-0 shadow select2me">
                             <option disabled selected>--Select Sector--</option>
                         </select>
                         <label asp-for="DataModel.SectorId" class="ms-2">Sector</label>
@@ -151,7 +154,7 @@
 </div>
 
 @section Scripts {
-    <script>
+@*     <script>
         tinymce.init({
             selector: 'textarea',
             plugins: 'anchor autolink charmap codesample emoticons lists  table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
@@ -169,7 +172,7 @@
             ],
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
-    </script>
+    </script> *@
 
     @{
         <partial name="_ValidationScriptsPartial" />

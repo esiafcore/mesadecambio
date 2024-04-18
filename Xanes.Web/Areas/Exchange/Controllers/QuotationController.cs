@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using System.Text.Json;
+using Xanes.Models;
 using Xanes.Models.Shared;
+using Xanes.Models.ViewModels;
+using Xanes.Utility;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Xanes.DataAccess.Repository;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -32,7 +37,72 @@ public class QuotationController : Controller
 
     public IActionResult Upsert(int? id)
     {
-        return View();
+        QuotationCreateVM model = new();
+        Quotation objData = new();
+
+        var objCurrencyList = _uow.Currency
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objCurrencyList == null)
+        {
+            return NotFound();
+        }
+
+        var objTypeList = _uow.QuotationType
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        var objCustomerList = _uow.Customer
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        if (id == null || id == 0)
+        {
+            objData = new Quotation
+            {
+                DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
+                TypeNumeral = EnumsAdmin.QuotationTypeNumeral.Buy,
+                CurrencyTransaType = EnumsAdmin.CurrencyType.Foreign,
+                CurrencyOriginExchangeType = EnumsAdmin.CurrencyType.Base
+
+            };
+
+        }
+        else
+        {
+            objData = _uow.Quotation
+                .Get(x => (x.Id == id)
+                    , isTracking: false);
+            //, includeProperties: "CurrencyTrx"
+
+            if (objData == null)
+            {
+                return NotFound();
+            }
+        }
+
+
+        model.CurrencyOriginExchangeList = objCurrencyList.Where(x => x.IsActive).ToList();
+        model.CurrencyTransaList = objCurrencyList
+                .Where(x => (x.IsActive && (x.Numeral != (int)EnumsAdmin.CurrencyType.Base)))
+                .ToList();
+            
+        model.QuotationTypeList = objTypeList;
+        model.CustomerList = objCustomerList.Select(x => new SelectListItem {Text = x.CommercialName, Value=x.Id.ToString() });
+        model.DataModel = objData;
+
+        return View(model);
     }
 
     #region API_CALL

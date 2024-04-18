@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Xanes.Models;
+using Xanes.Utility;
 
 namespace Xanes.DataAccess.Configuration;
 
@@ -29,6 +30,12 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.IsLoan).HasDefaultValue(false);
         builder.Property(b => b.IsPayment).HasDefaultValue(false);
         builder.Property(b => b.IsClosed).HasDefaultValue(false);
+        builder.Property(b => b.TypeNumeral).HasDefaultValue(EnumsAdmin.QuotationTypeNumeral.Buy)
+            .HasSentinel(default);
+        builder.Property(b => b.CurrencyOriginExchangeType).HasDefaultValue(EnumsAdmin.CurrencyType.Base)
+            .HasSentinel(default);
+        builder.Property(b => b.CurrencyTransaType).HasDefaultValue(EnumsAdmin.CurrencyType.Base)
+            .HasSentinel(default);
 
         builder.HasOne(x => x.TypeTrx)
             .WithMany()

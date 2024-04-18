@@ -24,7 +24,10 @@ const selectOptions = {
     blurable: true,
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
-//  
+
+//Constantes para STYLES / CSS
+const styleHide = "none";
+const styleShow = "inline-block";
 
 const ButtonsText = {
     Confirm: "Confirmar",
@@ -59,4 +62,10 @@ const ButtonsColor = {
 const YesNo = {
     Yes: 'Si',
     No: 'No'
+}
+
+const CurrencyType = {
+    Base: 1,
+    Foreign: 2,
+    Additional: 4
 }

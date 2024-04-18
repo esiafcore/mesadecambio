@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
+using Xanes.Utility;
 
 namespace Xanes.Models;
 [Table("quotations", Schema = "fac")]
@@ -21,6 +22,11 @@ public class Quotation : Entity, ICloneable
     [ValidateNever]
     public virtual QuotationType TypeTrx { get; set; } = null!;
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Tipo TC Source Currency")]
+    public EnumsAdmin.QuotationTypeNumeral TypeNumeral { get; set; }
+
+
     [DisplayName(displayName: "Número")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     public int Numeral { get; set; }
@@ -36,6 +42,11 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Id TC Source Currency")]
     [ForeignKey(nameof(CurrencyOriginExchangeTrx))]
     public int CurrencyOriginExchangeId { get; set; }
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Tipo TC Source Currency")]
+    public EnumsAdmin.CurrencyType CurrencyOriginExchangeType { get; set; }
+
     [ValidateNever]
     public virtual Currency CurrencyOriginExchangeTrx { get; set; } = null!;
 
@@ -43,6 +54,11 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Id Moneda Transaction Final")]
     [ForeignKey(nameof(CurrencyTransaTrx))]
     public int CurrencyTransaId { get; set; }
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Tipo Moneda Transaction Final")]
+    public EnumsAdmin.CurrencyType CurrencyTransaType { get; set; }
+
     [ValidateNever]
     public virtual Currency CurrencyTransaTrx { get; set; } = null!;
 
