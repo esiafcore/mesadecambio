@@ -23,8 +23,8 @@ public class Quotation : Entity, ICloneable
     public virtual QuotationType TypeTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Tipo TC Source Currency")]
-    public EnumsAdmin.QuotationTypeNumeral TypeNumeral { get; set; }
+    [Display(Name = "Tipo Numeral Mesa de Cambio")]
+    public SD.QuotationType TypeNumeral { get; set; }
 
 
     [DisplayName(displayName: "Número")]
@@ -45,7 +45,7 @@ public class Quotation : Entity, ICloneable
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Tipo TC Source Currency")]
-    public EnumsAdmin.CurrencyType CurrencyOriginExchangeType { get; set; }
+    public SD.CurrencyType CurrencyOriginExchangeType { get; set; }
 
     [ValidateNever]
     public virtual Currency CurrencyOriginExchangeTrx { get; set; } = null!;
@@ -57,7 +57,7 @@ public class Quotation : Entity, ICloneable
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Tipo Moneda Transaction Final")]
-    public EnumsAdmin.CurrencyType CurrencyTransaType { get; set; }
+    public SD.CurrencyType CurrencyTransaType { get; set; }
 
     [ValidateNever]
     public virtual Currency CurrencyTransaTrx { get; set; } = null!;

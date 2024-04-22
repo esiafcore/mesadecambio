@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NuGet.Versioning;
 using Xanes.DataAccess.Repository.IRepository;
+using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
 [Area("Customer")]
@@ -58,6 +60,8 @@ public class CustomerController : Controller
                 SecondName = string.Empty,
                 LastName = string.Empty,
                 SecondSurname = string.Empty,
+                BusinessName = string.Empty,
+                CommercialName = string.Empty,
                 IsActive = true
             };
         }
@@ -83,9 +87,23 @@ public class CustomerController : Controller
 
         var typeSelectList = _uow.PersonType
             .GetAll(filter: x => (x.CompanyId == _companyId))
-            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+            .ToList();
 
-        var dataVM = new Models.ViewModels.CustomerVM()
+        if (typeSelectList == null)
+        {
+            return NotFound();
+        }
+
+        if (id is null or 0)
+        {
+            var legalPerson = typeSelectList
+                .FirstOrDefault(x => x.Numeral == (int)SD.PersonType.LegalPerson);
+
+            obj.TypeNumeral = (int)SD.PersonType.LegalPerson;
+            if (legalPerson != null) { obj.TypeId = legalPerson.Id; }
+        }
+
+        var dataVM = new Models.ViewModels.CustomerCreateVM()
         {
             DataModel = obj,
             CategoryList = categorySelectList,
@@ -97,7 +115,7 @@ public class CustomerController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upsert(Models.ViewModels.CustomerVM objViewModel)
+    public IActionResult Upsert(Models.ViewModels.CustomerCreateVM objViewModel)
     {
         Models.Customer obj = objViewModel.DataModel;
         //Datos son validos
@@ -174,7 +192,7 @@ public class CustomerController : Controller
 
                 var typeSelectList = _uow.PersonType
                     .GetAll(filter: x => (x.CompanyId == _companyId))
-                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+                    .ToList();
 
                 objViewModel.CategoryList = categorySelectList;
                 objViewModel.TypeList = typeSelectList;
@@ -193,7 +211,7 @@ public class CustomerController : Controller
 
             var typeSelectList = _uow.PersonType
                 .GetAll(filter: x => (x.CompanyId == _companyId))
-                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+                .ToList();
 
             objViewModel.CategoryList = categorySelectList;
             objViewModel.TypeList = typeSelectList;

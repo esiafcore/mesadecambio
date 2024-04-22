@@ -25,9 +25,19 @@ const selectOptions = {
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
 
+const select2Options = {
+    theme: "bootstrap-5",
+    allowClear: true,
+    selectionCssClass: "select2--small",
+    dropdownCssClass: "select2--small",
+    placeholder: $(this).data('placeholder'),
+    width: '100%',
+}
+
 //Constantes para STYLES / CSS
 const styleHide = "none";
-const styleShow = "inline-block";
+const styleShow = "block";
+const styleShowInline = "inline-block";
 
 const ButtonsText = {
     Confirm: "Confirmar",
@@ -68,4 +78,31 @@ const CurrencyType = {
     Base: 1,
     Foreign: 2,
     Additional: 4
+}
+
+const PersonType = {
+    Natural: 1,
+    Legal: 2
+}
+
+const select2Floating = () => {
+    $('.select2me')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('height', ' calc(3.5rem + 2px)');
+
+    $('.select2me')
+        .parent('div')
+        .children('span')
+        .children('span')
+        .children('span')
+        .children('span')
+        .css('margin-top', '18px');
+
+    $('.select2me')
+        .parent('div')
+        .find('label')
+        .css('z-index', '1');
 }

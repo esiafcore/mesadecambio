@@ -1,21 +1,20 @@
 ﻿function currencyTransaType_onClick(objElem) {
 
-
     let curExchangeBaseDiv = document.getElementById(divnamecurExchange + CurrencyType.Base);
     let curExchangeForeignDiv = document.getElementById(divnamecurExchange + CurrencyType.Foreign);
     let curExchangeAdditionalDiv = document.getElementById(divnamecurExchange + CurrencyType.Additional);
-    let curTransaValue = Number(objElem.value);
+    let currentValue = Number(objElem.value);
 
-    if (curTransaValue == CurrencyType.Foreign) {
+    if (currentValue == CurrencyType.Foreign) {
         curExchangeForeignDiv.style.display = styleHide;
-        curExchangeBaseDiv.style.display = styleShow;
-        curExchangeAdditionalDiv.style.display = styleShow;
+        curExchangeBaseDiv.style.display = styleShowInline;
+        curExchangeAdditionalDiv.style.display = styleShowInline;
         document.getElementById(radnamecurExchange + CurrencyType.Base).checked = true;
     }
-    else if (curTransaValue == CurrencyType.Additional) {
+    else if (currentValue == CurrencyType.Additional) {
         curExchangeAdditionalDiv.style.display = styleHide;
-        curExchangeForeignDiv.style.display = styleShow;
-        curExchangeBaseDiv.style.display = styleShow;
+        curExchangeForeignDiv.style.display = styleShowInline;
+        curExchangeBaseDiv.style.display = styleShowInline;
         document.getElementById(radnamecurExchange + CurrencyType.Foreign).checked = true;
     }
 

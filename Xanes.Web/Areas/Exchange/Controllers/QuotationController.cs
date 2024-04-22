@@ -72,9 +72,9 @@ public class QuotationController : Controller
             objData = new Quotation
             {
                 DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
-                TypeNumeral = EnumsAdmin.QuotationTypeNumeral.Buy,
-                CurrencyTransaType = EnumsAdmin.CurrencyType.Foreign,
-                CurrencyOriginExchangeType = EnumsAdmin.CurrencyType.Base
+                TypeNumeral = SD.QuotationType.Buy,
+                CurrencyTransaType = SD.CurrencyType.Foreign,
+                CurrencyOriginExchangeType = SD.CurrencyType.Base
 
             };
 
@@ -95,7 +95,7 @@ public class QuotationController : Controller
 
         model.CurrencyOriginExchangeList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.CurrencyTransaList = objCurrencyList
-                .Where(x => (x.IsActive && (x.Numeral != (int)EnumsAdmin.CurrencyType.Base)))
+                .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
                 .ToList();
             
         model.QuotationTypeList = objTypeList;

@@ -1,4 +1,4 @@
-﻿@model CustomerVM
+﻿@model CustomerCreateVM
 
 <div class="card shadow border-0 mt-1">
     <div class="card-header bg-secondary bg-gradient ml-0 py-1">
@@ -15,12 +15,26 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input hidden asp-for="DataModel.Id" />
                     <input hidden asp-for="DataModel.CompanyId" />
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <select asp-for="DataModel.TypeId" asp-items="@Model.TypeList" class="form-select border-0 shadow">
-                            <option disabled selected>--Select Type--</option>
-                        </select>
-                        <label asp-for="DataModel.TypeId" class="ms-2">Tipo</label>
-                        <span asp-validation-for="DataModel.TypeId" class="text-danger"></span>
+                    <div class="row m-0 p-0">
+                        <div class="row col-12 col-md-6">
+                            <div class="col-12 col-md-2">Tipo</div>
+                            <div class="col-12 col-md-5 ms-3 w-auto border border-primary border-opacity-25">
+                                @foreach (var personType in Model.TypeList)
+                                {
+                                    <div class="form-check mt-2 mx-1 form-check-inline" id="@("personType_divradio_" + personType.Numeral)">
+                                        <input asp-for="DataModel.TypeNumeral" name="TypeNumeral" 
+                                               class="form-check-input border border-dark-subtle" type="radio"
+                                               id="@("personType_radio_" + personType.Numeral)"
+                                               value="@personType.Numeral"
+                                               onclick="return personType_onClick(this)" />
+                                        <label class="form-check-label" for="@("personType_label_" + personType.Numeral)">@personType.Code</label>
+                                    </div>
+                                }
+                            </div>
+                            <span asp-validation-for="DataModel.TypeId" class="text-danger"></span>
+                        </div>
+                        <div class="row col-12 col-md-6">
+                        </div>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         <select asp-for="DataModel.CategoryId" asp-items="@Model.CategoryList"
@@ -42,52 +56,58 @@
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         @if (Model.DataModel.Id != 0)
                         {
-                            <input asp-for="DataModel.Code" type="text" readonly="readonly" class="form-control border-0 shadow" />
+                            <input asp-for="DataModel.Code" type="text" readonly="readonly" 
+                                class="form-control border-0 shadow" />
                         }
                         else
                         {
-                            <input asp-for="DataModel.Code" type="text" class="form-control border-0 shadow" />
+                            <input asp-for="DataModel.Code" type="text" 
+                                class="form-control border-0 shadow" />
                         }
                         <label asp-for="DataModel.Code" class="ms-2"></label>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <input asp-for="DataModel.Identificationnumber" type="text" class="form-control border-0 shadow" />
+                        <input asp-for="DataModel.Identificationnumber" type="text" 
+                            class="form-control border-0 shadow" />
                         <label asp-for="DataModel.Identificationnumber" class="ms-2"></label>
                         <span asp-validation-for="DataModel.Identificationnumber" class="text-danger"></span>
                     </div>
-                    @* Para completar las 12 columnas *@
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                    </div>
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.FirstName" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <input asp-for="DataModel.SecondName" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.SecondName" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <input asp-for="DataModel.LastName" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.LastName" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                        <input asp-for="DataModel.SecondSurname" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.SecondSurname" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
+                    @* Nombre para persona natural *@
+                    <div id="personNatural_div" class="row m-0 p-0">
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                            <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.FirstName" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                            <input asp-for="DataModel.SecondName" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.SecondName" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                            <input asp-for="DataModel.LastName" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.LastName" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                            <input asp-for="DataModel.SecondSurname" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.SecondSurname" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
+                        </div>
                     </div>
 
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
-                        <input asp-for="DataModel.CommercialName" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.CommercialName" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.CommercialName" class="text-danger"></span>
-                    </div>
-                    <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
-                        <input asp-for="DataModel.BusinessName" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="DataModel.BusinessName" class="ms-2"></label>
-                        <span asp-validation-for="DataModel.BusinessName" class="text-danger"></span>
+                    @* Nombre para persona juridica*@
+                    <div id="personLegal_div" class="row m-0 p-0">
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
+                            <input asp-for="DataModel.CommercialName" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.CommercialName" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.CommercialName" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
+                            <input asp-for="DataModel.BusinessName" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="DataModel.BusinessName" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.BusinessName" class="text-danger"></span>
+                        </div>
                     </div>
                     <div class="pb-1 pt-2 col-md-12">
                         <label asp-for="DataModel.AddressPrimary" class="ms-2 text-muted"></label>
@@ -127,7 +147,7 @@
                     }
 
                     <div class="row pt-2">
-                        <div class="col-6 col-md-3">
+                        <div class="col-12 col-md-3">
                             @if (Model.DataModel.Id != 0)
                             {
                                 <button type="submit" class="btn btn-primary form-control">
@@ -141,7 +161,7 @@
                                 </button>
                             }
                         </div>
-                        <div class="col-6 col-md-3">
+                        <div class="col-12 col-md-3">
                             <a asp-controller="Customer" asp-action="Index" class="btn btn-secondary border form-control">
                                 <i class="bi bi-arrow-return-left"></i> Regresar
                             </a>
@@ -173,7 +193,12 @@
             ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
         });
     </script> *@
+    <script>
+        let personNaturalDiv = document.getElementById("personNatural_div");
+        let personLegalDiv = document.getElementById("personLegal_div");
+        let personLegalRad = document.getElementById("personType_radio_" + PersonType.Legal);
 
+     </script> 
     @{
         <partial name="_ValidationScriptsPartial" />
         <script src="~/js/Customer/Customer/customerUpsert.js"></script>

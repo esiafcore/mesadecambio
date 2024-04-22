@@ -30,11 +30,11 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.IsLoan).HasDefaultValue(false);
         builder.Property(b => b.IsPayment).HasDefaultValue(false);
         builder.Property(b => b.IsClosed).HasDefaultValue(false);
-        builder.Property(b => b.TypeNumeral).HasDefaultValue(EnumsAdmin.QuotationTypeNumeral.Buy)
+        builder.Property(b => b.TypeNumeral).HasDefaultValue(SD.QuotationType.Buy)
             .HasSentinel(default);
-        builder.Property(b => b.CurrencyOriginExchangeType).HasDefaultValue(EnumsAdmin.CurrencyType.Base)
+        builder.Property(b => b.CurrencyOriginExchangeType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
-        builder.Property(b => b.CurrencyTransaType).HasDefaultValue(EnumsAdmin.CurrencyType.Base)
+        builder.Property(b => b.CurrencyTransaType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
 
         builder.HasOne(x => x.TypeTrx)
