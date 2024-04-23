@@ -38,6 +38,10 @@ public class Customer: EntityInactivated, ICloneable
     [ValidateNever]
     public virtual CustomerSector SectorTrx { get; set; } = null!;
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Internal Serial")]
+    public char InternalSerial { get; set; }
+
     [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Código")]

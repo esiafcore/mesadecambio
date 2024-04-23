@@ -11,17 +11,14 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
+        builder.Property(x => x.InternalSerial).ValueGeneratedOnAdd().HasDefaultValue(AC.InternalSerialOfficial);
 
-        builder.HasIndex(x => new { x.CompanyId, x.Code }
+        builder.HasIndex(x => new { x.CompanyId, x.InternalSerial, x.Code }
                 , "customers_idx_2010")
             .IsUnique();
 
         builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.Identificationnumber }
                 , "customers_idx_2020")
-            .IsUnique();
-
-        builder.HasIndex(x => new { x.CompanyId, x.Code }
-                , "customers_idx_2030")
             .IsUnique();
 
         builder.HasOne(x => x.CategoryTrx)

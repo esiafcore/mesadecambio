@@ -71,10 +71,14 @@ public class Repository<T> : IRepository<T> where T : class
         dbSet.RemoveRange(entities);
     }
 
-    public bool IsExist(Expression<Func<T, bool>> filter)
+    public async Task<bool> IsExists(Expression<Func<T, bool>>? filter = null)
     {
-        IQueryable<T> query = dbSet;
-        return query.Any(filter);
+        if (filter != null)
+        {
+            IQueryable<T> query = dbSet;
+            return await query.AnyAsync(filter);
+        }
+        return await Task.FromResult(false);
     }
 
     public bool RemoveByFilter(Expression<Func<T, bool>> filter)

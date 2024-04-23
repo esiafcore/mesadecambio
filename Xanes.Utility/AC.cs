@@ -19,6 +19,10 @@ public static class AC
 
     public static char CharDefaultEmpty = '0';
     public static short RepeatCharTimes = 5;
+    public static char InternalSerialDraft = 'Y';
+    public static char InternalSerialOfficial = 'Z';
+
+
 
 
 }

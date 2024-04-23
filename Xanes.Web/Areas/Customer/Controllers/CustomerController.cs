@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NuGet.Versioning;
 using Xanes.DataAccess.Repository.IRepository;
+using Xanes.Models;
 using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
@@ -11,12 +11,15 @@ public class CustomerController : Controller
     private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
+    private readonly ConfigCxc _cfgCxc;
 
     public CustomerController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+        _cfgCxc = _uow.ConfigCxc
+            .Get(filter: x => (x.CompanyId == _companyId));
     }
     public IActionResult Index()
     {
@@ -43,8 +46,7 @@ public class CustomerController : Controller
 
         return View(obj);
     }
-
-    public IActionResult Upsert(int? id)
+    public async Task<IActionResult> Upsert(int? id)
     {
 
         Models.Customer obj;
@@ -62,8 +64,23 @@ public class CustomerController : Controller
                 SecondSurname = string.Empty,
                 BusinessName = string.Empty,
                 CommercialName = string.Empty,
+                InternalSerial = AC.InternalSerialDraft,
+                Code = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes),
                 IsActive = true
             };
+
+            if (_cfgCxc.IsAutomaticallyCustomerCode)
+            {
+                var nextCode= await _uow
+                    .ConfigCxc
+                    .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
+                        , typeSequential: SD.TypeSequential.Draft
+                        , mustUpdate: true);
+
+                obj.Code = nextCode.ToString()
+                    .PadLeft(AC.RepeatCharTimes,AC.CharDefaultEmpty);
+            }
+
         }
         else
         {
@@ -115,8 +132,12 @@ public class CustomerController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upsert(Models.ViewModels.CustomerCreateVM objViewModel)
+    public async Task<IActionResult> Upsert(Models.ViewModels.CustomerCreateVM objViewModel)
     {
+        IEnumerable<SelectListItem> categorySelectList;
+        IEnumerable<SelectListItem> sectorSelectList;
+        List<PersonType> typeSelectList;
+
         Models.Customer obj = objViewModel.DataModel;
         //Datos son validos
         if (ModelState.IsValid)
@@ -146,10 +167,20 @@ public class CustomerController : Controller
             //Creando
             if (obj.Id == 0)
             {
-                _uow.Customer.Add(obj);
-                _uow.Save();
-                TempData["success"] = "Customer created successfully";
-                return RedirectToAction("Index", "Customer");
+                //Validar si no existe
+                bool isExist = await _uow
+                    .Customer.IsExists(x => (x.CompanyId == obj.CompanyId)
+                     && (x.Code.Trim() == obj.Code.Trim()));
+
+                if (!isExist)
+                {
+                    _uow.Customer.Add(obj);
+                    _uow.Save();
+                    TempData["success"] = "Customer created successfully";
+                    return RedirectToAction("Index", "Customer");
+                }
+
+                ModelState.AddModelError("code", $"Código {obj.Code} ya existe");
             }
             else
             {
@@ -182,43 +213,41 @@ public class CustomerController : Controller
                     TempData["success"] = "Customer updated successfully";
                     return RedirectToAction("Index", "Customer");
                 }
-                var categorySelectList = _uow.CustomerCategory
+                categorySelectList = _uow.CustomerCategory
                     .GetAll(filter: x => (x.CompanyId == _companyId))
                     .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-                var sectorSelectList = _uow.CustomerSector
+                sectorSelectList = _uow.CustomerSector
                     .GetAll(filter: x => (x.CompanyId == _companyId))
                     .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-                var typeSelectList = _uow.PersonType
+                typeSelectList = _uow.PersonType
                     .GetAll(filter: x => (x.CompanyId == _companyId))
                     .ToList();
 
                 objViewModel.CategoryList = categorySelectList;
                 objViewModel.TypeList = typeSelectList;
+                objViewModel.SectorList = sectorSelectList;
                 return View(objViewModel);
             }
         }
-        else
-        {
-            var categorySelectList = _uow.CustomerCategory
-                .GetAll(filter: x => (x.CompanyId == _companyId))
-                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-            var sectorSelectList = _uow.CustomerSector
-                .GetAll(filter: x => (x.CompanyId == _companyId))
-                .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+        categorySelectList = _uow.CustomerCategory
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-            var typeSelectList = _uow.PersonType
-                .GetAll(filter: x => (x.CompanyId == _companyId))
-                .ToList();
+        sectorSelectList = _uow.CustomerSector
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-            objViewModel.CategoryList = categorySelectList;
-            objViewModel.TypeList = typeSelectList;
+        typeSelectList = _uow.PersonType
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .ToList();
 
-            return View(objViewModel);
-
-        }
+        objViewModel.CategoryList = categorySelectList;
+        objViewModel.SectorList = sectorSelectList;
+        objViewModel.TypeList = typeSelectList;
+        return View(objViewModel);
     }
 
     public IActionResult Delete(int? id)
@@ -241,14 +270,14 @@ public class CustomerController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
-    public IActionResult DeletePost(int? id)
+    public async Task<IActionResult> DeletePost(int? id)
     {
         if (id == null || id == 0)
         {
             return NotFound();
         }
 
-        if (!_uow.Customer.IsExist(filter: x => x.Id == id))
+        if (!await _uow.Customer.IsExists(filter: x => x.Id == id.Value)) 
         {
             return NotFound();
         }
