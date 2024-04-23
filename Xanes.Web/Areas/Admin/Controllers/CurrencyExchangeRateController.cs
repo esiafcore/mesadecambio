@@ -4,6 +4,10 @@ using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models.ViewModels;
 using Xanes.Models;
 using Xanes.Utility;
+using Microsoft.DotNet.MSIdentity.Shared;
+using Newtonsoft.Json;
+using System.Text;
+using Xanes.Models.Shared;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
 [Area("Admin")]
@@ -241,6 +245,37 @@ public class CurrencyExchangeRateController : Controller
         }
 
         return View(obj);
+    }
+
+    [HttpPost]
+    public async Task<JsonResult> GetCurrencyExchangeRate(string date)
+    {
+        JsonResultResponse? jsonResponse = new();
+        DateOnly dateTransa = DateOnly.Parse(date);
+
+        var objList = _uow.CurrencyExchangeRate.GetAll
+            (x => (x.CompanyId == _companyId) && (x.DateTransa == dateTransa)
+                , includeProperties: "CurrencyTrx").ToList();
+
+        if (objList is null || objList.Count == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            return Json(jsonResponse);
+        }
+
+        var currencyForeign = objList
+            .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign));
+        var currencyAdditional = objList
+            .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Additional));
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = new
+        {
+            CurrencyForeign = currencyForeign,
+            CurrencyAdditional = currencyAdditional
+        };
+
+        return Json(jsonResponse);
     }
 
 

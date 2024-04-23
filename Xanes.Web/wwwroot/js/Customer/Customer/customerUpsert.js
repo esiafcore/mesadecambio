@@ -10,7 +10,7 @@
     });
 
     //Setear form-floating para Select2
-    select2Floating()
+    select2Floating();
 
     //setear el foco al crear o editar
     document.getElementById("DataModel_Code").focus();
