@@ -93,6 +93,27 @@ const select2Floating = () => {
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
 
+    //document.querySelectorAll('.select2me').forEach((element) => {
+    //    let parentDiv = element.parentElement;
+    //    if (parentDiv.tagName.toLowerCase() === 'div') {
+    //        let spans = parentDiv.querySelectorAll('span');
+    //        spans.forEach(function (span) {
+    //            span.style.height = 'calc(3.5rem + 2px)';
+    //            span.style.marginTop = '18px';
+    //        });
+    //    }
+    //});
+
+    //document.querySelectorAll('.select2me').forEach((element) => {
+    //    let parentDiv = element.parentElement;
+    //    if (parentDiv.tagName.toLowerCase() === 'div') {
+    //        let labels = parentDiv.querySelectorAll('label');
+    //        labels.forEach(function (label) {
+    //            label.style.zIndex = '1';
+    //        });
+    //    }
+    //});
+
     $('.select2me')
         .parent('div')
         .children('span')

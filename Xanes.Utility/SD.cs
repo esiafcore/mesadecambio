@@ -67,4 +67,11 @@ public static class SD
         SubLevel = 2,
         Detail = 4
     }
+
+    [Flags]
+    public enum TypeSequential: short
+    {
+        Draft = 1,
+        Official = 2
+    }
 }

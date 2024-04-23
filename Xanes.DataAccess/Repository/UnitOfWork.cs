@@ -21,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
     public ICurrencyExchangeRateRepository CurrencyExchangeRate { get; private set; }
     public IQuotationTypeRepository QuotationType { get; private set; }
     public IQuotationRepository Quotation { get; private set; }
+    public IConfigCxcRepository ConfigCxc { get; private set; }
 
     public UnitOfWork(ApplicationDbContext db)
     {
@@ -36,6 +37,7 @@ public class UnitOfWork : IUnitOfWork
         CurrencyExchangeRate = new CurrencyExchangeRateRepository(_db);
         QuotationType = new QuotationTypeRepository(_db);
         Quotation = new QuotationRepository(_db);
+        ConfigCxc = new ConfigCxcRepository(_db);
     }
 
     public void Save()

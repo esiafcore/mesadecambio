@@ -17,5 +17,8 @@ public static class AC
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";
 
+    public static char CharDefaultEmpty = '0';
+    public static short RepeatCharTimes = 5;
+
 
 }
