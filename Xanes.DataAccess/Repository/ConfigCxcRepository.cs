@@ -11,7 +11,6 @@ namespace Xanes.DataAccess.Repository;
 public class ConfigCxcRepository : Repository<ConfigCxc>, IConfigCxcRepository
 {
     private readonly ApplicationDbContext _db;
-    private IConfigCxcRepository _configCxcRepositoryImplementation;
 
     public ConfigCxcRepository(ApplicationDbContext db) : base(db)
     {

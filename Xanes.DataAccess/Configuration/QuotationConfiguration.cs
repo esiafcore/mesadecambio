@@ -11,10 +11,7 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
-
-        builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.DateTransa ,x.Numeral }
-                , "quotations_idx_2010")
-            .IsUnique();
+        builder.Property(x => x.InternalSerial).ValueGeneratedOnAdd().HasDefaultValue(AC.InternalSerialOfficial);
 
         builder.Property(b => b.ExchangeRateOfficialTransa).HasPrecision(18, 8);
         builder.Property(b => b.ExchangeRateBuyTransa).HasPrecision(18, 8);
@@ -36,6 +33,10 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .HasSentinel(default);
         builder.Property(b => b.CurrencyTransaType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
+
+        builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.DateTransa, x.InternalSerial, x.Numeral }
+                , "quotations_idx_2010")
+            .IsUnique();
 
         builder.HasOne(x => x.TypeTrx)
             .WithMany()

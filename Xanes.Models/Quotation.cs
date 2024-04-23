@@ -26,6 +26,9 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Tipo Numeral Mesa de Cambio")]
     public SD.QuotationType TypeNumeral { get; set; }
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Internal Serial")]
+    public char InternalSerial { get; set; }
 
     [DisplayName(displayName: "Número")]
     [Required(ErrorMessage = "El campo {0} es requerido")]

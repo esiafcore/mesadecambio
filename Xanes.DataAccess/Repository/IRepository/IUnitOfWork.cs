@@ -14,6 +14,6 @@ public interface IUnitOfWork
     IQuotationTypeRepository QuotationType { get; }
     IQuotationRepository Quotation{ get; }
     IConfigCxcRepository ConfigCxc { get; }
-
+    IConfigFacRepository ConfigFac { get; }
     void Save();
 }

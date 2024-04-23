@@ -31,6 +31,7 @@ public class ApplicationDbContext: DbContext
         modelBuilder.ApplyConfiguration<CurrencyExchangeRate>(new CurrencyExchangeRateConfiguration());
         modelBuilder.ApplyConfiguration<Quotation>(new QuotationConfiguration());
         modelBuilder.ApplyConfiguration<ConfigCxc>(new ConfigCxcConfiguration());
+        modelBuilder.ApplyConfiguration<ConfigFac>(new ConfigFacConfiguration());
 
     }
 
@@ -46,5 +47,6 @@ public class ApplicationDbContext: DbContext
     public virtual DbSet<QuotationType> QuotationsTypes { get; set; }
     public virtual DbSet<Quotation> Quotations { get; set; }
     public virtual DbSet<ConfigCxc> ConfigsCxc { get; set; }
+    public virtual DbSet<ConfigFac> ConfigsFac { get; set; }
 
 }
