@@ -97,9 +97,9 @@ public class QuotationController : Controller
         model.CurrencyTransaList = objCurrencyList
                 .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
                 .ToList();
-            
+
         model.QuotationTypeList = objTypeList;
-        model.CustomerList = objCustomerList.Select(x => new SelectListItem {Text = x.CommercialName, Value=x.Id.ToString() });
+        model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
         model.DataModel = objData;
 
         return View(model);
@@ -112,7 +112,7 @@ public class QuotationController : Controller
 
         var objList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId)
-            ,includeProperties: "TypeTrx,CustomerTrx,CurrencyOriginExchangeTrx,CurrencyTransaTrx").ToList();
+            , includeProperties: "TypeTrx,CustomerTrx,CurrencyOriginExchangeTrx,CurrencyTransaTrx").ToList();
         if (objList.Count <= 0)
         {
             jsonResponse.IsSuccess = false;

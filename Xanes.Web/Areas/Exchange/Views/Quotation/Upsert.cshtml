@@ -37,64 +37,64 @@
                         <input hidden asp-for="DataModel.Id" />
                         <input hidden asp-for="DataModel.CompanyId" />
                         <div class="row my-1">
-                            <div class="row col-6">
-                                <div class="col-3">Tipo</div>
-                                <div class="col-5 ms-3 w-auto border border-primary border-opacity-25">
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Tipo</div>
+                                <div class="col-xl-6 col-sm-7 col-8 w-auto border border-primary border-opacity-25">
                                     @foreach (var quotationType in Model.QuotationTypeList)
                                     {
                                         <div class="form-check mt-2 mx-1 form-check-inline" id="@("quotationType_divradio_" + quotationType.Numeral)">
-                                            <input asp-for="DataModel.TypeNumeral" name="TypeNumeral" 
-                                                class="form-check-input border border-dark-subtle" type="radio"
+                                            <input asp-for="DataModel.TypeNumeral" name="TypeNumeral"
+                                                   class="form-check-input border border-dark-subtle" type="radio"
                                                    id="@("quotationType_radio_" + quotationType.Numeral)" value="@quotationType.Numeral" />
                                             <label class="form-check-label" for="@("quotationType_label_" + quotationType.Numeral)">@quotationType.Code</label>
                                         </div>
                                     }
                                 </div>
                             </div>
-                            <div class="row col-6">
-                                <div class="col-3">Fecha</div>
-                                <div class="col-5">
-                                    <input asp-for="DataModel.DateTransa" type="date" class="form-control" />
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Fecha</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.DateTransa" type="date" class="form-control border p-1" />
                                 </div>
                             </div>
                         </div>
-                        <div class="row my-1">
-                            <div class="row col-6">
-                                <div class="col-3">Cliente</div>
-                                <div class="col-9">
+                        <div class="row">
+                            <div class="row col-xl-8 col-12 ps-2 mb-2">
+                                <div class="col-4 col-sm-5 col-md-2 me-lg-0 me-md-3">Cliente</div>
+                                <div class="col-8 col-sm-7 col-md-8 ms-lg-1 ms-md-3 ps-lg-2 ps-xl-2">
                                     <select asp-for="DataModel.CustomerId" asp-items="@Model.CustomerList"
-                                        class="form-select border">
+                                            class="form-select border p-1">
                                         <option disabled selected>--Select Cliente--</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row my-1">
-                            <div class="row col-6">
-                                <div class="col-3">Mon Transa</div>
-                                <div class="col-5 ms-3 w-auto border border-primary border-opacity-25">
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Mon Transa</div>
+                                <div class="col-xl-6 col-sm-7 col-8 w-auto border border-primary border-opacity-25">
                                     @foreach (var currency in Model.CurrencyTransaList)
                                     {
-                                        <div class="form-check mt-2 mx-1 form-check-inline" 
-                                            id="@("currencyTransaType_divradio_"+currency.Numeral)">
-                                            <input asp-for="DataModel.CurrencyTransaType" name="CurrencyTransaType" 
-                                                class="form-check-input border border-dark-subtle" type="radio"
+                                        <div class="form-check mt-2 mx-1 form-check-inline"
+                                             id="@("currencyTransaType_divradio_"+currency.Numeral)">
+                                            <input asp-for="DataModel.CurrencyTransaType" name="CurrencyTransaType"
+                                                   class="form-check-input border border-dark-subtle" type="radio"
                                                    id="@("currencyTransaType_radio_" + currency.Numeral)"
-                                                   value="@currency.Numeral" 
+                                                   value="@currency.Numeral"
                                                    onclick="return currencyTransaType_onClick(this)" />
                                             <label class="form-check-label" for="@("currencyTransaType_label_" + currency.Numeral)">@currency.Abbreviation</label>
                                         </div>
                                     }
                                 </div>
                             </div>
-                            <div class="row col-6">
-                                <div class="col-3">Mon Origen</div>
-                                <div class="col-5 ms-3 w-auto border border-primary border-opacity-25">
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Mon Origen</div>
+                                <div class="col-xl-6 col-sm-7 col-8 w-auto border border-primary border-opacity-25">
                                     @foreach (var currency in Model.CurrencyOriginExchangeList)
                                     {
-                                        <div class="form-check mt-2 mx-1 form-check-inline" 
-                                            id="@("currencyOriginExchangeType_divradio_"+currency.Numeral)">
-                                            <input asp-for="DataModel.CurrencyOriginExchangeType" name="CurrencyOriginExchangeType" 
+                                        <div class="form-check mt-2 mx-1 form-check-inline"
+                                             id="@("currencyOriginExchangeType_divradio_"+currency.Numeral)">
+                                            <input asp-for="DataModel.CurrencyOriginExchangeType" name="CurrencyOriginExchangeType"
                                                    class="form-check-input border border-dark-subtle" type="radio"
                                                    id="@("currencyOriginExchangeType_radio_" + currency.Numeral)" value="@currency.Numeral" />
                                             <label class="form-check-label fs-labelform" for="@("currencyOriginExchangeType_label_" + currency.Numeral)">@currency.Abbreviation</label>
@@ -104,31 +104,29 @@
                             </div>
                         </div>
                         <div class="row my-1">
-                            <div class="row col-6">
-                                <div class="col-3">T/C Oficial</div>
-                                <div class="col-5 ">
-                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" type="number" class="form-control text-end" step="any" />
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" type="number" class="form-control text-end border p-1" step="any" />
                                 </div>
                             </div>
-                            <div class="row col-6">
-                                <div class="col-3">T/C Compra</div>
-                                <div class="col-5 ">
-                                    <input asp-for="DataModel.ExchangeRateBuyTransa" type="number" class="form-control text-end" step="any" />
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateBuyTransa" type="number" class="form-control text-end border p-1" step="any" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row my-1">
-                            <div class="row col-6">
-                                <div class="col-3">Monto</div>
-                                <div class="col-5 ">
-                                    <input asp-for="DataModel.AmountTransa" type="number" class="form-control text-end" step="any" />
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Monto</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountTransa" type="number" class="form-control text-end border p-1" step="any" />
                                 </div>
 
                             </div>
-                            <div class="row col-6">
-                                <div class="col-3">Costo</div>
-                                <div class="col-5 ">
-                                    <input asp-for="DataModel.AmountCost" type="number" class="form-control text-end" step="any" />
+                            <div class="row col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Costo</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountCost" type="number" class="form-control text-end border p-1" step="any" />
                                 </div>
                             </div>
                         </div>
@@ -144,9 +142,9 @@
 
 @section Scripts {
     <script>
-            let divnamecurExchange = "currencyOriginExchangeType_divradio_";
-            let radnamecurExchange = "currencyOriginExchangeType_radio_";
-     </script> 
+        let divnamecurExchange = "currencyOriginExchangeType_divradio_";
+        let radnamecurExchange = "currencyOriginExchangeType_radio_";
+    </script>
     @{
         <partial name="_ValidationScriptsPartial" />
     }

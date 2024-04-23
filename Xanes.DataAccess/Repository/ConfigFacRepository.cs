@@ -21,7 +21,8 @@ public class ConfigFacRepository : Repository<ConfigFac>, IConfigFacRepository
         _db.ConfigsFac.Update(obj);
     }
 
-    public async Task<long> NextSequentialNumber(Expression<Func<ConfigFac, bool>>? filter = null, SD.TypeSequential typeSequential = SD.TypeSequential.Draft,
+    public async Task<long> NextSequentialNumber(Expression<Func<ConfigFac, bool>>? filter = null
+        , SD.TypeSequential typeSequential = SD.TypeSequential.Draft,
         bool mustUpdate = false)
     {
         IQueryable<ConfigFac> query = _db.Set<ConfigFac>();
@@ -41,15 +42,18 @@ public class ConfigFacRepository : Repository<ConfigFac>, IConfigFacRepository
                 : itemRecord.SequentialNumberDraftQuotation;
             nextSequential++;
 
-            if (typeSequential == SD.TypeSequential.Official)
+            if (mustUpdate)
             {
-                itemRecord.SequentialNumberQuotation = nextSequential;
+                if (typeSequential == SD.TypeSequential.Official)
+                {
+                    itemRecord.SequentialNumberQuotation = nextSequential;
+                }
+                else
+                {
+                    itemRecord.SequentialNumberDraftQuotation = nextSequential;
+                }
+                Update(itemRecord);
             }
-            else
-            {
-                itemRecord.SequentialNumberDraftQuotation = nextSequential;
-            }
-            Update(itemRecord);
         }
 
         return await Task.FromResult(nextSequential);
