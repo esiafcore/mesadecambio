@@ -99,7 +99,7 @@ public class CustomerSectorController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upsert(CustomerSector obj)
+    public async Task<IActionResult> Upsert(CustomerSector obj)
     {
         bool isParentData = false;
         CustomerSector? modelParent = new();
@@ -204,8 +204,8 @@ public class CustomerSectorController : Controller
             else
             {
                 // Verificar que exista
-                if (!_uow.CustomerSector
-                        .IsExist(filter: x => x.Id == obj.Id))
+                if (! (await _uow.CustomerSector
+                        .IsExists(filter:x => x.Id == obj.Id)))
                 {
                     return NotFound();
                 }
@@ -242,21 +242,21 @@ public class CustomerSectorController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
-    public IActionResult DeletePost(int? id)
+    public async Task<IActionResult> DeletePost(int? id)
     {
         if (id == null || id == 0)
         {
             return NotFound();
         }
 
-        if (!_uow.CustomerSector
-                .IsExist(filter: x => (x.Id == id)))
+        if (!(await _uow.CustomerSector
+                .IsExists(filter: x => (x.Id == id))))
         {
             return NotFound();
         }
 
         // Verificar si tiene hijos
-        if (_uow.CustomerSector.IsExist(filter: x => (x.ParentId == id)))
+        if (await _uow.CustomerSector.IsExists(filter: x => (x.ParentId == id)))
         {
             return BadRequest();
         }

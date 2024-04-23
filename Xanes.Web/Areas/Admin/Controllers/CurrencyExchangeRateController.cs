@@ -121,7 +121,7 @@ public class CurrencyExchangeRateController : Controller
     }
 
     [HttpPost]
-    public IActionResult Upsert(CurrencyExchangeRateVM objViewModel)
+    public async Task<IActionResult> Upsert(CurrencyExchangeRateVM objViewModel)
     {
         CurrencyExchangeRate obj = objViewModel.DataModel;
         if (ModelState.IsValid)
@@ -158,11 +158,11 @@ public class CurrencyExchangeRateController : Controller
             obj.CurrencyId = objCurrency.Id;
 
             // Verificar si ya existe moneda - fecha
-            var objExist = _uow.CurrencyExchangeRate
-                .IsExist(x => (x.CompanyId == _companyId)
-                            && (x.DateTransa == obj.DateTransa) 
-                            && (x.CurrencyType == obj.CurrencyType)
-                            && (x.Id != obj.Id));
+            var objExist = await _uow.CurrencyExchangeRate
+                .IsExists(filter: x => (x.CompanyId == _companyId)
+                                       && (x.DateTransa == obj.DateTransa)
+                                       && (x.CurrencyType == obj.CurrencyType)
+                                       && (x.Id != obj.Id));
             if (objExist)
             {
                 ModelState.AddModelError("", $"Tipo de cambio para {objCurrency.Abbreviation} - {obj.DateTransa} ya existe");
@@ -194,8 +194,8 @@ public class CurrencyExchangeRateController : Controller
             else
             {
                 // Verificar que exista
-                if (!_uow.CurrencyExchangeRate
-                        .IsExist(filter: x => x.Id == obj.Id))
+                if (!(await _uow.CurrencyExchangeRate
+                        .IsExists(filter: x => x.Id == obj.Id)))
                 {
                     return NotFound();
                 }
