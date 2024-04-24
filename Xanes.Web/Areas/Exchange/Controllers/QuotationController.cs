@@ -190,6 +190,8 @@ public class QuotationController : Controller
             ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         }
 
+
+
         return View(objViewModel);
     }
 
@@ -197,14 +199,26 @@ public class QuotationController : Controller
     {
         QuotationDetailVM model = new();
 
-        var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+        var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
+            includeProperties: "TypeTrx,CustomerTrx");
         if (objHeader == null)
         {
             return NotFound();
         }
 
-        model.ModelCreateVM.DataModel = objHeader;
+        var objBankList = _uow.Bank
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
 
+        if (objBankList == null)
+        {
+            return NotFound();
+        }
+
+        model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code} {x.Name}", Value = x.Id.ToString() });
+        model.ModelCreateVM.DataModel = objHeader;
+        model.CustomerFullName = $"{objHeader.CustomerTrx.FirstName} {objHeader.CustomerTrx.SecondName} {objHeader.CustomerTrx.LastName} {objHeader.CustomerTrx.SecondSurname}";
+        model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         return View(model);
     }
 
