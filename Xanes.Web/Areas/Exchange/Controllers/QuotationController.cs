@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using System.Text.Json;
 using Xanes.Models;
@@ -7,6 +8,10 @@ using Xanes.Models.ViewModels;
 using Xanes.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Xanes.DataAccess.Repository;
+using Microsoft.DotNet.MSIdentity.Shared;
+using System.Text;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Runtime.CompilerServices;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -35,7 +40,7 @@ public class QuotationController : Controller
         return View();
     }
 
-    public IActionResult Upsert(int? id)
+    public IActionResult Create()
     {
         QuotationCreateVM model = new();
         Quotation objData = new();
@@ -67,31 +72,14 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        if (id == null || id == 0)
+        objData = new Quotation
         {
-            objData = new Quotation
-            {
-                DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
-                TypeNumeral = SD.QuotationType.Buy,
-                CurrencyTransaType = SD.CurrencyType.Foreign,
-                CurrencyOriginExchangeType = SD.CurrencyType.Base
-
-            };
-
-        }
-        else
-        {
-            objData = _uow.Quotation
-                .Get(x => (x.Id == id)
-                    , isTracking: false);
-            //, includeProperties: "CurrencyTrx"
-
-            if (objData == null)
-            {
-                return NotFound();
-            }
-        }
-
+            DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
+            TypeNumeral = SD.QuotationType.Buy,
+            CurrencyTransaType = SD.CurrencyType.Foreign,
+            CurrencyOriginExchangeType = SD.CurrencyType.Base,
+            CompanyId = _companyId
+        };
 
         model.CurrencyOriginExchangeList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.CurrencyTransaList = objCurrencyList
@@ -104,6 +92,125 @@ public class QuotationController : Controller
 
         return View(model);
     }
+
+    [HttpPost]
+    public IActionResult Create(Models.ViewModels.QuotationCreateVM objViewModel)
+    {
+        Models.Quotation obj = objViewModel.DataModel;
+        //Datos son validos
+        if (ModelState.IsValid)
+        {
+            if (obj.CompanyId != _companyId)
+            {
+                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+            }
+
+            //Verificamos si existe la moneda de la Transaccion
+            var objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda de la transacción no encontrada");
+            }
+            else
+            {
+                obj.CurrencyTransaId = objCurrency.Id;
+            }
+
+            //Verificamos si existe la moneda de origen
+            objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda origen no encontrada");
+            }
+            else
+            {
+                obj.CurrencyOriginExchangeId = objCurrency.Id;
+            }
+
+            //Verificamos si existe el tipo
+            var objQuotationType = _uow.QuotationType.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+
+            if (objQuotationType == null)
+            {
+                ModelState.AddModelError("", $"Tipo de transacción no encontrado");
+            }
+            else
+            {
+                obj.TypeId = objQuotationType.Id;
+            }
+
+            //Verificamos si existe el cliente
+            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+            if (objCustomer == null)
+            {
+                ModelState.AddModelError("", $"Cliente no encontrado");
+            }
+
+            if (!ModelState.IsValid) return View(objViewModel);
+
+            //Obtenemos el secuencial en borrador
+            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
+                SD.TypeSequential.Draft, true);
+
+            obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+            obj.InternalSerial = AC.InternalSerialDraft;
+
+            //Seteamos campos de auditoria
+            obj.CreatedBy = "LOCALHOSTME";
+            obj.CreatedDate = DateTime.Now;
+            obj.CreatedHostName = "LOCALHOSTPC";
+            obj.CreatedIpv4 = "127.0.0.1";
+            obj.IsPosted = false;
+            obj.IsClosed = false;
+            obj.IsLoan = false;
+            obj.IsPayment = false;
+            _uow.Quotation.Add(obj);
+            _uow.Save();
+            TempData["success"] = "Quotation created successfully";
+            return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+        }
+        else
+        {
+            StringBuilder errorsMessagesBuilder = new();
+
+            List<string> listErrorMessages = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            foreach (var item in listErrorMessages)
+            {
+                errorsMessagesBuilder.Append(item);
+            }
+
+            ModelState.AddModelError("", errorsMessagesBuilder.ToString());
+        }
+
+        return View(objViewModel);
+    }
+
+    public async Task<IActionResult> CreateDetail(int id)
+    {
+        QuotationDetailVM model = new();
+
+        var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+        if (objHeader == null)
+        {
+            return NotFound();
+        }
+
+        model.ModelCreateVM.DataModel = objHeader;
+
+        return View(model);
+    }
+
+
+
+
 
     #region API_CALL
     public JsonResult GetAll()

@@ -38,4 +38,12 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Exchange\Views\Quotation\CreateDetail.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Exchange\Views\Quotation\CreateDetail.cshtml" />
+  </ItemGroup>
+
 </Project>

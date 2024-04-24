@@ -33,13 +33,18 @@ public class CurrencyExchangeRateController : Controller
             .ToList();
 
         var currencyList = _uow.Currency
-            .GetAll(filter: x => (x.CompanyId == _companyId) 
+            .GetAll(filter: x => (x.CompanyId == _companyId)
                 && (x.Numeral != (short)SD.CurrencyType.Base)
                 && (x.IsActive))
             .OrderBy(x => x.Numeral)
-            .Select(x => new SelectListItem { Value = x.Id.ToString()
-                , Text = x.Abbreviation
-                , Selected = (x.Numeral == (short)currencyType) });
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString()
+                ,
+                Text = x.Abbreviation
+                ,
+                Selected = (x.Numeral == (short)currencyType)
+            });
 
         var objViewModel = new CurrencyExchangeRateIndexVM()
         {
@@ -111,9 +116,14 @@ public class CurrencyExchangeRateController : Controller
             .GetAll(filter: x => (x.CompanyId == _companyId)
                 && (x.Numeral != (short)SD.CurrencyType.Base))
             .OrderBy(x => x.Numeral)
-            .Select(x => new SelectListItem { Value = x.Id.ToString()
-                , Text = x.Abbreviation
-                , Selected = (x.Numeral == (short)obj.CurrencyType) });
+            .Select(x => new SelectListItem
+            {
+                Value = x.Id.ToString()
+                ,
+                Text = x.Abbreviation
+                ,
+                Selected = (x.Numeral == (short)obj.CurrencyType)
+            });
 
         var dataVM = new CurrencyExchangeRateVM()
         {
@@ -179,9 +189,14 @@ public class CurrencyExchangeRateController : Controller
                     .GetAll(filter: x => (x.CompanyId == _companyId)
                         && (x.Numeral != (short)SD.CurrencyType.Base))
                     .OrderBy(x => x.Numeral)
-                    .Select(x => new SelectListItem { Value = x.Id.ToString()
-                        , Text = x.Abbreviation
-                        , Selected = (x.Numeral == (short)obj.CurrencyType) });
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.Id.ToString()
+                        ,
+                        Text = x.Abbreviation
+                        ,
+                        Selected = (x.Numeral == (short)obj.CurrencyType)
+                    });
 
                 objViewModel.CurrencyList = currencyList;
                 objViewModel.DataModel.CurrencyTrx = objCurrency;
@@ -215,12 +230,17 @@ public class CurrencyExchangeRateController : Controller
         {
 
             var currencyList = _uow.Currency
-                .GetAll(filter: x => (x.CompanyId == _companyId) 
+                .GetAll(filter: x => (x.CompanyId == _companyId)
                 && (x.Numeral != (short)SD.CurrencyType.Base))
                 .OrderBy(x => x.Numeral)
-                .Select(x => new SelectListItem { Value = x.Id.ToString()
-                , Text = x.Abbreviation
-                , Selected = (x.Numeral == (short)obj.CurrencyType) });
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString()
+                ,
+                    Text = x.Abbreviation
+                ,
+                    Selected = (x.Numeral == (short)obj.CurrencyType)
+                });
 
             objViewModel.CurrencyList = currencyList;
             return View(objViewModel);
