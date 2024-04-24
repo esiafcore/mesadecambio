@@ -81,10 +81,10 @@ public class QuotationController : Controller
             CompanyId = _companyId
         };
 
-        model.CurrencyOriginExchangeList = objCurrencyList.Where(x => x.IsActive).ToList();
-        model.CurrencyTransaList = objCurrencyList
-                .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
-                .ToList();
+        model.CurrencyOriginExchangeList = objCurrencyList
+            .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+            .ToList();
+        model.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
 
         model.QuotationTypeList = objTypeList;
         model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });

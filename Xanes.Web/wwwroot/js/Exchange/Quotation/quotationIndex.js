@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
     fnEnableTooltip();
 });
 
-
 function loadDatatable() {
     dataTable = new DataTable("#tblData", {
         dataSrc: 'data',
@@ -87,12 +86,13 @@ function loadDatatable() {
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a onClick="fnDeleteRow('/exchange/quotation/delete?id=${row.id}','${row.dateTransa}','${row.transaFullName}')" class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                        <a onClick="fnDeleteRow('/exchange/quotation/delete?id=${row.id}','${row.dateTransa}','${
+                        row.transaFullName}')" class="btn btn-danger py-1 px-3 my-0 mx-1" 
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
 
-                    </div>`
+                    </div>`;
                 }
             }
         ],
