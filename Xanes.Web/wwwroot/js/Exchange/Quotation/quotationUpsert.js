@@ -1,6 +1,6 @@
 ﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa,
-    inputExchangeRateOfficialTransa, inputAmountCost, currencyType, currencies, typeNumerals, currenciesOrigin,
-    inputCurrencyType, inputCurrencyOriginExchangeType, inputTypeNumeral;
+    inputExchangeRateOfficialTransa, inputAmountCost, currencyType, currenciesDestiny, typeNumerals, currenciesOrigin,
+    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -9,11 +9,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputExchangeRateBuyTransa = document.querySelector("#exchangeRateBuyTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountCost = document.querySelector("#amountCost");
-    currencies = document.querySelectorAll(".currencies");
+    currenciesDestiny = document.querySelectorAll(".currenciesDestiny");
     typeNumerals = document.querySelectorAll(".typeNumerals");
     currenciesOrigin = document.querySelectorAll(".currenciesOrigin");
-    inputCurrencyType = document.querySelector("#currencyTransaType");
-    inputCurrencyOriginExchangeType = document.querySelector("#currencyOriginExchangeType");
+    inputCurrencyDestiny = document.querySelector("#currencyTransaType");
+    inputCurrencyOrigin = document.querySelector("#currencyOriginExchangeType");
     inputTypeNumeral = document.querySelector("#typeNumeral");
 
     //Aplicar select2
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currencyType = firstCurrency.value;
-    inputCurrencyType.value = parseInt(currencyType);
+    inputCurrencyDestiny.value = parseInt(currencyType);
     //Por defecto la moneda es dolar
     currencyTransaType_onClick(firstCurrency);
 
@@ -40,10 +40,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         fnCalculateCost();
     });
 
-    currencies.forEach((item) => {
+    currenciesDestiny.forEach((item) => {
         item.addEventListener("change", () => {
             currencyType = item.value;
-            inputCurrencyType.value = parseInt(currencyType);
+            inputCurrencyDestiny.value = parseInt(currencyType);
         });
     });
 
@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currenciesOrigin.forEach((item) => {
-        if (item.checked) inputCurrencyOriginExchangeType.value = parseInt(item.value);
+        if (item.checked) inputCurrencyOrigin.value = parseInt(item.value);
         item.addEventListener("change", () => {
-            inputCurrencyOriginExchangeType.value = parseInt(item.value);
+            inputCurrencyOrigin.value = parseInt(item.value);
         });
     });
 });
