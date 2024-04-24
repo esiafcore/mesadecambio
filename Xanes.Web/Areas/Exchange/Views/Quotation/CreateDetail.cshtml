@@ -9,34 +9,34 @@
         </div>
 
     </div>
-    <div class="card-body">
-        <div class="row m-1 bg-success bg-gradient">
+    <div class="card-body p-1">
+        <div class="row m-1 bg-secondary bg-gradient p-1">
             <div class="col-2 col-xl-1 mb-1">
-                <h5 class="text-black">Cliente</h5>
+                <h5 class="text-white">Cliente</h5>
             </div>
             <div class="col-9 col-xl-6 mb-1">
-                <input class="form-control text-start border p-1" value="@Model.CustomerFullName" readonly/>
+                <input class="form-control text-start border p-1" value="@Model.CustomerFullName" readonly />
             </div>
             <div class="col-2 col-xl-1 mb-1">
-                <h5 class="text-black"># Transa</h5>
+                <h5 class="text-white"># Transa</h5>
             </div>
             <div class="col-8 col-md-4 col-xl-3 mb-1 me-1">
                 <input class="form-control text-start border p-1" value="@Model.NumberTransa" readonly />
             </div>
             <div class="col-2 col-xl-1 mb-1">
-                <h5 class="text-black">Fecha</h5>
+                <h5 class="text-white">Fecha</h5>
             </div>
             <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
                 <input class="form-control text-start border p-1" value="@Model.ModelCreateVM.DataModel.DateTransa" readonly />
             </div>
             <div class="col-2 col-xl-1 mb-1">
-                <h5 class="text-black">T/C</h5>
+                <h5 class="text-white">T/C</h5>
             </div>
             <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
                 <input class="form-control text-end border p-1" value="@Model.ModelCreateVM.DataModel.ExchangeRateOfficialTransa" readonly />
             </div>
             <div class="col-2 col-xl-1 mb-1 offset-md-1">
-                <h5 class="text-black">Monto</h5>
+                <h5 class="text-white">Monto</h5>
             </div>
             <div class="col-8 col-md-3 col-xl-2 mb-1">
                 <input class="form-control text-end border p-1" value="@Model.ModelCreateVM.DataModel.AmountTransa" readonly />
@@ -44,56 +44,65 @@
         </div>
         <hr />
         <div class="row mt-1">
-            <div class="row col-xl-6">
+            <div class="row col-xl-6 me-1">
                 <table id="tblDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
                     <thead>
-                    <tr>
-                        <div class="row">
-                            <button type="button" class="btn btn-info col-1 btn-sm form-control"
-                                    data-bs-toggle="tooltip" data-bs-title="Crear"
-                                    data-bs-toggle="modal" data-bs-target="#modalCreateDeposit">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                            <h5>Depósitos: 0 - Pendientes: 1,000</h5>
-                        </div>
-                    </tr>
-                    <tr>
-                        <th>#</th>
-                        <th data-priority="1">Banco</th>
-                        <th data-priority="2">Importe</th>
-                        <th data-priority="3"></th>
-                    </tr>
+                        <tr>
+                            <div class="row">
+                                <div class="d-flex justify-content-start">
+                                    <button type="button" class="btn btn-info"
+                                            data-bs-toggle="tooltip" data-bs-title="Crear"
+                                            data-bs-toggle="modal" data-bs-target="#modalCreateDeposit">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <h5 class="m-0 ms-2 col-10">Depósitos: 0 - Pendientes: 1,000</h5>
+                                </div>
+                            </div>
+                        </tr>
+                        <tr>
+                            <th class="text-center align-middle my-0 py-0">#</th>
+                            <th data-priority="1" class="text-center align-middle my-0 py-0">Banco</th>
+                            <th data-priority="2" class="text-center align-middle my-0 py-0">Importe</th>
+                            <th data-priority="3" class="text-center align-middle my-0 py-0"></th>
+                        </tr>
                     </thead>
                 </table>
             </div>
             <div class="modal fade" id="modalCreateDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_CreateDetailDeposit" />
-            </div>  <div class="modal fade" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            </div>
+            <div class="modal fade" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_CreateDetailTransfer" />
             </div>
             <div class="row col-xl-6">
                 <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
                     <thead>
-                    <tr>
-                        <div class="row">
-                            <button type="button" class="btn btn-info col-1 btn-sm form-control"
-                                    data-bs-toggle="tooltip" data-bs-title="Crear"
-                                    data-bs-toggle="modal" data-bs-target="#modalCreateTransfer">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                            <h5>Transferencias: 0 - Pendientes: 36,700</h5>
-                        </div>
-                    </tr>
-                    <tr>
-                        <th>#</th>
-                        <th data-priority="1">Banco Origen</th>
-                        <th data-priority="2">Banco Destino</th>
-                        <th data-priority="3">Importe</th>
-                        <th data-priority="4"></th>
-                    </tr>
+                        <tr>
+                            <div class="row">
+                                <div class="d-flex justify-content-start">
+                                    <button type="button" class="btn btn-info"
+                                            data-bs-toggle="tooltip" data-bs-title="Crear"
+                                            data-bs-toggle="modal" data-bs-target="#modalCreateTransfer">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                    <h5 class="m-0 ms-2 col-10">Transferencias: 0 - Pendientes: 36,700</h5>
+                                </div>
+                            </div>
+                        </tr>
+                        <tr>
+                            <th class="text-center align-middle my-0 py-0">#</th>
+                            <th data-priority="1" class="text-center align-middle my-0 py-0">Banco Origen</th>
+                            <th data-priority="2" class="text-center align-middle my-0 py-0">Banco Destino</th>
+                            <th data-priority="3" class="text-center align-middle my-0 py-0">Importe</th>
+                            <th data-priority="4" class="text-center align-middle my-0 py-0"></th>
+                        </tr>
                     </thead>
                 </table>
             </div>
         </div>
     </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/Exchange/Quotation/quotationDetail.js"></script>
+}
