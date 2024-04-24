@@ -123,6 +123,10 @@ public class Quotation : Entity, ICloneable
     public bool IsLoan { get; set; }
 
     [Required]
+    [Display(Name = "Está Anulado?")]
+    public bool IsVoid { get; set; }
+
+    [Required]
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
 

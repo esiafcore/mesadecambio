@@ -74,4 +74,12 @@ public static class SD
         Draft = 1,
         Official = 2
     }
+
+    [Flags]
+    public enum QuotationDetailType : short
+    {
+        Deposit = 1,
+        Transfer = 2
+    }
+
 }

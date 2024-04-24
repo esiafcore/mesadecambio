@@ -13,6 +13,7 @@ public interface IUnitOfWork
     ICurrencyExchangeRateRepository CurrencyExchangeRate { get; }
     IQuotationTypeRepository QuotationType { get; }
     IQuotationRepository Quotation{ get; }
+    IQuotationDetailRepository QuotationDetail { get; }
     IConfigCxcRepository ConfigCxc { get; }
     IConfigFacRepository ConfigFac { get; }
     void Save();
