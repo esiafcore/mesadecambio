@@ -13,6 +13,11 @@ public class CustomerController : Controller
     private readonly int _companyId;
     private readonly ConfigCxc _cfgCxc;
 
+    //Usada en el Upsert
+    private IEnumerable<SelectListItem> categorySelectList;
+    private IEnumerable<SelectListItem> sectorSelectList;
+    private List<PersonType> typeSelectList;
+
     public CustomerController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
@@ -23,8 +28,8 @@ public class CustomerController : Controller
     }
     public IActionResult Index()
     {
-        var objList = _uow.Customer.GetAll(filter:x => (x.CompanyId == _companyId)
-        ,includeProperties: "TypeTrx,CategoryTrx,SectorTrx").ToList();
+        var objList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId)
+        , includeProperties: "TypeTrx,CategoryTrx,SectorTrx").ToList();
         return View(objList);
     }
 
@@ -71,14 +76,14 @@ public class CustomerController : Controller
 
             if (_cfgCxc.IsAutomaticallyCustomerCode)
             {
-                var nextCode= await _uow
+                var nextCode = await _uow
                     .ConfigCxc
                     .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
                         , typeSequential: SD.TypeSequential.Draft
                         , mustUpdate: true);
 
                 obj.Code = nextCode.ToString()
-                    .PadLeft(AC.RepeatCharTimes,AC.CharDefaultEmpty);
+                    .PadLeft(AC.RepeatCharTimes, AC.CharDefaultEmpty);
             }
 
         }
@@ -94,22 +99,7 @@ public class CustomerController : Controller
             }
         }
 
-        var categorySelectList = _uow.CustomerCategory
-            .GetAll(filter: x => (x.CompanyId == _companyId))
-            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
-
-        var sectorSelectList = _uow.CustomerSector
-            .GetAll(filter: x => (x.CompanyId == _companyId))
-            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
-
-        var typeSelectList = _uow.PersonType
-            .GetAll(filter: x => (x.CompanyId == _companyId))
-            .ToList();
-
-        if (typeSelectList == null)
-        {
-            return NotFound();
-        }
+        fnFillDataUpsertLists();
 
         if (id is null or 0)
         {
@@ -134,9 +124,6 @@ public class CustomerController : Controller
     [HttpPost]
     public async Task<IActionResult> Upsert(Models.ViewModels.CustomerCreateVM objViewModel)
     {
-        IEnumerable<SelectListItem> categorySelectList;
-        IEnumerable<SelectListItem> sectorSelectList;
-        List<PersonType> typeSelectList;
 
         Models.Customer obj = objViewModel.DataModel;
         //Datos son validos
@@ -167,20 +154,51 @@ public class CustomerController : Controller
             //Creando
             if (obj.Id == 0)
             {
-                //Validar si no existe
-                bool isExist = await _uow
-                    .Customer.IsExists(x => (x.CompanyId == obj.CompanyId)
-                     && (x.Code.Trim() == obj.Code.Trim()));
-
-                if (!isExist)
+                if (!_cfgCxc.IsAutomaticallyCustomerCode)
                 {
+                    //Validar si codigo no existe
+                    bool isExist = await _uow
+                        .Customer.IsExists(x => (x.CompanyId == obj.CompanyId)
+                                                && (x.Code.Trim() == obj.Code.Trim()));
+                    if (isExist)
+                    {
+                        ModelState.AddModelError("code", $"Código {obj.Code} ya existe");
+                    }
+                }
+
+
+                //Validar si identificación ya existe
+                bool isIdentificationExist = await _uow
+                    .Customer.IsExists(x => (x.CompanyId == obj.CompanyId)
+                                            && (x.Identificationnumber.Trim() == obj.Identificationnumber.Trim())
+                                            && (x.TypeNumeral == obj.TypeNumeral) );
+
+                if (isIdentificationExist)
+                {
+                    if (isIdentificationExist)
+                    {
+                        ModelState.AddModelError("Identificationnumber", $"# Identificación {obj.Code} ya existe");
+                    }
+                }
+
+                if (ModelState.IsValid)
+                {
+                    if (_cfgCxc.IsAutomaticallyCustomerCode)
+                    {
+                        var nextSequential = await _uow
+                            .Customer
+                            .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
+                                                               && (x.InternalSerial == AC.InternalSerialOfficial));
+
+                        obj.Code = nextSequential.ToString()
+                            .PadLeft(AC.RepeatCharTimes, AC.CharDefaultEmpty);
+                    }
+
                     _uow.Customer.Add(obj);
                     _uow.Save();
                     TempData["success"] = "Customer created successfully";
                     return RedirectToAction("Index", "Customer");
                 }
-
-                ModelState.AddModelError("code", $"Código {obj.Code} ya existe");
             }
             else
             {
@@ -213,17 +231,8 @@ public class CustomerController : Controller
                     TempData["success"] = "Customer updated successfully";
                     return RedirectToAction("Index", "Customer");
                 }
-                categorySelectList = _uow.CustomerCategory
-                    .GetAll(filter: x => (x.CompanyId == _companyId))
-                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
-                sectorSelectList = _uow.CustomerSector
-                    .GetAll(filter: x => (x.CompanyId == _companyId))
-                    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
-
-                typeSelectList = _uow.PersonType
-                    .GetAll(filter: x => (x.CompanyId == _companyId))
-                    .ToList();
+                fnFillDataUpsertLists();
 
                 objViewModel.CategoryList = categorySelectList;
                 objViewModel.TypeList = typeSelectList;
@@ -232,6 +241,17 @@ public class CustomerController : Controller
             }
         }
 
+        fnFillDataUpsertLists();
+
+        objViewModel.CategoryList = categorySelectList;
+        objViewModel.SectorList = sectorSelectList;
+        objViewModel.TypeList = typeSelectList;
+        return View(objViewModel);
+
+    }
+
+    private void fnFillDataUpsertLists()
+    {
         categorySelectList = _uow.CustomerCategory
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
@@ -243,12 +263,8 @@ public class CustomerController : Controller
         typeSelectList = _uow.PersonType
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .ToList();
-
-        objViewModel.CategoryList = categorySelectList;
-        objViewModel.SectorList = sectorSelectList;
-        objViewModel.TypeList = typeSelectList;
-        return View(objViewModel);
     }
+
 
     public IActionResult Delete(int? id)
     {
@@ -277,7 +293,7 @@ public class CustomerController : Controller
             return NotFound();
         }
 
-        if (!await _uow.Customer.IsExists(filter: x => x.Id == id.Value)) 
+        if (!await _uow.Customer.IsExists(filter: x => x.Id == id.Value))
         {
             return NotFound();
         }
