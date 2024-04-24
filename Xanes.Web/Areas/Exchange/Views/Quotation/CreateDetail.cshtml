@@ -1,1 +1,74 @@
 ﻿@model QuotationDetailVM
+
+<div class="card shadow border-0 mt-1">
+    <div class="card-header bg-secondary bg-gradient">
+        <div class="row mb-1">
+            <div class="col-12 col-md-6">
+                <h2 class="text-white text-center text-md-start py-1">Detalle - Cotización</h2>
+            </div>
+        </div>
+
+    </div>
+    <div class="card-body">
+        <div class="row m-1">
+            <div class="col-2 col-xl-1 mb-1">
+                <h5 class="text-black">Cliente</h5>
+            </div>
+            <div class="col-9 col-xl-6 mb-1">
+                <input class="form-control text-end border p-1" />
+            </div>
+            <div class="col-2 col-xl-1 mb-1">
+                <h5 class="text-black"># Transa</h5>
+            </div>
+            <div class="col-8 col-md-4 col-xl-3 mb-1 me-1">
+                <input class="form-control text-end border p-1" />
+            </div>
+            <div class="col-2 col-xl-1 mb-1">
+                <h5 class="text-black">Fecha</h5>
+            </div>
+            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
+                <input class="form-control text-end border p-1" />
+            </div>
+            <div class="col-2 col-xl-1 mb-1">
+                <h5 class="text-black">T/Cambio</h5>
+            </div>
+            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
+                <input class="form-control text-end border p-1" />
+            </div>
+            <div class="col-2 col-xl-1 mb-1 offset-md-1">
+                <h5 class="text-black">Monto</h5>
+            </div>
+            <div class="col-8 col-md-3 col-xl-2 mb-1">
+                <input class="form-control text-end border p-1" />
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="row col-xl-6">
+                <table id="tblDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th data-priority="1">Banco</th>
+                            <th data-priority="2">Importe</th>
+                            <th data-priority="3"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="row col-xl-6">
+                <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th data-priority="1">Banco Origen</th>
+                            <th data-priority="2">Banco Destino</th>
+                            <th data-priority="3">Importe</th>
+                            <th data-priority="4"></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
