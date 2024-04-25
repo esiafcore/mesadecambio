@@ -106,6 +106,10 @@ const QuotationType = {
     Transfer: 4
 }
 
+
+const fnparseFloat = (valueInput) => {
+    return parseFloat(valueInput.replace(",", ""));
+}
 const select2Floating = () => {
     $('.select2me')
         .parent('div')

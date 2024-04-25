@@ -114,7 +114,7 @@ const fnCalculateRevenueCost = () => {
     let exchangeRateBuyTransa = parseFloat(inputExchangeRateBuyTransa.value);
     let exchangeRateSellTransa = parseFloat(inputExchangeRateSellTransa.value);
     let exchangeRateOfficialTransa = parseFloat(inputExchangeRateOfficialTransa.value);
-    let amountTransa = parseFloat(inputAmountTransa.value);
+    let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
 
     if (inputTypeNumeral.value == QuotationType.Buy) {
