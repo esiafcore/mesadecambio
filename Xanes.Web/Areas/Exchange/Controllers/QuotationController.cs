@@ -396,7 +396,7 @@ public class QuotationController : Controller
         //    ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         //}
 
-      
+
     }
 
     public IActionResult Delete(int id)
@@ -518,7 +518,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost, ActionName("Delete")]
-    public JsonResult DeletePost(int id)
+    public async Task<JsonResult> DeletePost(int id)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
@@ -539,7 +539,8 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            if (!_uow.Quotation.RemoveByFilter(filter: x => x.Id == id))
+
+            if (!(await _uow.Quotation.RemoveWithChildren(objHeader.Id)))
             {
                 jsonResponse.IsSuccess = false;
                 jsonResponse.ErrorMessages = $"Cotización no encontrada";
