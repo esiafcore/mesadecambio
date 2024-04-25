@@ -6,7 +6,7 @@ namespace Xanes.Models.ViewModels;
 
 public class QuotationDetailVM
 {
-    public Quotation DataModel { get; set; } = null!;
+    public QuotationDetail DataModel { get; set; } = null!;
 
     [ValidateNever]
     public string CustomerFullName { get; set; } = string.Empty;

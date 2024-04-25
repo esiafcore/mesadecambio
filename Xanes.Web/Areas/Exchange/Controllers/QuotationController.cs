@@ -190,7 +190,39 @@ public class QuotationController : Controller
             ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         }
 
+        var objCurrencyList = _uow.Currency
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
 
+        if (objCurrencyList == null)
+        {
+            return NotFound();
+        }
+
+        var objTypeList = _uow.QuotationType
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        var objCustomerList = _uow.Customer
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        objViewModel.CurrencyOriginExchangeList = objCurrencyList
+            .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+            .ToList();
+        objViewModel.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
+        objViewModel.QuotationTypeList = objTypeList;
+        objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
         return View(objViewModel);
     }
@@ -198,6 +230,7 @@ public class QuotationController : Controller
     public async Task<IActionResult> CreateDetail(int id)
     {
         QuotationDetailVM model = new();
+        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx");
@@ -222,7 +255,105 @@ public class QuotationController : Controller
         return View(model);
     }
 
+    [HttpPost]
+    public IActionResult CreateDetail(Models.ViewModels.QuotationDetailVM objViewModel)
+    {
+        Models.QuotationDetail obj = objViewModel.DataModel;
+        //Datos son validos
+        if (ModelState.IsValid)
+        {
+            if (obj.CompanyId != _companyId)
+            {
+                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+            }
 
+            ////Verificamos si existe la moneda de la Transaccion
+            //var objCurrency = _uow.Currency.Get(filter: x =>
+            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+
+            //if (objCurrency == null)
+            //{
+            //    ModelState.AddModelError("", $"Moneda de la transacción no encontrada");
+            //}
+            //else
+            //{
+            //    obj.CurrencyTransaId = objCurrency.Id;
+            //}
+
+            ////Verificamos si existe la moneda de origen
+            //objCurrency = _uow.Currency.Get(filter: x =>
+            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+
+            //if (objCurrency == null)
+            //{
+            //    ModelState.AddModelError("", $"Moneda origen no encontrada");
+            //}
+            //else
+            //{
+            //    obj.CurrencyOriginExchangeId = objCurrency.Id;
+            //}
+
+            ////Verificamos si existe el tipo
+            //var objQuotationType = _uow.QuotationType.Get(filter: x =>
+            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+
+            //if (objQuotationType == null)
+            //{
+            //    ModelState.AddModelError("", $"Tipo de transacción no encontrado");
+            //}
+            //else
+            //{
+            //    obj.TypeId = objQuotationType.Id;
+            //}
+
+            ////Verificamos si existe el cliente
+            //var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+            //if (objCustomer == null)
+            //{
+            //    ModelState.AddModelError("", $"Cliente no encontrado");
+            //}
+
+            if (!ModelState.IsValid) return View(objViewModel);
+
+            //Obtenemos el secuencial en borrador
+            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
+                SD.TypeSequential.Draft, true);
+
+            //obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+            //obj.InternalSerial = AC.InternalSerialDraft;
+
+            ////Seteamos campos de auditoria
+            //obj.CreatedBy = "LOCALHOSTME";
+            //obj.CreatedDate = DateTime.Now;
+            //obj.CreatedHostName = "LOCALHOSTPC";
+            //obj.CreatedIpv4 = "127.0.0.1";
+            //obj.IsPosted = false;
+            //obj.IsClosed = false;
+            //obj.IsLoan = false;
+            //obj.IsPayment = false;
+            //_uow.Quotation.Add(obj);
+            _uow.Save();
+            //TempData["success"] = "Quotation created successfully";
+            //return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+        }
+        else
+        {
+            StringBuilder errorsMessagesBuilder = new();
+
+            List<string> listErrorMessages = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            foreach (var item in listErrorMessages)
+            {
+                errorsMessagesBuilder.Append(item);
+            }
+
+            ModelState.AddModelError("", errorsMessagesBuilder.ToString());
+        }
+
+        return View(objViewModel);
+    }
 
 
 
@@ -238,6 +369,48 @@ public class QuotationController : Controller
         {
             jsonResponse.IsSuccess = false;
             jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
+    }
+
+    public JsonResult GetAllDepositByParent(int parentId)
+    {
+        JsonResultResponse? jsonResponse = new();
+
+        var objList = _uow.QuotationDetail
+            .GetAll(x => (x.CompanyId == _companyId &&
+                          x.ParentId == parentId &&
+                          x.QuotationDetailType == SD.QuotationDetailType.Deposit)
+                , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
+    }
+
+    public JsonResult GetAllTransferByParent(int parentId)
+    {
+        JsonResultResponse? jsonResponse = new();
+
+        var objList = _uow.QuotationDetail
+            .GetAll(x => (x.CompanyId == _companyId &&
+                          x.ParentId == parentId &&
+                          x.QuotationDetailType == SD.QuotationDetailType.Transfer)
+                , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
             return Json(jsonResponse);
         }
 

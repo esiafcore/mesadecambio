@@ -1,5 +1,8 @@
 ﻿@model QuotationDetailVM
 
+<input value="@Model.ModelCreateVM.DataModel.Id" id="parentId" hidden />
+
+
 <div class="card shadow border-0 mt-1">
     <div class="card-header bg-secondary bg-gradient">
         <div class="row mb-1">
@@ -50,12 +53,11 @@
                         <tr>
                             <div class="row">
                                 <div class="d-flex justify-content-start">
-                                    <button type="button" class="btn btn-info"
-                                            data-bs-toggle="tooltip" data-bs-title="Crear"
-                                            data-bs-toggle="modal" data-bs-target="#modalCreateDeposit">
+                                    <a type="button" class="btn btn-info fs-2"
+                                       data-bs-toggle="tooltip" data-bs-title="Crear" onclick="fnShowModalDeposit()">
                                         <i class="bi bi-plus"></i>
-                                    </button>
-                                    <h5 class="m-0 ms-2 col-10">Depósitos: 0 - Pendientes: 1,000</h5>
+                                    </a>
+                                    <h5 class="m-0 ms-2 col-10 align-content-center">Depósitos: 0 - Pendientes: 1,000</h5>
                                 </div>
                             </div>
                         </tr>
@@ -68,24 +70,18 @@
                     </thead>
                 </table>
             </div>
-            <div class="modal fade" id="modalCreateDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <partial name="_CreateDetailDeposit" />
-            </div>
-            <div class="modal fade" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <partial name="_CreateDetailTransfer" />
-            </div>
             <div class="row col-xl-6">
                 <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
                     <thead>
                         <tr>
                             <div class="row">
                                 <div class="d-flex justify-content-start">
-                                    <button type="button" class="btn btn-info"
-                                            data-bs-toggle="tooltip" data-bs-title="Crear"
-                                            data-bs-toggle="modal" data-bs-target="#modalCreateTransfer">
+                                    <a type="button" class="btn btn-info fs-2"
+                                       data-bs-toggle="tooltip" data-bs-title="Crear"
+                                       onclick="fnShowModalTransfer()">
                                         <i class="bi bi-plus"></i>
-                                    </button>
-                                    <h5 class="m-0 ms-2 col-10">Transferencias: 0 - Pendientes: 36,700</h5>
+                                    </a>
+                                    <h5 class="m-0 ms-2 col-10 align-content-center">Transferencias: 0 - Pendientes: 36,700</h5>
                                 </div>
                             </div>
                         </tr>
@@ -99,10 +95,19 @@
                     </thead>
                 </table>
             </div>
+            <div class="modal fade modal-lg" id="modalCreateDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <partial name="_CreateDetailDeposit" />
+            </div>
+            <div class="modal fade modal-lg" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <partial name="_CreateDetailTransfer" />
+            </div>
         </div>
     </div>
 </div>
 @section Scripts {
+    <script>
+        let decimalTransa = @Html.Raw(@ViewBag.DecimalTransa);
+    </script>
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/js/Exchange/Quotation/quotationDetail.js"></script>
+    <script defer src="~/js/Exchange/Quotation/quotationDetail.js"></script>
 }
