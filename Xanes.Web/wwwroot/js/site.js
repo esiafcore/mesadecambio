@@ -12,9 +12,15 @@ const fnEnableTooltip = () => {
     });
 };
 
-const defaultFormatDate = 'dd/MM/yyyy';
 const defaultDecimalTransa = 2;
 const defaultDecimalExchange = 4;
+const localLanguage = "es-NI";
+const formatterAmount = (fractionDigits = defaultDecimalTransa) => {
+    return new Intl.NumberFormat(localLanguage, { style: 'decimal', maximumFractionDigits: fractionDigits });
+}
+//formatterAmount(2).format(10000000000.123456)
+
+const defaultFormatDate = 'dd/MM/yyyy';
 const paddingLength = 3;
 const paddingChar = '0';
 const selectOptions = {
@@ -83,6 +89,11 @@ const CurrencyType = {
 const PersonType = {
     Natural: 1,
     Legal: 2
+}
+
+const QuotationDetailType = {
+    Deposit: 1,
+    Transfer: 2
 }
 
 const select2Floating = () => {

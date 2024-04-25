@@ -233,7 +233,7 @@ public class QuotationController : Controller
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx");
+            includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -248,7 +248,8 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code} {x.Name}", Value = x.Id.ToString() });
+        //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
+        model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.FirstName} {objHeader.CustomerTrx.SecondName} {objHeader.CustomerTrx.LastName} {objHeader.CustomerTrx.SecondSurname}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
@@ -267,74 +268,89 @@ public class QuotationController : Controller
                 ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
             }
 
-            ////Verificamos si existe la moneda de la Transaccion
-            //var objCurrency = _uow.Currency.Get(filter: x =>
-            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+            //Verificamos si existe el padre
+            var objHeader = _uow.Quotation.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Id == obj.ParentId, isTracking: false);
 
-            //if (objCurrency == null)
-            //{
-            //    ModelState.AddModelError("", $"Moneda de la transacción no encontrada");
-            //}
-            //else
-            //{
-            //    obj.CurrencyTransaId = objCurrency.Id;
-            //}
+            if (objHeader == null)
+            {
+                ModelState.AddModelError("", $"Registro padre no encontrada");
+            }
 
-            ////Verificamos si existe la moneda de origen
-            //objCurrency = _uow.Currency.Get(filter: x =>
-            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+            //Obtenemos los hijos
+            var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
+                x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == objViewModel.DataModel.QuotationDetailType);
 
-            //if (objCurrency == null)
-            //{
-            //    ModelState.AddModelError("", $"Moneda origen no encontrada");
-            //}
-            //else
-            //{
-            //    obj.CurrencyOriginExchangeId = objCurrency.Id;
-            //}
+            if (objDetails == null)
+            {
+                ModelState.AddModelError("", $"Registros hijos son invalidos");
+            }
 
-            ////Verificamos si existe el tipo
-            //var objQuotationType = _uow.QuotationType.Get(filter: x =>
-            //    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+            //Verificamos si existe la moneda
+            var objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDetailId, isTracking: false);
 
-            //if (objQuotationType == null)
-            //{
-            //    ModelState.AddModelError("", $"Tipo de transacción no encontrado");
-            //}
-            //else
-            //{
-            //    obj.TypeId = objQuotationType.Id;
-            //}
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda no encontrada");
+            }
 
-            ////Verificamos si existe el cliente
-            //var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
-            //if (objCustomer == null)
-            //{
-            //    ModelState.AddModelError("", $"Cliente no encontrado");
-            //}
+            //Verificamos si existe el banco origen
+            var objBankSource = _uow.Bank.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Id == obj.BankSourceId, isTracking: false);
+
+            if (objBankSource == null)
+            {
+                ModelState.AddModelError("", $"Banco Origen no encontrado");
+            }
+
+            //Verificamos si tiene banco destino y verificamos si existe
+            if (obj.BankTargetId != 0)
+            {
+                var objBankTarget = _uow.Bank.Get(filter: x =>
+                    x.CompanyId == obj.CompanyId && x.Id == obj.BankTargetId, isTracking: false);
+
+                if (objBankTarget == null)
+                {
+                    ModelState.AddModelError("", $"Banco Destino no encontrado");
+                }
+            }
+            else
+            {
+                obj.BankTargetId = obj.BankSourceId;
+            }
 
             if (!ModelState.IsValid) return View(objViewModel);
 
-            //Obtenemos el secuencial en borrador
-            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
-                SD.TypeSequential.Draft, true);
 
-            //obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
-            //obj.InternalSerial = AC.InternalSerialDraft;
+            if (obj.Id == 0)
+            {
+                //Seteamos campos de auditoria
+                obj.LineNumber = objDetails.Count() + 1;
+                obj.CreatedBy = "LOCALHOSTME";
+                obj.CreatedDate = DateTime.Now;
+                obj.CreatedHostName = "LOCALHOSTPC";
+                obj.CreatedIpv4 = "127.0.0.1";
+                _uow.QuotationDetail.Add(obj);
+                _uow.Save();
+                TempData["success"] = "Cotización creada exitosamente";
+            }
+            else
+            {
+                var objDetail = objDetails.First(x => x.Id == obj.Id);
 
-            ////Seteamos campos de auditoria
-            //obj.CreatedBy = "LOCALHOSTME";
-            //obj.CreatedDate = DateTime.Now;
-            //obj.CreatedHostName = "LOCALHOSTPC";
-            //obj.CreatedIpv4 = "127.0.0.1";
-            //obj.IsPosted = false;
-            //obj.IsClosed = false;
-            //obj.IsLoan = false;
-            //obj.IsPayment = false;
-            //_uow.Quotation.Add(obj);
-            _uow.Save();
-            //TempData["success"] = "Quotation created successfully";
-            //return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+                //Seteamos campos de auditoria
+                obj.LineNumber = objDetail.LineNumber;
+                obj.UpdatedBy = "LOCALHOSTME";
+                obj.UpdatedDate = DateTime.Now;
+                obj.UpdatedHostName = "LOCALHOSTPC";
+                obj.UpdatedIpv4 = "127.0.0.1";
+                _uow.QuotationDetail.Update(obj);
+                _uow.Save();
+                TempData["success"] = "Cotización actualizada exitosamente";
+            }
+
+            return RedirectToAction("CreateDetail", "Quotation", new { id = obj.ParentId });
         }
         else
         {
@@ -351,6 +367,27 @@ public class QuotationController : Controller
 
             ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         }
+
+        var objHeaderQt = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == obj.ParentId,
+            includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
+        if (objHeaderQt == null)
+        {
+            return NotFound();
+        }
+
+        var objBankList = _uow.Bank
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objBankList == null)
+        {
+            return NotFound();
+        }
+
+        objViewModel.BankList = objBankList;
+        objViewModel.ModelCreateVM.DataModel = objHeaderQt;
+        objViewModel.CustomerFullName = $"{objHeaderQt.CustomerTrx.FirstName} {objHeaderQt.CustomerTrx.SecondName} {objHeaderQt.CustomerTrx.LastName} {objHeaderQt.CustomerTrx.SecondSurname}";
+        objViewModel.NumberTransa = $"COT-{objHeaderQt.TypeTrx.Code}-{objHeaderQt.Numeral}";
 
         return View(objViewModel);
     }
@@ -417,6 +454,78 @@ public class QuotationController : Controller
         jsonResponse.IsSuccess = true;
         jsonResponse.Data = objList;
         return Json(jsonResponse);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    public JsonResult DeletePost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+        try
+        {
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            _uow.Quotation.Remove(objHeader);
+            jsonResponse.IsSuccess = true;
+            jsonResponse.SuccessMessages = $"Cotización eliminada correctamente";
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost, ActionName("DeleteDetail")]
+    public JsonResult DeleteDetailPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+        try
+        {
+            var objDetail = _uow.QuotationDetail
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objDetail == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
+                return Json(jsonResponse);
+            }
+
+            _uow.QuotationDetail.Remove(objDetail);
+            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
     }
 
     [HttpDelete]

@@ -1,10 +1,28 @@
 ﻿let containerMain;
-let dataTableTransfer, dataTableDeposit, parentId;
+let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amountTotalTransfer = 0;
+let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
+let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
+    amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
 document.addEventListener("DOMContentLoaded", function () {
-    
+
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
     parentId = document.querySelector("#parentId").value;
+    amountHeader = document.querySelector("#amountHeader").value;
+    tableRowLabelDeposit = document.querySelector("#tableRowLabelDeposit");
+    tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
+    selectBankSourceDeposit = document.querySelector("#selectBankSourceDeposit");
+    selectBankSourceTransfer = document.querySelector("#selectBankSourceTransfer");
+    selectBankTargetTransfer = document.querySelector("#selectBankTargetTransfer");
+    amountDeposit = document.querySelector("#amountDeposit");
+    amountTransfer = document.querySelector("#amountTransfer");
+    idDetailDeposit = document.querySelector("#idDetailDeposit");
+    idDetailTransfer = document.querySelector("#idDetailTransfer");
+    TCHeader = document.querySelector("#TCHeader");
+    TCHeader.value = formatterAmount().format(TCHeader.value);
+    amountHeader.value = formatterAmount().format(amountHeader.value);
+    //amountTotalDeposit = parseFloat(document.querySelector("#totalAmountDeposit").value);
+    //amountTotalTransfer = parseFloat(document.querySelector("#totalAmountTransfer").value);
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
     //Habilitar Tooltip
@@ -13,13 +31,98 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 const fnShowModalDeposit = () => {
+    document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
     $('#modalCreateDeposit').modal('show');
 };
 
-
 const fnShowModalTransfer = () => {
+    document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
     $('#modalCreateTransfer').modal('show');
 };
+
+const fndeleteRow = async (id) => {
+    let result = await Swal.fire({
+        title: `&#191;Está seguro de eliminar el detalle?`,
+        html: `Este registro no se podrá recuperar`,
+        icon: "warning",
+        showCancelButton: true,
+        reverseButtons: true,
+        focusConfirm: false,
+        confirmButtonText: ButtonsText.Delete,
+        cancelButtonText: ButtonsText.Cancel,
+        customClass: {
+            confirmButton: "btn btn-danger px-3 mx-2",
+            cancelButton: "btn btn-primary px-3 mx-2"
+        },
+        buttonsStyling: false
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    try {
+
+        let url = `/exchange/quotation/DeleteDetail?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            toastr.success(jsonResponse.successMessages);
+            dataTableDeposit.ajax.reload();
+            dataTableTransfer.ajax.reload();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) => {
+    if (quotationDetailType == QuotationDetailType.Deposit) {
+        document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
+        idDetailDeposit.value = id;
+        amountDeposit.value = formatterAmount().format(amount);
+        [...selectBankSourceDeposit.options].forEach((opt) => {
+            if (opt.value == bankSource) {
+                opt.selected = true;
+                return;
+            }
+        });
+        $('#modalCreateDeposit').modal('show');
+    } else {
+        document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Actualizar Transferencia";
+        idDetailTransfer.value = id;
+        amountTransfer.value = formatterAmount().format(amount);
+        [...selectBankSourceTransfer.options].forEach((opt) => {
+            if (opt.value == bankSource) {
+                opt.selected = true;
+                return;
+            }
+        });
+        [...selectBankTargetTransfer.options].forEach((opt) => {
+            if (opt.value == bankTarget) {
+                opt.selected = true;
+                return;
+            }
+        });
+        $('#modalCreateTransfer').modal('show');
+    }
+};
+
 function fnLoadDatatableDeposit() {
     dataTableDeposit = new DataTable("#tblDeposit", {
         "dataSrc": 'data',
@@ -40,7 +143,7 @@ function fnLoadDatatableDeposit() {
         },
         "columns": [
             {
-                data: 'lineNumber', "width": "5%", orderable: true
+                data: 'lineNumber', "width": "2%", orderable: true
             },
             {
                 data: 'bankSourceTrx.code', "width": "20%", orderable: false
@@ -55,10 +158,12 @@ function fnLoadDatatableDeposit() {
                 , "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
+                         onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId}, '${QuotationDetailType.Deposit}')"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                        <a class="btn btn-danger py-1 px-3 my-0 mx-1"
+                            onclick="fndeleteRow(${data.id})"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
@@ -66,8 +171,43 @@ function fnLoadDatatableDeposit() {
                 }
             }
         ],
-        "searching": true,
-        "select": selectOptions
+        "searching": false,
+        "paging": false,
+        "select": selectOptions,
+        "language": {
+            infoEmpty: "No hay datos para mostrar",
+            zeroRecords: "No se encontraron coincidencias",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: "No hay datos disponibles en la tabla",
+            select: {
+                cells: {
+                    "1": "1 celda seleccionada",
+                    "_": "%d celdas seleccionadas"
+                },
+                columns: {
+                    "1": "1 columna seleccionada",
+                    "_": "%d columnas seleccionadas"
+                },
+                rows: {
+                    "1": "1 fila seleccionada",
+                    "_": "%d filas seleccionadas"
+                }
+            }
+        },
+        "footer": true,
+        "footerCallback": function (row, data) {
+            let footerCell = $(this.api().column(0).footer());
+            footerCell.removeClass();
+            footerCell.addClass('footer-left text-end');
+            let total = 0, pending = 0;
+            data.forEach((item) => {
+                total += item.amountDetail;
+            });
+            pending = parseFloat(amountHeader) - total;
+            tableRowLabelDeposit.innerHTML = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            $(footerCell).html(`${formatterAmount().format(total)}`);
+        }
     });
 }
 function fnLoadDatatableTransfer() {
@@ -90,7 +230,7 @@ function fnLoadDatatableTransfer() {
         },
         "columns": [
             {
-                data: 'lineNumber', "width": "5%", orderable: true
+                data: 'lineNumber', "width": "2%", orderable: true
             },
             {
                 data: 'bankSourceTrx.code', "width": "20%", orderable: false
@@ -108,10 +248,12 @@ function fnLoadDatatableTransfer() {
                 , "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
+                            onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId},'${QuotationDetailType.Transfer}')"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                        <a class="btn btn-danger py-1 px-3 my-0 mx-1"
+                            onclick="fndeleteRow(${data.id})"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
@@ -119,7 +261,42 @@ function fnLoadDatatableTransfer() {
                 }
             }
         ],
-        "searching": true,
-        "select": selectOptions
+        "searching": false,
+        "paging": false,
+        "select": selectOptions,
+        "language": {
+            infoEmpty: "No hay datos para mostrar",
+            zeroRecords: "No se encontraron coincidencias",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: "No hay datos disponibles en la tabla",
+            select: {
+                cells: {
+                    "1": "1 celda seleccionada",
+                    "_": "%d celdas seleccionadas"
+                },
+                columns: {
+                    "1": "1 columna seleccionada",
+                    "_": "%d columnas seleccionadas"
+                },
+                rows: {
+                    "1": "1 fila seleccionada",
+                    "_": "%d filas seleccionadas"
+                }
+            }
+        },
+        "footer": true,
+        "footerCallback": function (row, data) {
+            let footerCell = $(this.api().column(0).footer());
+            footerCell.removeClass();
+            footerCell.addClass('footer-left text-end');
+            let total = 0, pending = 0;
+            data.forEach((item) => {
+                total += item.amountDetail;
+            });
+            pending = parseFloat(amountHeader) - total;
+            tableRowLabelTransfer.innerHTML = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            $(footerCell).html(`${formatterAmount().format(total)}`);
+        }
     });
 }

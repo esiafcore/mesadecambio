@@ -1,44 +1,55 @@
 ﻿@model QuotationDetailVM
 
 <form method="post" asp-action="CreateDetail">
+    <input asp-for="DataModel.Id" id="idDetailDeposit" hidden />
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden/>
-    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden />
-    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyOriginExchangeId" hidden />
+    <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
+    <input asp-for="DataModel.BankTargetId" hidden />
+    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden/>
+    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyOriginExchangeId" hidden/>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Nuevo Depósito</h1>
+                <h1 class="modal-title fs-5" id="staticBackdropLabelDeposit"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <div class="modal-body row">
-                <div class="row col-8">
+                <div class="row mb-1">
+                    <div class="col-xl-2">
+                        Monto
+                    </div>
+                    <div class="col-xl-6">
+                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1"/>
+                        <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-xl-2">
                         Banco
                     </div>
                     <div class="col-xl-9">
-                        <select asp-items="@Model.BankList" asp-for="DataModel.BankSourceId"
+                        <select asp-for="DataModel.BankSourceId"
                                 class="form-select border p-1" size="10" id="selectBankSourceDeposit">
                             <option disabled selected>--Select Banco--</option>
+                            @foreach (var bank in Model.BankList)
+                            {
+                                <option value="@bank.Id">@bank.Code</option>
+                            }
                         </select>
-                        <span class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="row col-4">
-                    <div class="col-xl-4">
-                        Monto
-                    </div>
-                    <div class="col-xl-8">
-                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1"/>
+                        <span class="text-danger" asp-validation-for="DataModel.BankSourceId"></span>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-sm btn-primary" data-bs-dismiss="modal">
-                    <i class="bi bi-printer-fill"></i> Salvar
+                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">
+                    <i class="bi bi-x-square"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="bi bi-floppy"></i> Salvar
                 </button>
             </div>
         </div>

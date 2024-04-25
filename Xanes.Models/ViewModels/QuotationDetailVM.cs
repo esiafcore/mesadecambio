@@ -15,7 +15,10 @@ public class QuotationDetailVM
     public string NumberTransa { get; set; } = string.Empty;
 
     [ValidateNever]
-    public IEnumerable<SelectListItem> BankList { get; set; } = null!;
+    public IEnumerable<SelectListItem> BankListItem { get; set; } = null!;
+    
+    [ValidateNever]
+    public List<Bank> BankList { get; set; } = null!;
 
     [ValidateNever]
     public QuotationCreateVM ModelCreateVM { get; set; } = new();
