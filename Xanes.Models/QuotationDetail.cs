@@ -36,7 +36,7 @@ public class QuotationDetail: Entity, ICloneable
 
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Bank Source")]
+    [Display(Name = "Banco Origen")]
     [ForeignKey(nameof(BankSourceTrx))]
     public int BankSourceId { get; set; }
 
@@ -44,7 +44,7 @@ public class QuotationDetail: Entity, ICloneable
     public virtual Bank BankSourceTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Bank Target")]
+    [Display(Name = "Banco Destino")]
     [ForeignKey(nameof(BankTargetTrx))]
     public int BankTargetId { get; set; }
 
@@ -52,7 +52,7 @@ public class QuotationDetail: Entity, ICloneable
     public virtual Bank BankTargetTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
-    [Display(Name = "Monto Detail")]
+    [Display(Name = "Monto Detalle")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal AmountDetail { get; set; } = 0M;
 

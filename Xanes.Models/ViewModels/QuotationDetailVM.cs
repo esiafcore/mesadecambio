@@ -6,7 +6,8 @@ namespace Xanes.Models.ViewModels;
 
 public class QuotationDetailVM
 {
-    public Quotation DataModel { get; set; } = null!;
+    [ValidateNever]
+    public QuotationDetail DataModel { get; set; } = null!;
 
     [ValidateNever]
     public string CustomerFullName { get; set; } = string.Empty;
@@ -15,7 +16,10 @@ public class QuotationDetailVM
     public string NumberTransa { get; set; } = string.Empty;
 
     [ValidateNever]
-    public IEnumerable<SelectListItem> BankList { get; set; } = null!;
+    public IEnumerable<SelectListItem> BankListItem { get; set; } = null!;
+    
+    [ValidateNever]
+    public List<Bank> BankList { get; set; } = null!;
 
     [ValidateNever]
     public QuotationCreateVM ModelCreateVM { get; set; } = new();

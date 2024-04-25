@@ -113,30 +113,44 @@
                             <div class="row col-xl-4 col-md-6 col-12 mb-1">
                                 <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" type="number" class="form-control text-end border p-1" step="any" />
+                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" class="form-control text-end border p-1 decimalFormat" step="any" readonly/>
                                     <span asp-validation-for="DataModel.ExchangeRateOfficialTransa" class="text-danger"></span>
                                 </div>
                             </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy">
                                 <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.ExchangeRateBuyTransa" type="number" id="exchangeRateBuyTransa" class="form-control text-end border p-1" step="any" />
+                                    <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1" step="any" />
                                     <span asp-validation-for="DataModel.ExchangeRateBuyTransa" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Venta</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateSellTransa" id="exchangeRateSellTransa" class="form-control text-end border p-1 decimalFormat" step="any" />
+                                    <span asp-validation-for="DataModel.ExchangeRateSellTransa" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="row col-xl-4 col-md-6 col-12 mb-1">
                                 <div class="col-sm-5 col-lg-4 col-4">Monto</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountTransa" type="number" id="amountTransa" class="form-control text-end border p-1" step="any" />
+                                    <input asp-for="DataModel.AmountTransa" id="amountTransa" class="form-control text-end border p-1 decimalFormat" step="any" />
                                     <span asp-validation-for="DataModel.AmountTransa" class="text-danger"></span>
                                 </div>
 
                             </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy">
                                 <div class="col-sm-5 col-lg-4 col-4">Costo</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountCost" type="number" id="amountCost" class="form-control text-end border p-1" step="any" />
+                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 decimalFormat" step="any" />
                                     <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">Ingreso</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 decimalFormat" step="any" />
+                                    <span asp-validation-for="DataModel.AmountRevenue" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
