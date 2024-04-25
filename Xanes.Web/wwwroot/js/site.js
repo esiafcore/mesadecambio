@@ -16,7 +16,11 @@ const defaultDecimalTransa = 2;
 const defaultDecimalExchange = 4;
 const localLanguage = "es-NI";
 const formatterAmount = (fractionDigits = defaultDecimalTransa) => {
-    return new Intl.NumberFormat(localLanguage, { style: 'decimal', maximumFractionDigits: fractionDigits });
+    return new Intl.NumberFormat(localLanguage, {
+        style: 'decimal'
+        , maximumFractionDigits: fractionDigits
+        , minimumFractionDigits: fractionDigits
+    });
 }
 //formatterAmount(2).format(10000000000.123456)
 

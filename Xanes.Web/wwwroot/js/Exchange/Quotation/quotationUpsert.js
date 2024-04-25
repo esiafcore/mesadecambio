@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     inputAmountTransa.addEventListener("change", () => {
-        fnCalculateCost();
+        fnCalculateRevenueCost();
     });
 
     currenciesDestiny.forEach((item) => {
@@ -109,7 +109,7 @@ function currencyTransaType_onClick(objElem) {
 }
 
 //Funcion para calcular el costo
-const fnCalculateCost = () => {
+const fnCalculateRevenueCost = () => {
 
     let exchangeRateBuyTransa = parseFloat(inputExchangeRateBuyTransa.value);
     let exchangeRateSellTransa = parseFloat(inputExchangeRateSellTransa.value);
@@ -130,13 +130,11 @@ const fnCalculateCost = () => {
             amountCost = (exchangeRateOfficialTransa - exchangeRateSellTransa) * amountTransa;
         }
 
-    } else {
+    } 
 
-    }
-
-    inputAmountCost.value = amountCost;
-    inputAmountRevenue.value = amountRevenue;
-
+    inputAmountCost.value = formatterAmount().format(amountCost);
+    inputAmountRevenue.value = formatterAmount().format(amountRevenue);
+    inputAmountTransa.value = formatterAmount().format(amountTransa); 
 };
 
 //Funcion para obtener el tipo de cambio oficial
