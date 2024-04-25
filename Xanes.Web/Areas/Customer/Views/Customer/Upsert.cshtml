@@ -75,7 +75,7 @@
                     @* Nombre para persona natural *@
                     <div id="personNatural_div" class="row m-0 p-0">
                         <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                            <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" />
+                            <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" onchange="" />
                             <label asp-for="DataModel.FirstName" class="ms-2"></label>
                             <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
                         </div>
@@ -174,31 +174,19 @@
 </div>
 
 @section Scripts {
-@*     <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'anchor autolink charmap codesample emoticons lists  table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent ',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-            language: 'es_MX',
-            height: 250,
-            min_height: 250,
-            max_height: 250,
-            language_url: '/languages/es_MX.js',
-            mergetags_list: [
-                { value: 'First.Name', title: 'First Name' },
-                { value: 'Email', title: 'Email' },
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant")),
-        });
-    </script> *@
     <script>
         let personNaturalDiv = document.getElementById("personNatural_div");
         let personLegalDiv = document.getElementById("personLegal_div");
         let personLegalRad = document.getElementById("personType_radio_" + PersonType.Legal);
+        let personNaturalRad = document.getElementById("personType_radio_" + PersonType.Natural);
 
-     </script> 
+        //Nombre persona natural
+        let inputFirstName = document.getElementById("DataModel_FirstName");
+        let inputSecondName = document.getElementById("DataModel_SecondName");
+        let inputLastName = document.getElementById("DataModel_LastName");
+        let inputSecondSurname = document.getElementById("DataModel_SecondSurname");
+    </script>
+
     @{
         <partial name="_ValidationScriptsPartial" />
         <script src="~/js/Customer/Customer/customerUpsert.js"></script>
