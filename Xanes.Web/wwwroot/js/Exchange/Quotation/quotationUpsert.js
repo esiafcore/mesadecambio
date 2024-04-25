@@ -1,20 +1,25 @@
-﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa,
-    inputExchangeRateOfficialTransa, inputAmountCost, currencyType, currenciesDestiny, typeNumerals, currenciesOrigin,
-    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral;
+﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa, inputExchangeRateSellTransa,
+    inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currenciesDestiny, typeNumerals, currenciesOrigin,
+    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral, elementsBuy, elementsSell;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
     firstCurrency = document.querySelector("#currencyTransaType_radio_2");
     inputExchangeRateBuyTransa = document.querySelector("#exchangeRateBuyTransa");
+    inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountCost = document.querySelector("#amountCost");
+    inputAmountRevenue = document.querySelector("#amountRevenue");
     currenciesDestiny = document.querySelectorAll(".currenciesDestiny");
     typeNumerals = document.querySelectorAll(".typeNumerals");
     currenciesOrigin = document.querySelectorAll(".currenciesOrigin");
     inputCurrencyDestiny = document.querySelector("#currencyTransaType");
     inputCurrencyOrigin = document.querySelector("#currencyOriginExchangeType");
     inputTypeNumeral = document.querySelector("#typeNumeral");
+    elementsBuy = document.querySelectorAll(".typeBuy");
+    elementsSell = document.querySelectorAll(".typeSell");
+    let decimalFormat = document.querySelectorAll(".decimalFormat");
 
     //Aplicar select2
     $("#selectCustomer").select2(select2Options);
@@ -51,6 +56,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (item.checked) inputTypeNumeral.value = parseInt(item.value);
         item.addEventListener("change", () => {
             inputTypeNumeral.value = parseInt(item.value);
+            if (item.value == QuotationType.Buy) {
+                elementsBuy.forEach((item) => item.hidden = false);
+                elementsSell.forEach((item) => item.hidden = true);
+
+            } else if (item.value == QuotationType.Sell) {
+                elementsBuy.forEach((item) => item.hidden = true);
+                elementsSell.forEach((item) => item.hidden = false);
+            } else {
+
+            }
         });
     });
 
@@ -60,6 +75,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             inputCurrencyOrigin.value = parseInt(item.value);
         });
     });
+
+    //decimalFormat.forEach((item) => {
+    //    item.value = formatterAmount().format(parseFloat(item.value));
+    //    item.addEventListener("change", () => {
+    //        item.value = formatterAmount().format(item.value);
+    //    });
+    //});
+
 });
 
 function currencyTransaType_onClick(objElem) {
@@ -89,13 +112,31 @@ function currencyTransaType_onClick(objElem) {
 const fnCalculateCost = () => {
 
     let exchangeRateBuyTransa = parseFloat(inputExchangeRateBuyTransa.value);
+    let exchangeRateSellTransa = parseFloat(inputExchangeRateSellTransa.value);
     let exchangeRateOfficialTransa = parseFloat(inputExchangeRateOfficialTransa.value);
     let amountTransa = parseFloat(inputAmountTransa.value);
-    let amountCost = 0;
+    let amountCost = 0, amountRevenue = 0;
 
-    amountCost = (exchangeRateBuyTransa - exchangeRateOfficialTransa) * amountTransa;
+    if (inputTypeNumeral.value == QuotationType.Buy) {
+        if (exchangeRateBuyTransa > exchangeRateOfficialTransa) {
+            amountCost = (exchangeRateBuyTransa - exchangeRateOfficialTransa) * amountTransa;
+        } else {
+            amountRevenue = (exchangeRateOfficialTransa - exchangeRateBuyTransa) * amountTransa;
+        }
+    } else if (inputTypeNumeral.value == QuotationType.Sell) {
+        if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
+            amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
+        } else {
+            amountCost = (exchangeRateOfficialTransa - exchangeRateSellTransa) * amountTransa;
+        }
+
+    } else {
+
+    }
 
     inputAmountCost.value = amountCost;
+    inputAmountRevenue.value = amountRevenue;
+
 };
 
 //Funcion para obtener el tipo de cambio oficial

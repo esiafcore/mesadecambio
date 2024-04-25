@@ -96,6 +96,12 @@ const QuotationDetailType = {
     Transfer: 2
 }
 
+const QuotationType = {
+    Buy: 1,
+    Sell: 2,
+    Transfer: 4
+}
+
 const select2Floating = () => {
     $('.select2me')
         .parent('div')

@@ -9,40 +9,20 @@ document.addEventListener("DOMContentLoaded", function () {
     containerMain.className = "container-fluid";
     parentId = document.querySelector("#parentId").value;
     amountHeader = document.querySelector("#amountHeader").value;
+    TCHeader = document.querySelector("#TCHeader");
     tableRowLabelDeposit = document.querySelector("#tableRowLabelDeposit");
     tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
-    selectBankSourceDeposit = document.querySelector("#selectBankSourceDeposit");
-    selectBankSourceTransfer = document.querySelector("#selectBankSourceTransfer");
-    selectBankTargetTransfer = document.querySelector("#selectBankTargetTransfer");
-    amountDeposit = document.querySelector("#amountDeposit");
-    amountTransfer = document.querySelector("#amountTransfer");
-    idDetailDeposit = document.querySelector("#idDetailDeposit");
-    idDetailTransfer = document.querySelector("#idDetailTransfer");
-    TCHeader = document.querySelector("#TCHeader");
     TCHeader.value = formatterAmount().format(TCHeader.value);
     amountHeader.value = formatterAmount().format(amountHeader.value);
-    //amountTotalDeposit = parseFloat(document.querySelector("#totalAmountDeposit").value);
-    //amountTotalTransfer = parseFloat(document.querySelector("#totalAmountTransfer").value);
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
-    //Habilitar Tooltip
     fnEnableTooltip();
 });
 
 
-const fnShowModalDeposit = () => {
-    document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
-    $('#modalCreateDeposit').modal('show');
-};
-
-const fnShowModalTransfer = () => {
-    document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
-    $('#modalCreateTransfer').modal('show');
-};
-
 const fndeleteRow = async (id) => {
     let result = await Swal.fire({
-        title: `&#191;Está seguro de eliminar el detalle?`,
+        title: `&#191;Está seguro de eliminar la cotización?`,
         html: `Este registro no se podrá recuperar`,
         icon: "warning",
         showCancelButton: true,
@@ -63,7 +43,7 @@ const fndeleteRow = async (id) => {
 
     try {
 
-        let url = `/exchange/quotation/DeleteDetail?id=${id}`;
+        let url = `/exchange/quotation/Delete?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'
@@ -77,9 +57,9 @@ const fndeleteRow = async (id) => {
                 text: jsonResponse.errorMessages
             });
         } else {
-            toastr.success(jsonResponse.successMessages);
-            dataTableDeposit.ajax.reload();
-            dataTableTransfer.ajax.reload();
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
         }
 
     } catch (e) {
@@ -90,39 +70,6 @@ const fndeleteRow = async (id) => {
         });
     }
 };
-
-const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) => {
-    if (quotationDetailType == QuotationDetailType.Deposit) {
-        document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
-        idDetailDeposit.value = id;
-        amountDeposit.value = formatterAmount().format(amount);
-        [...selectBankSourceDeposit.options].forEach((opt) => {
-            if (opt.value == bankSource) {
-                opt.selected = true;
-                return;
-            }
-        });
-        $('#modalCreateDeposit').modal('show');
-    } else {
-        document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Actualizar Transferencia";
-        idDetailTransfer.value = id;
-        amountTransfer.value = formatterAmount().format(amount);
-        [...selectBankSourceTransfer.options].forEach((opt) => {
-            if (opt.value == bankSource) {
-                opt.selected = true;
-                return;
-            }
-        });
-        [...selectBankTargetTransfer.options].forEach((opt) => {
-            if (opt.value == bankTarget) {
-                opt.selected = true;
-                return;
-            }
-        });
-        $('#modalCreateTransfer').modal('show');
-    }
-};
-
 function fnLoadDatatableDeposit() {
     dataTableDeposit = new DataTable("#tblDeposit", {
         "dataSrc": 'data',
@@ -139,9 +86,6 @@ function fnLoadDatatableDeposit() {
                     });
                     return [];
                 }
-            },
-            "complete": function () {
-                fnEnableTooltip();
             }
         },
         "columns": [
@@ -155,23 +99,6 @@ function fnLoadDatatableDeposit() {
                 data: 'amountDetail', "width": "15%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
-            },
-            {
-                data: null, "width": "5%", orderable: false
-                , "render": (data, type, row) => {
-                    return `<div class="btn-group" role="group">        
-                        <a class="btn btn-primary py-1 px-3 my-0 mx-1"
-                         onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId}, '${QuotationDetailType.Deposit}')"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
-                            <i class="bi bi-pencil-square fs-5"></i>
-                        </a>
-                        <a class="btn btn-danger py-1 px-3 my-0 mx-1"
-                            onclick="fndeleteRow(${data.id})"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
-                            <i class="bi bi-trash-fill fs-5"></i>
-                        </a>
-                    </div>`;
-                }
             }
         ],
         "searching": false,
@@ -229,9 +156,6 @@ function fnLoadDatatableTransfer() {
                     });
                     return [];
                 }
-            },
-            "complete": function () {
-                fnEnableTooltip();
             }
         },
         "columns": [
@@ -248,23 +172,6 @@ function fnLoadDatatableTransfer() {
                 data: 'amountDetail', "width": "15%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
-            },
-            {
-                data: null, "width": "5%", orderable: false
-                , "render": (data, type, row) => {
-                    return `<div class="btn-group" role="group">        
-                        <a class="btn btn-primary py-1 px-3 my-0 mx-1"
-                            onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId},'${QuotationDetailType.Transfer}')"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
-                            <i class="bi bi-pencil-square fs-5"></i>
-                        </a>
-                        <a class="btn btn-danger py-1 px-3 my-0 mx-1"
-                            onclick="fndeleteRow(${data.id})"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
-                            <i class="bi bi-trash-fill fs-5"></i>
-                        </a>
-                    </div>`;
-                }
             }
         ],
         "searching": false,

@@ -7,14 +7,9 @@
     <div class="card-header bg-secondary bg-gradient">
         <div class="row mb-1">
             <div class="col-12 col-md-6 pb-1">
-                <h2 class="text-white text-center text-md-start py-1">Detalle - Cotización</h2>
+                <h2 class="text-white text-center text-md-start py-1">Visualizar - Cotización</h2>
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
-                <div class="col-6 col-md-5 col-xl-4">
-                    <a onclick="fnApproved" class="btn btn-info form-control btn-sm">
-                        <i class="bi bi-check-square-fill"></i> Cerrar Cotización
-                    </a>
-                </div>
                 <div class="col-6 col-md-5 col-xl-4">
                     <a asp-action="Index" class="btn btn-secondary form-control btn-sm">
                         <i class="bi bi-arrow-return-left"></i> Regresar
@@ -62,10 +57,10 @@
             <div class="col-xl-6">
                 <div class="row">
                     <div class="d-flex justify-content-start">
-                        <a type="button" class="btn btn-info fs-2"
+                       @*  <a type="button" class="btn btn-info fs-2"
                            data-bs-toggle="tooltip" data-bs-title="Crear" onclick="fnShowModalDeposit()">
                             <i class="bi bi-plus"></i>
-                        </a>
+                        </a> *@
                         <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelDeposit"></h5>
                     </div>
                 </div>
@@ -75,7 +70,6 @@
                             <th class="text-center align-middle my-0 py-0">#</th>
                             <th data-priority="1" class="text-center align-middle my-0 py-0">Banco</th>
                             <th data-priority="2" class="text-center align-middle my-0 py-0">Importe</th>
-                            <th data-priority="3" class="text-center align-middle my-0 py-0"></th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -88,11 +82,11 @@
             <div class="col-xl-6">
                 <div class="row">
                     <div class="d-flex justify-content-start">
-                        <a type="button" class="btn btn-info fs-2"
+                      @*   <a type="button" class="btn btn-info fs-2"
                            data-bs-toggle="tooltip" data-bs-title="Crear"
                            onclick="fnShowModalTransfer()">
                             <i class="bi bi-plus"></i>
-                        </a>
+                        </a> *@
                         <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelTransfer"></h5>
                     </div>
                 </div>
@@ -103,7 +97,6 @@
                             <th data-priority="1" class="text-center align-middle my-0 py-0">Banco Origen</th>
                             <th data-priority="2" class="text-center align-middle my-0 py-0">Banco Destino</th>
                             <th data-priority="3" class="text-center align-middle my-0 py-0">Importe</th>
-                            <th data-priority="4" class="text-center align-middle my-0 py-0"></th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -113,12 +106,6 @@
                     </tfoot>
                 </table>
             </div>
-            <div class="modal fade" id="modalCreateDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <partial name="_CreateDetailDeposit" />
-            </div>
-            <div class="modal fade modal-lg" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <partial name="_CreateDetailTransfer" />
-            </div>
         </div>
     </div>
 </div>
@@ -127,5 +114,5 @@
         let decimalTransa = @Html.Raw(@ViewBag.DecimalTransa);
     </script>
     <partial name="_ValidationScriptsPartial" />
-    <script defer src="~/js/Exchange/Quotation/quotationDetail.js"></script>
+    <script defer src="~/js/Exchange/Quotation/quotationDelete.js"></script>
 }

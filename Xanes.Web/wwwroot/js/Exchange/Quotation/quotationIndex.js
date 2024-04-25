@@ -9,7 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadDatatable() {
     dataTable = new DataTable("#tblData", {
         dataSrc: 'data',
-        ajax: { url: '/exchange/quotation/getall' },
+        ajax: {
+            "url": '/exchange/quotation/getall',
+            "complete": function () {
+                fnEnableTooltip();
+            }
+        },
         columns: [
             {
                 data: 'dateTransa', "width": "5%"
@@ -25,7 +30,7 @@ function loadDatatable() {
             },
             {
                 data: 'customerTrx.businessName', "width": "38%"
-                , render: DataTable.render.ellipsis(28,false)
+                , render: DataTable.render.ellipsis(28, false)
                 , orderable: true
             },
             {
@@ -62,7 +67,7 @@ function loadDatatable() {
             },
             {
                 data: 'isClosed', "width": "2%"
-                ,render: function (data, type, row) {
+                , render: function (data, type, row) {
                     return data ? YesNo.Yes : YesNo.No;
                 }
                 , orderable: false
@@ -76,18 +81,17 @@ function loadDatatable() {
             },
             {
                 data: null, "width": "5%", orderable: false
-                ,"render": (data, type, row) => {
+                , "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
-                        <a href="/exchange/quotation/detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
+                        <a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
                             <i class="bi bi-eye fs-5"></i>
                         </a>
-                        <a href="/exchange/quotation/upsert?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
+                        <a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
-                        <a onClick="fnDeleteRow('/exchange/quotation/delete?id=${row.id}','${row.dateTransa}','${
-                        row.transaFullName}')" class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                        <a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
