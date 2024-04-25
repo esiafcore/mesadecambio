@@ -130,11 +130,12 @@ const fnCalculateRevenueCost = () => {
             amountCost = (exchangeRateOfficialTransa - exchangeRateSellTransa) * amountTransa;
         }
 
-    } 
-
+    }
+    inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
+    inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);
     inputAmountRevenue.value = formatterAmount().format(amountRevenue);
-    inputAmountTransa.value = formatterAmount().format(amountTransa); 
+    inputAmountTransa.value = formatterAmount().format(amountTransa);
 };
 
 //Funcion para obtener el tipo de cambio oficial

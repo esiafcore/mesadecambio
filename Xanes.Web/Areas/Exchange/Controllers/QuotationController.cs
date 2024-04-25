@@ -233,6 +233,7 @@ public class QuotationController : Controller
     {
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
+        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
