@@ -15,7 +15,10 @@ public class QuotationCreateVM
     public List<Currency> CurrencyTransaList { get; set; } = new();
 
     [ValidateNever]
-    public List<Currency> CurrencyOriginExchangeList { get; set; } = new();
+    public List<Currency> CurrencyDepositList { get; set; } = new();
+
+    [ValidateNever]
+    public List<Currency> CurrencyTransferList { get; set; } = new();
 
     [ValidateNever]
     public List<QuotationType> QuotationTypeList { get; set; } = new();

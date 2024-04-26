@@ -1,7 +1,7 @@
 ﻿@model QuotationCreateVM
 
 <div class="col-8 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2">
-    @foreach (var currency in Model.CurrencyOriginExchangeList)
+    @foreach (var currency in Model.CurrencyTransaList)
     {
         <div class="form-check mt-2 mx-1 form-check-inline">
             <input asp-for="DataModel.CurrencyDepositType" name="CurrencyOriginExchangeType" 
