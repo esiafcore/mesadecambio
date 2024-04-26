@@ -79,7 +79,7 @@ public class QuotationController : Controller
             DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
             TypeNumeral = SD.QuotationType.Buy,
             CurrencyTransaType = SD.CurrencyType.Foreign,
-            CurrencyOriginExchangeType = SD.CurrencyType.Base,
+            CurrencyDepositType = SD.CurrencyType.Base,
             CompanyId = _companyId
         };
 
@@ -122,7 +122,7 @@ public class QuotationController : Controller
 
             //Verificamos si existe la moneda de origen
             objCurrency = _uow.Currency.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
 
             if (objCurrency == null)
             {
@@ -130,7 +130,7 @@ public class QuotationController : Controller
             }
             else
             {
-                obj.CurrencyOriginExchangeId = objCurrency.Id;
+                obj.CurrencyDepositId = objCurrency.Id;
             }
 
             //Verificamos si existe el tipo
@@ -283,7 +283,7 @@ public class QuotationController : Controller
 
             //Verificamos si existe la moneda de origen
             objCurrency = _uow.Currency.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
 
             if (objCurrency == null)
             {
@@ -291,7 +291,7 @@ public class QuotationController : Controller
             }
             else
             {
-                obj.CurrencyOriginExchangeId = objCurrency.Id;
+                obj.CurrencyDepositId = objCurrency.Id;
             }
 
             //Verificamos si existe el tipo

@@ -42,16 +42,29 @@ public class Quotation : Entity, ICloneable
     public virtual Customer CustomerTrx { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id TC Source Currency")]
-    [ForeignKey(nameof(CurrencyOriginExchangeTrx))]
-    public int CurrencyOriginExchangeId { get; set; }
+    [Display(Name = "Id Deposit Currency")]
+    [ForeignKey(nameof(CurrencyDepositTrx))]
+    public int CurrencyDepositId { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Tipo TC Source Currency")]
-    public SD.CurrencyType CurrencyOriginExchangeType { get; set; }
+    [Display(Name = "Tipo Deposit Currency")]
+    public SD.CurrencyType CurrencyDepositType { get; set; }
 
     [ValidateNever]
-    public virtual Currency CurrencyOriginExchangeTrx { get; set; } = null!;
+    public virtual Currency CurrencyDepositTrx { get; set; } = null!;
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id Transfer Currency")]
+    [ForeignKey(nameof(CurrencyTransferTrx))]
+    public int CurrencyTransferId { get; set; }
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Tipo Transfer Currency")]
+    public SD.CurrencyType CurrencyTransferType { get; set; }
+
+    [ValidateNever]
+    public virtual Currency CurrencyTransferTrx { get; set; } = null!;
+
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id Moneda Transaction Final")]
@@ -97,17 +110,17 @@ public class Quotation : Entity, ICloneable
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Transacción")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountTransa { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Ingreso Transacción")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountRevenue { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Costo Transacción")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;
 
     [Required]

@@ -6,7 +6,7 @@
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
     <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" hidden />
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden/>
-    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyOriginExchangeId" hidden/>
+    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden/>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="modal-dialog modal-dialog-centered">

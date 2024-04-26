@@ -29,7 +29,7 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.IsClosed).HasDefaultValue(false);
         builder.Property(b => b.TypeNumeral).HasDefaultValue(SD.QuotationType.Buy)
             .HasSentinel(default);
-        builder.Property(b => b.CurrencyOriginExchangeType).HasDefaultValue(SD.CurrencyType.Base)
+        builder.Property(b => b.CurrencyDepositType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
         builder.Property(b => b.CurrencyTransaType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
@@ -50,9 +50,9 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(true);
 
-        builder.HasOne(x => x.CurrencyOriginExchangeTrx)
+        builder.HasOne(x => x.CurrencyDepositTrx)
             .WithMany()
-            .HasForeignKey(x => x.CurrencyOriginExchangeId)
+            .HasForeignKey(x => x.CurrencyDepositId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(true);
 

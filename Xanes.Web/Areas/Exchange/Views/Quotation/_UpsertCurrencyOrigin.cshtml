@@ -4,7 +4,7 @@
     @foreach (var currency in Model.CurrencyOriginExchangeList)
     {
         <div class="form-check mt-2 mx-1 form-check-inline">
-            <input asp-for="DataModel.CurrencyOriginExchangeType" name="CurrencyOriginExchangeType" 
+            <input asp-for="DataModel.CurrencyDepositType" name="CurrencyOriginExchangeType" 
                 class="form-check-input border border-dark-subtle" type="radio" id="@("inlineRadio" + currency.Id)" value="@currency.Numeral" />
             <label class="form-check-label fs-labelform" for="@("inlineRadio" + currency.Id)">@currency.Abbreviation</label>
         </div>

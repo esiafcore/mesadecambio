@@ -38,7 +38,6 @@
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         <select asp-for="DataModel.CategoryId" asp-items="@Model.CategoryList"
-                                data-placeholder="Categoría"
                                 class="form-select border-0 shadow select2me">
                         </select>
                         <label asp-for="DataModel.CategoryId" class="ms-2">Categoria</label>
@@ -46,7 +45,6 @@
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                         <select asp-for="DataModel.SectorId" asp-items="@Model.SectorList" 
-                             data-placeholder="Sector"
                                 class="form-select border-0 shadow select2me">
                             <option disabled selected>--Select Sector--</option>
                         </select>
