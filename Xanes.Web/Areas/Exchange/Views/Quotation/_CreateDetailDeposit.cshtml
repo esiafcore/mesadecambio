@@ -11,26 +11,28 @@
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabelDeposit"></h1>
+            <div class="modal-header p-1 bg-secondary bg-gradient">
+                <h1 class="modal-title text-white fs-3" id="staticBackdropLabelDeposit"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body row">
+            <div class="modal-body row pt-0 mt-1">
+                <h5 class="text-success mb-1 ps-0" id="infoModalDeposit"></h5>
+                <hr class="w-100 mb-1"/>
                 <div class="row mb-1">
-                    <div class="col-xl-2">
+                    <div class="col-2">
                         Monto
                     </div>
-                    <div class="col-xl-6">
-                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1"/>
+                    <div class="col-6">
+                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa" />
                         <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xl-2">
+                    <div class="col-2">
                         Banco
                     </div>
-                    <div class="col-xl-9">
+                    <div class="col-9">
                         <select asp-for="DataModel.BankSourceId"
                                 class="form-select border p-1" size="10" id="selectBankSourceDeposit">
                             <option disabled selected>--Select Banco--</option>

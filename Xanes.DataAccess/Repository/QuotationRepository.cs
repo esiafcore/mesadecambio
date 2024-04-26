@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;
@@ -18,6 +19,36 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
     public void Update(Quotation obj)
     {
         _db.Quotations.Update(obj);
+    }
+
+    public async Task<bool> RemoveWithChildren(int id)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            await _db.QuotationsDetails
+                .Where(x => x.ParentId == id)
+                .ExecuteDeleteAsync();
+
+            await _db.Quotations
+                .Where(x => x.Id == id)
+                .ExecuteDeleteAsync();
+            
+            await transaction.CommitAsync();
+            return await Task.FromResult(true);
+        }
+        catch (DbUpdateException ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception(ex.InnerException?.Message);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception(ex.Message);
+        }
+
+        return await Task.FromResult(false);
     }
 
     public async Task<int> NextSequentialNumber(Expression<Func<Quotation, bool>>? filter = null)

@@ -3,6 +3,8 @@ let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amoun
 let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
+
+let inputsFormatTransa, inputsFormatExchange;
 document.addEventListener("DOMContentLoaded", function () {
 
     containerMain = document.querySelector("#containerMain");
@@ -19,8 +21,34 @@ document.addEventListener("DOMContentLoaded", function () {
     idDetailDeposit = document.querySelector("#idDetailDeposit");
     idDetailTransfer = document.querySelector("#idDetailTransfer");
     TCHeader = document.querySelector("#TCHeader");
-    TCHeader.value = formatterAmount().format(TCHeader.value);
-    amountHeader.value = formatterAmount().format(amountHeader.value);
+    inputsFormatTransa = document.querySelectorAll(".decimalTransa");
+    inputsFormatExchange = document.querySelectorAll(".decimalTC");
+    
+    //Aplicar select2
+    $("#selectCustomer").select2(select2Options);
+
+    //Setear enfoque en el search input
+    $(document).on('select2:open', function (e) {
+        document.querySelector(`[aria-controls="select2-${e.target.id}-results"]`).focus();
+    });
+
+    inputsFormatTransa.forEach((item) => {
+        item.value = formatterAmount().format(fnparseFloat(item.value));
+
+        item.addEventListener("change", () => {
+            item.value = formatterAmount().format(fnparseFloat(item.value));
+        });
+    });
+
+    inputsFormatExchange.forEach((item) => {
+        item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+
+        item.addEventListener("change", () => {
+            item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+        });
+    });
+    //TCHeader.value = formatterAmount().format(TCHeader.value);
+    //amountHeader.value = formatterAmount().format(amountHeader.value);
     //amountTotalDeposit = parseFloat(document.querySelector("#totalAmountDeposit").value);
     //amountTotalTransfer = parseFloat(document.querySelector("#totalAmountTransfer").value);
     fnLoadDatatableDeposit();
@@ -29,14 +57,35 @@ document.addEventListener("DOMContentLoaded", function () {
     fnEnableTooltip();
 });
 
+const fnClearModalDeposit = () => {
+    document.querySelector("#idDetailDeposit").value = 0;
+    document.querySelector("#amountDeposit").value = formatterAmount().format(0);
+    document.querySelector("#selectBankSourceDeposit").selectedIndex = 0;
+};
+
+const fnClearModalTransfer = () => {
+    document.querySelector("#idDetailTransfer").value = 0;
+    document.querySelector("#amountTransfer").value = formatterAmount().format(0);
+    document.querySelector("#selectBankSourceTransfer").selectedIndex = 0;
+    document.querySelector("#selectBankTargetTransfer").selectedIndex = 0;
+};
+
+
+const fnShowModalUpdateHeader = () => {
+    $('#modalUpdateHeader').modal('show');
+};
 
 const fnShowModalDeposit = () => {
+    fnClearModalDeposit();
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
+    document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
     $('#modalCreateDeposit').modal('show');
 };
 
 const fnShowModalTransfer = () => {
+    fnClearModalTransfer();
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
+    document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
     $('#modalCreateTransfer').modal('show');
 };
 
@@ -102,6 +151,7 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
                 return;
             }
         });
+        document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
         $('#modalCreateDeposit').modal('show');
     } else {
         document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Actualizar Transferencia";
@@ -119,6 +169,7 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
                 return;
             }
         });
+        document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
         $('#modalCreateTransfer').modal('show');
     }
 };
@@ -208,7 +259,13 @@ function fnLoadDatatableDeposit() {
                 total += item.amountDetail;
             });
             pending = parseFloat(amountHeader) - total;
+            if (pending == 0) {
+                document.querySelector("#btnCreateDetailDeposit").hidden = true;
+            } else {
+                document.querySelector("#btnCreateDetailDeposit").hidden = false;
+            }
             tableRowLabelDeposit.innerHTML = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelDeposit.value = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
@@ -300,8 +357,15 @@ function fnLoadDatatableTransfer() {
             data.forEach((item) => {
                 total += item.amountDetail;
             });
-            pending = parseFloat(amountHeader) - total;
+            pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+            if (pending == 0) {
+                document.querySelector("#btnCreateDetailTransfer").hidden = true;
+            } else {
+                document.querySelector("#btnCreateDetailTransfer").hidden = false;
+
+            }
             tableRowLabelTransfer.innerHTML = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelTransfer.value = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });

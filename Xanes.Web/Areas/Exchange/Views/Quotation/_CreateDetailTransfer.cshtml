@@ -1,7 +1,7 @@
 ﻿@model QuotationDetailVM
 
 <form method="post" asp-action="CreateDetail">
-    <input asp-for="DataModel.Id" id="idDetailTransfer" hidden />
+    <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailTransfer" hidden />
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden/>
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" hidden/>
@@ -10,26 +10,28 @@
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabelTransfer"></h1>
+            <div class="modal-header p-1 bg-secondary bg-gradient">
+                <h1 class="modal-title text-white fs-3" id="staticBackdropLabelTransfer"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body row">
+            <div class="modal-body row pt-0 mt-1">
+                <h5 class="text-success mb-1 ps-0" id="infoModalTransfer"></h5>
+                <hr class="w-100 mb-1"/>
                 <div class="row col-12 mb-1">
-                    <div class="col-xl-1">
+                    <div class="col-2 col-lg-1">
                         Monto
                     </div>
-                    <div class="col-xl-3 ms-4">
-                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" class="form-control border p-1"/>
+                    <div class="col-3 ms-4">
+                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa" />
                         <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
                     </div>
                 </div>
                 <div class="row col-6 mb-1">
-                    <div class="col-xl-12">
+                    <div class="col-12">
                         Banco Origen
                     </div>
-                    <div class="col-xl-12">
+                    <div class="col-12">
                         <select asp-for="DataModel.BankSourceId"
                                 class="form-select border p-1" size="10" id="selectBankSourceTransfer">
                             <option disabled selected>--Select Banco--</option>
@@ -42,10 +44,10 @@
                     </div>
                 </div>
                 <div class="row col-6 mb-1">
-                    <div class="col-xl-12">
+                    <div class="col-12">
                         Banco Destino
                     </div>
-                    <div class="col-xl-12">
+                    <div class="col-12">
                         <select asp-for="DataModel.BankTargetId"
                                 class="form-select border p-1" size="10" id="selectBankTargetTransfer">
                             <option disabled selected>--Select Banco--</option>

@@ -35,7 +35,7 @@ public class Quotation : Entity, ICloneable
     public int Numeral { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Customer")]
+    [Display(Name = "Cliente")]
     [ForeignKey(nameof(CustomerTrx))]
     public int CustomerId { get; set; }
     [ValidateNever]
