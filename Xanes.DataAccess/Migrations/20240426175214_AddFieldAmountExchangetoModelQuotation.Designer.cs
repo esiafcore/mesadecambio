@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xanes.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using Xanes.DataAccess.Data;
 namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240426175214_AddFieldAmountExchangetoModelQuotation")]
+    partial class AddFieldAmountExchangetoModelQuotation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -454,7 +457,7 @@ namespace Xanes.DataAccess.Migrations
                             CountryCode = "NIC",
                             CountryNumber = (short)558,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 4, 26, 17, 53, 44, 390, DateTimeKind.Utc).AddTicks(694),
+                            CreatedDate = new DateTime(2024, 4, 26, 17, 52, 13, 287, DateTimeKind.Utc).AddTicks(3222),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IdentificationNumber = "J0310000031339",
@@ -1929,8 +1932,7 @@ namespace Xanes.DataAccess.Migrations
                         .HasColumnName("amountcost");
 
                     b.Property<decimal>("AmountExchange")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)")
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("amountexchange");
 
                     b.Property<decimal>("AmountRevenue")

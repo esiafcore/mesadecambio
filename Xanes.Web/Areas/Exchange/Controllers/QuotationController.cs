@@ -166,24 +166,24 @@ public class QuotationController : Controller
             {
                 if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
                 }
                 else
                 {
-                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
                 }
             }else if (obj.TypeNumeral == SD.QuotationType.Sell)
             {
                 if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransa;
+                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
                 }
                 else
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
                 }
             }
@@ -327,12 +327,12 @@ public class QuotationController : Controller
             {
                 if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
                 }
                 else
                 {
-                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
                 }
             }
@@ -340,12 +340,12 @@ public class QuotationController : Controller
             {
                 if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransa;
+                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
                 }
                 else
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
                 }
             }

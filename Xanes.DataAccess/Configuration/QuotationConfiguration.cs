@@ -20,7 +20,8 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.ExchangeRateBuyReal).HasPrecision(18, 8);
         builder.Property(b => b.ExchangeRateSellReal).HasPrecision(18, 8);
 
-        builder.Property(b => b.AmountTransa).HasPrecision(18, 4);
+        builder.Property(b => b.AmountTransaction).HasPrecision(18, 4);
+        builder.Property(b => b.AmountExchange).HasPrecision(18, 4);
         builder.Property(b => b.AmountRevenue).HasPrecision(18, 4);
         builder.Property(b => b.AmountCost).HasPrecision(18, 4);
         builder.Property(b => b.IsPosted).HasDefaultValue(false);

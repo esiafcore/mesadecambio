@@ -111,7 +111,12 @@ public class Quotation : Entity, ICloneable
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
-    public decimal AmountTransa { get; set; } = 0M;
+    public decimal AmountTransaction { get; set; } = 0M;
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Monto Mesa Cambio")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountExchange { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Ingreso Transacción")]
