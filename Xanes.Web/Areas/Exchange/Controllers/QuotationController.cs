@@ -162,6 +162,33 @@ public class QuotationController : Controller
             obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
             obj.InternalSerial = AC.InternalSerialDraft;
 
+            if (obj.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
+                {
+                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransa;
+                    obj.AmountCost = 0;
+                }
+                else
+                {
+                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = 0;
+                }
+            }else if (obj.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
+                {
+                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = 0;
+                }
+                else
+                {
+                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountCost = 0;
+                }
+            }
+
+
             //Seteamos campos de auditoria
             obj.CreatedBy = "LOCALHOSTME";
             obj.CreatedDate = DateTime.Now;
@@ -229,6 +256,132 @@ public class QuotationController : Controller
         return View(objViewModel);
     }
 
+    [HttpPost]
+    public IActionResult Update(Models.ViewModels.QuotationCreateVM objViewModel)
+    {
+        Models.Quotation obj = objViewModel.DataModel;
+        //Datos son validos
+        if (ModelState.IsValid)
+        {
+            if (obj.CompanyId != _companyId)
+            {
+                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+            }
+
+            //Verificamos si existe la moneda de la Transaccion
+            var objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda de la transacción no encontrada");
+            }
+            else
+            {
+                obj.CurrencyTransaId = objCurrency.Id;
+            }
+
+            //Verificamos si existe la moneda de origen
+            objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyOriginExchangeType);
+
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda origen no encontrada");
+            }
+            else
+            {
+                obj.CurrencyOriginExchangeId = objCurrency.Id;
+            }
+
+            //Verificamos si existe el tipo
+            var objQuotationType = _uow.QuotationType.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+
+            if (objQuotationType == null)
+            {
+                ModelState.AddModelError("", $"Tipo de transacción no encontrado");
+            }
+            else
+            {
+                obj.TypeId = objQuotationType.Id;
+            }
+
+            //Verificamos si existe el cliente
+            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+            if (objCustomer == null)
+            {
+                ModelState.AddModelError("", $"Cliente no encontrado");
+            }
+
+            if (!ModelState.IsValid) return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+
+            //Obtenemos el secuencial en borrador
+            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
+                SD.TypeSequential.Draft, true);
+
+            obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+            obj.InternalSerial = AC.InternalSerialDraft;
+
+            if (obj.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
+                {
+                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransa;
+                    obj.AmountCost = 0;
+                }
+                else
+                {
+                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = 0;
+                }
+            }
+            else if (obj.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
+                {
+                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransa;
+                    obj.AmountRevenue = 0;
+                }
+                else
+                {
+                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransa;
+                    obj.AmountCost = 0;
+                }
+            }
+
+            //Seteamos campos de auditoria
+            obj.UpdatedBy = "LOCALHOSTME";
+            obj.UpdatedDate = DateTime.Now;
+            obj.UpdatedHostName = "LOCALHOSTPC";
+            obj.UpdatedIpv4 = "127.0.0.1";
+            obj.IsPosted = false;
+            obj.IsClosed = false;
+            obj.IsLoan = false;
+            obj.IsPayment = false;
+            _uow.Quotation.Update(obj);
+            _uow.Save();
+            TempData["success"] = "Cotización actualizada exitosamente";
+        }
+        else
+        {
+            StringBuilder errorsMessagesBuilder = new();
+
+            List<string> listErrorMessages = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            foreach (var item in listErrorMessages)
+            {
+                errorsMessagesBuilder.Append(item);
+            }
+
+            ModelState.AddModelError("", errorsMessagesBuilder.ToString());
+        }
+
+        return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+    }
+
     public IActionResult CreateDetail(int id)
     {
         QuotationDetailVM model = new();
@@ -250,6 +403,41 @@ public class QuotationController : Controller
         {
             return NotFound();
         }
+
+        var objCurrencyList = _uow.Currency
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objCurrencyList == null)
+        {
+            return NotFound();
+        }
+
+        var objTypeList = _uow.QuotationType
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        var objCustomerList = _uow.Customer
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objTypeList == null)
+        {
+            return NotFound();
+        }
+
+        model.ModelCreateVM.CurrencyOriginExchangeList = objCurrencyList
+            .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+            .ToList();
+        model.ModelCreateVM.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
+
+        model.ModelCreateVM.QuotationTypeList = objTypeList;
+        model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
         model.BankList = objBankList;

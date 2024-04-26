@@ -28,15 +28,19 @@ document.addEventListener("DOMContentLoaded", function () {
     //Habilitar Tooltip
     fnEnableTooltip();
 });
-
+const fnShowModalUpdateHeader = () => {
+    $('#modalUpdateHeader').modal('show');
+};
 
 const fnShowModalDeposit = () => {
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
+    document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
     $('#modalCreateDeposit').modal('show');
 };
 
 const fnShowModalTransfer = () => {
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
+    document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
     $('#modalCreateTransfer').modal('show');
 };
 
@@ -209,6 +213,7 @@ function fnLoadDatatableDeposit() {
             });
             pending = parseFloat(amountHeader) - total;
             tableRowLabelDeposit.innerHTML = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelDeposit.value = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
@@ -300,8 +305,9 @@ function fnLoadDatatableTransfer() {
             data.forEach((item) => {
                 total += item.amountDetail;
             });
-            pending = parseFloat(amountHeader) - total;
+            pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
             tableRowLabelTransfer.innerHTML = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelTransfer.value = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });

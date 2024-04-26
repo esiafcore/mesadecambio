@@ -27,34 +27,61 @@
     <div class="card-body p-1">
         <div class="row m-1 bg-secondary bg-gradient p-1">
             <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">Cliente</h5>
+                <h5 class="text-white fs-6">Cliente</h5>
             </div>
-            <div class="col-9 col-xl-6 mb-1">
+            <div class="col-9 col-xl-6 col-xxl-4 mb-1">
                 <input class="form-control text-start border p-1" value="@Model.CustomerFullName" readonly />
             </div>
             <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white"># Transa</h5>
+                <h5 class="text-white fs-6"># Transa</h5>
             </div>
-            <div class="col-8 col-md-4 col-xl-3 mb-1 me-1">
+            <div class="col-8 col-md-3 col-xl-3 col-xxl-1 mb-1 me-1">
                 <input class="form-control text-start border p-1" value="@Model.NumberTransa" readonly />
             </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">Fecha</h5>
+            <div class="col-3 col-md-2 col-xl-1 mb-1 offset-md-1 offset-xl-0">
+                <h5 class="text-white fs-6">Fecha</h5>
             </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
+            <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
                 <input class="form-control text-start border p-1" value="@Model.ModelCreateVM.DataModel.DateTransa" readonly />
             </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">T/C Oficial</h5>
+            @if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Buy)
+            {
+                <div class="col-3 col-md-2 col-xl-2 col-xxl-1 mb-1">
+                    <h5 class="text-white fs-6">T/C Compra</h5>
+                </div>
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
+                    <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
+                </div>
+            }
+            else if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Sell)
+            {
+                <div class="col-3 col-md-2 col-xl-2 col-xxl-1 mb-1">
+                    <h5 class="text-white fs-6">T/C Venta</h5>
+                </div>
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
+                    <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateSellTransa" readonly />
+                </div>
+            }
+            else
+            {
+                <div class="col-3 col-md-2 col-xl-2 col-xxl-1 mb-1">
+                    <h5 class="text-white fs-6">T/C Oficial</h5>
+                </div>
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
+                    <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateOfficialTransa" readonly />
+                </div>
+            }
+            <div class="col-3 col-md-2 col-xl-1 mb-1 offset-md-1 offset-xl-0 offset-xxl-0">
+                <h5 class="text-white fs-6">Monto</h5>
             </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
-                <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateOfficialTransa" readonly />
-            </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1 offset-md-1">
-                <h5 class="text-white">Monto</h5>
-            </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 ps-xl-2">
+            <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 ps-xl-2">
                 <input class="form-control text-end border p-1" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransa" readonly />
+            </div>
+            <div class="col d-flex justify-content-end justify-content-xxl-start">
+                <a type="button" class="btn btn-success fs-2"
+                   data-bs-toggle="tooltip" data-bs-title="Actualizar" onclick="fnShowModalUpdateHeader()">
+                    <i class="bi bi-pencil-square"></i>
+                </a>
             </div>
         </div>
         <hr />
@@ -118,6 +145,9 @@
             </div>
             <div class="modal fade modal-lg" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_CreateDetailTransfer" />
+            </div>
+            <div class="modal fade modal-xl" id="modalUpdateHeader" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <partial name="_UpdateHeader" model="Model.ModelCreateVM" />
             </div>
         </div>
     </div>
