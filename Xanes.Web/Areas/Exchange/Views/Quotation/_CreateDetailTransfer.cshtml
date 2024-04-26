@@ -1,7 +1,7 @@
 ﻿@model QuotationDetailVM
 
 <form method="post" asp-action="CreateDetail">
-    <input asp-for="DataModel.Id" id="idDetailTransfer" hidden />
+    <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailTransfer" hidden />
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden/>
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" hidden/>
@@ -23,7 +23,7 @@
                         Monto
                     </div>
                     <div class="col-3 ms-4">
-                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" class="form-control border p-1"/>
+                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa" />
                         <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
                     </div>
                 </div>

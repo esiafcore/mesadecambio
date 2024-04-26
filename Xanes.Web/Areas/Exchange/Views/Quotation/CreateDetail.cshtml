@@ -10,7 +10,7 @@
                 <h2 class="text-white text-center text-md-start py-1">Detalle - Cotización</h2>
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
-                <div class="col-6 col-md-5 col-xl-4">
+                <div class="col-6 col-lg-5 col-xl-4">
                     <a onclick="fnApproved" class="btn btn-info form-control btn-sm">
                         <i class="bi bi-check-square-fill"></i> Cerrar Cotización
                     </a>
@@ -50,7 +50,7 @@
                     <h5 class="text-white fs-6">T/C Compra</h5>
                 </div>
                 <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
-                    <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
+                    <input class="form-control text-end border p-1 decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
                 </div>
             }
             else if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Sell)
@@ -58,7 +58,7 @@
                 <div class="col-3 col-md-2 col-xl-2 col-xxl-1 mb-1">
                     <h5 class="text-white fs-6">T/C Venta</h5>
                 </div>
-                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1 decimalTC">
                     <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateSellTransa" readonly />
                 </div>
             }
@@ -67,7 +67,7 @@
                 <div class="col-3 col-md-2 col-xl-2 col-xxl-1 mb-1">
                     <h5 class="text-white fs-6">T/C Oficial</h5>
                 </div>
-                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1">
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 me-1 decimalTC">
                     <input class="form-control text-end border p-1" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateOfficialTransa" readonly />
                 </div>
             }
@@ -75,7 +75,7 @@
                 <h5 class="text-white fs-6">Monto</h5>
             </div>
             <div class="col-8 col-md-3 col-xl-2 col-xxl-1 mb-1 ps-xl-2">
-                <input class="form-control text-end border p-1" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransa" readonly />
+                <input class="form-control text-end border p-1 decimalTransa" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransa" readonly />
             </div>
             <div class="col d-flex justify-content-end justify-content-xxl-start">
                 <a type="button" class="btn btn-success fs-2"
@@ -90,7 +90,7 @@
                 <div class="row">
                     <div class="d-flex justify-content-start">
                         <a type="button" class="btn btn-info fs-2"
-                           data-bs-toggle="tooltip" data-bs-title="Crear" onclick="fnShowModalDeposit()">
+                           data-bs-toggle="tooltip" data-bs-title="Crear" id="btnCreateDetailDeposit" onclick="fnShowModalDeposit()">
                             <i class="bi bi-plus"></i>
                         </a>
                         <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelDeposit"></h5>
@@ -116,7 +116,7 @@
                 <div class="row">
                     <div class="d-flex justify-content-start">
                         <a type="button" class="btn btn-info fs-2"
-                           data-bs-toggle="tooltip" data-bs-title="Crear"
+                           data-bs-toggle="tooltip" data-bs-title="Crear" id="btnCreateDetailTransfer"
                            onclick="fnShowModalTransfer()">
                             <i class="bi bi-plus"></i>
                         </a>

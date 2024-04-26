@@ -471,7 +471,8 @@ public class QuotationController : Controller
 
         //Obtenemos los hijos
         var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
-            x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == objViewModel.DataModel.QuotationDetailType);
+            x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == objViewModel.DataModel.QuotationDetailType
+            , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx");
 
         if (objDetails == null)
         {
@@ -556,12 +557,15 @@ public class QuotationController : Controller
             var objDetail = objDetails.First(x => x.Id == obj.Id);
 
             //Seteamos campos de auditoria
-            obj.LineNumber = objDetail.LineNumber;
-            obj.UpdatedBy = "LOCALHOSTME";
-            obj.UpdatedDate = DateTime.Now;
-            obj.UpdatedHostName = "LOCALHOSTPC";
-            obj.UpdatedIpv4 = "127.0.0.1";
-            _uow.QuotationDetail.Update(obj);
+            objDetail.AmountDetail = obj.AmountDetail;
+            objDetail.BankSourceId = obj.BankSourceId;
+            objDetail.BankTargetId = obj.BankTargetId;
+            objDetail.QuotationDetailType = obj.QuotationDetailType;
+            objDetail.UpdatedBy = "LOCALHOSTME";
+            objDetail.UpdatedDate = DateTime.Now;
+            objDetail.UpdatedHostName = "LOCALHOSTPC";
+            objDetail.UpdatedIpv4 = "127.0.0.1";
+            _uow.QuotationDetail.Update(objDetail);
             _uow.Save();
             TempData["success"] = "Cotización actualizada exitosamente";
         }
