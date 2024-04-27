@@ -7,11 +7,7 @@ using Xanes.Models.Shared;
 using Xanes.Models.ViewModels;
 using Xanes.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Xanes.DataAccess.Repository;
-using Microsoft.DotNet.MSIdentity.Shared;
 using System.Text;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Runtime.CompilerServices;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -83,11 +79,11 @@ public class QuotationController : Controller
             CompanyId = _companyId
         };
 
-        model.CurrencyOriginExchangeList = objCurrencyList
+        model.CurrencyTransaList = objCurrencyList
             .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
             .ToList();
-        model.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
-
+        model.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+        model.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.QuotationTypeList = objTypeList;
         model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
         model.DataModel = objData;
@@ -120,17 +116,30 @@ public class QuotationController : Controller
                 obj.CurrencyTransaId = objCurrency.Id;
             }
 
-            //Verificamos si existe la moneda de origen
+            //Verificamos si existe la moneda de deposito
             objCurrency = _uow.Currency.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
 
             if (objCurrency == null)
             {
-                ModelState.AddModelError("", $"Moneda origen no encontrada");
+                ModelState.AddModelError("", $"Moneda de deposito no encontrada");
             }
             else
             {
                 obj.CurrencyDepositId = objCurrency.Id;
+            }
+
+            //Verificamos si existe la moneda de transferencia
+            objCurrency = _uow.Currency.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransferType);
+
+            if (objCurrency == null)
+            {
+                ModelState.AddModelError("", $"Moneda de transferencia no encontrada");
+            }
+            else
+            {
+                obj.CurrencyTransferId = objCurrency.Id;
             }
 
             //Verificamos si existe el tipo
@@ -246,10 +255,11 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        objViewModel.CurrencyOriginExchangeList = objCurrencyList
+        objViewModel.CurrencyTransaList = objCurrencyList
             .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
             .ToList();
-        objViewModel.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
+        objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+        objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         objViewModel.QuotationTypeList = objTypeList;
         objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
@@ -268,45 +278,6 @@ public class QuotationController : Controller
                 ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
             }
 
-            //Verificamos si existe la moneda de la Transaccion
-            var objCurrency = _uow.Currency.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
-
-            if (objCurrency == null)
-            {
-                ModelState.AddModelError("", $"Moneda de la transacción no encontrada");
-            }
-            else
-            {
-                obj.CurrencyTransaId = objCurrency.Id;
-            }
-
-            //Verificamos si existe la moneda de origen
-            objCurrency = _uow.Currency.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
-
-            if (objCurrency == null)
-            {
-                ModelState.AddModelError("", $"Moneda origen no encontrada");
-            }
-            else
-            {
-                obj.CurrencyDepositId = objCurrency.Id;
-            }
-
-            //Verificamos si existe el tipo
-            var objQuotationType = _uow.QuotationType.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
-
-            if (objQuotationType == null)
-            {
-                ModelState.AddModelError("", $"Tipo de transacción no encontrado");
-            }
-            else
-            {
-                obj.TypeId = objQuotationType.Id;
-            }
-
             //Verificamos si existe el cliente
             var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
             if (objCustomer == null)
@@ -315,13 +286,6 @@ public class QuotationController : Controller
             }
 
             if (!ModelState.IsValid) return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
-
-            //Obtenemos el secuencial en borrador
-            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
-                SD.TypeSequential.Draft, true);
-
-            obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
-            obj.InternalSerial = AC.InternalSerialDraft;
 
             if (obj.TypeNumeral == SD.QuotationType.Buy)
             {
@@ -430,12 +394,11 @@ public class QuotationController : Controller
         {
             return NotFound();
         }
-
-        model.ModelCreateVM.CurrencyOriginExchangeList = objCurrencyList
+        model.ModelCreateVM.CurrencyTransaList = objCurrencyList
             .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
             .ToList();
-        model.ModelCreateVM.CurrencyTransaList = objCurrencyList.Where(x => x.IsActive).ToList();
-
+        model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+        model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.QuotationTypeList = objTypeList;
         model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
@@ -654,7 +617,7 @@ public class QuotationController : Controller
 
         var objList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId)
-            , includeProperties: "TypeTrx,CustomerTrx,CurrencyOriginExchangeTrx,CurrencyTransaTrx").ToList();
+            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx").ToList();
         if (objList.Count <= 0)
         {
             jsonResponse.IsSuccess = false;

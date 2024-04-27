@@ -11,6 +11,18 @@ function loadDatatable() {
         dataSrc: 'data',
         ajax: {
             "url": '/exchange/quotation/getall',
+            "dataSrc": function (data) {
+                if (data.isSuccess) {
+                    return data.data;
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.errorMessages
+                    });
+                    return [];
+                }
+            },
             "complete": function () {
                 fnEnableTooltip();
             }

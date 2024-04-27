@@ -1,6 +1,6 @@
 ﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa, inputExchangeRateSellTransa,
     inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currenciesDestiny, typeNumerals, currenciesOrigin,
-    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral, elementsBuy, elementsSell;
+    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral, elementsBuy, elementsSell, divCurrencyTransfer, divCurrencyDeposit;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementsBuy = document.querySelectorAll(".typeBuy");
     elementsSell = document.querySelectorAll(".typeSell");
     let decimalFormat = document.querySelectorAll(".decimalFormat");
+    divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
+    divCurrencyTransfer = document.querySelector("#divCurrencyTransfer");
 
     //Aplicar select2
     $("#selectCustomer").select2(select2Options);
@@ -57,10 +59,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         item.addEventListener("change", () => {
             inputTypeNumeral.value = parseInt(item.value);
             if (item.value == QuotationType.Buy) {
+                divCurrencyTransfer.hidden = false;
+                divCurrencyDeposit.hidden = true;
                 elementsBuy.forEach((item) => item.hidden = false);
                 elementsSell.forEach((item) => item.hidden = true);
 
             } else if (item.value == QuotationType.Sell) {
+                divCurrencyTransfer.hidden = true;
+                divCurrencyDeposit.hidden = false;
                 elementsBuy.forEach((item) => item.hidden = true);
                 elementsSell.forEach((item) => item.hidden = false);
             } else {
@@ -87,22 +93,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function currencyTransaType_onClick(objElem) {
 
-    let curExchangeBaseDiv = document.getElementById(divnamecurExchange + CurrencyType.Base);
-    let curExchangeForeignDiv = document.getElementById(divnamecurExchange + CurrencyType.Foreign);
-    let curExchangeAdditionalDiv = document.getElementById(divnamecurExchange + CurrencyType.Additional);
+    let curDepositBaseDiv = document.getElementById(divnamecurDeposit + CurrencyType.Base);
+    let curDepositForeignDiv = document.getElementById(divnamecurDeposit + CurrencyType.Foreign);
+    let curDepositAdditionalDiv = document.getElementById(divnamecurDeposit + CurrencyType.Additional);
+    let curTransferBaseDiv = document.getElementById(divnamecurTransfer + CurrencyType.Base);
+    let curTransferForeignDiv = document.getElementById(divnamecurTransfer + CurrencyType.Foreign);
+    let curTransferAdditionalDiv = document.getElementById(divnamecurTransfer + CurrencyType.Additional);
     let currentValue = Number(objElem.value);
 
     if (currentValue == CurrencyType.Foreign) {
-        curExchangeForeignDiv.style.display = styleHide;
-        curExchangeBaseDiv.style.display = styleShowInline;
-        curExchangeAdditionalDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurExchange + CurrencyType.Base).checked = true;
+        curDepositForeignDiv.style.display = styleHide;
+        curDepositBaseDiv.style.display = styleShowInline;
+        curDepositAdditionalDiv.style.display = styleShowInline;
+        document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
+        curTransferForeignDiv.style.display = styleHide;
+        curTransferBaseDiv.style.display = styleShowInline;
+        curTransferAdditionalDiv.style.display = styleShowInline;
+        document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
     }
     else if (currentValue == CurrencyType.Additional) {
-        curExchangeAdditionalDiv.style.display = styleHide;
-        curExchangeForeignDiv.style.display = styleShowInline;
-        curExchangeBaseDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurExchange + CurrencyType.Foreign).checked = true;
+        curDepositAdditionalDiv.style.display = styleHide;
+        curDepositForeignDiv.style.display = styleShowInline;
+        curDepositBaseDiv.style.display = styleShowInline;
+        document.getElementById(radnamecurDeposit + CurrencyType.Foreign).checked = true;
+        curTransferAdditionalDiv.style.display = styleHide;
+        curTransferForeignDiv.style.display = styleShowInline;
+        curTransferBaseDiv.style.display = styleShowInline;
+        document.getElementById(radnamecurTransfer + CurrencyType.Foreign).checked = true;
     }
 
     return true;
