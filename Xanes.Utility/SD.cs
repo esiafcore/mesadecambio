@@ -19,6 +19,7 @@ public static class SD
         MonXtr = 4
     }
 
+
     [Flags]
     public enum QuotationType : int
     {
@@ -82,4 +83,11 @@ public static class SD
         Transfer = 2
     }
 
+    [Flags]
+    public enum ExchangeRateSourceType : short
+    {
+        BaseForeign = 1,
+        BaseAdditional = 2,
+        ForeignAdditional = 4
+    }
 }

@@ -34,6 +34,8 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .HasSentinel(default);
         builder.Property(b => b.CurrencyTransaType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
+        builder.Property(b => b.ExchangeRateSourceType).HasDefaultValue(SD.ExchangeRateSourceType.BaseForeign)
+            .HasSentinel(default);
 
         builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.DateTransa, x.InternalSerial, x.Numeral }
                 , "quotations_idx_2010")
