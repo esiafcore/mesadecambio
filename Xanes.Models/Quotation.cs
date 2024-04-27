@@ -93,6 +93,10 @@ public class Quotation : Entity, ICloneable
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateSellTransa { get; set; } = 0M;
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Tipo de Origen de TC")]
+    public SD.ExchangeRateSourceType ExchangeRateSourceType { get; set; }
+
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Oficial Real")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
