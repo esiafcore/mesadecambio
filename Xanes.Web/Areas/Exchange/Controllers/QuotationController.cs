@@ -183,7 +183,8 @@ public class QuotationController : Controller
                     obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
                 }
-            }else if (obj.TypeNumeral == SD.QuotationType.Sell)
+            }
+            else if (obj.TypeNumeral == SD.QuotationType.Sell)
             {
                 if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
                 {
@@ -278,8 +279,13 @@ public class QuotationController : Controller
                 ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
             }
 
+            var objQt = _uow.Quotation.Get(filter: x => x.Id == obj.Id);
+            if (objQt == null)
+            {
+                ModelState.AddModelError("", $"Cotización no encontrada");
+            }
             //Verificamos si existe el cliente
-            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId, isTracking: false);
             if (objCustomer == null)
             {
                 ModelState.AddModelError("", $"Cliente no encontrado");
@@ -314,16 +320,19 @@ public class QuotationController : Controller
                 }
             }
 
+            objQt.AmountRevenue = obj.AmountRevenue;
+            objQt.AmountCost = obj.AmountCost;
+            objQt.AmountTransaction = obj.AmountTransaction;
+            objQt.DateTransa = obj.DateTransa;
+            objQt.ExchangeRateBuyTransa = obj.ExchangeRateBuyTransa;
+            objQt.ExchangeRateSellReal = obj.ExchangeRateSellReal;
+
             //Seteamos campos de auditoria
-            obj.UpdatedBy = "LOCALHOSTME";
-            obj.UpdatedDate = DateTime.Now;
-            obj.UpdatedHostName = "LOCALHOSTPC";
-            obj.UpdatedIpv4 = "127.0.0.1";
-            obj.IsPosted = false;
-            obj.IsClosed = false;
-            obj.IsLoan = false;
-            obj.IsPayment = false;
-            _uow.Quotation.Update(obj);
+            objQt.UpdatedBy = "LOCALHOSTME";
+            objQt.UpdatedDate = DateTime.Now;
+            objQt.UpdatedHostName = "LOCALHOSTPC";
+            objQt.UpdatedIpv4 = "127.0.0.1";
+            _uow.Quotation.Update(objQt);
             _uow.Save();
             TempData["success"] = "Cotización actualizada exitosamente";
         }

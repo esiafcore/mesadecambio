@@ -3,8 +3,8 @@ let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amoun
 let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
-
-let inputsFormatTransa, inputsFormatExchange;
+let inputExchangeRateBuyTransa, inputExchangeRateSellTransa, inputExchangeRateOfficialTransa;
+let inputsFormatTransa, inputsFormatExchange, inputAmountTransa;
 document.addEventListener("DOMContentLoaded", function () {
 
     containerMain = document.querySelector("#containerMain");
@@ -23,7 +23,11 @@ document.addEventListener("DOMContentLoaded", function () {
     TCHeader = document.querySelector("#TCHeader");
     inputsFormatTransa = document.querySelectorAll(".decimalTransa");
     inputsFormatExchange = document.querySelectorAll(".decimalTC");
-    
+    inputExchangeRateBuyTransa = document.querySelector("#exchangeRateBuyTransa");
+    inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
+    inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
+    inputAmountTransa = document.querySelector("#amountTransa");
+
     //Aplicar select2
     $("#selectCustomer").select2(select2Options);
 
@@ -47,6 +51,12 @@ document.addEventListener("DOMContentLoaded", function () {
             item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
         });
     });
+
+    document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
+
+    }));
+
+
     //TCHeader.value = formatterAmount().format(TCHeader.value);
     //amountHeader.value = formatterAmount().format(amountHeader.value);
     //amountTotalDeposit = parseFloat(document.querySelector("#totalAmountDeposit").value);
@@ -56,6 +66,48 @@ document.addEventListener("DOMContentLoaded", function () {
     //Habilitar Tooltip
     fnEnableTooltip();
 });
+
+
+//Funcion para calcular el costo
+const fnCalculateRevenueCost = () => {
+    let divRevenue = document.querySelector("#divRevenue");
+    let divCost = document.querySelector("#divCost");
+    let amountExchange = document.querySelector("#amountExchange");
+    let exchangeRateBuyTransa = fnparseFloat(inputExchangeRateBuyTransa.value);
+    let exchangeRateSellTransa = fnparseFloat(inputExchangeRateSellTransa.value);
+    let exchangeRateOfficialTransa = fnparseFloat(inputExchangeRateOfficialTransa.value);
+    let amountTransa = fnparseFloat(inputAmountTransa.value);
+    let amountCost = 0, amountRevenue = 0;
+
+    if (inputTypeNumeral.value == QuotationType.Buy) {
+        if (exchangeRateBuyTransa > exchangeRateOfficialTransa) {
+            amountCost = (exchangeRateBuyTransa - exchangeRateOfficialTransa) * amountTransa;
+            divRevenue.hidden = true;
+            divCost.hidden = false;
+        } else {
+            amountRevenue = (exchangeRateOfficialTransa - exchangeRateBuyTransa) * amountTransa;
+            divRevenue.hidden = false;
+            divCost.hidden = true;
+        }
+        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
+    } else if (inputTypeNumeral.value == QuotationType.Sell) {
+        if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
+            amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
+            divRevenue.hidden = false;
+            divCost.hidden = true;
+        } else {
+            amountCost = (exchangeRateOfficialTransa - exchangeRateSellTransa) * amountTransa;
+            divRevenue.hidden = true;
+            divCost.hidden = false;
+        }
+        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+    }
+    inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
+    inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
+    inputAmountCost.value = formatterAmount().format(amountCost);
+    inputAmountRevenue.value = formatterAmount().format(amountRevenue);
+    inputAmountTransa.value = formatterAmount().format(amountTransa);
+};
 
 const fnClearModalDeposit = () => {
     document.querySelector("#idDetailDeposit").value = 0;
@@ -69,7 +121,6 @@ const fnClearModalTransfer = () => {
     document.querySelector("#selectBankSourceTransfer").selectedIndex = 0;
     document.querySelector("#selectBankTargetTransfer").selectedIndex = 0;
 };
-
 
 const fnShowModalUpdateHeader = () => {
     $('#modalUpdateHeader').modal('show');
@@ -173,7 +224,6 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
         $('#modalCreateTransfer').modal('show');
     }
 };
-
 function fnLoadDatatableDeposit() {
     dataTableDeposit = new DataTable("#tblDeposit", {
         "dataSrc": 'data',

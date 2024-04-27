@@ -46,9 +46,9 @@ function loadDatatable() {
                 , orderable: true
             },
             {
-                data: 'currencyOriginExchangeTrx.code', "width": "10%"
+                data: 'currencyTransaTrx.code', "width": "10%"
                 , render: function (data, type, row) {
-                    return `${row.currencyOriginExchangeTrx.code} - ${row.currencyTransaTrx.code}`;
+                    return `${row.currencyTransaTrx.code} - ${row.currencyTransferTrx.code}`;
                 }
                 , orderable: false
             },
@@ -63,7 +63,7 @@ function loadDatatable() {
                 , orderable: false
             },
             {
-                data: 'amountTransa', "width": "10%"
+                data: 'amountTransaction', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: true
             },
