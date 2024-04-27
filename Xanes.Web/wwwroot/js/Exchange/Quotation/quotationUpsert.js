@@ -1,6 +1,7 @@
 ﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa, inputExchangeRateSellTransa,
-    inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currenciesDestiny, typeNumerals, currenciesOrigin,
-    inputCurrencyDestiny, inputCurrencyOrigin, inputTypeNumeral, elementsBuy, elementsSell, divCurrencyTransfer, divCurrencyDeposit;
+    inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currenciesTransa, currenciesDeposit, currenciesTransfer,
+    typeNumerals, inputCurrencyTransa, inputCurrencyDeposit, inputCurrencyTransfer, inputTypeNumeral, elementsBuy, elementsSell, divCurrencyTransfer, divCurrencyDeposit;
+let inputsFormatTransa, inputsFormatExchange;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -11,17 +12,38 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountCost = document.querySelector("#amountCost");
     inputAmountRevenue = document.querySelector("#amountRevenue");
-    currenciesDestiny = document.querySelectorAll(".currenciesDestiny");
+    currenciesTransa = document.querySelectorAll(".currenciesTransa");
+    currenciesDeposit = document.querySelectorAll(".currenciesTransfer");
+    currenciesTransfer = document.querySelectorAll(".currenciesDeposit");
     typeNumerals = document.querySelectorAll(".typeNumerals");
-    currenciesOrigin = document.querySelectorAll(".currenciesOrigin");
-    inputCurrencyDestiny = document.querySelector("#currencyTransaType");
-    inputCurrencyOrigin = document.querySelector("#currencyOriginExchangeType");
+    inputCurrencyTransa = document.querySelector("#currencyTransaType");
+    inputCurrencyDeposit = document.querySelector("#currencyDepositType");
+    inputCurrencyTransfer = document.querySelector("#currencyTransferType");
     inputTypeNumeral = document.querySelector("#typeNumeral");
     elementsBuy = document.querySelectorAll(".typeBuy");
     elementsSell = document.querySelectorAll(".typeSell");
-    let decimalFormat = document.querySelectorAll(".decimalFormat");
     divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
     divCurrencyTransfer = document.querySelector("#divCurrencyTransfer");
+    inputsFormatTransa = document.querySelectorAll(".decimalTransa");
+    inputsFormatExchange = document.querySelectorAll(".decimalTC");
+
+    inputsFormatTransa.forEach((item) => {
+        item.value = formatterAmount().format(fnparseFloat(item.value));
+
+        item.addEventListener("change", () => {
+            item.value = formatterAmount().format(fnparseFloat(item.value));
+            fnCalculateRevenueCost();
+        });
+    });
+
+    inputsFormatExchange.forEach((item) => {
+        item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+
+        item.addEventListener("change", () => {
+            item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+            fnCalculateRevenueCost();
+        });
+    });
 
     //Aplicar select2
     $("#selectCustomer").select2(select2Options);
@@ -32,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currencyType = firstCurrency.value;
-    inputCurrencyDestiny.value = parseInt(currencyType);
+    inputCurrencyTransa.value = parseInt(currencyType);
     //Por defecto la moneda es dolar
     currencyTransaType_onClick(firstCurrency);
 
@@ -43,14 +65,27 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fnTCByDate();
     });
 
-    inputAmountTransa.addEventListener("change", () => {
-        fnCalculateRevenueCost();
-    });
+    //document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
+    //}));
 
-    currenciesDestiny.forEach((item) => {
+    currenciesTransa.forEach((item) => {
         item.addEventListener("change", () => {
             currencyType = item.value;
-            inputCurrencyDestiny.value = parseInt(currencyType);
+            inputCurrencyTransa.value = parseInt(currencyType);
+        });
+    });
+
+    currenciesDeposit.forEach((item) => {
+        if (item.checked) inputCurrencyDeposit.value = parseInt(item.value);
+        item.addEventListener("change", () => {
+            inputCurrencyDeposit.value = parseInt(item.value);
+        });
+    });
+
+    currenciesTransfer.forEach((item) => {
+        if (item.checked) inputCurrencyTransfer.value = parseInt(item.value);
+        item.addEventListener("change", () => {
+            inputCurrencyTransfer.value = parseInt(item.value);
         });
     });
 
@@ -72,13 +107,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
 
             }
-        });
-    });
-
-    currenciesOrigin.forEach((item) => {
-        if (item.checked) inputCurrencyOrigin.value = parseInt(item.value);
-        item.addEventListener("change", () => {
-            inputCurrencyOrigin.value = parseInt(item.value);
         });
     });
 
@@ -104,11 +132,11 @@ function currencyTransaType_onClick(objElem) {
     if (currentValue == CurrencyType.Foreign) {
         curDepositForeignDiv.style.display = styleHide;
         curDepositBaseDiv.style.display = styleShowInline;
-        curDepositAdditionalDiv.style.display = styleShowInline;
+        curDepositAdditionalDiv.style.display = styleHide;
         document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
         curTransferForeignDiv.style.display = styleHide;
         curTransferBaseDiv.style.display = styleShowInline;
-        curTransferAdditionalDiv.style.display = styleShowInline;
+        curTransferAdditionalDiv.style.display = styleHide;
         document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
     }
     else if (currentValue == CurrencyType.Additional) {
@@ -127,26 +155,37 @@ function currencyTransaType_onClick(objElem) {
 
 //Funcion para calcular el costo
 const fnCalculateRevenueCost = () => {
-
-    let exchangeRateBuyTransa = parseFloat(inputExchangeRateBuyTransa.value);
-    let exchangeRateSellTransa = parseFloat(inputExchangeRateSellTransa.value);
-    let exchangeRateOfficialTransa = parseFloat(inputExchangeRateOfficialTransa.value);
+    let divRevenue = document.querySelector("#divRevenue");
+    let divCost = document.querySelector("#divCost");
+    let amountExchange = document.querySelector("#amountExchange");
+    let exchangeRateBuyTransa = fnparseFloat(inputExchangeRateBuyTransa.value);
+    let exchangeRateSellTransa = fnparseFloat(inputExchangeRateSellTransa.value);
+    let exchangeRateOfficialTransa = fnparseFloat(inputExchangeRateOfficialTransa.value);
     let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
 
     if (inputTypeNumeral.value == QuotationType.Buy) {
         if (exchangeRateBuyTransa > exchangeRateOfficialTransa) {
             amountCost = (exchangeRateBuyTransa - exchangeRateOfficialTransa) * amountTransa;
+            divRevenue.hidden = true;
+            divCost.hidden = false;
         } else {
             amountRevenue = (exchangeRateOfficialTransa - exchangeRateBuyTransa) * amountTransa;
+            divRevenue.hidden = false;
+            divCost.hidden = true;
         }
+        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
     } else if (inputTypeNumeral.value == QuotationType.Sell) {
         if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
             amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
+            divRevenue.hidden = false;
+            divCost.hidden = true;
         } else {
             amountCost = (exchangeRateOfficialTransa - exchangeRateSellTransa) * amountTransa;
+            divRevenue.hidden = true;
+            divCost.hidden = false;
         }
-
+        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);

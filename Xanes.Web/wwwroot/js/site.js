@@ -108,8 +108,16 @@ const QuotationType = {
 
 
 const fnparseFloat = (valueInput) => {
-    return parseFloat(valueInput.replace(",", ""));
+    valueInput = valueInput.replace(",", "");
+    // Verificar si el valor del input es un número
+    if (!isNaN(valueInput) && valueInput.trim() !== "") {
+        return parseFloat(valueInput);
+    } else {
+        // Si no es un número, retornar 0
+        return 0;
+    }
 }
+
 const select2Floating = () => {
     $('.select2me')
         .parent('div')
