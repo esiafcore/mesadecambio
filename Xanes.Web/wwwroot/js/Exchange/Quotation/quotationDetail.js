@@ -314,8 +314,8 @@ function fnLoadDatatableDeposit() {
             } else {
                 document.querySelector("#btnCreateDetailDeposit").hidden = false;
             }
-            tableRowLabelDeposit.innerHTML = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
-            tableRowLabelDeposit.value = `Depósitos: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelDeposit.innerHTML = `Depositar: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelDeposit.value = `Depositar: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
@@ -414,8 +414,8 @@ function fnLoadDatatableTransfer() {
                 document.querySelector("#btnCreateDetailTransfer").hidden = false;
 
             }
-            tableRowLabelTransfer.innerHTML = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
-            tableRowLabelTransfer.value = `Transferencias: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelTransfer.innerHTML = `Transferir: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+            tableRowLabelTransfer.value = `Transferir: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });

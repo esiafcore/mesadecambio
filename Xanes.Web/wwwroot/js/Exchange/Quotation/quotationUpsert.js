@@ -1,5 +1,5 @@
 ﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa, inputExchangeRateSellTransa,
-    inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currenciesTransa, currenciesDeposit, currenciesTransfer,
+    inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currencyTypeDeposit, currencyTypeTransfer, currenciesTransa, currenciesDeposit, currenciesTransfer,
     typeNumerals, inputCurrencyTransa, inputCurrencyDeposit, inputCurrencyTransfer, inputTypeNumeral, elementsBuy, elementsSell, divCurrencyTransfer, divCurrencyDeposit;
 let inputsFormatTransa, inputsFormatExchange;
 
@@ -65,9 +65,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fnTCByDate();
     });
 
-    //document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
-    //}));
-
     currenciesTransa.forEach((item) => {
         item.addEventListener("change", () => {
             currencyType = item.value;
@@ -76,16 +73,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currenciesDeposit.forEach((item) => {
-        if (item.checked) inputCurrencyDeposit.value = parseInt(item.value);
+        if (item.checked) {
+            inputCurrencyDeposit.value = parseInt(item.value);
+            currencyTypeDeposit = parseInt(item.value);
+        }
         item.addEventListener("change", () => {
             inputCurrencyDeposit.value = parseInt(item.value);
         });
     });
 
     currenciesTransfer.forEach((item) => {
-        if (item.checked) inputCurrencyTransfer.value = parseInt(item.value);
+        if (item.checked) {
+            inputCurrencyTransfer.value = parseInt(item.value);
+            currencyTypeTransfer = parseInt(item.value);
+        }
         item.addEventListener("change", () => {
             inputCurrencyTransfer.value = parseInt(item.value);
+            currencyTypeTransfer = parseInt(item.value);
         });
     });
 
@@ -107,16 +111,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
 
             }
+            fnCalculateRevenueCost();
         });
     });
-
-    //decimalFormat.forEach((item) => {
-    //    item.value = formatterAmount().format(parseFloat(item.value));
-    //    item.addEventListener("change", () => {
-    //        item.value = formatterAmount().format(item.value);
-    //    });
-    //});
-
 });
 
 function currencyTransaType_onClick(objElem) {
@@ -174,7 +171,9 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = false;
             divCost.hidden = true;
         }
+
         amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
+
     } else if (inputTypeNumeral.value == QuotationType.Sell) {
         if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
             amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
@@ -185,7 +184,7 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = true;
             divCost.hidden = false;
         }
-        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+        amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
