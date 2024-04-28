@@ -184,7 +184,13 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = true;
             divCost.hidden = false;
         }
-        amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+
+        //Verificamos si el tcventa es cero para no realizar la division
+        if (exchangeRateSellTransa == 0) {
+            amountExchange.value = formatterAmount().format(0);
+        } else {
+            amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+        }
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);

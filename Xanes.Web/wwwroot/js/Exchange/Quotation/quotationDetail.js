@@ -4,9 +4,10 @@ let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
 let inputExchangeRateBuyTransa, inputExchangeRateSellTransa, inputExchangeRateOfficialTransa;
-let inputsFormatTransa, inputsFormatExchange, inputAmountTransa;
-document.addEventListener("DOMContentLoaded", function () {
-
+let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType;
+document.addEventListener("DOMContentLoaded", async function () {
+    currencies = document.querySelectorAll(".currenciesTransa");
+    inputDateTransa = document.querySelector("#dateTransa");
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
     parentId = document.querySelector("#parentId").value;
@@ -27,6 +28,19 @@ document.addEventListener("DOMContentLoaded", function () {
     inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
+
+    currencies.forEach((item) => {
+        if (item.checked) {
+            currencyType = item.value;
+        }
+    });
+
+    //Obtenemos el tipo de cambio en base a la fecha
+    await fnTCByDate();
+
+    inputDateTransa.addEventListener('change', async () => {
+        await fnTCByDate();
+    });
 
     //Aplicar select2
     $("#selectCustomer").select2(select2Options);
@@ -53,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
-
+        fnCalculateRevenueCost();
     }));
 
 
@@ -66,7 +80,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //Habilitar Tooltip
     fnEnableTooltip();
 });
-
 
 //Funcion para calcular el costo
 const fnCalculateRevenueCost = () => {
@@ -89,7 +102,9 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = false;
             divCost.hidden = true;
         }
+
         amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
+
     } else if (inputTypeNumeral.value == QuotationType.Sell) {
         if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
             amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
@@ -100,13 +115,46 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = true;
             divCost.hidden = false;
         }
-        amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+
+        //Verificamos si el tcventa es cero para no realizar la division
+        if (exchangeRateSellTransa == 0) {
+            amountExchange.value = formatterAmount().format(0);
+        } else {
+            amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+        }
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);
     inputAmountRevenue.value = formatterAmount().format(amountRevenue);
     inputAmountTransa.value = formatterAmount().format(amountTransa);
+};
+
+//Funcion para obtener el tipo de cambio oficial
+const fnTCByDate = async () => {
+    let url = `/Admin/CurrencyExchangeRate/GetCurrencyExchangeRate?date=${inputDateTransa.value}`;
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonResponse = await response.json();
+
+        if (jsonResponse.isSuccess) {
+            if (currencyType == CurrencyType.Foreign) {
+                inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
+            } else if (currencyType == CurrencyType.Additional) {
+                inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRate ?? 1;
+            }
+        } else {
+            inputExchangeRateOfficialTransa.value = 1;
+        }
+
+    } catch (error) {
+        alert(error);
+    }
 };
 
 const fnClearModalDeposit = () => {
