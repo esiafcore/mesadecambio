@@ -35,6 +35,13 @@ const selectOptions = {
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
 
+const customMessagesSelect = {
+    noResults: function () {
+        return "No se encontraron resultados.";
+    }
+};
+
+
 const select2Options = {
     theme: "bootstrap-5",
     allowClear: true,

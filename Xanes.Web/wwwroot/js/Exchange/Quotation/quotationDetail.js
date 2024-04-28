@@ -70,16 +70,30 @@ document.addEventListener("DOMContentLoaded", async function () {
         fnCalculateRevenueCost();
     }));
 
-
-    //TCHeader.value = formatterAmount().format(TCHeader.value);
-    //amountHeader.value = formatterAmount().format(amountHeader.value);
-    //amountTotalDeposit = parseFloat(document.querySelector("#totalAmountDeposit").value);
-    //amountTotalTransfer = parseFloat(document.querySelector("#totalAmountTransfer").value);
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
+
     //Habilitar Tooltip
     fnEnableTooltip();
 });
+
+function formatOption(option) {
+    if (!option.id) {
+        return option.text;
+    }
+
+    var thumbnailUrl = option.element.dataset.thumbnail;
+
+    if (thumbnailUrl) {
+        var $option = $(
+            '<span><img src="' + thumbnailUrl + '" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" />' + option.text + '</span>'
+        );
+    } else {
+        var $option = $('<span>' + option.text + '</span>');
+    }
+
+    return $option;
+}
 
 //Funcion para calcular el costo
 const fnCalculateRevenueCost = () => {
@@ -178,6 +192,15 @@ const fnShowModalDeposit = () => {
     fnClearModalDeposit();
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
     document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
+    $('#selectBankSourceDeposit').select2({
+        templateResult: formatOption,
+        language: customMessagesSelect,
+        allowClear: true,
+        minimumResultsForSearch: Infinity,
+        openOnEnter: true, // Esto mantendrá siempre abierto el dropdown
+        width: "resolve",
+        dropdownParent: $('#modalCreateDeposit')
+    });
     $('#modalCreateDeposit').modal('show');
 };
 
