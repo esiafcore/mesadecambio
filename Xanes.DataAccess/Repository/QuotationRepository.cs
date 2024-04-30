@@ -58,7 +58,9 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
         {
             query = query.Where(filter);
         }
-        int nextNumeral = query.Max(x => x.Numeral);
+
+        // Si no hay elementos, asigna 0 como valor predeterminado
+        int nextNumeral = query.Any() ? query.Max(x => x.Numeral) : 0;
 
         return await Task.FromResult(nextNumeral + 1);
     }

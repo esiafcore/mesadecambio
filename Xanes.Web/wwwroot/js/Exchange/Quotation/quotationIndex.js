@@ -107,16 +107,52 @@ function loadDatatable() {
                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
-
+                          <a onclick="fnPrintReport('${row.id}')" class="btn btn-outline-primary py-1 px-3 my-0 mx-1" 
+                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir">
+                              <i class="bi bi-printer fs-5"></i>
+                          </a>
                     </div>`;
                 }
             }
         ],
         searching: true,
         select: selectOptions
-
     });
 }
+
+
+const fnPrintReport = async (id) => {
+    try {
+        const url = `/exchange/quotation/ValidateDataToPrint?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.isSuccess) {
+                window.open(`${jsonResponse.data.urlRedirectTo}`, "_blank");
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+
+
 
 const fnDeleteRow = async (url, dateTransa, transaFullName) => {
     let fetchOptions;

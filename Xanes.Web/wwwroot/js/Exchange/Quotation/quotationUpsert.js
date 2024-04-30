@@ -189,7 +189,11 @@ const fnCalculateRevenueCost = () => {
         if (exchangeRateSellTransa == 0) {
             amountExchange.value = formatterAmount().format(0);
         } else {
-            amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+            if (currencyType == CurrencyType.Foreign) {
+                amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+            }else if (currencyType == CurrencyType.Additional) {
+                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+            }
         }
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);

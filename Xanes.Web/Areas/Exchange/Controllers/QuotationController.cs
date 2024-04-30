@@ -8,6 +8,13 @@ using Xanes.Models.ViewModels;
 using Xanes.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.DotNet.MSIdentity.Shared;
+using Microsoft.Extensions.Hosting;
+using Stimulsoft.Report;
+using Stimulsoft.Report.Mvc;
+using static Xanes.Utility.SD;
+using static Stimulsoft.Report.Help.StiHelpProvider;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -19,15 +26,26 @@ public class QuotationController : Controller
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
+    private Dictionary<ParametersReport, object?> _parametersReport;
+    private readonly IWebHostEnvironment _hostEnvironment;
 
-    public QuotationController(IUnitOfWork uow, IConfiguration configuration)
+    public QuotationController(IUnitOfWork uow, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
     {
         _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
         _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
+        _hostEnvironment = hostEnvironment;
 
+        _parametersReport = new();
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
+        // Verificar si el archivo existe
+        FileInfo file = new FileInfo(path);
+        if (file.Exists)
+        {
+            Stimulsoft.Base.StiLicense.LoadFromFile(path);
+        }
     }
     public IActionResult Index()
     {
@@ -236,7 +254,7 @@ public class QuotationController : Controller
                     //Cliente paga en Cordobas
                     if (obj.CurrencyDepositType == SD.CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction / obj.ExchangeRateSellTransa);
+                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
                         obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
                     }
                 }
@@ -255,17 +273,17 @@ public class QuotationController : Controller
                     {
                         obj.AmountExchange = (obj.AmountTransaction / obj.ExchangeRateSellTransa);
                         obj.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
-                    }   
+                    }
                 }
 
             }
 
 
             //Seteamos campos de auditoria
-            obj.CreatedBy = "LOCALHOSTME";
-            obj.CreatedDate = DateTime.Now;
-            obj.CreatedHostName = "LOCALHOSTPC";
-            obj.CreatedIpv4 = "127.0.0.1";
+            obj.CreatedBy = AC.LOCALHOSTME;
+            obj.CreatedDate = DateTime.UtcNow;
+            obj.CreatedHostName = AC.LOCALHOSTPC;
+            obj.CreatedIpv4 = AC.Ipv4Default;
             obj.IsPosted = false;
             obj.IsClosed = false;
             obj.IsLoan = false;
@@ -390,10 +408,10 @@ public class QuotationController : Controller
             objQt.ExchangeRateSellReal = obj.ExchangeRateSellReal;
 
             //Seteamos campos de auditoria
-            objQt.UpdatedBy = "LOCALHOSTME";
-            objQt.UpdatedDate = DateTime.Now;
-            objQt.UpdatedHostName = "LOCALHOSTPC";
-            objQt.UpdatedIpv4 = "127.0.0.1";
+            objQt.UpdatedBy = AC.LOCALHOSTME;
+            objQt.UpdatedDate = DateTime.UtcNow;
+            objQt.UpdatedHostName = AC.LOCALHOSTPC;
+            objQt.UpdatedIpv4 = AC.Ipv4Default;
             _uow.Quotation.Update(objQt);
             _uow.Save();
             TempData["success"] = "Cotización actualizada exitosamente";
@@ -578,10 +596,10 @@ public class QuotationController : Controller
         {
             //Seteamos campos de auditoria
             obj.LineNumber = objDetails.Count() + 1;
-            obj.CreatedBy = "LOCALHOSTME";
-            obj.CreatedDate = DateTime.Now;
-            obj.CreatedHostName = "LOCALHOSTPC";
-            obj.CreatedIpv4 = "127.0.0.1";
+            obj.CreatedBy = AC.LOCALHOSTME;
+            obj.CreatedDate = DateTime.UtcNow;
+            obj.CreatedHostName = AC.LOCALHOSTPC;
+            obj.CreatedIpv4 = AC.Ipv4Default;
             _uow.QuotationDetail.Add(obj);
             _uow.Save();
             TempData["success"] = "Cotización creada exitosamente";
@@ -605,24 +623,6 @@ public class QuotationController : Controller
         }
 
         return RedirectToAction("CreateDetail", "Quotation", new { id = obj.ParentId });
-        //}
-        //else
-        //{
-        //    StringBuilder errorsMessagesBuilder = new();
-
-        //    List<string> listErrorMessages = ModelState.Values
-        //        .SelectMany(v => v.Errors)
-        //        .Select(x => x.ErrorMessage)
-        //        .ToList();
-        //    foreach (var item in listErrorMessages)
-        //    {
-        //        errorsMessagesBuilder.Append(item);
-        //    }
-
-        //    ModelState.AddModelError("", errorsMessagesBuilder.ToString());
-        //}
-
-
     }
 
     public IActionResult Delete(int id)
@@ -786,6 +786,63 @@ public class QuotationController : Controller
         }
     }
 
+    [HttpPost, ActionName("Approved")]
+    public async Task<JsonResult> ApprovedPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+
+        try
+        {
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
+                                                                           x.TypeNumeral == objHeader.TypeNumeral &&
+                                                                           x.DateTransa == objHeader.DateTransa &&
+                                                                           x.InternalSerial == AC.InternalSerialOfficial);
+            if (nextSeq == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Consecutivo de cotización no encontrado";
+                return Json(jsonResponse);
+            }
+
+            objHeader.IsClosed = true;
+            objHeader.Numeral = nextSeq;
+            //Seteamos campos de auditoria
+            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            TempData["success"] = $"Cotización cerrada correctamente";
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
     [HttpPost, ActionName("DeleteDetail")]
     public JsonResult DeleteDetailPost(int id)
     {
@@ -846,4 +903,184 @@ public class QuotationController : Controller
     }
 
     #endregion
+
+    #region REPORT
+
+    public IActionResult PrintReport()
+    {
+        // Titulo pestaña del reporte
+        ViewData["Title"] = $"Rpt - Nota de Crédito";
+        return View("~/Views/Shared/IndexReport.cshtml");
+    }
+
+    public IActionResult GetReport()
+    {
+        try
+        {
+            var report = new StiReport();
+            // Veficar que hay datos del reporte guardados
+            var reportDataJson = HttpContext.Session.GetString(AC.ObjectReportData);
+            if (reportDataJson is null)
+            {
+                throw new Exception($"Error al cargar el informe");
+            }
+            var datRepJson = HttpContext.Session.GetString(AC.DatRep);
+            // cargar reporte
+            report.LoadFromJson(reportDataJson);
+
+            // Cargar objetos ya deserialiozados
+            if (datRepJson != null)
+                report.RegBusinessObject(AC.DatRep, JsonSerializer.Deserialize<QuotationReportVM>(datRepJson));
+
+            return StiNetCoreViewer.GetReportResult(this, report);
+        }
+        catch (Exception ex)
+        {
+            //TempData[AC.Error] = ex.Message;
+            return Content($"Error al cargar el informe: {ex.Message}");
+        }
+    }
+
+    public IActionResult ViewerEvent()
+    {
+        return StiNetCoreViewer.ViewerEventResult(this);
+    }
+    
+    //Validar todos los datos de la cotización
+    [HttpPost]
+    public async Task<JsonResult> ValidateDataToPrint(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        StiReport reportResult = new();
+        ConfigFac? configFac = null;
+        Company? company = null;
+        Quotation? transaction = null;
+
+        try
+        {
+            _parametersReport.Add(ParametersReport.FileName, "Quotation.mrt");
+            _parametersReport.Add(ParametersReport.FilePath,
+                $"{Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", "Quotation.mrt")}");
+
+            // Verificar que existe el archivo del reporte
+            if (!System.IO.File.Exists(_parametersReport[ParametersReport.FilePath]?.ToString() ?? string.Empty))
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Reporte no encontrado";
+                return Json(jsonResponse);
+            }
+
+            if (Path.GetExtension(_parametersReport[ParametersReport.FileName]?.ToString() ?? string.Empty).ToUpper() != ".MRT")
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Reporte invalido";
+                return Json(jsonResponse);
+            }
+
+            // Obtener configurcion fac
+            configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            if (configFac is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Configuración de facturación no encontrada";
+                return Json(jsonResponse);
+            }
+
+            // Obtener compañia
+            company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            if (company is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Compañia no encontrada";
+                return Json(jsonResponse);
+            }
+
+            // Obtener la cotización
+            transaction = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id, includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx");
+            if (transaction is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            //Obtener los hijos
+            var transaDetails = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.ParentId == id && x.QuotationDetailType == QuotationDetailType.Transfer, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+            if (transaDetails is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización sin hijos encontrados";
+                return Json(jsonResponse);
+            }
+
+            var detailDistinct = transaDetails.Select(x => x.BankTargetTrx).Distinct().ToList();
+            string bankTargets = "", numberReferenTarget = "";
+            foreach (var detail in detailDistinct)
+            {
+                bankTargets += detail.Code + ", ";
+                numberReferenTarget += $"{transaction.Numeral}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+            }
+
+            // Remover la coma adicional al final, si es necesario
+            if (!string.IsNullOrEmpty(bankTargets) && !string.IsNullOrEmpty(numberReferenTarget))
+            {
+                bankTargets = bankTargets.Trim().TrimEnd(',');
+                numberReferenTarget = numberReferenTarget.Trim().TrimEnd(',');
+            }
+
+            //Tipo de Cambio
+            decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa
+                : transaction.ExchangeRateSellTransa;
+
+            // Crear objeto para pasar datos de cabecera al reporte
+            var dataHead = new QuotationReportVM()
+            {
+                CustomerFullName = transaction.CustomerTrx.CommercialName,
+                BankTargetFullName = bankTargets,
+                IsClosed = transaction.IsClosed,
+                CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
+                AmountTransaction = transaction.AmountTransaction,
+                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchange}",
+                NumberReferen = numberReferenTarget,
+                DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
+            };
+
+            // Cargar reporte
+            reportResult.Load(StiNetCoreHelper.MapPath(this, _parametersReport[ParametersReport.FilePath]?.ToString() ?? string.Empty));
+
+            // Decimales
+            reportResult.Dictionary.Variables[AC.ParDecimalTransaction].ValueObject = _decimalTransa;
+            reportResult.Dictionary.Variables[AC.ParDecimalExchangeRate].ValueObject = _decimalExchange;
+            reportResult.Dictionary.Variables[AC.ParNameCompany].ValueObject = $"{company.Name}";
+            reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = "Nota de Crédito";
+            reportResult.Dictionary.Variables[AC.ParFileImagePath].ValueObject = $"{company.ImageLogoUrl}";
+            string isClosed = transaction.IsClosed ? "Cerrado" : "No Cerrado";
+            reportResult.Dictionary.Variables["parIsClosed"].ValueObject = isClosed;
+            reportResult.ReportName = "Nota de Crédito";
+
+            // Guardar los datos en el contexto
+            // Reporte 
+            HttpContext.Session.SetString(AC.ObjectReportData, reportResult.SaveToJsonString());
+            // Objeros de negocio
+            HttpContext.Session.SetString(AC.DatRep, JsonSerializer.Serialize(dataHead));
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = new
+            {
+                urlRedirectTo = Url.Action("PrintReport", "Quotation", new { area = "Exchange" })
+            };
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+    }
+
+    #endregion
+
+
 }

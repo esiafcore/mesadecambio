@@ -1,0 +1,69 @@
+﻿@using Stimulsoft.Report.Mvc
+@using Stimulsoft.Report.Web
+@using Stimulsoft.System.Web.UI.WebControls;
+
+@Html.StiNetCoreViewer(new StiNetCoreViewerOptions()
+{
+    Actions = {
+        GetReport = "GetReport",
+        ViewerEvent = "ViewerEvent"
+    },
+    Localization = "~/Localization/es.xml",
+    Theme = StiViewerTheme.Office2022BlackPurple,
+    Appearance =
+    {
+        InterfaceType = StiInterfaceType.Mouse,
+        ShowTooltips = true,
+        ScrollbarsMode = true,
+        BackgroundColor = System.Drawing.Color.FromArgb(0xe8, 0xe8, 0xe8),
+    },
+    Toolbar =
+    {
+        DisplayMode = StiToolbarDisplayMode.Simple,
+        ShowFullScreenButton = false,
+        PrintDestination = StiPrintDestination.Direct,
+        ShowBookmarksButton = false,
+        ShowParametersButton = false,
+        ShowResourcesButton = false,
+        ShowSaveButton = true,
+        ShowOpenButton = true,
+        ShowPrintButton = true,
+    },
+    Exports = {
+        ShowExportToDocument = false,
+        ShowExportToPdf = true, // 1
+        ShowExportToXps = false,
+        ShowExportToPowerPoint = true,
+        ShowExportToHtml = false,
+        ShowExportToHtml5 = false,
+        ShowExportToMht = false,
+        ShowExportToText = false,
+        ShowExportToRtf = false,
+        ShowExportToWord2007 = true, // 1
+        ShowExportToOpenDocumentWriter = true,
+        ShowExportToExcel = false,
+        ShowExportToExcelXml = false,
+        ShowExportToExcel2007 = true, // 1
+        ShowExportToOpenDocumentCalc = true,
+        ShowExportToCsv = false,
+        ShowExportToDbf = false,
+        ShowExportToXml = false,
+        ShowExportToDif = false,
+        ShowExportToSylk = false,
+        ShowExportToImageBmp = false,
+        ShowExportToImageGif = false,
+        ShowExportToImageJpeg = true, // 1
+        ShowExportToImagePcx = false,
+        ShowExportToImagePng = false,
+        ShowExportToImageTiff = false,
+        ShowExportToImageMetafile = false,
+        ShowExportToImageSvg = false,
+        ShowExportToImageSvgz = false,
+        ShowExportToJson = false,
+        ShowOpenAfterExport = true,
+        ShowExportDialog = true // Mostrar C. Dialog de export
+    },
+    Width = Unit.Percentage(100),
+
+
+})

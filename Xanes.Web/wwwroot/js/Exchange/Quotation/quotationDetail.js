@@ -4,7 +4,7 @@ let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
 let inputExchangeRateBuyTransa, inputExchangeRateSellTransa, inputExchangeRateOfficialTransa;
-let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType;
+let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType, typeNumeral, typeNumerals;
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
     inputDateTransa = document.querySelector("#dateTransa");
@@ -28,10 +28,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
-
+    typeNumerals = document.querySelectorAll(".typeNumerals");
     currencies.forEach((item) => {
         if (item.checked) {
             currencyType = item.value;
+        }
+    });
+
+    typeNumerals.forEach((item) => {
+        if (item.checked) {
+             typeNumeral = item.value;
         }
     });
 
@@ -106,7 +112,7 @@ const fnCalculateRevenueCost = () => {
     let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
 
-    if (inputTypeNumeral.value == QuotationType.Buy) {
+    if (typeNumeral == QuotationType.Buy) {
         if (exchangeRateBuyTransa > exchangeRateOfficialTransa) {
             amountCost = (exchangeRateBuyTransa - exchangeRateOfficialTransa) * amountTransa;
             divRevenue.hidden = true;
@@ -119,7 +125,7 @@ const fnCalculateRevenueCost = () => {
 
         amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
 
-    } else if (inputTypeNumeral.value == QuotationType.Sell) {
+    } else if (typeNumeral == QuotationType.Sell) {
         if (exchangeRateSellTransa > exchangeRateOfficialTransa) {
             amountRevenue = (exchangeRateSellTransa - exchangeRateOfficialTransa) * amountTransa;
             divRevenue.hidden = false;
@@ -134,9 +140,14 @@ const fnCalculateRevenueCost = () => {
         if (exchangeRateSellTransa == 0) {
             amountExchange.value = formatterAmount().format(0);
         } else {
-            amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+            if (currencyType == CurrencyType.Foreign) {
+                amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+            } else if (currencyType == CurrencyType.Additional) {
+                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+            }
         }
     }
+
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);
@@ -251,6 +262,57 @@ const fndeleteRow = async (id) => {
             toastr.success(jsonResponse.successMessages);
             dataTableDeposit.ajax.reload();
             dataTableTransfer.ajax.reload();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+const fnApproved = async (id) => {
+    //let result = await Swal.fire({
+    //    title: `&#191;Está seguro de aprobar la cotizatión?`,
+    //    html: `Este registro no se podrá recuperar`,
+    //    icon: "warning",
+    //    showCancelButton: true,
+    //    reverseButtons: true,
+    //    focusConfirm: false,
+    //    confirmButtonText: ButtonsText.Approved,
+    //    cancelButtonText: ButtonsText.Cancel,
+    //    customClass: {
+    //        confirmButton: "btn btn-info px-3 mx-2",
+    //        cancelButton: "btn btn-primary px-3 mx-2"
+    //    },
+    //    buttonsStyling: false
+    //});
+
+    //if (!result.isConfirmed) {
+    //    return;
+    //}
+
+    try {
+
+        let url = `/exchange/quotation/Approved?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
         }
 
     } catch (e) {
@@ -379,7 +441,12 @@ function fnLoadDatatableDeposit() {
             data.forEach((item) => {
                 total += item.amountDetail;
             });
-            pending = parseFloat(amountHeader) - total;
+            if (typeNumeral == QuotationType.Buy) {
+                pending = parseFloat(amountHeader) - total;
+            } else if (typeNumeral == QuotationType.Sell) {
+                pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+            }
+           
             if (pending == 0) {
                 document.querySelector("#btnCreateDetailDeposit").hidden = true;
             } else {
@@ -478,7 +545,12 @@ function fnLoadDatatableTransfer() {
             data.forEach((item) => {
                 total += item.amountDetail;
             });
-            pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+            if (typeNumeral == QuotationType.Buy) {
+                pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+            } else if (typeNumeral == QuotationType.Sell) {
+                pending = parseFloat(amountHeader) - total;
+            }
+           
             if (pending == 0) {
                 document.querySelector("#btnCreateDetailTransfer").hidden = true;
             } else {

@@ -29,6 +29,14 @@ public static class SD
     }
 
     [Flags]
+    public enum QuotationTypeName : int
+    {
+        Compra = 1,
+        Venta = 2,
+        Trasferencia = 4
+    }
+
+    [Flags]
     public enum PersonType : int
     {
         NaturalPerson = 1,
@@ -89,5 +97,32 @@ public static class SD
         BaseForeign = 1,
         BaseAdditional = 2,
         ForeignAdditional = 4
+    }
+
+    public enum ParametersReport : short
+    {
+        DecimalBalance = 1,
+        DecimalTransaction = 2,
+        FilePath = 3,
+        ListData = 4,
+        FiltersDescription = 5,
+        FileName = 6
+    }
+
+    public enum MonthName : short
+    {
+        Inicial = 0,
+        Enero = 1,
+        Febrero = 2,
+        Marzo = 3,
+        Abril = 4,
+        Mayo = 5,
+        Junio = 6,
+        Julio = 7,
+        Agosto = 8,
+        Septiembre = 9,
+        Octubre = 10,
+        Noviembre = 11,
+        Diciembre = 12
     }
 }

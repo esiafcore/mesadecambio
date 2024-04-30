@@ -20,7 +20,7 @@
                         <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2 p-1">
                             @foreach (var quotationType in Model.QuotationTypeList)
                             {
-                                var isChecked = (quotationType == Model.QuotationTypeList.First());
+                                var isChecked = (quotationType.Id == Model.DataModel.TypeId);
 
                                 <div class="form-check mt-0 mx-0 form-check-inline" id="@("quotationType_divradio_" + quotationType.Numeral)">
                                     <input name="QuotationTypes"
