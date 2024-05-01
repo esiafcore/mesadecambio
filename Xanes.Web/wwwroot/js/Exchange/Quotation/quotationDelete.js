@@ -3,6 +3,7 @@ let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amoun
 let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
+let inputsFormatTransa, inputsFormatExchange;
 document.addEventListener("DOMContentLoaded", function () {
 
     containerMain = document.querySelector("#containerMain");
@@ -12,8 +13,17 @@ document.addEventListener("DOMContentLoaded", function () {
     TCHeader = document.querySelector("#TCHeader");
     tableRowLabelDeposit = document.querySelector("#tableRowLabelDeposit");
     tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
-    TCHeader.value = formatterAmount().format(TCHeader.value);
-    amountHeader.value = formatterAmount().format(amountHeader.value);
+    inputsFormatTransa = document.querySelectorAll(".decimalTransa");
+    inputsFormatExchange = document.querySelectorAll(".decimalTC");
+
+    inputsFormatTransa.forEach((item) => {
+        item.value = formatterAmount().format(fnparseFloat(item.value));
+    });
+
+    inputsFormatExchange.forEach((item) => {
+        item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+    });
+
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
     fnEnableTooltip();
