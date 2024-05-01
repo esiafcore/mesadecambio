@@ -41,6 +41,13 @@ const customMessagesSelect = {
     }
 };
 
+const SystemInformationReportType = {
+    // Transacciones
+    Operation: 1,
+    Deposit: 2,
+    Transfer: 4
+};
+
 
 const select2Options = {
     theme: "bootstrap-5",

@@ -14,6 +14,7 @@ public static class AC
     public const string XlsFormatRateExchange = "#,##0.0000";
     public const string XlsFormatNumeric = "#,##0.00";
     public static char SeparationCharCode = '|';
+    public static string Title = "Title";
 
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";
@@ -41,6 +42,12 @@ public static class AC
     public static string ParDecimalPriceSell = "parDecimalPriceSell";
     public static string ParDecimalExchangeRate = "parDecimalExchangeRate";
     public static string DatRep = "datrep";
+    public static string ReportListData = "ListaDatosReporte";
     public static string ObjectReportData = "ObjetoReporte";
+    public static string FilterReportData = "FilterReportData";
+    public static string ReportDataType = "TipoReporte";
+    public static string ReportDataErrorLoad = "Error al cargar el informe";
+    public static string ReportFileNotFound = "No se encuentra el archivo de informe";
+    public static string ReportFileInvalid = "Archivo de informe invalido";
 
 }

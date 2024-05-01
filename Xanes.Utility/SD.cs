@@ -37,6 +37,14 @@ public static class SD
     }
 
     [Flags]
+    public enum QuotationTypeNameAbrv : int
+    {
+        Com = 1,
+        Vta = 2,
+        Tra = 4
+    }
+
+    [Flags]
     public enum PersonType : int
     {
         NaturalPerson = 1,
@@ -92,6 +100,14 @@ public static class SD
     }
 
     [Flags]
+    public enum ReportTransaType : short
+    {
+        Operation = 1,
+        Deposit = 2,
+        Transfer = 4
+    }
+
+    [Flags]
     public enum ExchangeRateSourceType : short
     {
         BaseForeign = 1,
@@ -125,4 +141,29 @@ public static class SD
         Noviembre = 11,
         Diciembre = 12
     }
+
+
+    public static Dictionary<short, string> SystemInformationReportTypeName = new()
+    {
+        // Transacciones
+        { (short)ReportTransaType.Operation,"Listado de Operaciones"},
+        { (short)ReportTransaType.Deposit,"Listado de Depositos"},
+        { (short)ReportTransaType.Transfer,"Listado de Transferencias"}
+    };
+
+    public static Dictionary<short, string> SystemInformationReportTypeFileName = new()
+    {
+        // Transacciones
+        { (short)ReportTransaType.Operation,"OperationList.mrt"},
+        { (short)ReportTransaType.Deposit,"DepositList.mrt"},
+        { (short)ReportTransaType.Transfer,"TransferList.mrt"}
+    };
+
+    // nombre las vistas parciales
+    public static Dictionary<short, string> SystemInformationReportPartialViewName = new()
+    {
+        { (short)ReportTransaType.Operation,"_TransaTypeOperation"},
+        { (short)ReportTransaType.Deposit,"_TransaTypeDeposit"},
+        { (short)ReportTransaType.Transfer,"_TransaTypeTransfer"}
+    };
 }

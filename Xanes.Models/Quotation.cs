@@ -65,7 +65,6 @@ public class Quotation : Entity, ICloneable
     [ValidateNever]
     public virtual Currency CurrencyTransferTrx { get; set; } = null!;
 
-
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id Moneda Transaction Final")]
     [ForeignKey(nameof(CurrencyTransaTrx))]
