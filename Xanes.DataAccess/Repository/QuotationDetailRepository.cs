@@ -26,7 +26,9 @@ public class QuotationDetailRepository : Repository<QuotationDetail>, IQuotation
         {
             query = query.Where(filter);
         }
-        int nextNumeral = query.Max(x => x.LineNumber);
+
+        // Si no hay elementos, asigna 0 como valor predeterminado
+        int nextNumeral = query.Any() ? query.Max(x => x.LineNumber) : 0;
 
         return await Task.FromResult(nextNumeral + 1);
     }

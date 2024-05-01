@@ -208,7 +208,6 @@ const fnShowModalDeposit = () => {
         language: customMessagesSelect,
         allowClear: true,
         minimumResultsForSearch: Infinity,
-        openOnEnter: true, // Esto mantendrá siempre abierto el dropdown
         width: "resolve",
         dropdownParent: $('#modalCreateDeposit')
     });
@@ -219,6 +218,22 @@ const fnShowModalTransfer = () => {
     fnClearModalTransfer();
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
     document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
+    $('#selectBankSourceTransfer').select2({
+        templateResult: formatOption,
+        language: customMessagesSelect,
+        allowClear: true,
+        minimumResultsForSearch: Infinity,
+        width: "resolve",
+        dropdownParent: $('#modalCreateTransfer')
+    });
+    $('#selectBankTargetTransfer').select2({
+        templateResult: formatOption,
+        language: customMessagesSelect,
+        allowClear: true,
+        minimumResultsForSearch: Infinity,
+        width: "resolve",
+        dropdownParent: $('#modalCreateTransfer')
+    });
     $('#modalCreateTransfer').modal('show');
 };
 

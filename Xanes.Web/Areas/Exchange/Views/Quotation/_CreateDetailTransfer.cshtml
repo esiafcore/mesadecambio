@@ -33,11 +33,11 @@
                     </div>
                     <div class="col-12">
                         <select asp-for="DataModel.BankSourceId"
-                                class="form-select border p-1" size="10" id="selectBankSourceTransfer">
+                                class="form-select border p-1" size="10" id="selectBankSourceTransfer" style="width: 100%; height: 100%">
                             <option disabled selected>--Select Banco--</option>
                             @foreach (var bank in Model.BankList)
                             {
-                                <option value="@bank.Id">@bank.Code</option>
+                                <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
                             }
                         </select>
                         <span class="text-danger" asp-validation-for="DataModel.BankSourceId"></span>
@@ -49,11 +49,11 @@
                     </div>
                     <div class="col-12">
                         <select asp-for="DataModel.BankTargetId"
-                                class="form-select border p-1" size="10" id="selectBankTargetTransfer">
+                                class="form-select border p-1" size="10" id="selectBankTargetTransfer" style="width: 100%; height: 100%">
                             <option disabled selected>--Select Banco--</option>
                             @foreach (var bank in Model.BankList)
                             {
-                                <option value="@bank.Id">@bank.Code</option>
+                                <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
                             }
                         </select>
                         <span class="text-danger" asp-validation-for="DataModel.BankTargetId"></span>

@@ -33,8 +33,7 @@ public class QuotationDetail: Entity, ICloneable
 
     [ValidateNever]
     public virtual Currency CurrencyDetailTrx { get; set; } = null!;
-
-
+    
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Banco Origen")]
     [ForeignKey(nameof(BankSourceTrx))]
@@ -70,7 +69,6 @@ public class QuotationDetail: Entity, ICloneable
     [Display(Name = "Uid Transacción")]
     public Guid? BankTransactionId { get; set; }
 
-
     [Required]
     [Display(Name = "Está Contabilizado el Comprobante Anulación")]
     public bool IsJournalEntryVoidPosted { get; set; }
@@ -84,7 +82,6 @@ public class QuotationDetail: Entity, ICloneable
 
     [Display(Name = "Uid Transacción")]
     public Guid? BankTransactionVoidId { get; set; }
-
 
     public object Clone()
     {

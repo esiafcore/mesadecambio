@@ -132,6 +132,16 @@ public class Quotation : Entity, ICloneable
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;
 
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Total Depósito")]
+    [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
+    public decimal TotalDeposit { get; set; } = 0M;
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Total Transferencia")]
+    [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
+    public decimal TotalTransfer { get; set; } = 0M;
+
     [Required]
     [Display(Name = "Está Contabilizado?")]
     public bool IsPosted { get; set; }
@@ -152,7 +162,23 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
 
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [Display(Name = "Cerrado El")]
+    public DateTime ClosedDate { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
 
+    [Display(Name = "Cerrado Por")]
+    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string ClosedBy { get; set; } = string.Empty;
+
+    [Display(Name = "IPv4 Cerrado")]
+    [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string ClosedIpv4 { get; set; } = string.Empty;
+
+    [Display(Name = "HostName Cerrado")]
+    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string ClosedHostName { get; set; } = string.Empty;
+    
     public object Clone()
     {
         throw new NotImplementedException();

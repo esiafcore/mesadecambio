@@ -115,7 +115,8 @@ const QuotationType = {
 
 
 const fnparseFloat = (valueInput) => {
-    valueInput = valueInput.replace(",", "");
+    // Utiliza una expresión regular para reemplazar todas las comas
+    valueInput = valueInput.replace(/,/g, ""); 
     // Verificar si el valor del input es un número
     if (!isNaN(valueInput) && valueInput.trim() !== "") {
         return parseFloat(valueInput);

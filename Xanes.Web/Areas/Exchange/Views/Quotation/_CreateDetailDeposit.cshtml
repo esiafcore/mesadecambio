@@ -2,11 +2,11 @@
 
 <form method="post" asp-action="CreateDetail">
     <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailDeposit" hidden />
-    <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden/>
-    <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
+    <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden />
+    <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden />
     <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" hidden />
-    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden/>
-    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden/>
+    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden />
+    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="modal-dialog modal-dialog-centered">
@@ -18,7 +18,7 @@
 
             <div class="modal-body row pt-0 mt-1">
                 <h5 class="text-success mb-1 ps-0" id="infoModalDeposit"></h5>
-                <hr class="w-100 mb-1"/>
+                <hr class="w-100 mb-1" />
                 <div class="row mb-1">
                     <div class="col-2">
                         Monto
@@ -38,10 +38,6 @@
                             <option disabled selected>--Select Banco--</option>
                             @foreach (var bank in Model.BankList)
                             {
-                             @*    <option value="@bank.Id"
-                                        style="background-image: url('@bank.LogoUrl'); background-repeat: no-repeat; background-position: left center; padding-left: 30px;">
-                                    @bank.Code
-                                </option> *@
                                 <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
                             }
                         </select>

@@ -8,9 +8,6 @@ using Xanes.Models.ViewModels;
 using Xanes.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.DotNet.MSIdentity.Shared;
-using Microsoft.Extensions.Hosting;
 using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
@@ -47,6 +44,7 @@ public class QuotationController : Controller
             Stimulsoft.Base.StiLicense.LoadFromFile(path);
         }
     }
+
     public IActionResult Index()
     {
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
@@ -501,7 +499,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreateDetail(Models.ViewModels.QuotationDetailVM objViewModel)
+    public async Task<IActionResult> CreateDetail(Models.ViewModels.QuotationDetailVM objViewModel)
     {
         Models.QuotationDetail obj = objViewModel.DataModel;
         //Datos son validos
@@ -514,26 +512,16 @@ public class QuotationController : Controller
 
         //Verificamos si existe el padre
         var objHeader = _uow.Quotation.Get(filter: x =>
-            x.CompanyId == obj.CompanyId && x.Id == obj.ParentId, isTracking: false);
+            x.CompanyId == obj.CompanyId && x.Id == obj.ParentId);
 
         if (objHeader == null)
         {
             ModelState.AddModelError("", $"Registro padre no encontrada");
         }
 
-        //Obtenemos los hijos
-        var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
-            x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == objViewModel.DataModel.QuotationDetailType
-            , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx");
-
-        if (objDetails == null)
-        {
-            ModelState.AddModelError("", $"Registros hijos son invalidos");
-        }
-
         //Verificamos si existe la moneda
         var objCurrency = _uow.Currency.Get(filter: x =>
-            x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDetailId, isTracking: false);
+            x.CompanyId == obj.CompanyId && x.Numeral == obj.CurrencyDetailId, isTracking: false);
 
         if (objCurrency == null)
         {
@@ -595,7 +583,8 @@ public class QuotationController : Controller
         if (obj.Id == 0)
         {
             //Seteamos campos de auditoria
-            obj.LineNumber = objDetails.Count() + 1;
+            obj.LineNumber = await _uow.QuotationDetail.NextLineNumber(filter: x =>
+                objHeader != null && x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == objViewModel.DataModel.QuotationDetailType);
             obj.CreatedBy = AC.LOCALHOSTME;
             obj.CreatedDate = DateTime.UtcNow;
             obj.CreatedHostName = AC.LOCALHOSTPC;
@@ -606,20 +595,48 @@ public class QuotationController : Controller
         }
         else
         {
-            var objDetail = objDetails.First(x => x.Id == obj.Id);
-
+            var objDetail = _uow.QuotationDetail.Get(filter: x => x.Id == obj.Id && x.CompanyId == _companyId);
+            if (objDetail == null)
+            {
+                return NotFound();
+            }
             //Seteamos campos de auditoria
             objDetail.AmountDetail = obj.AmountDetail;
             objDetail.BankSourceId = obj.BankSourceId;
             objDetail.BankTargetId = obj.BankTargetId;
             objDetail.QuotationDetailType = obj.QuotationDetailType;
-            objDetail.UpdatedBy = "LOCALHOSTME";
-            objDetail.UpdatedDate = DateTime.Now;
-            objDetail.UpdatedHostName = "LOCALHOSTPC";
-            objDetail.UpdatedIpv4 = "127.0.0.1";
+            objDetail.UpdatedBy = AC.LOCALHOSTME;
+            objDetail.UpdatedDate = DateTime.UtcNow;
+            objDetail.UpdatedHostName = AC.LOCALHOSTPC;
+            objDetail.UpdatedIpv4 = AC.Ipv4Default;
             _uow.QuotationDetail.Update(objDetail);
             _uow.Save();
             TempData["success"] = "Cotización actualizada exitosamente";
+        }
+
+        //Obtenemos los hijos
+        var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
+                objHeader != null && x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+        if (objDetails == null)
+        {
+            return NotFound();
+        }
+
+        if (objHeader != null)
+        {
+            objHeader.TotalDeposit = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                .Sum(x => x.AmountDetail);
+            objHeader.TotalTransfer = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                .Sum(x => x.AmountDetail);
+            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
         }
 
         return RedirectToAction("CreateDetail", "Quotation", new { id = obj.ParentId });
@@ -827,6 +844,10 @@ public class QuotationController : Controller
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
             objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.ClosedDate = DateTime.UtcNow;
+            objHeader.ClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ClosedIpv4 = AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
@@ -865,8 +886,46 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
+            int parentId = objDetail.ParentId;
+
             _uow.QuotationDetail.Remove(objDetail);
             _uow.Save();
+
+            //Obtenemos el padre
+            var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == parentId);
+
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            //Obtenemos los hijos
+            var objDetails = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.ParentId == parentId).ToList();
+
+            if (objDetails == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización invalido";
+                return Json(jsonResponse);
+            }
+
+
+            objHeader.TotalDeposit = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                .Sum(x => x.AmountDetail);
+            objHeader.TotalTransfer = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                .Sum(x => x.AmountDetail);
+            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+
+
             jsonResponse.IsSuccess = true;
             jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
             return Json(jsonResponse);
@@ -945,10 +1004,10 @@ public class QuotationController : Controller
     {
         return StiNetCoreViewer.ViewerEventResult(this);
     }
-    
+
     //Validar todos los datos de la cotización
     [HttpPost]
-    public async Task<JsonResult> ValidateDataToPrint(int id)
+    public JsonResult ValidateDataToPrint(int id)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
