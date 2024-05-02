@@ -20,6 +20,7 @@ public class ApplicationDbContext: DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration<Bank>(new BankConfiguration());
+        modelBuilder.ApplyConfiguration<BankAccount>(new BankAccountConfiguration());
         modelBuilder.ApplyConfiguration<Currency>(new CurrencyConfiguration());
         modelBuilder.ApplyConfiguration<QuotationType>(new QuotationTypeConfiguration());
         modelBuilder.ApplyConfiguration<PersonType>(new PersonTypeConfiguration());
@@ -37,6 +38,7 @@ public class ApplicationDbContext: DbContext
     }
 
     public virtual DbSet<Bank> Banks {get;set;}
+    public virtual DbSet<BankAccount> BankAccounts { get; set; }
     public virtual DbSet<Currency> Currencies { get; set; }
     public virtual DbSet<PersonType> PersonsTypes { get; set; }
     public virtual DbSet<CustomerSector> CustomersSectors { get; set; }
