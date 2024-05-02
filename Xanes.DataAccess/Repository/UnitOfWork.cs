@@ -8,6 +8,8 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _db;
     public IBankRepository Bank { get; private set; }
+    public IBankAccountRepository BankAccount { get; private set; }
+
     public ICurrencyRepository Currency { get; private set; }
 
     public ICustomerCategoryRepository CustomerCategory { get; private set; }
@@ -29,6 +31,7 @@ public class UnitOfWork : IUnitOfWork
     {
         _db = db;
         Bank = new BankRepository(_db);
+        BankAccount = new BankAccountRepository(_db);
         Currency = new CurrencyRepository(_db);
         CustomerCategory = new CustomerCategoryRepository(_db);
         IdentificationType = new IdentificationTypeRepository(_db);

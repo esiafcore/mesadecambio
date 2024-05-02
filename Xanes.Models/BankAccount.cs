@@ -6,7 +6,7 @@ using Xanes.Models.Abstractions;
 using Xanes.Utility;
 namespace Xanes.Models;
 
-[Table("bankaccounts", Schema = "bco")]
+[Table("banksaccounts", Schema = "bco")]
 public class BankAccount : EntityInactivated, ICloneable
 {
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -19,10 +19,10 @@ public class BankAccount : EntityInactivated, ICloneable
 
     [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name ="Código")]
+    [Display(Name ="Número de Cuenta Bancaria")]
     public string Code { get; set; } = null!;
 
-    [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;

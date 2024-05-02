@@ -3,6 +3,7 @@
 public interface IUnitOfWork
 {
     IBankRepository Bank { get; }
+    IBankAccountRepository BankAccount { get; }
     ICurrencyRepository Currency { get; } 
     ICustomerCategoryRepository CustomerCategory { get; }
     IIdentificationTypeRepository IdentificationType { get; }

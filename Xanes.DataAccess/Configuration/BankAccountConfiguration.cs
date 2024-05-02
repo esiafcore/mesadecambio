@@ -15,7 +15,7 @@ public class BankAccountConfiguration : IEntityTypeConfiguration<BankAccount>
         builder.Property(b => b.CurrencyType).HasDefaultValue(SD.CurrencyType.Base)
             .HasSentinel(default);
         builder.HasIndex(x => new { x.CompanyId, x.ParentId, x.Code }
-                , "bankaccounts_idx_2010")
+                , "banksaccounts_idx_2010")
             .IsUnique();
 
         builder.HasOne(x => x.ParentTrx)

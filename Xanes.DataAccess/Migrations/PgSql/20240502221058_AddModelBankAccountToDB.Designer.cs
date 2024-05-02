@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.DataAccess.Migrations
+namespace Xanes.DataAccess.Migrations.PgSql
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240502221058_AddModelBankAccountToDB")]
+    partial class AddModelBankAccountToDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -581,7 +584,7 @@ namespace Xanes.DataAccess.Migrations
                             CountryCode = "NIC",
                             CountryNumber = (short)558,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 5, 2, 22, 16, 11, 369, DateTimeKind.Utc).AddTicks(5510),
+                            CreatedDate = new DateTime(2024, 5, 2, 22, 10, 56, 724, DateTimeKind.Utc).AddTicks(6647),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IdentificationNumber = "J0310000031339",
@@ -2051,31 +2054,23 @@ namespace Xanes.DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("AmountCost")
-                        .ValueGeneratedOnAdd()
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
                         .HasColumnName("amountcost");
 
                     b.Property<decimal>("AmountExchange")
-                        .ValueGeneratedOnAdd()
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
                         .HasColumnName("amountexchange");
 
                     b.Property<decimal>("AmountRevenue")
-                        .ValueGeneratedOnAdd()
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
                         .HasColumnName("amountrevenue");
 
                     b.Property<decimal>("AmountTransaction")
-                        .ValueGeneratedOnAdd()
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
                         .HasColumnName("amounttransaction");
 
                     b.Property<string>("ClosedBy")
@@ -2240,17 +2235,11 @@ namespace Xanes.DataAccess.Migrations
                         .HasColumnName("numeral");
 
                     b.Property<decimal>("TotalDeposit")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("totaldeposit");
 
                     b.Property<decimal>("TotalTransfer")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)")
-                        .HasDefaultValue(0m)
+                        .HasColumnType("decimal(18,2)")
                         .HasColumnName("totaltransfer");
 
                     b.Property<int>("TypeId")
