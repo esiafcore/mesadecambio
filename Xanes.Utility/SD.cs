@@ -96,7 +96,9 @@ public static class SD
     public enum QuotationDetailType : short
     {
         Deposit = 1,
-        Transfer = 2
+        Transfer = 2,
+        CreditTransfer = 4,
+        DebitTranssfer = 8
     }
 
     [Flags]
