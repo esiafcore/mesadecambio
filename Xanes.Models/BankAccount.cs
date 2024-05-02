@@ -43,6 +43,14 @@ public class BankAccount : EntityInactivated, ICloneable
     [ValidateNever]
     public virtual Currency CurrencyTrx { get; set; } = null!;
 
+    [MaxLength(5, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Display(Name = "Literal de País")]
+    public string? LiteralPrefix { get; set; }
+
+    [Display(Name = "Ledger Account Id")]
+    public Guid? LedgerAccountId { get; set; }
+
+
     #region ICloneable Members
 
     public virtual object Clone()
