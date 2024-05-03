@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
             await fnloadPartialsView(selectReportValue);
         }
     });
+
+    await fnloadPartialsView(SystemInformationReportType.Operation);
 });
 
 // Validaciones en formularios ====>

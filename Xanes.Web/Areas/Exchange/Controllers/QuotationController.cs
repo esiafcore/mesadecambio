@@ -681,7 +681,6 @@ public class QuotationController : Controller
             obj.CreatedIpv4 = AC.Ipv4Default;
             _uow.QuotationDetail.Add(obj);
             _uow.Save();
-            TempData["success"] = "Cotización creada exitosamente";
         }
         else
         {
@@ -701,7 +700,6 @@ public class QuotationController : Controller
             objDetail.UpdatedIpv4 = AC.Ipv4Default;
             _uow.QuotationDetail.Update(objDetail);
             _uow.Save();
-            TempData["success"] = "Cotización actualizada exitosamente";
         }
 
         //Obtenemos los hijos

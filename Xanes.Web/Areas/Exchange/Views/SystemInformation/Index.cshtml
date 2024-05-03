@@ -17,15 +17,15 @@
                 <!-- Transacciiones -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
-                        <button class="accordion-button collapsed border border-primary border-2 border-opacity-25" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#transactions" aria-expanded="false" aria-controls="transactions">
+                        <button class="accordion-button border border-primary border-2 border-opacity-25" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#transactions" aria-expanded="true" aria-controls="transactions">
                             <i class="bi bi-file-earmark-medical-fill me-1"></i> Transacciones
                         </button>
                     </h2>
-                    <div id="transactions" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#select-group">
+                    <div id="transactions" class="accordion-collapse collapse show" aria-labelledby="headingTwo" data-bs-parent="#select-group">
                         <div class="accordion-body p-1">
-                            <select size="6" class="form-select p-1 border border-primary border-opacity-25 select-report">
-                                <option value="@((short)SD.ReportTransaType.Operation)">
+                            <select id="selectTransactions" size="6" class="form-select p-1 border border-primary border-opacity-25 select-report">
+                                <option value="@((short)SD.ReportTransaType.Operation)" selected>
                                     @(SD.SystemInformationReportTypeName[(short)SD.ReportTransaType.Operation])
                                 </option>
                                 <option value="@((short)SD.ReportTransaType.Deposit)">

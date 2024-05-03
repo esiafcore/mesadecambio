@@ -42,12 +42,12 @@ function loadDatatable() {
                 , orderable: false
             },
             {
-                data: 'customerTrx.businessName', "width": "38%"
+                data: 'customerTrx.businessName', "width": "30%"
                 , render: DataTable.render.ellipsis(28, false)
                 , orderable: true
             },
             {
-                data: 'currencyTransaTrx.code', "width": "10%"
+                data: 'currencyTransaTrx.code', "width": "5%"
                 , render: function (data, type, row) {
                     return `${row.currencyTransaTrx.code} - ${row.currencyTransferTrx.code}`;
                 }
@@ -69,31 +69,31 @@ function loadDatatable() {
                 , orderable: true
             },
             {
-                data: 'amountRevenue', "width": "5%"
+                data: 'amountRevenue', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
             },
             {
-                data: 'amountCost', "width": "5%"
+                data: 'amountCost', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
             },
             {
-                data: 'isClosed', "width": "2%"
+                data: 'isClosed', "width": "5%"
                 , render: function (data, type, row) {
                     return data ? YesNo.Yes : YesNo.No;
                 }
                 , orderable: false
             },
             {
-                data: 'isPosted', "width": "2%"
+                data: 'isPosted', "width": "5%"
                 , render: function (data, type, row) {
                     return data ? YesNo.Yes : YesNo.No;
                 }
                 , orderable: false
             },
             {
-                data: null, "width": "5%", orderable: false
+                data: null, "width": "10%", orderable: false
                 , "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
                         <a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"

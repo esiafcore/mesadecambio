@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     typeNumerals.forEach((item) => {
         if (item.checked) {
-             typeNumeral = item.value;
+            typeNumeral = item.value;
         }
     });
 
@@ -199,44 +199,81 @@ const fnShowModalUpdateHeader = () => {
     $('#modalUpdateHeader').modal('show');
 };
 
-const fnShowModalDeposit = () => {
+const fnShowModalDeposit = async () => {
     fnClearModalDeposit();
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
     document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
-    $('#selectBankSourceDeposit').select2({
-        templateResult: formatOption,
-        language: customMessagesSelect,
-        allowClear: true,
-        minimumResultsForSearch: Infinity,
-        width: "resolve",
-        dropdownParent: $('#modalCreateDeposit')
-    });
+    // Obtener la cantidad total de elementos en la lista
+    var totalOptions = $('#selectBankSourceDeposit option').length;
+
+    // Mostrar el modal
     $('#modalCreateDeposit').modal('show');
-    // Abrir Select2 nuevamente
-    $("#selectBankSourceDeposit").select2('open');
+
+    // Esperar a que el modal esté completamente visible
+    $('#modalCreateDeposit').on('shown.bs.modal', function () {
+        // Inicializar Select2 en el elemento de selección
+        $(selectBankSourceDeposit).select2({
+            templateResult: formatOption,
+            language: customMessagesSelect,
+            allowClear: true,
+            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
+            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
+            dropdownParent: $('#modalCreateDeposit'),
+            maximumSelectionLength: totalOptions // Establecer el tamaño máximo del menú desplegable
+        });
+        $(selectBankSourceDeposit).select2('open');
+    });
 };
 
 const fnShowModalTransfer = () => {
     fnClearModalTransfer();
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
     document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
-    $('#selectBankSourceTransfer').select2({
-        templateResult: formatOption,
-        language: customMessagesSelect,
-        allowClear: true,
-        minimumResultsForSearch: Infinity,
-        width: "resolve",
-        dropdownParent: $('#modalCreateTransfer')
-    });
-    $('#selectBankTargetTransfer').select2({
-        templateResult: formatOption,
-        language: customMessagesSelect,
-        allowClear: true,
-        minimumResultsForSearch: Infinity,
-        width: "resolve",
-        dropdownParent: $('#modalCreateTransfer')
-    });
+    // Obtener la cantidad total de elementos en la lista
+    var totalOptionsSource = $('#selectBankSourceTransfer option').length;
+    // Obtener la cantidad total de elementos en la lista
+    var totalOptionsTarget = $('#selectBankTargetTransfer option').length;
     $('#modalCreateTransfer').modal('show');
+
+    $('#modalCreateTransfer').on('shown.bs.modal', function () {
+        // Inicializar Select2 en el elemento de selección
+        $(selectBankSourceTransfer).select2({
+            templateResult: formatOption,
+            language: customMessagesSelect,
+            allowClear: true,
+            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
+            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
+            dropdownParent: $('#modalCreateTransfer'),
+            maximumSelectionLength: totalOptionsSource // Establecer el tamaño máximo del menú desplegable
+        });
+        $(selectBankSourceTransfer).select2('open');
+        $(selectBankTargetTransfer).select2({
+            templateResult: formatOption,
+            language: customMessagesSelect,
+            allowClear: true,
+            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
+            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
+            dropdownParent: $('#modalCreateTransfer'),
+            maximumSelectionLength: totalOptionsTarget // Establecer el tamaño máximo del menú desplegable
+        });
+        $(selectBankTargetTransfer).select2('open');
+    });
+    //$('#selectBankSourceTransfer').select2({
+    //    templateResult: formatOption,
+    //    language: customMessagesSelect,
+    //    allowClear: true,
+    //    minimumResultsForSearch: Infinity,
+    //    width: "resolve",
+    //    dropdownParent: $('#modalCreateTransfer')
+    //});
+    //$('#selectBankTargetTransfer').select2({
+    //    templateResult: formatOption,
+    //    language: customMessagesSelect,
+    //    allowClear: true,
+    //    minimumResultsForSearch: Infinity,
+    //    width: "resolve",
+    //    dropdownParent: $('#modalCreateTransfer')
+    //});
 };
 
 const fndeleteRow = async (id) => {
@@ -463,7 +500,7 @@ function fnLoadDatatableDeposit() {
             } else if (typeNumeral == QuotationType.Sell) {
                 pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
             }
-           
+
             if (pending == 0) {
                 document.querySelector("#btnCreateDetailDeposit").hidden = true;
             } else {
@@ -567,7 +604,7 @@ function fnLoadDatatableTransfer() {
             } else if (typeNumeral == QuotationType.Sell) {
                 pending = parseFloat(amountHeader) - total;
             }
-           
+
             if (pending == 0) {
                 document.querySelector("#btnCreateDetailTransfer").hidden = true;
             } else {
