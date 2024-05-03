@@ -9,15 +9,11 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _db;
     public IBankRepository Bank { get; private set; }
     public IBankAccountRepository BankAccount { get; private set; }
-
     public ICurrencyRepository Currency { get; private set; }
-
     public ICustomerCategoryRepository CustomerCategory { get; private set; }
-
     public IIdentificationTypeRepository IdentificationType { get; private set; }
     public ICustomerRepository Customer { get; private set; }
     public ICompanyRepository Company { get; }
-
     public IPersonTypeRepository PersonType { get; private set; }
     public ICustomerSectorRepository CustomerSector { get; private set; }
     public ICurrencyExchangeRateRepository CurrencyExchangeRate { get; private set; }

@@ -1,7 +1,9 @@
 ﻿let inputDateTransa, firstCurrency, inputAmountTransa, inputExchangeRateBuyTransa, inputExchangeRateSellTransa,
     inputExchangeRateOfficialTransa, inputAmountCost, inputAmountRevenue, currencyType, currencyTypeDeposit, currencyTypeTransfer, currenciesTransa, currenciesDeposit, currenciesTransfer,
-    typeNumerals, inputCurrencyTransa, inputCurrencyDeposit, inputCurrencyTransfer, inputTypeNumeral, elementsBuy, elementsSell, divCurrencyTransfer, divCurrencyDeposit;
+    typeNumerals, inputCurrencyTransa, inputCurrencyDeposit, inputCurrencyTransfer, inputTypeNumeral, elementsBuy, elementsTransfer, elementsSell, divCurrencyTransfer, divCurrencyDeposit,
+    divAmountExchange, divCommission, divCurrencyTransa;
 let inputsFormatTransa, inputsFormatExchange;
+let containerMain, selectCustomer, selectBankAccountTarget, selectBankAccountSource;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -21,12 +23,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputCurrencyTransfer = document.querySelector("#currencyTransferType");
     inputTypeNumeral = document.querySelector("#typeNumeral");
     elementsBuy = document.querySelectorAll(".typeBuy");
+    elementsTransfer = document.querySelectorAll(".typeTransfer");
     elementsSell = document.querySelectorAll(".typeSell");
     divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
     divCurrencyTransfer = document.querySelector("#divCurrencyTransfer");
     inputsFormatTransa = document.querySelectorAll(".decimalTransa");
     inputsFormatExchange = document.querySelectorAll(".decimalTC");
-
+    divAmountExchange = document.querySelector("#divAmountExchange");
+    divCommission = document.querySelector("#divCommission");
+    divCurrencyTransa = document.querySelector("#divCurrencyTransa");
+    selectCustomer = document.querySelector("#selectCustomer");
+    selectBankAccountSource = document.querySelector("#selectBankAccountSource");
+    selectBankAccountTarget = document.querySelector("#selectBankAccountTarget");
+    containerMain = document.querySelector("#containerMain");
+    containerMain.className = "container-fluid col-md-12 col-xxl-10 col-11 m-1";
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 
@@ -46,7 +56,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     //Aplicar select2
-    $("#selectCustomer").select2(select2Options);
+    $(selectCustomer).select2(select2Options);
+
+    await fnGetBankAccounts();
 
     //Setear enfoque en el search input
     $(document).on('select2:open', function (e) {
@@ -97,24 +109,131 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (item.checked) inputTypeNumeral.value = parseInt(item.value);
         item.addEventListener("change", () => {
             inputTypeNumeral.value = parseInt(item.value);
-            if (item.value == QuotationType.Buy) {
-                divCurrencyTransfer.hidden = false;
-                divCurrencyDeposit.hidden = true;
-                elementsBuy.forEach((item) => item.hidden = false);
-                elementsSell.forEach((item) => item.hidden = true);
-
-            } else if (item.value == QuotationType.Sell) {
-                divCurrencyTransfer.hidden = true;
-                divCurrencyDeposit.hidden = false;
-                elementsBuy.forEach((item) => item.hidden = true);
-                elementsSell.forEach((item) => item.hidden = false);
-            } else {
-
-            }
-            fnCalculateRevenueCost();
+            fnLoadInputsByType(item.value);
         });
+        fnLoadInputsByType(inputTypeNumeral.value);
     });
 });
+
+const fnGetBankAccounts = async () => {
+    $(selectBankAccountSource).select2(select2Options);
+    $(selectBankAccountTarget).select2(select2Options);
+
+    $(selectBankAccountSource).on('select2:select', async function (e) {
+        let url = `/Exchange/Quotation/GetBankAccountTarget?idSource=${e.params.data.id}`;
+
+        try {
+
+            const response = await fetch(url, {
+                method: "POST"
+            });
+
+            const jsonResponse = await response.json();
+
+            if (jsonResponse.isSuccess) {
+                selectBankAccountTarget.innerHTML = "";
+                // Agregar options
+                let option = document.createElement("option");
+                option.value = "";
+                option.text = "--Select Cta Destino--";
+                option.disabled = true;
+                option.selected = true;
+
+                selectBankAccountTarget.insertBefore(option, selectBankAccountTarget.firstChild);
+
+                jsonResponse.data.forEach((item) => {
+                    let option = document.createElement("option");
+                    option.value = item.value;
+                    option.text = item.text;
+                    selectBankAccountTarget.appendChild(option);
+                });
+
+                $(selectBankAccountTarget).select2(select2Options);
+
+            } else {
+                alert(jsonResponse.errorMessages);
+            }
+
+        } catch (error) {
+            alert(error);
+        }
+    });
+};
+
+const fnChangeCustomers = async (onlyCompanies) => {
+    let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonResponse = await response.json();
+
+        if (jsonResponse.isSuccess) {
+            selectCustomer.innerHTML = "";
+            // Agregar options
+            let option = document.createElement("option");
+            option.value = "";
+            option.text = "--Select Cta Destino--";
+            option.disabled = true;
+            option.selected = true;
+
+            selectCustomer.insertBefore(option, selectCustomer.firstChild);
+
+            jsonResponse.data.forEach((item) => {
+                let option = document.createElement("option");
+                option.value = item.value;
+                option.text = item.text;
+                selectCustomer.appendChild(option);
+            });
+
+            $(selectCustomer).select2(select2Options);
+
+        } else {
+            alert(jsonResponse.errorMessages);
+        }
+
+    } catch (error) {
+        alert(error);
+    }
+};
+
+const fnLoadInputsByType = (type) => {
+    if (type == QuotationType.Buy) {
+        divCurrencyTransa.hidden = false;
+        divAmountExchange.hidden = false;
+        divCommission.hidden = true;
+        divCurrencyTransfer.hidden = false;
+        divCurrencyDeposit.hidden = true;
+        elementsBuy.forEach((item) => item.hidden = false);
+        elementsSell.forEach((item) => item.hidden = true);
+        elementsTransfer.forEach((item) => item.hidden = true);
+        fnChangeCustomers(false);
+    } else if (type == QuotationType.Sell) {
+        divCurrencyTransa.hidden = false;
+        divAmountExchange.hidden = false;
+        divCommission.hidden = true;
+        divCurrencyTransfer.hidden = true;
+        divCurrencyDeposit.hidden = false;
+        elementsBuy.forEach((item) => item.hidden = true);
+        elementsSell.forEach((item) => item.hidden = false);
+        elementsTransfer.forEach((item) => item.hidden = true);
+        fnChangeCustomers(false);
+    } else {
+        divAmountExchange.hidden = true;
+        divCurrencyTransa.hidden = true;
+        divCommission.hidden = false;
+        divCurrencyTransfer.hidden = true;
+        divCurrencyDeposit.hidden = true;
+        elementsBuy.forEach((item) => item.hidden = true);
+        elementsSell.forEach((item) => item.hidden = true);
+        elementsTransfer.forEach((item) => item.hidden = false);
+        fnChangeCustomers(true);
+    }
+    fnCalculateRevenueCost();
+};
 
 function currencyTransaType_onClick(objElem) {
 
@@ -191,7 +310,7 @@ const fnCalculateRevenueCost = () => {
         } else {
             if (currencyType == CurrencyType.Foreign) {
                 amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
-            }else if (currencyType == CurrencyType.Additional) {
+            } else if (currencyType == CurrencyType.Additional) {
                 amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
             }
         }

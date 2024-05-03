@@ -12,6 +12,12 @@ public class QuotationCreateVM
     public IEnumerable<SelectListItem> CustomerList { get; set; } = null!;
 
     [ValidateNever]
+    public IEnumerable<SelectListItem>? BankAccountSourceList { get; set; } = null;
+
+    [ValidateNever]
+    public IEnumerable<SelectListItem>? BankAccountTargetList { get; set; } = null;
+
+    [ValidateNever]
     public List<Currency> CurrencyTransaList { get; set; } = new();
 
     [ValidateNever]

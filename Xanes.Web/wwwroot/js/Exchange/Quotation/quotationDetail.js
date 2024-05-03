@@ -212,6 +212,8 @@ const fnShowModalDeposit = () => {
         dropdownParent: $('#modalCreateDeposit')
     });
     $('#modalCreateDeposit').modal('show');
+    // Abrir Select2 nuevamente
+    $("#selectBankSourceDeposit").select2('open');
 };
 
 const fnShowModalTransfer = () => {

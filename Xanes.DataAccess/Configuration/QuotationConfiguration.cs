@@ -10,6 +10,9 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
     public void Configure(EntityTypeBuilder<Quotation> builder)
     {
         builder.HasKey(x => x.Id);
+        builder.Property(x => x.BankAccountSourceId).IsRequired(false);
+        builder.Property(x => x.BankAccountTargetId).IsRequired(false);
+
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
         builder.Property(x => x.InternalSerial).ValueGeneratedOnAdd().HasDefaultValue(AC.InternalSerialOfficial);
 
@@ -59,9 +62,27 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(true);
 
+        builder.HasOne(x => x.BankAccountSourceTrx)
+            .WithMany()
+            .HasForeignKey(x => x.BankAccountSourceId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(false);
+
+        builder.HasOne(x => x.BankAccountTargetTrx)
+            .WithMany()
+            .HasForeignKey(x => x.BankAccountTargetId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(false);
+
         builder.HasOne(x => x.CurrencyDepositTrx)
             .WithMany()
             .HasForeignKey(x => x.CurrencyDepositId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
+
+        builder.HasOne(x => x.CurrencyTransferTrx)
+            .WithMany()
+            .HasForeignKey(x => x.CurrencyTransferId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(true);
 
