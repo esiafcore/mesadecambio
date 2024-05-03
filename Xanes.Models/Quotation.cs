@@ -43,14 +43,14 @@ public class Quotation : Entity, ICloneable
 
     [Display(Name = "Cuenta Bancaria Origen")]
     [ForeignKey(nameof(BankAccountSourceTrx))]
-    public int? BankAccountSourceId { get; set; } = null;
+    public int? BankAccountSourceId { get; set; }
 
     [ValidateNever]
     public virtual BankAccount? BankAccountSourceTrx { get; set; } = null;
 
     [Display(Name = "Cuenta Bancaria Destino")]
     [ForeignKey(nameof(BankAccountTargetTrx))]
-    public int? BankAccountTargetId { get; set; } = null;
+    public int? BankAccountTargetId { get; set; }
     [ValidateNever]
     public virtual BankAccount? BankAccountTargetTrx { get; set; } = null;
 
