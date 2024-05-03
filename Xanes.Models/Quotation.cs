@@ -46,13 +46,13 @@ public class Quotation : Entity, ICloneable
     public int? BankAccountSourceId { get; set; }
 
     [ValidateNever]
-    public virtual BankAccount? BankAccountSourceTrx { get; set; } = null;
+    public virtual BankAccount? BankAccountSourceTrx { get; set; }
 
     [Display(Name = "Cuenta Bancaria Destino")]
     [ForeignKey(nameof(BankAccountTargetTrx))]
     public int? BankAccountTargetId { get; set; }
     [ValidateNever]
-    public virtual BankAccount? BankAccountTargetTrx { get; set; } = null;
+    public virtual BankAccount? BankAccountTargetTrx { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id Deposit Currency")]

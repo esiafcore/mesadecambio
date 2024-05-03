@@ -1,7 +1,8 @@
-﻿let dataTable;
+﻿let dataTable, containerMain;
 document.addEventListener("DOMContentLoaded", function () {
+    containerMain = document.querySelector("#containerMain");
+    containerMain.className = "container-fluid";
     loadDatatable();
-
     //Habilitar Tooltip
     fnEnableTooltip();
 });
