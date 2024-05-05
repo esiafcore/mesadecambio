@@ -16,11 +16,7 @@ function loadDatatable() {
                 if (data.isSuccess) {
                     return data.data;
                 } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: data.errorMessages
-                    });
+                    fnShowModalMessages(data);
                     return [];
                 }
             },

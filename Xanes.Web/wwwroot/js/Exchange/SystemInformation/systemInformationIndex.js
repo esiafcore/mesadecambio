@@ -1,7 +1,7 @@
 ﻿// Reporte seleccionadoo
 let selectReportValue;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     const selectGroupReport = document.getElementById("select-group");
     selectGroupReport.addEventListener("change", async (event) => {

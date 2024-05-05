@@ -15,10 +15,10 @@
             </div>
 
             <div class="modal-body">
-                <div class="row my-1">
+                <div class="row">
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Tipo</div>
-                        <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2 p-1">
+                        <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2 p-1">
                             @foreach (var quotationType in Model.QuotationTypeList)
                             {
                                 var isChecked = (quotationType.Id == Model.DataModel.TypeId);
@@ -38,27 +38,47 @@
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4">Fecha</div>
                         <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.DateTransa" type="date" id="dateTransa" class="form-control border p-1" />
+                            <input asp-for="DataModel.DateTransa" type="date" id="dateTransa" class="form-control border p-1 shadow" />
                             <span asp-validation-for="DataModel.DateTransa" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="row col-xl-8 col-12 ps-2 mb-1">
+                    <div class="row col-xl-8 col-12 ps-2 mb-1" id="divCustomer">
                         <div class="col-4 col-sm-5 col-md-5 col-lg-2 me-lg-0 ps-3">Cliente</div>
                         <div class="col-8 col-sm-7 col-md-7 col-lg-7 ms-xl-1 ps-lg-2 ps-xl-2">
                             <select asp-for="DataModel.CustomerId" asp-items="@Model.CustomerList"
-                                    class="form-select border p-1" id="selectCustomer">
+                                    class="form-select border p-1 shadow" id="selectCustomer">
                                 <option disabled selected>--Select Cliente--</option>
                             </select>
                             <span asp-validation-for="DataModel.CustomerId" class="text-danger"></span>
                         </div>
                     </div>
+                    <div class="row col-xl-8 col-12 ps-2 mb-1 typeTransfer" hidden>
+                        <div class="col-4 col-sm-5 col-md-5 col-lg-2 me-lg-0 ps-3">Cta/Ban Orig.</div>
+                        <div class="col-8 col-sm-7 col-md-7 col-lg-7 ms-xl-1 ps-lg-2 ps-xl-2">
+                            <select asp-for="DataModel.BankAccountSourceId" asp-items="@Model.BankAccountSourceList" disabled
+                                    class="form-select border p-1 shadow" id="selectBankAccountSource">
+                                <option disabled selected>--Select Cuenta Bancaria--</option>
+                            </select>
+                            <span asp-validation-for="DataModel.BankAccountSourceId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row col-xl-8 col-12 ps-2 mb-1 typeTransfer" hidden>
+                        <div class="col-4 col-sm-5 col-md-5 col-lg-2 me-lg-0 ps-3">Cta/Ban Dest.</div>
+                        <div class="col-8 col-sm-7 col-md-7 col-lg-7 ms-xl-1 ps-lg-2 ps-xl-2">
+                            <select asp-for="DataModel.BankAccountTargetId" asp-items="@Model.BankAccountTargetList" disabled
+                                    class="form-select border p-1 shadow" id="selectBankAccountTarget">
+                                <option disabled selected>--Select Cuenta Bancaria--</option>
+                            </select>
+                            <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="row my-1">
-                    <div class="row col-xl-4 col-lg-6 col-12 mb-1">
+                <div class="row">
+                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCurrencyTransa">
                         <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transa</div>
-                        <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2">
+                        <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
                             @foreach (var currency in Model.CurrencyTransferList)
                             {
                                 var isChecked = (currency.Id == Model.DataModel.CurrencyTransaId);
@@ -76,9 +96,9 @@
                     </div>
                     @if (Model.DataModel.TypeNumeral == SD.QuotationType.Buy)
                     {
-                        <div class="row col-xl-4 col-lg-6 col-12 mb-1">
+                        <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCurrencyTransfer">
                             <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transfer</div>
-                            <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2">
+                            <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
                                 @foreach (var currency in Model.CurrencyTransferList)
                                 {
                                     var isChecked = (currency.Id == Model.DataModel.CurrencyTransferId);
@@ -97,9 +117,9 @@
                     }
                     else
                     {
-                        <div class="row col-xl-4 col-lg-6 col-12 mb-1">
+                        <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCurrencyDeposit" hidden>
                             <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Deposit</div>
-                            <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 w-auto ms-1 ms-md-1 ps-xl-2">
+                            <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
                                 @foreach (var currency in Model.CurrencyDepositList)
                                 {
                                     var isChecked = (currency.Id == Model.DataModel.CurrencyDepositId);
@@ -119,7 +139,7 @@
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
                         <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" class="form-control text-end border p-1 decimalTC" step="any" readonly />
+                            <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" readonly />
                             <span asp-validation-for="DataModel.ExchangeRateOfficialTransa" class="text-danger"></span>
                         </div>
                     </div>
@@ -128,7 +148,7 @@
                         <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeBuy">
                             <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
                             <div class="col-xl-6 col-sm-7 col-8">
-                                <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 decimalTC" step="any" />
+                                <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
                                 <span asp-validation-for="DataModel.ExchangeRateBuyTransa" class="text-danger"></span>
                             </div>
                         </div>
@@ -138,7 +158,7 @@
                         <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeSell" hidden>
                             <div class="col-sm-5 col-lg-4 col-4">T/C Venta</div>
                             <div class="col-xl-6 col-sm-7 col-8">
-                                <input asp-for="DataModel.ExchangeRateSellTransa" id="exchangeRateSellTransa" class="form-control text-end border p-1 decimalTC" step="any" />
+                                <input asp-for="DataModel.ExchangeRateSellTransa" id="exchangeRateSellTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
                                 <span asp-validation-for="DataModel.ExchangeRateSellTransa" class="text-danger"></span>
                             </div>
                         </div>
@@ -146,7 +166,7 @@
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4">Monto</div>
                         <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.AmountTransaction" id="amountTransa" class="form-control text-end border p-1 decimalTransa" step="any" />
+                            <input asp-for="DataModel.AmountTransaction" id="amountTransa" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
                             <span asp-validation-for="DataModel.AmountTransaction" class="text-danger"></span>
                         </div>
                     </div>
@@ -157,7 +177,7 @@
                             <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeSell" id="divRevenue" hidden>
                                 <div class="col-sm-5 col-lg-4 col-4">Ingreso</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 decimalTransa" step="any" readonly />
+                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                                     <span asp-validation-for="DataModel.AmountRevenue" class="text-danger"></span>
                                 </div>
                             </div>
@@ -167,7 +187,7 @@
                             <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeBuy" id="divCost">
                                 <div class="col-sm-5 col-lg-4 col-4">Costo</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 decimalTransa" step="any" readonly />
+                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                                     <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
                                 </div>
                             </div>
@@ -180,7 +200,7 @@
                             <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeBuy" id="divCost">
                                 <div class="col-sm-5 col-lg-4 col-4">Costo</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 decimalTransa" step="any" readonly />
+                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                                     <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
                                 </div>
                             </div>
@@ -190,19 +210,25 @@
                             <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeSell" id="divRevenue" hidden>
                                 <div class="col-sm-5 col-lg-4 col-4">Ingreso</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 decimalTransa" step="any" readonly />
+                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                                     <span asp-validation-for="DataModel.AmountRevenue" class="text-danger"></span>
                                 </div>
                             </div>
                         }
                     }
-                    <div class="row col-xl-4 col-lg-6 col-12 mb-1">
+                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divAmountExchange">
                         <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
                         <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 decimalTC" step="any" readonly />
+                            <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                             <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
                         </div>
-
+                    </div>
+                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCommission" hidden>
+                        <div class="col-sm-5 col-lg-4 col-4">Comisión TRF</div>
+                        <div class="col-xl-6 col-sm-7 col-8">
+                            <input id="commission" asp-for="DataModel.AmountCommission" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
+                            <span asp-validation-for="DataModel.AmountCommission" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
             </div>

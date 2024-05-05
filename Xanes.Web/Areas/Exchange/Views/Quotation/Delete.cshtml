@@ -1,6 +1,8 @@
 ﻿@model QuotationDetailVM
 
 <input value="@Model.ModelCreateVM.DataModel.Id" id="parentId" hidden />
+<input value="@((int)Model.ModelCreateVM.DataModel.TypeNumeral)" id="type" hidden />
+
 
 
 <div class="card shadow border-0 mt-1">
@@ -22,97 +24,9 @@
                 </div>
             </div>
         </div>
-
     </div>
-    <div class="card-body p-1">
-        <div class="row m-1 bg-secondary bg-gradient p-1">
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">Cliente</h5>
-            </div>
-            <div class="col-9 col-xl-6 mb-1">
-                <input class="form-control text-start border p-1" value="@Model.CustomerFullName" readonly />
-            </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white"># Transa</h5>
-            </div>
-            <div class="col-8 col-md-4 col-xl-3 mb-1 me-1">
-                <input class="form-control text-start border p-1" value="@Model.NumberTransa" readonly />
-            </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">Fecha</h5>
-            </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
-                <input class="form-control text-start border p-1" value="@Model.ModelCreateVM.DataModel.DateTransa" readonly />
-            </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1">
-                <h5 class="text-white">T/C</h5>
-            </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 me-1">
-                <input class="form-control text-end border p-1 decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateOfficialTransa" readonly />
-            </div>
-            <div class="col-3 col-md-2 col-xl-1 mb-1 offset-md-1">
-                <h5 class="text-white">Monto</h5>
-            </div>
-            <div class="col-8 col-md-3 col-xl-2 mb-1 ps-xl-2">
-                <input class="form-control text-end border p-1 decimalTransa" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransaction" readonly />
-            </div>
-        </div>
-        <hr />
-        <div class="row mt-1">
-            <div class="col-xl-6">
-                <div class="row">
-                    <div class="d-flex justify-content-start">
-                       @*  <a type="button" class="btn btn-info fs-2"
-                           data-bs-toggle="tooltip" data-bs-title="Crear" onclick="fnShowModalDeposit()">
-                            <i class="bi bi-plus"></i>
-                        </a> *@
-                        <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelDeposit"></h5>
-                    </div>
-                </div>
-                <table id="tblDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th class="text-center align-middle my-0 py-0">#</th>
-                            <th data-priority="1" class="text-center align-middle my-0 py-0">Banco</th>
-                            <th data-priority="2" class="text-center align-middle my-0 py-0">Importe</th>
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <th id="totalAmountDeposit" colspan="3"></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div class="col-xl-6">
-                <div class="row">
-                    <div class="d-flex justify-content-start">
-                      @*   <a type="button" class="btn btn-info fs-2"
-                           data-bs-toggle="tooltip" data-bs-title="Crear"
-                           onclick="fnShowModalTransfer()">
-                            <i class="bi bi-plus"></i>
-                        </a> *@
-                        <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelTransfer"></h5>
-                    </div>
-                </div>
-                <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th class="text-center align-middle my-0 py-0">#</th>
-                            <th data-priority="1" class="text-center align-middle my-0 py-0">Banco Origen</th>
-                            <th data-priority="2" class="text-center align-middle my-0 py-0">Banco Destino</th>
-                            <th data-priority="3" class="text-center align-middle my-0 py-0">Importe</th>
-                        </tr>
-                    </thead>
-                    <tfoot>
-                        <tr>
-                            <th id="totalAmountTransfer" colspan="4"></th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
+    <partial name="_Detail" model="@Model" />
+   
 </div>
 @section Scripts {
     <script>

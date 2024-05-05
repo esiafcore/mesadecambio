@@ -55,9 +55,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    //Aplicar select2
-    $(selectCustomer).select2(select2Options);
-
     await fnGetBankAccounts();
 
     //Setear enfoque en el search input
@@ -111,8 +108,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             inputTypeNumeral.value = parseInt(item.value);
             fnLoadInputsByType(item.value);
         });
-        fnLoadInputsByType(inputTypeNumeral.value);
     });
+
+    fnLoadInputsByType(inputTypeNumeral.value);
 });
 
 const fnGetBankAccounts = async () => {
@@ -173,14 +171,6 @@ const fnChangeCustomers = async (onlyCompanies) => {
 
         if (jsonResponse.isSuccess) {
             selectCustomer.innerHTML = "";
-            // Agregar options
-            let option = document.createElement("option");
-            option.value = "";
-            option.text = "--Select Cta Destino--";
-            option.disabled = true;
-            option.selected = true;
-
-            selectCustomer.insertBefore(option, selectCustomer.firstChild);
 
             jsonResponse.data.forEach((item) => {
                 let option = document.createElement("option");
@@ -190,6 +180,11 @@ const fnChangeCustomers = async (onlyCompanies) => {
             });
 
             $(selectCustomer).select2(select2Options);
+            var options = selectCustomer.getElementsByTagName('option');
+            if (options.length > 0) {
+                // Selecciona el primer elemento
+                selectCustomer.value = options[0].value;
+            }
 
         } else {
             alert(jsonResponse.errorMessages);

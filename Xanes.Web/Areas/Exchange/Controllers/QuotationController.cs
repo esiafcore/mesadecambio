@@ -77,14 +77,14 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        var objCustomerList = _uow.Customer
-            .GetAll(x => (x.CompanyId == _companyId))
-            .ToList();
+        //var objCustomerList = _uow.Customer
+        //    .GetAll(x => (x.CompanyId == _companyId))
+        //    .ToList();
 
-        if (objCustomerList == null)
-        {
-            return NotFound();
-        }
+        //if (objCustomerList == null)
+        //{
+        //    return NotFound();
+        //}
 
         var objBankAccountList = _uow.BankAccount
             .GetAll(x => (x.CompanyId == _companyId))
@@ -110,7 +110,7 @@ public class QuotationController : Controller
         model.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.QuotationTypeList = objTypeList;
-        model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+        //model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
         model.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         model.BankAccountTargetList = new List<SelectListItem>();
         model.DataModel = objData;
@@ -336,7 +336,7 @@ public class QuotationController : Controller
 
             if (obj.TypeNumeral == SD.QuotationType.Transfer)
             {
-                if (obj.BankAccountSourceTrx != null)
+                if (obj.BankAccountTargetTrx != null)
                 {
                     var objDetailBankAccountSource = new QuotationDetail()
                     {
@@ -345,8 +345,8 @@ public class QuotationController : Controller
                         QuotationDetailType = QuotationDetailType.CreditTransfer,
                         LineNumber = 1,
                         CurrencyDetailId = obj.CurrencyTransaId,
-                        BankSourceId = obj.BankAccountSourceTrx.ParentId,
-                        BankTargetId = obj.BankAccountSourceTrx.ParentId,
+                        BankSourceId = obj.BankAccountTargetTrx.ParentId,
+                        BankTargetId = obj.BankAccountTargetTrx.ParentId,
                         AmountDetail = obj.AmountTransaction,
                         CreatedBy = AC.LOCALHOSTME,
                         CreatedDate = DateTime.UtcNow,
@@ -357,17 +357,17 @@ public class QuotationController : Controller
                     _uow.QuotationDetail.Add(objDetailBankAccountSource);
                 }
 
-                if (obj.BankAccountTargetTrx != null)
+                if (obj.BankAccountSourceTrx != null)
                 {
                     var objDetailBankAccountTarget = new QuotationDetail()
                     {
                         ParentId = obj.Id,
                         CompanyId = obj.CompanyId,
-                        QuotationDetailType = QuotationDetailType.DebitTranssfer,
+                        QuotationDetailType = QuotationDetailType.DebitTransfer,
                         LineNumber = 1,
                         CurrencyDetailId = obj.CurrencyTransaId,
-                        BankTargetId = obj.BankAccountTargetTrx.ParentId,
-                        BankSourceId = obj.BankAccountTargetTrx.ParentId,
+                        BankTargetId = obj.BankAccountSourceTrx.ParentId,
+                        BankSourceId = obj.BankAccountSourceTrx.ParentId,
                         AmountDetail = obj.AmountTransaction,
                         CreatedBy = AC.LOCALHOSTME,
                         CreatedDate = DateTime.UtcNow,
@@ -563,21 +563,31 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        var objCustomerList = _uow.Customer
-            .GetAll(x => (x.CompanyId == _companyId))
-            .ToList();
+        //var objCustomerList = _uow.Customer
+        //    .GetAll(x => (x.CompanyId == _companyId))
+        //    .ToList();
 
-        if (objTypeList == null)
+        //if (objCustomerList == null)
+        //{
+        //    return NotFound();
+        //}
+
+        var objBankAccountList = _uow.BankAccount
+            .GetAll(filter: x => x.CompanyId == _companyId).ToList();
+        if (objBankAccountList == null)
         {
             return NotFound();
         }
+
+        model.ModelCreateVM.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+        model.ModelCreateVM.BankAccountTargetList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         model.ModelCreateVM.CurrencyTransaList = objCurrencyList
             .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
             .ToList();
         model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.QuotationTypeList = objTypeList;
-        model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+        //model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
         model.BankList = objBankList;
@@ -796,8 +806,17 @@ public class QuotationController : Controller
         var objList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId)
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx").ToList();
+
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
         if (objList.Count <= 0)
         {
+            jsonResponse.IsInfo = true;
             jsonResponse.IsSuccess = false;
             jsonResponse.ErrorMessages = "No hay registros que mostrar";
             return Json(jsonResponse);
@@ -808,35 +827,14 @@ public class QuotationController : Controller
         return Json(jsonResponse);
     }
 
-    public JsonResult GetAllDepositByParent(int parentId)
+    public JsonResult GetAllByParent(int parentId = 0, QuotationDetailType type = QuotationDetailType.Deposit)
     {
         JsonResultResponse? jsonResponse = new();
 
         var objList = _uow.QuotationDetail
             .GetAll(x => (x.CompanyId == _companyId &&
                           x.ParentId == parentId &&
-                          x.QuotationDetailType == SD.QuotationDetailType.Deposit)
-                , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-        if (objList == null)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = "Error al cargar los datos";
-            return Json(jsonResponse);
-        }
-
-        jsonResponse.IsSuccess = true;
-        jsonResponse.Data = objList;
-        return Json(jsonResponse);
-    }
-
-    public JsonResult GetAllTransferByParent(int parentId)
-    {
-        JsonResultResponse? jsonResponse = new();
-
-        var objList = _uow.QuotationDetail
-            .GetAll(x => (x.CompanyId == _companyId &&
-                          x.ParentId == parentId &&
-                          x.QuotationDetailType == SD.QuotationDetailType.Transfer)
+                          x.QuotationDetailType == type)
                 , includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
         if (objList == null)
         {

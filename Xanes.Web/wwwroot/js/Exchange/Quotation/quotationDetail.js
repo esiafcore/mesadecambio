@@ -4,7 +4,8 @@ let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
 let inputExchangeRateBuyTransa, inputExchangeRateSellTransa, inputExchangeRateOfficialTransa;
-let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType, typeNumeral, typeNumerals;
+let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType, typeNumeral, typeNumerals, amountExchangeDetail;
+let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurrencyTransfer, divCurrencyDeposit, elementsTransfer, elementsSell, elementsBuy, selectBankAccountSource, selectBankAccountTarget;
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
     inputDateTransa = document.querySelector("#dateTransa");
@@ -28,7 +29,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
+    amountExchangeDetail = document.querySelector("#amountExchangeDetail");
     typeNumerals = document.querySelectorAll(".typeNumerals");
+    selectCustomer = document.querySelector("#selectCustomer");
+    divCurrencyTransa = document.querySelector("#divCurrencyTransa");
+    divAmountExchange = document.querySelector("#divAmountExchange");
+    divCommission = document.querySelector("#divCommission");
+    divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
+    divCurrencyTransfer = document.querySelector("#divCurrencyTransfer");
+    elementsBuy = document.querySelectorAll(".typeBuy");
+    elementsTransfer = document.querySelectorAll(".typeTransfer");
+    elementsSell = document.querySelectorAll(".typeSell");
+    selectBankAccountSource = document.querySelector("#selectBankAccountSource");
+    selectBankAccountTarget = document.querySelector("#selectBankAccountTarget");
     currencies.forEach((item) => {
         if (item.checked) {
             currencyType = item.value;
@@ -40,6 +53,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             typeNumeral = item.value;
         }
     });
+
+    fnLoadInputsByType(typeNumeral);
 
     //Obtenemos el tipo de cambio en base a la fecha
     await fnTCByDate();
@@ -75,13 +90,89 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
         fnCalculateRevenueCost();
     }));
+    $(selectBankAccountSource).select2(select2Options);
+    $(selectBankAccountTarget).select2(select2Options);
 
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
-
     //Habilitar Tooltip
     fnEnableTooltip();
 });
+
+const fnChangeCustomers = async (onlyCompanies) => {
+    let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonResponse = await response.json();
+
+        if (jsonResponse.isSuccess) {
+            selectCustomer.innerHTML = "";
+
+            jsonResponse.data.forEach((item) => {
+                let option = document.createElement("option");
+                option.value = item.value;
+                option.text = item.text;
+                selectCustomer.appendChild(option);
+            });
+
+            $(selectCustomer).select2(select2Options);
+            var options = selectCustomer.getElementsByTagName('option');
+            if (options.length > 0) {
+                // Selecciona el primer elemento
+                selectCustomer.value = options[0].value;
+            }
+
+        } else {
+            alert(jsonResponse.errorMessages);
+        }
+
+    } catch (error) {
+        alert(error);
+    }
+};
+
+const fnLoadInputsByType = (type) => {
+    if (type == QuotationType.Buy) {
+        divCurrencyTransa.hidden = false;
+        divAmountExchange.hidden = false;
+        divCommission.hidden = true;
+        divCurrencyTransfer.hidden = false;
+        divCurrencyDeposit.hidden = true;
+        elementsBuy.forEach((item) => item.hidden = false);
+        elementsSell.forEach((item) => item.hidden = true);
+        elementsTransfer.forEach((item) => item.hidden = true);
+        fnChangeCustomers(false);
+        fnCalculateRevenueCost();
+
+    } else if (type == QuotationType.Sell) {
+        divCurrencyTransa.hidden = false;
+        divAmountExchange.hidden = false;
+        divCommission.hidden = true;
+        divCurrencyTransfer.hidden = true;
+        divCurrencyDeposit.hidden = false;
+        elementsBuy.forEach((item) => item.hidden = true);
+        elementsSell.forEach((item) => item.hidden = false);
+        elementsTransfer.forEach((item) => item.hidden = true);
+        fnChangeCustomers(false);
+        fnCalculateRevenueCost();
+
+    } else {
+        divAmountExchange.hidden = true;
+        divCurrencyTransa.hidden = true;
+        //divCurrencyTransfer.hidden = true;
+        //divCurrencyDeposit.hidden = true;
+        divCommission.hidden = false;
+        elementsBuy.forEach((item) => item.hidden = true);
+        elementsSell.forEach((item) => item.hidden = true);
+        elementsTransfer.forEach((item) => item.hidden = false);
+        fnChangeCustomers(true);
+    }
+};
 
 function formatOption(option) {
     if (!option.id) {
@@ -147,13 +238,13 @@ const fnCalculateRevenueCost = () => {
             }
         }
     }
-
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);
     inputAmountRevenue.value = formatterAmount().format(amountRevenue);
     inputAmountTransa.value = formatterAmount().format(amountTransa);
 };
+
 
 //Funcion para obtener el tipo de cambio oficial
 const fnTCByDate = async () => {
@@ -244,9 +335,9 @@ const fnShowModalTransfer = () => {
             minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
             dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
             dropdownParent: $('#modalCreateTransfer'),
-            maximumSelectionLength: totalOptionsSource // Establecer el tamaño máximo del menú desplegable
+            maximumSelectionLength: totalOptionsSource, // Establecer el tamaño máximo del menú desplegable
+            openOnEnter: true
         });
-        $(selectBankSourceTransfer).select2('open');
         $(selectBankTargetTransfer).select2({
             templateResult: formatOption,
             language: customMessagesSelect,
@@ -256,6 +347,7 @@ const fnShowModalTransfer = () => {
             dropdownParent: $('#modalCreateTransfer'),
             maximumSelectionLength: totalOptionsTarget // Establecer el tamaño máximo del menú desplegable
         });
+        $(selectBankSourceTransfer).select2('open');
         $(selectBankTargetTransfer).select2('open');
     });
     //$('#selectBankSourceTransfer').select2({
@@ -412,10 +504,15 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
     }
 };
 function fnLoadDatatableDeposit() {
+    let typeDetail = QuotationDetailType.Deposit;
+    if (typeNumeral == QuotationType.Transfer) {
+        typeDetail = QuotationDetailType.CreditTransfer;
+    }
+
     dataTableDeposit = new DataTable("#tblDeposit", {
         "dataSrc": 'data',
         "ajax": {
-            "url": `/exchange/quotation/GetAllDepositByParent?parentId=${parentId}`,
+            "url": `/exchange/quotation/GetAllByParent?parentId=${parentId}&type=${typeDetail}`,
             "dataSrc": function (data) {
                 if (data.isSuccess) {
                     return data.data;
@@ -434,10 +531,22 @@ function fnLoadDatatableDeposit() {
         },
         "columns": [
             {
-                data: 'lineNumber', "width": "2%", orderable: true
+                data: 'lineNumber',
+                "width": "2%",
+                orderable: true
             },
             {
-                data: 'bankSourceTrx.code', "width": "20%", orderable: false
+                data: null, "width":
+                    "20%", orderable: false,
+                "render": (data) => {
+                    let dataCode;
+                    if (typeNumeral != QuotationType.Transfer) {
+                        dataCode = data.bankSourceTrx.code;
+                    } else {
+                        dataCode = data.bankTargetTrx.code;
+                    }
+                    return dataCode;
+                }
             },
             {
                 data: 'amountDetail', "width": "15%"
@@ -496,27 +605,46 @@ function fnLoadDatatableDeposit() {
                 total += item.amountDetail;
             });
             if (typeNumeral == QuotationType.Buy) {
-                pending = parseFloat(amountHeader) - total;
+                pending = fnparseFloat(amountHeader) - total;
             } else if (typeNumeral == QuotationType.Sell) {
-                pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+                pending = fnparseFloat(fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value)) - (total);
             }
 
-            if (pending == 0) {
-                document.querySelector("#btnCreateDetailDeposit").hidden = true;
+            if (typeNumeral != QuotationType.Transfer) {
+                if (pending == 0) {
+                    document.querySelector("#btnCreateDetailDeposit").hidden = true;
+                } else {
+                    document.querySelector("#btnCreateDetailDeposit").hidden = false;
+                }
+
+                tableRowLabelDeposit.innerHTML =
+                    `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
+                tableRowLabelDeposit.value =
+                    `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
             } else {
-                document.querySelector("#btnCreateDetailDeposit").hidden = false;
+                tableRowLabelDeposit.innerHTML = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
+                tableRowLabelDeposit.value = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
             }
-            tableRowLabelDeposit.innerHTML = `Depositar: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
-            tableRowLabelDeposit.value = `Depositar: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
+
+    if (typeNumeral == QuotationType.Transfer) {
+        dataTableDeposit.column(3).visible(false);
+    }
 }
 function fnLoadDatatableTransfer() {
+
+    let typeDetail = QuotationDetailType.Transfer;
+    if (typeNumeral == QuotationType.Transfer) {
+        typeDetail = QuotationDetailType.DebitTransfer;
+    }
+
     dataTableTransfer = new DataTable("#tblTransfer", {
         "dataSrc": 'data',
         "ajax": {
-            "url": `/exchange/quotation/GetAllTransferByParent?parentId=${parentId}`,
+            "url": `/exchange/quotation/GetAllByParent?parentId=${parentId}&type=${typeDetail}`,
             "dataSrc": function (data) {
                 if (data.isSuccess) {
                     return data.data;
@@ -600,20 +728,39 @@ function fnLoadDatatableTransfer() {
                 total += item.amountDetail;
             });
             if (typeNumeral == QuotationType.Buy) {
-                pending = parseFloat(amountHeader * fnparseFloat(TCHeader.value)) - (total);
+                pending = fnparseFloat(fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value)) - (total);
             } else if (typeNumeral == QuotationType.Sell) {
-                pending = parseFloat(amountHeader) - total;
+                pending = fnparseFloat(amountHeader) - total;
             }
 
-            if (pending == 0) {
-                document.querySelector("#btnCreateDetailTransfer").hidden = true;
+            if (typeNumeral != QuotationType.Transfer) {
+                if (pending == 0) {
+                    document.querySelector("#btnCreateDetailTransfer").hidden = true;
+                } else {
+                    document.querySelector("#btnCreateDetailTransfer").hidden = false;
+                }
+
+                tableRowLabelTransfer.innerHTML =
+                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchangeDetail.value))}  -  Pendiente: ${formatterAmount().format(pending)
+                    }`;
+                tableRowLabelTransfer.value =
+                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchangeDetail.value))}  -  Pendiente: ${formatterAmount().format(pending)
+                    }`;
             } else {
-                document.querySelector("#btnCreateDetailTransfer").hidden = false;
-
+                tableRowLabelTransfer.innerHTML =
+                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
+                    }`;
+                tableRowLabelTransfer.value =
+                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
+                    }`;
             }
-            tableRowLabelTransfer.innerHTML = `Transferir: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
-            tableRowLabelTransfer.value = `Transferir: ${formatterAmount().format(total)}  -  Pendiente: ${formatterAmount().format(pending)}`;
+
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
+
+    if (typeNumeral == QuotationType.Transfer) {
+        dataTableTransfer.column(2).visible(false);
+        dataTableTransfer.column(4).visible(false);
+    }
 }

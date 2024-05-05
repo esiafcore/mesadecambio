@@ -127,32 +127,37 @@ public class Quotation : Entity, ICloneable
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
-    public decimal AmountTransaction { get; set; }
+    public decimal AmountTransaction { get; set; } = 0M;
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Monto Comisión TRF")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountCommission { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Mesa Cambio")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
-    public decimal AmountExchange { get; set; }
+    public decimal AmountExchange { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Ingreso Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
-    public decimal AmountRevenue { get; set; }
+    public decimal AmountRevenue { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Costo Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
-    public decimal AmountCost { get; set; }
+    public decimal AmountCost { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Total Depósito")]
     [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
-    public decimal TotalDeposit { get; set; }
+    public decimal TotalDeposit { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Total Transferencia")]
     [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
-    public decimal TotalTransfer { get; set; }
+    public decimal TotalTransfer { get; set; } = 0M;
 
     [Required]
     [Display(Name = "Está Contabilizado?")]

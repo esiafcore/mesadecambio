@@ -35,6 +35,25 @@ const selectOptions = {
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
 
+const fnShowModalMessages = (data) => {
+    let icono = "error";
+    let titulo = "¡Ups, algo salió mal!";
+
+    if (data.isInfo) {
+        icono = "info";
+        titulo = "¡Hey, una noticia!";
+    } else if (data.isWarning) {
+        icono = "warning";
+        titulo = "¡Cuidado!";
+    }
+
+    Swal.fire({
+        icon: icono,
+        title: titulo,
+        text: data.errorMessages
+    });
+};
+
 const customMessagesSelect = {
     noResults: function () {
         return "No se encontraron resultados.";
@@ -111,7 +130,9 @@ const PersonType = {
 
 const QuotationDetailType = {
     Deposit: 1,
-    Transfer: 2
+    Transfer: 2,
+    CreditTransfer: 4,
+    DebitTransfer: 8
 }
 
 const QuotationType = {
@@ -122,15 +143,24 @@ const QuotationType = {
 
 
 const fnparseFloat = (valueInput) => {
-    // Utiliza una expresión regular para reemplazar todas las comas
-    valueInput = valueInput.replace(/,/g, ""); 
-    // Verificar si el valor del input es un número
-    if (!isNaN(valueInput) && valueInput.trim() !== "") {
+    // Verifica si valueInput es un número válido
+    if (!isNaN(valueInput) && valueInput !== "") {
+        // Si es un número válido, conviértelo a flotante y devuélvelo
         return parseFloat(valueInput);
-    } else {
-        // Si no es un número, retornar 0
-        return 0;
     }
+
+    // Verifica si valueInput es una cadena antes de intentar reemplazar las comas
+    if (typeof valueInput === 'string') {
+        // Utiliza una expresión regular para reemplazar todas las comas
+        valueInput = valueInput.replace(/,/g, "");
+        // Verifica si el valor del input es un número después de reemplazar las comas
+        if (!isNaN(valueInput.trim()) && valueInput.trim() !== "") {
+            return parseFloat(valueInput.trim());
+        }
+    }
+
+    // Si no es un número válido, retornar 0
+    return 0;
 }
 
 const select2Floating = () => {

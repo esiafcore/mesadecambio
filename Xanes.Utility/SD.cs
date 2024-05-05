@@ -98,7 +98,7 @@ public static class SD
         Deposit = 1,
         Transfer = 2,
         CreditTransfer = 4,
-        DebitTranssfer = 8
+        DebitTransfer = 8
     }
 
     [Flags]
