@@ -2,6 +2,7 @@
 using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
+using Xanes.Models.Shared;
 using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
@@ -142,12 +143,39 @@ public class BankController : Controller
     }
 
     #region API CALLS
-    public IActionResult GetAll()
+    public JsonResult GetAll()
     {
+        JsonResultResponse? jsonResponse = new();
+
         var objList = _uow.Bank
             .GetAll(x => (x.CompanyId == _companyId)).ToList();
-        return Json(new { data = objList });
+
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
+        if (objList.Count <= 0)
+        {
+            jsonResponse.IsInfo = true;
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
     }
+
+    //public IActionResult GetAll()
+    //{
+    //    var objList = _uow.Bank
+    //        .GetAll(x => (x.CompanyId == _companyId)).ToList();
+    //    return Json(new { data = objList });
+    //}
 
     [HttpDelete]
     public IActionResult Delete(int? id)

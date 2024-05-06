@@ -1,12 +1,14 @@
 ﻿let containerMain;
 let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amountTotalTransfer = 0;
 let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
-let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
+let inputBankSourceDeposit, inputBankTargetDeposit, inputBankSourceTransfer, inputBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
 let inputExchangeRateBuyTransa, inputExchangeRateSellTransa, inputExchangeRateOfficialTransa;
 let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa, currencies, currencyType, typeNumeral, typeNumerals, amountExchangeDetail;
 let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurrencyTransfer, divCurrencyDeposit, elementsTransfer, elementsSell, elementsBuy,
     selectBankAccountSource, selectBankAccountTarget, inputAmountCost, inputAmountRevenue, currencyTypeDeposit, currencyTypeTransfer, currenciesTransa, currenciesDeposit, currenciesTransfer;
+let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTargetTransfer;
+let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer;
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
     currenciesDeposit = document.querySelectorAll(".currenciesTransfer");
@@ -18,9 +20,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     amountHeader = document.querySelector("#amountHeader").value;
     tableRowLabelDeposit = document.querySelector("#tableRowLabelDeposit");
     tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
-    selectBankSourceDeposit = document.querySelector("#selectBankSourceDeposit");
-    selectBankSourceTransfer = document.querySelector("#selectBankSourceTransfer");
-    selectBankTargetTransfer = document.querySelector("#selectBankTargetTransfer");
+    inputBankSourceDeposit = document.querySelector("#bankSourceDeposit");
+    inputBankTargetDeposit = document.querySelector("#bankTargetDeposit");
+    inputBankSourceTransfer = document.querySelector("#bankSourceTransfer");
+    inputBankTargetTransfer = document.querySelector("#bankTargetTransfer");
     amountDeposit = document.querySelector("#amountDeposit");
     amountTransfer = document.querySelector("#amountTransfer");
     idDetailDeposit = document.querySelector("#idDetailDeposit");
@@ -114,6 +117,39 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     fnLoadDatatableDeposit();
     fnLoadDatatableTransfer();
+    fnLoadDatatableBankDeposit();
+    fnLoadDatatableBankTransferSource();
+    fnLoadDatatableBankTransferTarget();
+
+    dataTableBankSourceDeposit.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
+            inputBankTargetDeposit.value = inputBankSourceDeposit.value;
+        }
+    });
+
+    dataTableBankSourceTransfer.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
+            //if (dataTableBankTargetTransfer) {
+
+            //    dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer).select();
+            //}
+            //fnLoadDatatableBankTransferSource(indexDataTableBankSourceTransfer);
+
+        }
+    });
+
+    dataTableBankTargetTransfer.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
+            //if (dataTableBankSourceTransfer) {
+
+            //    dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer).select();
+            //}
+            //fnLoadDatatableBankTransferTarget(indexDataTableBankTargetTransfer);
+        }
+    });
     //Habilitar Tooltip
     fnEnableTooltip();
 });
@@ -192,7 +228,6 @@ const fnLoadInputsByType = (type) => {
         fnChangeCustomers(true);
     }
 };
-
 function formatOption(option) {
     if (!option.id) {
         return option.text;
@@ -210,6 +245,7 @@ function formatOption(option) {
 
     return $option;
 }
+
 
 //Funcion para calcular el costo
 const fnCalculateRevenueCost = () => {
@@ -296,14 +332,14 @@ const fnTCByDate = async () => {
 const fnClearModalDeposit = () => {
     document.querySelector("#idDetailDeposit").value = 0;
     document.querySelector("#amountDeposit").value = formatterAmount().format(0);
-    document.querySelector("#selectBankSourceDeposit").selectedIndex = 0;
+    //document.querySelector("#selectBankSourceDeposit").selectedIndex = 0;
 };
 
 const fnClearModalTransfer = () => {
     document.querySelector("#idDetailTransfer").value = 0;
     document.querySelector("#amountTransfer").value = formatterAmount().format(0);
-    document.querySelector("#selectBankSourceTransfer").selectedIndex = 0;
-    document.querySelector("#selectBankTargetTransfer").selectedIndex = 0;
+    //document.querySelector("#selectBankSourceTransfer").selectedIndex = 0;
+    //document.querySelector("#selectBankTargetTransfer").selectedIndex = 0;
 };
 
 const fnShowModalUpdateHeader = () => {
@@ -314,62 +350,53 @@ const fnShowModalDeposit = async () => {
     fnClearModalDeposit();
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
     document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
-    // Obtener la cantidad total de elementos en la lista
-    var totalOptions = $('#selectBankSourceDeposit option').length;
-
+    fnLoadDatatableBankDeposit();
     // Mostrar el modal
     $('#modalCreateDeposit').modal('show');
+};
 
-    // Esperar a que el modal esté completamente visible
-    $('#modalCreateDeposit').on('shown.bs.modal', function () {
-        // Inicializar Select2 en el elemento de selección
-        $(selectBankSourceDeposit).select2({
-            templateResult: formatOption,
-            language: customMessagesSelect,
-            allowClear: true,
-            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
-            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
-            dropdownParent: $('#modalCreateDeposit'),
-            maximumSelectionLength: totalOptions // Establecer el tamaño máximo del menú desplegable
-        });
-        $(selectBankSourceDeposit).select2('open');
+const fnGetBankId = async (table) => {
+    let dataRow = table.rows({ selected: true }).data().toArray();
+    let id;
+    dataRow.forEach(async (item) => {
+        id = item.id;
     });
+
+    return id;
 };
 
 const fnShowModalTransfer = () => {
     fnClearModalTransfer();
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
     document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
-    // Obtener la cantidad total de elementos en la lista
-    var totalOptionsSource = $('#selectBankSourceTransfer option').length;
-    // Obtener la cantidad total de elementos en la lista
-    var totalOptionsTarget = $('#selectBankTargetTransfer option').length;
+    fnLoadDatatableBankTransferSource();
+    fnLoadDatatableBankTransferTarget();
     $('#modalCreateTransfer').modal('show');
 
-    $('#modalCreateTransfer').on('shown.bs.modal', function () {
-        // Inicializar Select2 en el elemento de selección
-        $(selectBankSourceTransfer).select2({
-            templateResult: formatOption,
-            language: customMessagesSelect,
-            allowClear: true,
-            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
-            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
-            dropdownParent: $('#modalCreateTransfer'),
-            maximumSelectionLength: totalOptionsSource, // Establecer el tamaño máximo del menú desplegable
-            openOnEnter: true
-        });
-        $(selectBankTargetTransfer).select2({
-            templateResult: formatOption,
-            language: customMessagesSelect,
-            allowClear: true,
-            minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
-            dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
-            dropdownParent: $('#modalCreateTransfer'),
-            maximumSelectionLength: totalOptionsTarget // Establecer el tamaño máximo del menú desplegable
-        });
-        $(selectBankSourceTransfer).select2('open');
-        $(selectBankTargetTransfer).select2('open');
-    });
+    //$('#modalCreateTransfer').on('shown.bs.modal', function () {
+    //    // Inicializar Select2 en el elemento de selección
+    //    $(selectBankSourceTransfer).select2({
+    //        templateResult: formatOption,
+    //        language: customMessagesSelect,
+    //        allowClear: true,
+    //        minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
+    //        dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
+    //        dropdownParent: $('#modalCreateTransfer'),
+    //        maximumSelectionLength: totalOptionsSource, // Establecer el tamaño máximo del menú desplegable
+    //        openOnEnter: true
+    //    });
+    //    $(selectBankTargetTransfer).select2({
+    //        templateResult: formatOption,
+    //        language: customMessagesSelect,
+    //        allowClear: true,
+    //        minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
+    //        dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
+    //        dropdownParent: $('#modalCreateTransfer'),
+    //        maximumSelectionLength: totalOptionsTarget // Establecer el tamaño máximo del menú desplegable
+    //    });
+    //    $(selectBankSourceTransfer).select2('open');
+    //    $(selectBankTargetTransfer).select2('open');
+    //});
     //$('#selectBankSourceTransfer').select2({
     //    templateResult: formatOption,
     //    language: customMessagesSelect,
@@ -494,35 +521,266 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
     if (quotationDetailType == QuotationDetailType.Deposit) {
         document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
         idDetailDeposit.value = id;
-        amountDeposit.value = formatterAmount().format(amount);
-        [...selectBankSourceDeposit.options].forEach((opt) => {
-            if (opt.value == bankSource) {
-                opt.selected = true;
-                return;
+
+        // Busca la fila que contiene el ID especificado
+        let rowDataToSelect = null;
+        dataTableBankSourceDeposit.rows().every(function (index, element) {
+            var rowData = this.data();
+            if (rowData.id === bankSource) {
+                rowDataToSelect = index; // Asigna el índice de la fila directamente
+                return false; // Termina la iteración una vez que se encuentra la fila
             }
         });
+
+        // Verifica si se encontró la fila
+        if (rowDataToSelect !== null) {
+            // Selecciona la fila en la tabla
+            fnLoadDatatableBankDeposit(rowDataToSelect);
+        }
+
+        amountDeposit.value = formatterAmount().format(amount);
         document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
         $('#modalCreateDeposit').modal('show');
     } else {
         document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Actualizar Transferencia";
         idDetailTransfer.value = id;
         amountTransfer.value = formatterAmount().format(amount);
-        [...selectBankSourceTransfer.options].forEach((opt) => {
-            if (opt.value == bankSource) {
-                opt.selected = true;
-                return;
+
+        // Busca la fila que contiene el ID especificado
+        let rowDataToSelectSource = null;
+        dataTableBankSourceTransfer.rows().every(function (index, element) {
+            var rowData = this.data();
+            if (rowData.id === bankSource) {
+                rowDataToSelectSource = index; // Asigna el índice de la fila directamente
+                return false; // Termina la iteración una vez que se encuentra la fila
             }
         });
-        [...selectBankTargetTransfer.options].forEach((opt) => {
-            if (opt.value == bankTarget) {
-                opt.selected = true;
-                return;
+
+        // Verifica si se encontró la fila
+        if (rowDataToSelectSource !== null) {
+            // Selecciona la fila en la tabla
+            fnLoadDatatableBankTransferSource(rowDataToSelectSource);
+        }
+
+        // Busca la fila que contiene el ID especificado
+        let rowDataToSelectTarget = null;
+        dataTableBankTargetTransfer.rows().every(function (index, element) {
+            var rowData = this.data();
+            if (rowData.id === bankTarget) {
+                rowDataToSelectTarget = index; // Asigna el índice de la fila directamente
+                return false; // Termina la iteración una vez que se encuentra la fila
             }
         });
+
+        // Verifica si se encontró la fila
+        if (rowDataToSelectTarget !== null) {
+            // Selecciona la fila en la tabla
+            fnLoadDatatableBankTransferTarget(rowDataToSelectTarget);
+        }
+
+        //[...selectBankSourceTransfer.options].forEach((opt) => {
+        //    if (opt.value == bankSource) {
+        //        opt.selected = true;
+        //        return;
+        //    }
+        //});
+        //[...selectBankTargetTransfer.options].forEach((opt) => {
+        //    if (opt.value == bankTarget) {
+        //        opt.selected = true;
+        //        return;
+        //    }
+        //});
         document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
         $('#modalCreateTransfer').modal('show');
     }
 };
+
+function fnLoadDatatableBankTransferSource(index = 0) {
+    if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
+    dataTableBankSourceTransfer = new DataTable("#tblBankSourceTransfer", {
+        "dataSrc": 'data',
+        "ajax": {
+            "url": `/admin/bank/GetAll`,
+            "dataSrc": function (data) {
+                if (data.isSuccess) {
+                    return data.data;
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.errorMessages
+                    });
+                    return [];
+                }
+            },
+            "complete": async function () {
+                dataTableBankSourceTransfer.row(index).select();
+                indexDataTableBankSourceTransfer = index;
+                inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
+            }
+        },
+        "columns": [
+            {
+                data: null, "width":
+                    "15%", orderable: false,
+                "className": "text-center align-middle",
+                "render": (data) => {
+                    if (data.logoUrl != "" && data.logoUrl != null) {
+                        return `<span class="m-0 p-0"><img src="${data.logoUrl
+                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'code',
+                orderable: false,
+                "width": "85%"
+            }
+        ],
+        "searching": false,
+        "paging": false,
+        "select": {
+            info: false,
+            items: 'row',
+            style: 'single',
+            blurable: true,
+            className: 'bg-info bg-opacity-75 bg-gradient'
+        },
+        "language": {
+            info: "",
+            infoEmpty: "",
+            zeroRecords: "",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: ""
+        }
+    });
+}
+function fnLoadDatatableBankTransferTarget(index = 0) {
+    if (dataTableBankTargetTransfer) dataTableBankTargetTransfer.destroy();
+    dataTableBankTargetTransfer = new DataTable("#tblBankTargetTransfer", {
+        "dataSrc": 'data',
+        "ajax": {
+            "url": `/admin/bank/GetAll`,
+            "dataSrc": function (data) {
+                if (data.isSuccess) {
+                    return data.data;
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.errorMessages
+                    });
+                    return [];
+                }
+            },
+            "complete": async function () {
+                dataTableBankTargetTransfer.row(index).select();
+                indexDataTableBankTargetTransfer = index;
+                inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
+            }
+        },
+        "columns": [
+            {
+                data: null, "width":
+                    "15%", orderable: false,
+                "className": "text-center align-middle",
+                "render": (data) => {
+                    if (data.logoUrl != "" && data.logoUrl != null) {
+                        return `<span class="m-0 p-0"><img src="${data.logoUrl
+                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'code',
+                orderable: false,
+                "width": "85%"
+            }
+        ],
+        "searching": false,
+        "paging": false,
+        "select": {
+            info: false,
+            items: 'row',
+            style: 'single',
+            blurable: true,
+            className: 'bg-info bg-opacity-75 bg-gradient'
+        },
+        "language": {
+            info: "",
+            infoEmpty: "",
+            zeroRecords: "",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: ""
+        }
+    });
+}
+function fnLoadDatatableBankDeposit(index = 0) {
+    if (dataTableBankSourceDeposit) dataTableBankSourceDeposit.destroy();
+    dataTableBankSourceDeposit = new DataTable("#tblBankSourceDeposit", {
+        "dataSrc": 'data',
+        "ajax": {
+            "url": `/admin/bank/GetAll`,
+            "dataSrc": function (data) {
+                if (data.isSuccess) {
+                    return data.data;
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.errorMessages
+                    });
+                    return [];
+                }
+            },
+            "complete": async function () {
+                dataTableBankSourceDeposit.row(index).select();
+                inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
+                inputBankTargetDeposit.value = inputBankSourceDeposit.value;
+            }
+        },
+        "columns": [
+            {
+                data: null, "width":
+                    "15%", orderable: false,
+                "className": "text-center align-middle",
+                "render": (data) => {
+                    if (data.logoUrl != "" && data.logoUrl != null) {
+                        return `<span class="m-0 p-0"><img src="${data.logoUrl
+                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                    }
+                    return "";
+                }
+            },
+            {
+                data: 'code',
+                orderable: false,
+                "width": "85%"
+            }
+        ],
+        "searching": false,
+        "paging": false,
+        "select": {
+            info: false,
+            items: 'row',
+            style: 'single',
+            blurable: true,
+            className: 'bg-info bg-opacity-75 bg-gradient'
+        },
+        "language": {
+            info: "",
+            infoEmpty: "",
+            zeroRecords: "",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: ""
+        }
+    });
+}
 function fnLoadDatatableDeposit() {
     let typeDetail = QuotationDetailType.Deposit;
     if (typeNumeral == QuotationType.Transfer) {
@@ -595,6 +853,7 @@ function fnLoadDatatableDeposit() {
         "paging": false,
         "select": selectOptions,
         "language": {
+            info: "",
             infoEmpty: "No hay datos para mostrar",
             zeroRecords: "No se encontraron coincidencias",
             processing: "Procesando...",
@@ -731,6 +990,7 @@ function fnLoadDatatableTransfer() {
         "paging": false,
         "select": selectOptions,
         "language": {
+            info: "",
             infoEmpty: "No hay datos para mostrar",
             zeroRecords: "No se encontraron coincidencias",
             processing: "Procesando...",

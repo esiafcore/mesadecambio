@@ -4,7 +4,8 @@
     <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailDeposit" hidden />
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden />
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden />
-    <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" hidden />
+    <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" id="bankTargetDeposit" hidden />
+    <input asp-for="DataModel.BankSourceId" value="@Model.DataModel.BankSourceId" id="bankSourceDeposit" hidden />
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Deposit)" hidden />
     <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -29,19 +30,28 @@
                     </div>
                 </div>
                 <div class="row">
+
+
                     <div class="col-2">
                         Banco
                     </div>
                     <div class="col-9">
-                        <select asp-for="DataModel.BankSourceId"
-                                class="form-select border p-1" size="10" id="selectBankSourceDeposit" style="width: 100%; height: 100%">
-                            <option disabled selected>--Select Banco--</option>
-                            @foreach (var bank in Model.BankList)
-                            {
-                                <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
-                            }
-                        </select>
-                        <span class="text-danger" asp-validation-for="DataModel.BankSourceId"></span>
+                        @*  <select asp-for="DataModel.BankSourceId"
+                        class="form-select border p-1" size="10" id="selectBankSourceDeposit" style="width: 100%; height: 100%">
+                        <option disabled selected>--Select Banco--</option>
+                        @foreach (var bank in Model.BankList)
+                        {
+                        <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
+                        }
+                        </select> *@
+                        <table id="tblBankSourceDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th class="text-center align-middle my-0 py-0">Logo</th>
+                                    <th class="text-center align-middle my-0 py-0">Codigo</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>

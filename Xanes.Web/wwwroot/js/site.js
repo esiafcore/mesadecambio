@@ -35,16 +35,13 @@ const selectOptions = {
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
 
-const fnShowModalMessages = (data) => {
+const fnShowModalMessages = (data, titulo = "") => {
     let icono = "error";
-    let titulo = "¡Ups, algo salió mal!";
 
     if (data.isInfo) {
         icono = "info";
-        titulo = "¡Hey, una noticia!";
     } else if (data.isWarning) {
         icono = "warning";
-        titulo = "¡Cuidado!";
     }
 
     Swal.fire({

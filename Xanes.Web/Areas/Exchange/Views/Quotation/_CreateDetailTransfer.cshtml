@@ -6,6 +6,8 @@
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" hidden/>
     <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden/>
+    <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" id="bankTargetTransfer" hidden />
+    <input asp-for="DataModel.BankSourceId" value="@Model.DataModel.BankTargetId" id="bankSourceTransfer" hidden />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="modal-dialog modal-dialog-centered">
@@ -32,7 +34,7 @@
                         Banco Origen
                     </div>
                     <div class="col-12">
-                        <select asp-for="DataModel.BankSourceId"
+                        @*   <select asp-for="DataModel.BankSourceId"
                                 class="form-select border p-1" size="10" id="selectBankSourceTransfer" style="width: 100%; height: 100%">
                             <option disabled selected>--Select Banco--</option>
                             @foreach (var bank in Model.BankList)
@@ -40,7 +42,15 @@
                                 <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
                             }
                         </select>
-                        <span class="text-danger" asp-validation-for="DataModel.BankSourceId"></span>
+                        <span class="text-danger" asp-validation-for="DataModel.BankSourceId"></span> *@
+                        <table id="tblBankSourceTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th class="text-center align-middle my-0 py-0">Logo</th>
+                                <th class="text-center align-middle my-0 py-0">Codigo</th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
                 <div class="row col-6 mb-1">
@@ -48,7 +58,7 @@
                         Banco Destino
                     </div>
                     <div class="col-12">
-                        <select asp-for="DataModel.BankTargetId"
+                        @*   <select asp-for="DataModel.BankTargetId"
                                 class="form-select border p-1" size="10" id="selectBankTargetTransfer" style="width: 100%; height: 100%">
                             <option disabled selected>--Select Banco--</option>
                             @foreach (var bank in Model.BankList)
@@ -56,7 +66,15 @@
                                 <option value="@bank.Id" data-thumbnail="@bank.LogoUrl">@bank.Code</option>
                             }
                         </select>
-                        <span class="text-danger" asp-validation-for="DataModel.BankTargetId"></span>
+                        <span class="text-danger" asp-validation-for="DataModel.BankTargetId"></span> *@
+                        <table id="tblBankTargetTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th class="text-center align-middle my-0 py-0">Logo</th>
+                                <th class="text-center align-middle my-0 py-0">Codigo</th>
+                            </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
