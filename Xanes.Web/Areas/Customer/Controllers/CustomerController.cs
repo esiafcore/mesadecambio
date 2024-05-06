@@ -151,6 +151,20 @@ public class CustomerController : Controller
 
             if (!ModelState.IsValid) return View(objViewModel);
 
+            //Verificamos si existe el tipo
+            var objType = _uow.PersonType.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+
+            if (objType == null)
+            {
+                ModelState.AddModelError("", $"Tipo de persona no encontrada");
+            }
+            else
+            {
+                obj.TypeId = objType.Id;
+            }
+
+
             //Creando
             if (obj.Id == 0)
             {

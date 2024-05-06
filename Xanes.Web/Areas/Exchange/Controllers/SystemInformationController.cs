@@ -12,6 +12,7 @@ using Xanes.Models;
 using Xanes.Models.Shared;
 using Microsoft.DotNet.MSIdentity.Shared;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Microsoft.AspNetCore.Http;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -152,6 +153,11 @@ public class SystemInformationController : Controller
             _companyName = company.CommercialName;
             _companyImageUrl = company.ImageLogoUrl ?? string.Empty;
 
+            var DateTransaInitial = HttpContext.Session.GetString("DateTransaInitial");
+            var DateTransaFinal = HttpContext.Session.GetString("DateTransaFinal");
+
+            report.Dictionary.Variables[AC.ParFilterDescription].ValueObject = $"Fecha Inicial: {DateTransaInitial} Fecha Final: {DateTransaFinal}";
+
             report.Dictionary.Variables[AC.ParFileImagePath].ValueObject = _companyImageUrl;
             report.Dictionary.Variables[AC.ParNameCompany].ValueObject = _companyName;
             // Decimales
@@ -209,7 +215,37 @@ public class SystemInformationController : Controller
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
+        int countBuy = 0, countSell = 0;
+        decimal amountNetBuy = 0, amountNetSell = 0, amountNetDepositBuy = 0, amountNetDepositSell = 0, amountNetTransferBuy = 0, amountNetTransferSell = 0;
+        decimal amountNetCostBuy = 0, amountNetCostSell = 0, amountNetRevenueBuy = 0, amountNetRevenueSell = 0;
+
+        countBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Count();
+        countSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Count();
+        amountNetBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountTransaction);
+        amountNetCostBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCost);
+        amountNetDepositBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalDeposit);
+        amountNetTransferBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalTransfer);
+        amountNetRevenueBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenue);
+        amountNetSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountTransaction);
+        amountNetCostSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCost);
+        amountNetDepositSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalDeposit);
+        amountNetTransferSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalTransfer);
+        amountNetRevenueSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenue);
+
+
         // Setear parametros
+        reportResult.Dictionary.Variables["parCountBuy"].ValueObject = countBuy;
+        reportResult.Dictionary.Variables["parCountSell"].ValueObject = countSell;
+        reportResult.Dictionary.Variables["parAmountNetBuy"].ValueObject = amountNetBuy;
+        reportResult.Dictionary.Variables["parAmountNetCostBuy"].ValueObject = amountNetCostBuy;
+        reportResult.Dictionary.Variables["parAmountNetDepositBuy"].ValueObject = amountNetDepositBuy;
+        reportResult.Dictionary.Variables["parAmountNetTransferBuy"].ValueObject = amountNetTransferBuy;
+        reportResult.Dictionary.Variables["parAmountNetRevenueBuy"].ValueObject = amountNetRevenueBuy;
+        reportResult.Dictionary.Variables["parAmountNetSell"].ValueObject = amountNetSell;
+        reportResult.Dictionary.Variables["parAmountNetCostSell"].ValueObject = amountNetCostSell;
+        reportResult.Dictionary.Variables["parAmountNetDepositSell"].ValueObject = amountNetDepositSell;
+        reportResult.Dictionary.Variables["parAmountNetTransferSell"].ValueObject = amountNetTransferSell;
+        reportResult.Dictionary.Variables["parAmountNetRevenueSell"].ValueObject = amountNetRevenueSell;
         reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
 
         return reportResult;
@@ -247,7 +283,28 @@ public class SystemInformationController : Controller
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
+        int countClosed = 0, countOpen = 0;
+        decimal amountNetMBC = 0, amountNetMFC = 0, amountNetMAC = 0, amountNetMBO = 0, amountNetMFO = 0, amountNetMAO = 0;
+        countClosed = reportDataList.Where(x => x.IsClosed).Count();
+        countOpen = reportDataList.Where(x => x.IsClosed == false).Count();
+        amountNetMBC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionBase);
+        amountNetMFC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionForeign);
+        amountNetMAC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionAdditional);
+        amountNetMBO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionBase);
+        amountNetMFO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionForeign);
+        amountNetMAO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionAdditional);
+
+
         // Setear parametros
+        reportResult.Dictionary.Variables["parCountClosed"].ValueObject = countClosed;
+        reportResult.Dictionary.Variables["parCountOpen"].ValueObject = countOpen;
+        reportResult.Dictionary.Variables["parAmountNetMBC"].ValueObject = amountNetMBC;
+        reportResult.Dictionary.Variables["parAmountNetMFC"].ValueObject = amountNetMFC;
+        reportResult.Dictionary.Variables["parAmountNetMAC"].ValueObject = amountNetMAC;
+        reportResult.Dictionary.Variables["parAmountNetMBO"].ValueObject = amountNetMBO;
+        reportResult.Dictionary.Variables["parAmountNetMFO"].ValueObject = amountNetMFO;
+        reportResult.Dictionary.Variables["parAmountNetMAO"].ValueObject = amountNetMAO;
+
         reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
 
         return reportResult;
@@ -286,6 +343,27 @@ public class SystemInformationController : Controller
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
         // Setear parametros
+        int countClosed = 0, countOpen = 0;
+        decimal amountNetMBC = 0, amountNetMFC = 0, amountNetMAC = 0, amountNetMBO = 0, amountNetMFO = 0, amountNetMAO = 0;
+        countClosed = reportDataList.Where(x => x.IsClosed).Count();
+        countOpen = reportDataList.Where(x => x.IsClosed == false).Count();
+        amountNetMBC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionBase);
+        amountNetMFC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionForeign);
+        amountNetMAC = reportDataList.Where(x => x.IsClosed).Sum(x => x.AmountTransactionAdditional);
+        amountNetMBO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionBase);
+        amountNetMFO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionForeign);
+        amountNetMAO = reportDataList.Where(x => x.IsClosed == false).Sum(x => x.AmountTransactionAdditional);
+
+
+        // Setear parametros
+        reportResult.Dictionary.Variables["parCountClosed"].ValueObject = countClosed;
+        reportResult.Dictionary.Variables["parCountOpen"].ValueObject = countOpen;
+        reportResult.Dictionary.Variables["parAmountNetMBC"].ValueObject = amountNetMBC;
+        reportResult.Dictionary.Variables["parAmountNetMFC"].ValueObject = amountNetMFC;
+        reportResult.Dictionary.Variables["parAmountNetMAC"].ValueObject = amountNetMAC;
+        reportResult.Dictionary.Variables["parAmountNetMBO"].ValueObject = amountNetMBO;
+        reportResult.Dictionary.Variables["parAmountNetMFO"].ValueObject = amountNetMFO;
+        reportResult.Dictionary.Variables["parAmountNetMAO"].ValueObject = amountNetMAO;
         reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
 
         return reportResult;
@@ -416,16 +494,26 @@ public class SystemInformationController : Controller
     public async Task<JsonResult> VerificationDataForOperation([FromBody] TransactionReportVM reportData)
     {
         JsonResultResponse? jsonResponse = new();
+        StiReport reportResult = new();
         try
         {
             // Obtener la cotización
-            var transactionList = _uow.Quotation.GetAll(filter: x => x.CompanyId == _companyId,
+            var transactionList = _uow.Quotation.GetAll(filter: x => x.CompanyId == _companyId && x.DateTransa >= reportData.DateTransaInitial &&
+                                                                     x.DateTransa <= reportData.DateTransaFinal,
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx").ToList();
 
-            if (transactionList is null || transactionList.Count() == 0)
+            if (transactionList is null)
             {
                 jsonResponse.IsSuccess = false;
                 jsonResponse.ErrorMessages = $"Cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            if (transactionList.Count() == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay operaciones";
                 return Json(jsonResponse);
             }
 
@@ -437,6 +525,7 @@ public class SystemInformationController : Controller
                 {
                     Id = transaction.Id,
                     CompanyId = transaction.CompanyId,
+                    TypeNumeral = transaction.TypeNumeral,
                     NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral}",
                     CustomerFullName = transaction.CustomerTrx.CommercialName,
                     ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
@@ -458,6 +547,8 @@ public class SystemInformationController : Controller
             // Guardar los datos en el contexto
             var reportListData = JsonSerializer.Serialize(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
             jsonResponse.IsSuccess = true;
             return Json(jsonResponse);
         }
@@ -476,13 +567,23 @@ public class SystemInformationController : Controller
         try
         {
             // Obtener la cotización
-            var transactionDetailList = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.QuotationDetailType == QuotationDetailType.Deposit,
+            var transactionDetailList = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.QuotationDetailType == QuotationDetailType.Deposit
+                    && x.ParentTrx.DateTransa >= reportData.DateTransaInitial &&
+                    x.ParentTrx.DateTransa <= reportData.DateTransaFinal,
                 includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
 
-            if (transactionDetailList is null || transactionDetailList.Count() == 0)
+            if (transactionDetailList is null)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización invalida";
+                jsonResponse.ErrorMessages = $"Detalle cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            if (transactionDetailList.Count() == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay depositos";
                 return Json(jsonResponse);
             }
 
@@ -518,6 +619,7 @@ public class SystemInformationController : Controller
                 var transa = new TransaODTVM
                 {
                     Id = transaction.ParentId,
+                    QuotationDetailType = transaction.QuotationDetailType,
                     CompanyId = transaction.CompanyId,
                     NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.ParentTrx.TypeNumeral)}-{transaction.ParentTrx.Numeral}",
                     CustomerFullName = customer != null ? customer.CommercialName : "",
@@ -538,6 +640,9 @@ public class SystemInformationController : Controller
             // Guardar los datos en el contexto
             var reportListData = JsonSerializer.Serialize(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
+
             jsonResponse.IsSuccess = true;
             return Json(jsonResponse);
         }
@@ -556,13 +661,22 @@ public class SystemInformationController : Controller
         try
         {
             // Obtener la cotización
-            var transactionDetailList = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.QuotationDetailType == QuotationDetailType.Transfer,
+            var transactionDetailList = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.QuotationDetailType == QuotationDetailType.Transfer && x.ParentTrx.DateTransa >= reportData.DateTransaInitial &&
+                    x.ParentTrx.DateTransa <= reportData.DateTransaFinal,
                 includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
 
-            if (transactionDetailList is null || transactionDetailList.Count() == 0)
+            if (transactionDetailList is null)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización invalida";
+                jsonResponse.ErrorMessages = $"Detalle cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            if (transactionDetailList.Count() == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay transferencias";
                 return Json(jsonResponse);
             }
 
@@ -622,6 +736,8 @@ public class SystemInformationController : Controller
             // Guardar los datos en el contexto
             var reportListData = JsonSerializer.Serialize(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
             jsonResponse.IsSuccess = true;
             return Json(jsonResponse);
         }

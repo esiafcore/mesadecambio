@@ -15,6 +15,8 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input hidden asp-for="DataModel.Id" />
                     <input hidden asp-for="DataModel.CompanyId" />
+                    <input hidden asp-for="DataModel.TypeNumeral" id="typeNumeral" />
+
                     <div class="row m-0 p-0">
                         <div class="row col-12 col-md-6">
                             <div class="col-12 col-md-2">Tipo</div>
@@ -22,8 +24,8 @@
                                 @foreach (var personType in Model.TypeList)
                                 {
                                     <div class="form-check mt-2 mx-1 form-check-inline" id="@("personType_divradio_" + personType.Numeral)">
-                                        <input asp-for="DataModel.TypeNumeral" name="TypeNumeral" 
-                                               class="form-check-input border border-dark-subtle" type="radio"
+                                        <input asp-for="DataModel.TypeNumeral" name="TypeNumerals" 
+                                               class="form-check-input border border-dark-subtle typeNumerals" type="radio"
                                                id="@("personType_radio_" + personType.Numeral)"
                                                value="@personType.Numeral"
                                                onclick="return personType_onClick(this)" />

@@ -12,6 +12,7 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
 using static Stimulsoft.Report.Help.StiHelpProvider;
+using QuotationType = Xanes.Models.QuotationType;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -123,6 +124,12 @@ public class QuotationController : Controller
     {
         var objBankAccountTarget = new BankAccount();
         var objBankAccountSource = new BankAccount();
+        var objCurrency = new Currency();
+        var objCurrencyList = new List<Currency>();
+        var objTypeList = new List<QuotationType>();
+        var objCustomerList = new List<Models.Customer>();
+
+
         Models.Quotation obj = objViewModel.DataModel;
         //Datos son validos
         if (ModelState.IsValid)
@@ -148,7 +155,7 @@ public class QuotationController : Controller
             if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
             {
                 //Verificamos si existe la moneda de la Transaccion
-                var objCurrency = _uow.Currency.Get(filter: x =>
+                 objCurrency = _uow.Currency.Get(filter: x =>
                     x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
 
                 if (objCurrency == null)
@@ -210,7 +217,44 @@ public class QuotationController : Controller
                 ModelState.AddModelError("", $"Cliente no encontrado");
             }
 
-            if (!ModelState.IsValid) return View(objViewModel);
+            if (!ModelState.IsValid)
+            {
+                 objCurrencyList = _uow.Currency
+                    .GetAll(x => (x.CompanyId == _companyId))
+                    .ToList();
+
+                if (objCurrencyList == null)
+                {
+                    return NotFound();
+                }
+
+                 objTypeList = _uow.QuotationType
+                    .GetAll(x => (x.CompanyId == _companyId))
+                    .ToList();
+
+                if (objTypeList == null)
+                {
+                    return NotFound();
+                }
+
+                 objCustomerList = _uow.Customer
+                    .GetAll(x => (x.CompanyId == _companyId))
+                    .ToList();
+
+                if (objCustomerList == null)
+                {
+                    return NotFound();
+                }
+
+                objViewModel.CurrencyTransaList = objCurrencyList
+                    .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+                    .ToList();
+                objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+                objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
+                objViewModel.QuotationTypeList = objTypeList;
+                objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+                return View(objViewModel);
+            }
 
             //Obtenemos el secuencial en borrador
             var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
@@ -284,7 +328,7 @@ public class QuotationController : Controller
                     //Cliente paga en Cordobas
                     if (obj.CurrencyDepositType == SD.CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+                        obj.AmountExchange = (obj.AmountTransaction / obj.ExchangeRateSellTransa);
                         obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
                     }
                 }
@@ -397,7 +441,7 @@ public class QuotationController : Controller
             ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         }
 
-        var objCurrencyList = _uow.Currency
+         objCurrencyList = _uow.Currency
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
 
@@ -406,7 +450,7 @@ public class QuotationController : Controller
             return NotFound();
         }
 
-        var objTypeList = _uow.QuotationType
+         objTypeList = _uow.QuotationType
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
 
@@ -414,12 +458,12 @@ public class QuotationController : Controller
         {
             return NotFound();
         }
-
-        var objCustomerList = _uow.Customer
+        
+        objCustomerList = _uow.Customer
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
 
-        if (objTypeList == null)
+        if (objCustomerList == null)
         {
             return NotFound();
         }

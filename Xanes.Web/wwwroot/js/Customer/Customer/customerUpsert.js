@@ -1,4 +1,4 @@
-﻿
+﻿let typeNumeral, inputTypeNumeral, typeNumerals;
 document.addEventListener("DOMContentLoaded", () => {
 
     let inputId = document.getElementById("DataModel_Id");
@@ -23,6 +23,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //setear el foco al crear o editar
     document.getElementById("DataModel_Code").focus();
+
+    inputTypeNumeral = document.querySelector("#typeNumeral");
+    typeNumerals = document.querySelectorAll(".typeNumerals");
+
+    typeNumerals.forEach((item) => {
+        if (item.checked) typeNumeral = item.value;
+
+        item.addEventListener("change", () => {
+            typeNumeral = item.value;
+            inputTypeNumeral.value = typeNumeral;
+        });
+    });
+
+    inputTypeNumeral.value = typeNumeral;
+
 });
 
 function personType_onClick(objElem) {

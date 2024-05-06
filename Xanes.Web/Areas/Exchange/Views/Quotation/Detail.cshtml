@@ -1,17 +1,17 @@
 ﻿@model QuotationDetailVM
 
+<input value="@((int)Model.ModelCreateVM.DataModel.TypeNumeral)" id="type" hidden />
 <input value="@Model.ModelCreateVM.DataModel.Id" id="parentId" hidden />
 
-
 <div class="card shadow border-0 mt-1">
-    <div class="card-header bg-secondary bg-gradient">
+    <div class="card-header bg-primary bg-gradient">
         <div class="row mb-1">
             <div class="col-12 col-md-6 pb-1">
                 <h2 class="text-white text-center text-md-start py-1">Visualizar - Cotización</h2>
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
                 <div class="col-6 col-md-5 col-xl-4">
-                    <a asp-action="Index" class="btn btn-secondary form-control btn-sm">
+                    <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
                         <i class="bi bi-arrow-return-left"></i> Regresar
                     </a>
                 </div>

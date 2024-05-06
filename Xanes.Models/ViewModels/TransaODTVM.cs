@@ -7,6 +7,7 @@ namespace Xanes.Models.ViewModels;
 
 public class TransaODTVM : Quotation
 {
+    public SD.QuotationDetailType QuotationDetailType { get; set; }
     public string CustomerFullName { get; set; }
     public string NumberTransa { get; set; }
     public string BankSourceCode { get; set; }

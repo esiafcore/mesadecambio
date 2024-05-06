@@ -15,8 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
     inputsFormatTransa = document.querySelectorAll(".decimalTransa");
     inputsFormatExchange = document.querySelectorAll(".decimalTC");
-    amountExchange = document.querySelector("#amountExchange");
-    typeNumeral = document.querySelector("#type");
+    typeNumeral = document.querySelector("#type").value;
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
     });
@@ -172,7 +171,7 @@ function fnLoadDatatableDeposit() {
             }
 
             if (typeNumeral != QuotationType.Transfer) {
-              
+
                 tableRowLabelDeposit.innerHTML =
                     `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
                 tableRowLabelDeposit.value =
@@ -185,10 +184,6 @@ function fnLoadDatatableDeposit() {
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
-
-    if (typeNumeral == QuotationType.Transfer) {
-        dataTableDeposit.column(3).visible(false);
-    }
 }
 function fnLoadDatatableTransfer() {
 
@@ -273,6 +268,7 @@ function fnLoadDatatableTransfer() {
             }
 
             if (typeNumeral != QuotationType.Transfer) {
+                amountExchange = document.querySelector("#amountExchange");
                 tableRowLabelTransfer.innerHTML =
                     `Transferir: ${formatterAmount().format(fnparseFloat(amountExchange.value))}  -  Pendiente: ${formatterAmount().format(pending)
                     }`;
@@ -294,6 +290,5 @@ function fnLoadDatatableTransfer() {
 
     if (typeNumeral == QuotationType.Transfer) {
         dataTableTransfer.column(2).visible(false);
-        dataTableTransfer.column(4).visible(false);
     }
 }

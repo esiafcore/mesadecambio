@@ -118,6 +118,7 @@ const fnvalidateOperation = async (plainFormData) => {
     } else {
         let jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
+            fnShowModalMessages(jsonResponse);
             resultResponse.isSuccess = false;
             return resultResponse;
         }
@@ -155,6 +156,7 @@ const fnvalidateDeposit = async (plainFormData) => {
     } else {
         let jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
+            fnShowModalMessages(jsonResponse);
             resultResponse.isSuccess = false;
             return resultResponse;
         }
@@ -192,6 +194,7 @@ const fnvalidateTransfer = async (plainFormData) => {
     } else {
         let jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
+            fnShowModalMessages(jsonResponse);
             resultResponse.isSuccess = false;
             return resultResponse;
         }
