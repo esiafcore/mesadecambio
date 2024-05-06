@@ -131,23 +131,32 @@ document.addEventListener("DOMContentLoaded", async function () {
     dataTableBankSourceTransfer.on('select', async function (e, dt, type, indexes) {
         if (type === 'row') {
             inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
-            //if (dataTableBankTargetTransfer) {
+            var selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
+            var selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass('bg-success bg-opacity-75 bg-gradient');
 
-            //    dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer).select();
-            //}
-            //fnLoadDatatableBankTransferSource(indexDataTableBankSourceTransfer);
+            indexDataTableBankSourceTransfer = indexes;
 
+            // Selecciona la fila deseada
+            var selectedRow = dataTableBankSourceTransfer.row(indexes);
+            var selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
         }
     });
 
     dataTableBankTargetTransfer.on('select', async function (e, dt, type, indexes) {
         if (type === 'row') {
             inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
-            //if (dataTableBankSourceTransfer) {
+            var selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
+            var selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass('bg-success bg-opacity-75 bg-gradient');
 
-            //    dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer).select();
-            //}
-            //fnLoadDatatableBankTransferTarget(indexDataTableBankTargetTransfer);
+            indexDataTableBankTargetTransfer = indexes;
+
+            // Selecciona la fila deseada
+            var selectedRow = dataTableBankTargetTransfer.row(indexes);
+            var selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
         }
     });
     //Habilitar Tooltip
@@ -332,14 +341,11 @@ const fnTCByDate = async () => {
 const fnClearModalDeposit = () => {
     document.querySelector("#idDetailDeposit").value = 0;
     document.querySelector("#amountDeposit").value = formatterAmount().format(0);
-    //document.querySelector("#selectBankSourceDeposit").selectedIndex = 0;
 };
 
 const fnClearModalTransfer = () => {
     document.querySelector("#idDetailTransfer").value = 0;
     document.querySelector("#amountTransfer").value = formatterAmount().format(0);
-    //document.querySelector("#selectBankSourceTransfer").selectedIndex = 0;
-    //document.querySelector("#selectBankTargetTransfer").selectedIndex = 0;
 };
 
 const fnShowModalUpdateHeader = () => {
@@ -467,25 +473,6 @@ const fndeleteRow = async (id) => {
 };
 
 const fnApproved = async (id) => {
-    //let result = await Swal.fire({
-    //    title: `&#191;Está seguro de aprobar la cotizatión?`,
-    //    html: `Este registro no se podrá recuperar`,
-    //    icon: "warning",
-    //    showCancelButton: true,
-    //    reverseButtons: true,
-    //    focusConfirm: false,
-    //    confirmButtonText: ButtonsText.Approved,
-    //    cancelButtonText: ButtonsText.Cancel,
-    //    customClass: {
-    //        confirmButton: "btn btn-info px-3 mx-2",
-    //        cancelButton: "btn btn-primary px-3 mx-2"
-    //    },
-    //    buttonsStyling: false
-    //});
-
-    //if (!result.isConfirmed) {
-    //    return;
-    //}
 
     try {
 
@@ -614,10 +601,22 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 }
             },
             "complete": async function () {
-                dataTableBankSourceTransfer.row(index).select();
                 indexDataTableBankSourceTransfer = index;
                 inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
-            }
+                // Selecciona la fila deseada
+                var selectedRow = dataTableBankSourceTransfer.row(index);
+
+                // Deselecciona todas las filas
+                dataTableBankSourceTransfer.rows().deselect();
+
+                // Selecciona la fila deseada
+                selectedRow.select();
+
+                // Obtiene el nodo HTML de la fila seleccionada
+                var selectedRowNode = selectedRow.node();
+
+                $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
+            } 
         },
         "columns": [
             {
@@ -676,10 +675,22 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 }
             },
             "complete": async function () {
-                dataTableBankTargetTransfer.row(index).select();
                 indexDataTableBankTargetTransfer = index;
                 inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
-            }
+                // Selecciona la fila deseada
+                var selectedRow = dataTableBankTargetTransfer.row(index);
+
+                // Deselecciona todas las filas
+                dataTableBankTargetTransfer.rows().deselect();
+
+                // Selecciona la fila deseada
+                selectedRow.select();
+
+                // Obtiene el nodo HTML de la fila seleccionada
+                var selectedRowNode = selectedRow.node();
+
+                $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
+            } 
         },
         "columns": [
             {
