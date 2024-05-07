@@ -58,6 +58,8 @@
                 <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1 me-1">
                     <input class="form-control text-end border p-1 shadow decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
                 </div>
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-5 d-none d-xl-block">
+                </div>
             }
             else if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Sell)
             {
@@ -67,17 +69,17 @@
                 <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1 me-1">
                     <input class="form-control text-end border p-1 shadow decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateSellTransa" readonly />
                 </div>
+                <div class="col-8 col-md-3 col-xl-2 col-xxl-5 d-none d-xl-block">
+                </div>
             }
             <div class="col-3 col-md-2 col-xl-1 mb-1 @(Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Transfer ? "offset-md-1 offset-xl-0 offset-xxl-0" : ' ')">
                 <h5 class="text-white fs-6">Monto</h5>
             </div>
-            <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1 ps-xl-2">
+            <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1">
                 <input class="form-control text-end border p-1 shadow decimalTransa" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransaction" readonly />
             </div>
             @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
             {
-                <div class="col-8 col-md-3 col-xl-2 col-xxl-2 d-none d-xl-block">
-                </div>
                 <div class="col-3 col-md-2 col-xl-1 col-xxl-1 mb-1">
                     <h5 class="text-white fs-6 ms-md-1">Monto M/C</h5>
                 </div>

@@ -255,17 +255,16 @@ function formatOption(option) {
     return $option;
 }
 
-
 //Funcion para calcular el costo
 const fnCalculateRevenueCost = () => {
     let divRevenue = document.querySelector("#divRevenue");
     let divCost = document.querySelector("#divCost");
     let amountExchange = document.querySelector("#amountExchange");
-    let exchangeRateSellTransa;
+    let exchangeRateSellTransa = 0;
     let exchangeRateOfficialTransa = fnparseFloat(inputExchangeRateOfficialTransa.value);
     let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
-    let exchangeRateBuyTransa;
+    let exchangeRateBuyTransa = 0;
 
     if (typeNumeral == QuotationType.Buy) {
         exchangeRateBuyTransa = fnparseFloat(inputExchangeRateBuyTransa.value);
@@ -304,6 +303,7 @@ const fnCalculateRevenueCost = () => {
             }
         }
     }
+    inputExchangeRateSellTransa.value = formatterAmount(decimalExchange).format(exchangeRateSellTransa);
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);

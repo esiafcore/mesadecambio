@@ -155,8 +155,8 @@ public class QuotationController : Controller
             if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
             {
                 //Verificamos si existe la moneda de la Transaccion
-                 objCurrency = _uow.Currency.Get(filter: x =>
-                    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+                objCurrency = _uow.Currency.Get(filter: x =>
+                   x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
 
                 if (objCurrency == null)
                 {
@@ -219,27 +219,27 @@ public class QuotationController : Controller
 
             if (!ModelState.IsValid)
             {
-                 objCurrencyList = _uow.Currency
-                    .GetAll(x => (x.CompanyId == _companyId))
-                    .ToList();
+                objCurrencyList = _uow.Currency
+                   .GetAll(x => (x.CompanyId == _companyId))
+                   .ToList();
 
                 if (objCurrencyList == null)
                 {
                     return NotFound();
                 }
 
-                 objTypeList = _uow.QuotationType
-                    .GetAll(x => (x.CompanyId == _companyId))
-                    .ToList();
+                objTypeList = _uow.QuotationType
+                   .GetAll(x => (x.CompanyId == _companyId))
+                   .ToList();
 
                 if (objTypeList == null)
                 {
                     return NotFound();
                 }
 
-                 objCustomerList = _uow.Customer
-                    .GetAll(x => (x.CompanyId == _companyId))
-                    .ToList();
+                objCustomerList = _uow.Customer
+                   .GetAll(x => (x.CompanyId == _companyId))
+                   .ToList();
 
                 if (objCustomerList == null)
                 {
@@ -441,24 +441,24 @@ public class QuotationController : Controller
             ModelState.AddModelError("", errorsMessagesBuilder.ToString());
         }
 
-         objCurrencyList = _uow.Currency
-            .GetAll(x => (x.CompanyId == _companyId))
-            .ToList();
+        objCurrencyList = _uow.Currency
+           .GetAll(x => (x.CompanyId == _companyId))
+           .ToList();
 
         if (objCurrencyList == null)
         {
             return NotFound();
         }
 
-         objTypeList = _uow.QuotationType
-            .GetAll(x => (x.CompanyId == _companyId))
-            .ToList();
+        objTypeList = _uow.QuotationType
+           .GetAll(x => (x.CompanyId == _companyId))
+           .ToList();
 
         if (objTypeList == null)
         {
             return NotFound();
         }
-        
+
         objCustomerList = _uow.Customer
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
@@ -546,6 +546,24 @@ public class QuotationController : Controller
             objQt.UpdatedIpv4 = AC.Ipv4Default;
             _uow.Quotation.Update(objQt);
             _uow.Save();
+
+            if (objQt.TypeNumeral == SD.QuotationType.Transfer)
+            {
+
+                var objDetails = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.ParentId == objQt.Id).ToList();
+                foreach (var detail in objDetails)
+                {
+                    detail.AmountDetail = objQt.AmountTransaction;
+                    //Seteamos campos de auditoria
+                    detail.UpdatedBy = AC.LOCALHOSTME;
+                    detail.UpdatedDate = DateTime.UtcNow;
+                    detail.UpdatedHostName = AC.LOCALHOSTPC;
+                    detail.UpdatedIpv4 = AC.Ipv4Default;
+                    _uow.QuotationDetail.Update(detail);
+                }
+                _uow.Save();
+            }
+
             TempData["success"] = "Cotización actualizada exitosamente";
         }
         else
@@ -723,6 +741,42 @@ public class QuotationController : Controller
             return View(objViewModel);
         }
 
+        //Obtenemos los hijos
+        var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
+                objHeader != null && x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+        if (objDetails == null)
+        {
+            return NotFound();
+        }
+
+        var amountMax = objHeader.AmountTransaction;
+
+        if(objDetails.Count > 0)
+        {
+
+            if(objHeader.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if(obj.QuotationDetailType == QuotationDetailType.Deposit)
+                {
+
+                    var totalCurrentDeposit = objDetails.Where(x => x.QuotationDetailType == QuotationDetailType.Deposit).Sum(s => s.AmountDetail);
+                    
+
+
+                }else if(obj.QuotationDetailType == QuotationDetailType.Transfer)
+                {
+
+                }
+
+            }else if(objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+
+            }
+
+        }
+
+
 
         if (obj.Id == 0)
         {
@@ -738,11 +792,12 @@ public class QuotationController : Controller
         }
         else
         {
-            var objDetail = _uow.QuotationDetail.Get(filter: x => x.Id == obj.Id && x.CompanyId == _companyId);
+            var objDetail = objDetails.First(x => x.Id == obj.Id);
             if (objDetail == null)
             {
                 return NotFound();
             }
+
             //Seteamos campos de auditoria
             objDetail.AmountDetail = obj.AmountDetail;
             objDetail.BankSourceId = obj.BankSourceId;
@@ -754,15 +809,6 @@ public class QuotationController : Controller
             objDetail.UpdatedIpv4 = AC.Ipv4Default;
             _uow.QuotationDetail.Update(objDetail);
             _uow.Save();
-        }
-
-        //Obtenemos los hijos
-        var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
-                objHeader != null && x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-
-        if (objDetails == null)
-        {
-            return NotFound();
         }
 
         if (objHeader != null)

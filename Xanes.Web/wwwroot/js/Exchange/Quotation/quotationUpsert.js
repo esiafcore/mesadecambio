@@ -311,6 +311,7 @@ const fnCalculateRevenueCost = () => {
         }
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
+    inputExchangeRateSellTransa.value = formatterAmount(decimalExchange).format(exchangeRateSellTransa);
     inputExchangeRateOfficialTransa.value = formatterAmount(decimalExchange).format(exchangeRateOfficialTransa);
     inputAmountCost.value = formatterAmount().format(amountCost);
     inputAmountRevenue.value = formatterAmount().format(amountRevenue);
