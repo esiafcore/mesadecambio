@@ -564,6 +564,7 @@ public class QuotationController : Controller
             }
 
             objQt.AmountRevenue = obj.AmountRevenue;
+            objQt.AmountCommission = obj.AmountCommission;
             objQt.AmountCost = obj.AmountCost;
             objQt.AmountTransaction = obj.AmountTransaction;
             objQt.DateTransa = obj.DateTransa;

@@ -998,7 +998,7 @@ function fnLoadDatatableDeposit() {
             } else {
                 label = "TRC";
                 deposit = amountHeader;
-
+                isPendingDeposit = false;
             }
             tableRowLabelDeposit.innerHTML =
                 `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
@@ -1158,6 +1158,7 @@ function fnLoadDatatableTransfer() {
             } else {
                 label = "TRD";
                 transfer = amountHeader;
+                isPendingTransfer = false;
             }
 
             tableRowLabelTransfer.innerHTML =
