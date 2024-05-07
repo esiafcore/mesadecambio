@@ -112,12 +112,6 @@
 
                         </div>
                     </div>
-                   @*  @if (Model.DataModel.TypeNumeral == SD.QuotationType.Buy)
-                    {
-                    }
-                    else
-                    {
-                    } *@
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCurrencyDeposit" hidden>
                         <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Deposit</div>
                         <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
@@ -136,6 +130,12 @@
 
                         </div>
                     </div>
+                    @if (Model.DataModel.TypeNumeral != SD.QuotationType.Transfer)
+                    {
+                        @*Contenedor separador, simula un espacio*@
+                        <div class="row col-xl-4 d-none d-xl-block">
+                        </div>
+                    }
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
                         <div class="col-xl-6 col-sm-7 col-8">
@@ -146,7 +146,7 @@
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeBuy">
                         <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
                         <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 shadow decimalTC" step="any"/>
+                            <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
                             <span asp-validation-for="DataModel.ExchangeRateBuyTransa" class="text-danger"></span>
                         </div>
                     </div>
@@ -157,17 +157,24 @@
                             <span asp-validation-for="DataModel.ExchangeRateSellTransa" class="text-danger"></span>
                         </div>
                     </div>
-                    @*   @if (Model.DataModel.TypeNumeral == SD.QuotationType.Buy)
-                    {
-                    }
-                    else if (Model.DataModel.TypeNumeral == SD.QuotationType.Sell)
-                    {
-                    } *@
+                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divExchangeRateVariation" hidden>
+                        <div class="col-sm-5 col-lg-4 col-4">T/C Variación</div>
+                        <div class="col-xl-6 col-sm-7 col-8">
+                            <input id="exchangeRateVariation" class="form-control text-end border p-1 shadow decimalTC" step="any" readonly />
+                        </div>
+                    </div>
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1">
                         <div class="col-sm-5 col-lg-4 col-4">Monto</div>
                         <div class="col-xl-6 col-sm-7 col-8">
                             <input asp-for="DataModel.AmountTransaction" id="amountTransa" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
                             <span asp-validation-for="DataModel.AmountTransaction" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divAmountExchange">
+                        <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
+                        <div class="col-xl-6 col-sm-7 col-8">
+                            <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
+                            <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
                         </div>
                     </div>
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1 typeSell" id="divRevenue" hidden>
@@ -184,33 +191,6 @@
                             <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
                         </div>
                     </div>
-
-                    @*   @if (Model.DataModel.TypeNumeral == SD.QuotationType.Buy)
-                    {
-                    if (Model.DataModel.ExchangeRateBuyTransa < Model.DataModel.ExchangeRateOfficialTransa)
-                    {
-                    }
-                    else
-                    {
-                    }
-                    }
-                    else if (Model.DataModel.TypeNumeral == SD.QuotationType.Sell)
-                    {
-                    if (Model.DataModel.ExchangeRateSellTransa < Model.DataModel.ExchangeRateOfficialTransa)
-                    {
-                    }
-                    else
-                    {
-                    }
-                    } *@
-
-                    <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divAmountExchange">
-                        <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
-                        <div class="col-xl-6 col-sm-7 col-8">
-                            <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
-                            <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
-                        </div>
-                    </div>
                     <div class="row col-xl-4 col-lg-6 col-12 mb-1" id="divCommission" hidden>
                         <div class="col-sm-5 col-lg-4 col-4">Comisión TRF</div>
                         <div class="col-xl-6 col-sm-7 col-8">
@@ -219,6 +199,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div class="modal-footer justify-content-center">

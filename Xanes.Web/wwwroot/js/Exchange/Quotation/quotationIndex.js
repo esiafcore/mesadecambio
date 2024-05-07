@@ -91,24 +91,47 @@ function loadDatatable() {
             {
                 data: null, "width": "10%", orderable: false
                 , "render": (data, type, row) => {
-                    return `<div class="btn-group" role="group">
-                        <a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
-                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
-                            <i class="bi bi-eye fs-5"></i>
-                        </a>
-                        <a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
-                            <i class="bi bi-pencil-square fs-5"></i>
-                        </a>
-                        <a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
-                            <i class="bi bi-trash-fill fs-5"></i>
-                        </a>
-                          <a onclick="fnPrintReport('${row.id}')" class="btn btn-outline-primary py-1 px-3 my-0 mx-1" 
-                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir">
-                              <i class="bi bi-printer fs-5"></i>
-                          </a>
-                    </div>`;
+
+                    let btnUpdate = `<a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                                         <i class="bi bi-pencil-square fs-5"></i>
+                                     </a>`;
+
+                    let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
+                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
+                                     <i class="bi bi-eye fs-5"></i>
+                                   </a>`;
+
+                    let btnDelete = `<a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                                         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                                          <i class="bi bi-trash-fill fs-5"></i>
+                                     </a> `;
+
+                    let btnPrint = `<a onclick="fnPrintReport('${row.id}')" class="btn btn-outline-primary py-1 px-3 my-0 mx-1" 
+                                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir">
+                                        <i class="bi bi-printer fs-5"></i>
+                                    </a> `;
+
+                    let buttons = `<div class="btn-group" role="group">`;
+
+
+                    if (row.isClosed) {
+                        buttons += `
+                            ${btnView}
+                            ${btnPrint}
+                        `;
+                    } else {
+                        buttons += `
+                            ${btnView}
+                            ${btnUpdate}
+                            ${btnDelete}
+                            ${btnPrint}
+                        `;
+                    }
+
+                    buttons += `</div>`;
+
+                    return buttons;
                 }
             }
         ],

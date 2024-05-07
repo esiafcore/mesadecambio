@@ -25,8 +25,14 @@
                         Monto
                     </div>
                     <div class="col-6">
-                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa" />
+                        <input id="amountDeposit" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa text-end" />
                         <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
+                    </div>
+                    <div class="col d-flex justify-content-start">
+                        <a type="button" class="btn btn-info m-0 btn-sm border"
+                           data-bs-toggle="tooltip" data-bs-title="Agregar Automáticamente" onclick="fnBtnAddPendingDeposit()">
+                            <i class="bi bi-plus-square"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="row">
@@ -48,7 +54,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center align-middle my-0 py-0">Logo</th>
-                                    <th class="text-center align-middle my-0 py-0">Codigo</th>
+                                    <th class="text-center align-middle my-0 py-0">Iniciales</th>
                                 </tr>
                             </thead>
                         </table>

@@ -8,11 +8,12 @@ let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa
 let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurrencyTransfer, divCurrencyDeposit, elementsTransfer, elementsSell, elementsBuy,
     selectBankAccountSource, selectBankAccountTarget, inputAmountCost, inputAmountRevenue, currencyTypeDeposit, currencyTypeTransfer, currenciesTransa, currenciesDeposit, currenciesTransfer;
 let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTargetTransfer;
-let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer;
+let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
+let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
-    currenciesDeposit = document.querySelectorAll(".currenciesTransfer");
-    currenciesTransfer = document.querySelectorAll(".currenciesDeposit");
+    currenciesDeposit = document.querySelectorAll(".currenciesDeposit");
+    currenciesTransfer = document.querySelectorAll(".currenciesTransfer");
     inputDateTransa = document.querySelector("#dateTransa");
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
@@ -50,7 +51,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     selectBankAccountTarget = document.querySelector("#selectBankAccountTarget");
     inputAmountCost = document.querySelector("#amountCost");
     inputAmountRevenue = document.querySelector("#amountRevenue");
-
+    divExchangeRateVariation = document.querySelector("#divExchangeRateVariation");
+    inputExchangeRateVariation = document.querySelector("#exchangeRateVariation");
+    btnQuotationClosed = document.querySelector("#btnQuotationClosed");
     currencies.forEach((item) => {
         if (item.checked) {
             currencyType = item.value;
@@ -96,8 +99,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 
-        item.addEventListener("change", () => {
-            item.value = formatterAmount().format(fnparseFloat(item.value));
+        item.addEventListener("change", (event) => {
+            if (event.target === amountDeposit || event.target === amountTransfer) {
+                item.value = formatterAmount().format(fnparseFloat(item.value, true));
+            } else {
+                item.value = formatterAmount().format(fnparseFloat(item.value));
+            }
         });
     });
 
@@ -112,6 +119,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
         fnCalculateRevenueCost();
     }));
+
+    fnCalculateRevenueCost();
+
     $(selectBankAccountSource).select2(select2Options);
     $(selectBankAccountTarget).select2(select2Options);
 
@@ -125,6 +135,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (type === 'row') {
             inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
             inputBankTargetDeposit.value = inputBankSourceDeposit.value;
+
+            var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
+            var selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+
+            indexDataTableBankSourceDeposit = indexes;
+
+            // Selecciona la fila deseada
+            var selectedRow = dataTableBankSourceDeposit.row(indexes);
+            var selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
         }
     });
 
@@ -133,14 +154,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
             var selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
             var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass('bg-success bg-opacity-75 bg-gradient');
+            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
 
             indexDataTableBankSourceTransfer = indexes;
 
             // Selecciona la fila deseada
             var selectedRow = dataTableBankSourceTransfer.row(indexes);
             var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
+            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
         }
     });
 
@@ -149,14 +170,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
             var selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
             var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass('bg-success bg-opacity-75 bg-gradient');
+            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
 
             indexDataTableBankTargetTransfer = indexes;
 
             // Selecciona la fila deseada
             var selectedRow = dataTableBankTargetTransfer.row(indexes);
             var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
+            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
         }
     });
     //Habilitar Tooltip
@@ -206,6 +227,7 @@ const fnLoadInputsByType = (type) => {
         divAmountExchange.hidden = false;
         divCommission.hidden = true;
         divCurrencyTransfer.hidden = false;
+        divExchangeRateVariation.hidden = false;
         divCurrencyDeposit.hidden = true;
         elementsBuy.forEach((item) => item.hidden = false);
         elementsSell.forEach((item) => item.hidden = true);
@@ -218,6 +240,7 @@ const fnLoadInputsByType = (type) => {
         divAmountExchange.hidden = false;
         divCommission.hidden = true;
         divCurrencyTransfer.hidden = true;
+        divExchangeRateVariation.hidden = false;
         divCurrencyDeposit.hidden = false;
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = false);
@@ -230,6 +253,7 @@ const fnLoadInputsByType = (type) => {
         divCurrencyTransa.hidden = true;
         divCurrencyTransfer.hidden = true;
         divCurrencyDeposit.hidden = true;
+        divExchangeRateVariation.hidden = true;
         divCommission.hidden = false;
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
@@ -265,6 +289,7 @@ const fnCalculateRevenueCost = () => {
     let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
     let exchangeRateBuyTransa = 0;
+    let exchangeRateVariation = fnparseFloat(inputExchangeRateVariation.value);
 
     if (typeNumeral == QuotationType.Buy) {
         exchangeRateBuyTransa = fnparseFloat(inputExchangeRateBuyTransa.value);
@@ -277,7 +302,8 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = false;
             divCost.hidden = true;
         }
-
+        exchangeRateVariation = exchangeRateOfficialTransa - exchangeRateBuyTransa;
+        inputExchangeRateVariation.value = formatterAmount(decimalExchange).format(exchangeRateVariation);
         amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
 
     } else if (typeNumeral == QuotationType.Sell) {
@@ -297,11 +323,17 @@ const fnCalculateRevenueCost = () => {
             amountExchange.value = formatterAmount().format(0);
         } else {
             if (currencyType == CurrencyType.Foreign) {
-                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
             } else if (currencyType == CurrencyType.Additional) {
-                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                if (currencyTypeDeposit == CurrencyType.Base) {
+                    amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+                } else {
+                    amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                }
             }
         }
+        exchangeRateVariation = exchangeRateSellTransa - exchangeRateOfficialTransa;
+        inputExchangeRateVariation.value = formatterAmount(decimalExchange).format(exchangeRateVariation);
     }
     inputExchangeRateSellTransa.value = formatterAmount(decimalExchange).format(exchangeRateSellTransa);
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
@@ -356,7 +388,8 @@ const fnShowModalDeposit = async () => {
     fnClearModalDeposit();
     document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
     document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
-    fnLoadDatatableBankDeposit();
+    await fnSelectTableSourceDeposit();
+    //fnLoadDatatableBankDeposit();
     // Mostrar el modal
     $('#modalCreateDeposit').modal('show');
 };
@@ -504,7 +537,7 @@ const fnApproved = async (id) => {
     }
 };
 
-const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) => {
+const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
     if (quotationDetailType == QuotationDetailType.Deposit) {
         document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
         idDetailDeposit.value = id;
@@ -522,7 +555,7 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
         // Verifica si se encontró la fila
         if (rowDataToSelect !== null) {
             // Selecciona la fila en la tabla
-            fnLoadDatatableBankDeposit(rowDataToSelect);
+           await fnSelectTableSourceDeposit(rowDataToSelect);
         }
 
         amountDeposit.value = formatterAmount().format(amount);
@@ -582,6 +615,44 @@ const fnupdateRow = (id, amount, bankSource, bankTarget, quotationDetailType) =>
     }
 };
 
+const fnVerificateIsPending = () => {
+    if (isPendingDeposit == false && isPendingTransfer == false) {
+        btnQuotationClosed.hidden = false;
+    } else {
+        btnQuotationClosed.hidden = true;
+    }
+};
+
+const fnBtnAddPendingDeposit = () => {
+    amountDeposit.value = formatterAmount().format(fnparseFloat(pendingDeposit));
+};
+const fnBtnAddPendingTransfer = () => {
+    amountTransfer.value = formatterAmount().format(fnparseFloat(pendingTransfer));
+
+};
+
+const fnSelectTableSourceDeposit = async (index = 0) => {
+
+    var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
+    indexDataTableBankSourceDeposit = index;
+    var selectedRowNodeAfter = selectedRowAfter.node();
+    $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+
+    // Selecciona la fila deseada
+    var selectedRow = dataTableBankSourceDeposit.row(index);
+
+    // Deselecciona todas las filas
+    dataTableBankSourceDeposit.rows().deselect();
+
+    // Selecciona la fila deseada
+    selectedRow.select();
+
+    // Obtiene el nodo HTML de la fila seleccionada
+    var selectedRowNode = selectedRow.node();
+
+    $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+};
+
 function fnLoadDatatableBankTransferSource(index = 0) {
     if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
     dataTableBankSourceTransfer = new DataTable("#tblBankSourceTransfer", {
@@ -615,8 +686,8 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 // Obtiene el nodo HTML de la fila seleccionada
                 var selectedRowNode = selectedRow.node();
 
-                $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
-            } 
+                $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            }
         },
         "columns": [
             {
@@ -689,8 +760,8 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 // Obtiene el nodo HTML de la fila seleccionada
                 var selectedRowNode = selectedRow.node();
 
-                $(selectedRowNode).addClass('bg-success bg-opacity-75 bg-gradient');
-            } 
+                $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            }
         },
         "columns": [
             {
@@ -749,9 +820,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
                 }
             },
             "complete": async function () {
-                dataTableBankSourceDeposit.row(index).select();
-                inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
-                inputBankTargetDeposit.value = inputBankSourceDeposit.value;
+                await fnSelectTableSourceDeposit(index);
             }
         },
         "columns": [
@@ -775,6 +844,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
         ],
         "searching": false,
         "paging": false,
+        "ordering": false,
         "select": {
             info: false,
             items: 'row',
@@ -816,6 +886,7 @@ function fnLoadDatatableDeposit() {
             },
             "complete": function () {
                 fnEnableTooltip();
+                fnVerificateIsPending();
             }
         },
         "columns": [
@@ -890,44 +961,52 @@ function fnLoadDatatableDeposit() {
             let footerCell = $(this.api().column(0).footer());
             footerCell.removeClass();
             footerCell.addClass('footer-left text-end');
-            let total = 0, pending = 0;
-            let amount = 0;
+            let total = 0, pending = 0, deposit = 0, label = "Depositar";
             data.forEach((item) => {
                 total += item.amountDetail;
             });
             if (typeNumeral == QuotationType.Buy) {
                 pending = fnparseFloat(amountHeader) - total;
             } else if (typeNumeral == QuotationType.Sell) {
-                amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                pending = (amount.toFixed(decimalTransa)) - (total);
+                if (currencyType == CurrencyType.Foreign) {
+                    deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
+                    pending = (deposit.toFixed(decimalTransa)) - (total);
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeDeposit == CurrencyType.Foreign) {
+                        deposit = fnparseFloat(amountHeader) / fnparseFloat(TCHeader.value);
+                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                    } else if (currencyTypeDeposit == CurrencyType.Base) {
+                        deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
+                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                    }
+                }
             }
 
             if (typeNumeral != QuotationType.Transfer) {
                 if (pending == 0) {
                     document.querySelector("#btnCreateDetailDeposit").hidden = true;
+                    isPendingDeposit = false;
                 } else {
                     document.querySelector("#btnCreateDetailDeposit").hidden = false;
+                    isPendingDeposit = true;
                 }
 
-                if (typeNumeral == QuotationType.Sell) {
-                    if (currencyTypeDeposit == CurrencyType.Base) {
-                        tableRowLabelDeposit.innerHTML =
-                            `Depositar: ${formatterAmount().format(fnparseFloat(amount))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                        tableRowLabelDeposit.value =
-                            `Depositar: ${formatterAmount().format(fnparseFloat(amount))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                    }
-                } else {
-
-                    tableRowLabelDeposit.innerHTML =
-                        `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                    tableRowLabelDeposit.value =
-                        `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
+                if (typeNumeral == QuotationType.Buy) {
+                    deposit = amountHeader;
                 }
 
             } else {
-                tableRowLabelDeposit.innerHTML = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                tableRowLabelDeposit.value = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
+                label = "TRC";
+                deposit = amountHeader;
+
             }
+            tableRowLabelDeposit.innerHTML =
+                `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            tableRowLabelDeposit.value =
+                `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            pendingDeposit = pending;
 
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
@@ -962,6 +1041,7 @@ function fnLoadDatatableTransfer() {
             },
             "complete": function () {
                 fnEnableTooltip();
+                fnVerificateIsPending();
             }
         },
         "columns": [
@@ -1028,7 +1108,7 @@ function fnLoadDatatableTransfer() {
             let amount = 0;
             footerCell.removeClass();
             footerCell.addClass('footer-left text-end');
-            let total = 0, pending = 0;
+            let total = 0, pending = 0, transfer = 0, label = "Transferir";
             data.forEach((item) => {
                 total += item.amountDetail;
             });
@@ -1036,36 +1116,57 @@ function fnLoadDatatableTransfer() {
                 amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                 pending = (amount.toFixed(decimalTransa)) - (total);
             } else if (typeNumeral == QuotationType.Sell) {
-                if (currencyTypeDeposit == CurrencyType.Base) {
-                    amount = (fnparseFloat(amountHeader) / fnparseFloat(TCHeader.value));
-                    pending = amount.toFixed(decimalTransa) - total;
-                } else {
+                if (currencyType == CurrencyType.Foreign) {
                     pending = fnparseFloat(amountHeader) - total;
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeDeposit == CurrencyType.Base) {
+                        pending = fnparseFloat(amountHeader) - total;
+                    } else if (currencyTypeDeposit == CurrencyType.Foreign) {
+                        pending = fnparseFloat(amountHeader) - total;
+                    }
                 }
             }
 
             if (typeNumeral != QuotationType.Transfer) {
                 if (pending == 0) {
                     document.querySelector("#btnCreateDetailTransfer").hidden = true;
+                    isPendingTransfer = false;
                 } else {
                     document.querySelector("#btnCreateDetailTransfer").hidden = false;
+                    isPendingTransfer = true;
                 }
 
-                tableRowLabelTransfer.innerHTML =
-                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchangeDetail.value))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
-                tableRowLabelTransfer.value =
-                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchangeDetail.value))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
+                if (typeNumeral == QuotationType.Buy) {
+                    if (currencyType == CurrencyType.Foreign) {
+                        transfer = amountExchangeDetail.value;
+                    } else {
+                        if (currencyTypeTransfer == CurrencyType.Base) {
+                            transfer = amountExchangeDetail.value;
+                        }
+                    }
+                } else {
+                    if (currencyType == CurrencyType.Foreign) {
+                        transfer = amountHeader;
+                    } else if (currencyType == CurrencyType.Additional) {
+                        if (currencyTypeDeposit == CurrencyType.Base) {
+                            transfer = amountHeader;
+                        } else if (currencyTypeDeposit == CurrencyType.Foreign) {
+                            transfer = amountHeader;
+                        }
+                    }
+                }
             } else {
-                tableRowLabelTransfer.innerHTML =
-                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
-                tableRowLabelTransfer.value =
-                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
+                label = "TRD";
+                transfer = amountHeader;
             }
 
+            tableRowLabelTransfer.innerHTML =
+                `${label}: ${formatterAmount().format(fnparseFloat(transfer))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            tableRowLabelTransfer.value =
+                `${label}: ${formatterAmount().format(fnparseFloat(transfer))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            pendingTransfer = pending;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });

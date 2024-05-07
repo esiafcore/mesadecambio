@@ -3,7 +3,7 @@ let dataTableTransfer, dataTableDeposit, parentId, amountTotalDeposit = 0, amoun
 let tableRowLabelTransfer, tableRowLabelDeposit, amountHeader;
 let selectBankSourceDeposit, selectBankSourceTransfer, selectBankTargetTransfer,
     amountDeposit, amountTransfer, idDetailDeposit, idDetailTransfer, TCHeader;
-let inputsFormatTransa, inputsFormatExchange, typeNumeral, amountExchange, currencyTypeDeposit;
+let inputsFormatTransa, inputsFormatExchange, typeNumeral, amountExchangeDetail, currencyTypeDeposit, currencyType, currencyTypeTransfer;
 document.addEventListener("DOMContentLoaded", function () {
 
     containerMain = document.querySelector("#containerMain");
@@ -11,9 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
     parentId = document.querySelector("#parentId").value;
     amountHeader = document.querySelector("#amountHeader").value;
     TCHeader = document.querySelector("#TCHeader");
+    amountExchangeDetail = document.querySelector("#amountExchange");
     tableRowLabelDeposit = document.querySelector("#tableRowLabelDeposit");
     tableRowLabelTransfer = document.querySelector("#tableRowLabelTransfer");
     currencyTypeDeposit = document.querySelector("#currencyDepositType").value;
+    currencyType = document.querySelector("#currencyTransaType").value;
+    currencyTypeTransfer = document.querySelector("#currencyTransferType").value;
     inputsFormatTransa = document.querySelectorAll(".decimalTransa");
     inputsFormatExchange = document.querySelectorAll(".decimalTC");
     typeNumeral = document.querySelector("#type").value;
@@ -161,38 +164,42 @@ function fnLoadDatatableDeposit() {
             let footerCell = $(this.api().column(0).footer());
             footerCell.removeClass();
             footerCell.addClass('footer-left text-end');
-            let total = 0, pending = 0;
-            let amount = 0;
+            let total = 0, pending = 0, deposit = 0, label = "Depositar";
             data.forEach((item) => {
                 total += item.amountDetail;
             });
             if (typeNumeral == QuotationType.Buy) {
                 pending = fnparseFloat(amountHeader) - total;
             } else if (typeNumeral == QuotationType.Sell) {
-                amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                pending = (amount.toFixed(decimalTransa)) - (total);
+                if (currencyType == CurrencyType.Foreign) {
+                    deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
+                    pending = (deposit.toFixed(decimalTransa)) - (total);
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeDeposit == CurrencyType.Foreign) {
+                        deposit = fnparseFloat(amountHeader) / fnparseFloat(TCHeader.value);
+                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                    } else if (currencyTypeDeposit == CurrencyType.Base) {
+                        deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
+                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                    }
+                }
             }
 
             if (typeNumeral != QuotationType.Transfer) {
-                if (typeNumeral == QuotationType.Sell) {
-                    if (currencyTypeDeposit == CurrencyType.Base) {
-                        tableRowLabelDeposit.innerHTML =
-                            `Depositar: ${formatterAmount().format(fnparseFloat(amount))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                        tableRowLabelDeposit.value =
-                            `Depositar: ${formatterAmount().format(fnparseFloat(amount))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                    }
-                } else {
-
-                    tableRowLabelDeposit.innerHTML =
-                        `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                    tableRowLabelDeposit.value =
-                        `Depositar: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
+                if (typeNumeral == QuotationType.Buy) {
+                    deposit = amountHeader;
                 }
             } else {
-                tableRowLabelDeposit.innerHTML = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-                tableRowLabelDeposit.value = `TRC: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)}`;
-            }
+                label = "TRC";
+                deposit = amountHeader;
 
+            }
+            tableRowLabelDeposit.innerHTML =
+                `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            tableRowLabelDeposit.value =
+                `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
@@ -270,7 +277,7 @@ function fnLoadDatatableTransfer() {
             let amount = 0;
             footerCell.removeClass();
             footerCell.addClass('footer-left text-end');
-            let total = 0, pending = 0;
+            let total = 0, pending = 0, transfer = 0, label = "Transferir";
             data.forEach((item) => {
                 total += item.amountDetail;
             });
@@ -278,30 +285,49 @@ function fnLoadDatatableTransfer() {
                 amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                 pending = (amount.toFixed(decimalTransa)) - (total);
             } else if (typeNumeral == QuotationType.Sell) {
-                if (currencyTypeDeposit == CurrencyType.Base) {
-                    amount = (fnparseFloat(amountHeader) / fnparseFloat(TCHeader.value));
-                    pending = amount.toFixed(decimalTransa) - total;
-                } else {
+                if (currencyType == CurrencyType.Foreign) {
                     pending = fnparseFloat(amountHeader) - total;
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeDeposit == CurrencyType.Base) {
+                        pending = fnparseFloat(amountHeader) - total;
+                    } else if (currencyTypeDeposit == CurrencyType.Foreign) {
+                        pending = fnparseFloat(amountHeader) - total;
+                    }
                 }
             }
 
             if (typeNumeral != QuotationType.Transfer) {
-                amountExchange = document.querySelector("#amountExchange");
-                tableRowLabelTransfer.innerHTML =
-                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchange.value))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
-                tableRowLabelTransfer.value =
-                    `Transferir: ${formatterAmount().format(fnparseFloat(amountExchange.value))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
+              
+                if (typeNumeral == QuotationType.Buy) {
+                    if (currencyType == CurrencyType.Foreign) {
+                        transfer = amountExchangeDetail.value;
+                    } else {
+                        if (currencyTypeTransfer == CurrencyType.Base) {
+                            transfer = amountExchangeDetail.value;
+                        }
+                    }
+                } else {
+                    if (currencyType == CurrencyType.Foreign) {
+                        transfer = amountHeader;
+                    } else if (currencyType == CurrencyType.Additional) {
+                        if (currencyTypeDeposit == CurrencyType.Base) {
+                            transfer = amountHeader;
+                        } else if (currencyTypeDeposit == CurrencyType.Foreign) {
+                            transfer = amountHeader;
+                        }
+                    }
+                }
             } else {
-                tableRowLabelTransfer.innerHTML =
-                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
-                tableRowLabelTransfer.value =
-                    `TRD: ${formatterAmount().format(fnparseFloat(amountHeader))}  -  Pendiente: ${formatterAmount().format(pending)
-                    }`;
+                label = "TRD";
+                transfer = amountHeader;
             }
+
+            tableRowLabelTransfer.innerHTML =
+                `${label}: ${formatterAmount().format(fnparseFloat(transfer))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
+            tableRowLabelTransfer.value =
+                `${label}: ${formatterAmount().format(fnparseFloat(transfer))}  -  Pendiente: ${formatterAmount().format(pending)
+                }`;
 
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }

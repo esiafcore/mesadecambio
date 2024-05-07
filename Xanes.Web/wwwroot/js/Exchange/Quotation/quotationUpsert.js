@@ -4,6 +4,7 @@
     divAmountExchange, divCommission, divCurrencyTransa;
 let inputsFormatTransa, inputsFormatExchange;
 let containerMain, selectCustomer, selectBankAccountTarget, selectBankAccountSource;
+let elementsHiddenBuySell, divExchangeRateVariation, inputExchangeRateVariation, inputCommission;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -13,10 +14,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
     inputAmountCost = document.querySelector("#amountCost");
+    inputCommission = document.querySelector("#commission");
     inputAmountRevenue = document.querySelector("#amountRevenue");
     currenciesTransa = document.querySelectorAll(".currenciesTransa");
-    currenciesDeposit = document.querySelectorAll(".currenciesTransfer");
-    currenciesTransfer = document.querySelectorAll(".currenciesDeposit");
+    currenciesDeposit = document.querySelectorAll(".currenciesDeposit");
+    currenciesTransfer = document.querySelectorAll(".currenciesTransfer");
     typeNumerals = document.querySelectorAll(".typeNumerals");
     inputCurrencyTransa = document.querySelector("#currencyTransaType");
     inputCurrencyDeposit = document.querySelector("#currencyDepositType");
@@ -25,6 +27,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementsBuy = document.querySelectorAll(".typeBuy");
     elementsTransfer = document.querySelectorAll(".typeTransfer");
     elementsSell = document.querySelectorAll(".typeSell");
+    elementsHiddenBuySell = document.querySelectorAll(".typeBuySellhidden");
+    divExchangeRateVariation = document.querySelector("#divExchangeRateVariation");
+    inputExchangeRateVariation = document.querySelector("#exchangeRateVariation");
     divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
     divCurrencyTransfer = document.querySelector("#divCurrencyTransfer");
     inputsFormatTransa = document.querySelectorAll(".decimalTransa");
@@ -40,8 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 
-        item.addEventListener("change", () => {
-            item.value = formatterAmount().format(fnparseFloat(item.value));
+        item.addEventListener("change", (event) => {
+            if (event.target === inputAmountTransa ||
+                event.target === inputCommission) {
+                item.value = formatterAmount().format(fnparseFloat(item.value, true));
+            } else {
+                item.value = formatterAmount().format(fnparseFloat(item.value));
+            }
+
             fnCalculateRevenueCost();
         });
     });
@@ -49,8 +60,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     inputsFormatExchange.forEach((item) => {
         item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
 
-        item.addEventListener("change", () => {
-            item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+        item.addEventListener("change", (event) => {
+            if (event.target === inputExchangeRateSellTransa ||
+                event.target === inputExchangeRateBuyTransa) {
+                item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value, true));
+            } else {
+                item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
+            }
             fnCalculateRevenueCost();
         });
     });
@@ -74,32 +90,37 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fnTCByDate();
     });
 
-    currenciesTransa.forEach((item) => {
-        item.addEventListener("change", () => {
-            currencyType = item.value;
+    currenciesTransa.forEach((transa) => {
+        transa.addEventListener("change", () => {
+            currencyType = transa.value;
             inputCurrencyTransa.value = parseInt(currencyType);
+            fnCalculateRevenueCost();
         });
     });
 
-    currenciesDeposit.forEach((item) => {
-        if (item.checked) {
-            inputCurrencyDeposit.value = parseInt(item.value);
-            currencyTypeDeposit = parseInt(item.value);
-        }
-        item.addEventListener("change", () => {
-            inputCurrencyDeposit.value = parseInt(item.value);
+    currenciesDeposit.forEach((deposit) => {
+        deposit.addEventListener("change", () => {
+            inputCurrencyDeposit.value = parseInt(deposit.value);
+            currencyTypeDeposit = parseInt(deposit.value);
+            fnCalculateRevenueCost();
         });
+        if (deposit.checked) {
+            inputCurrencyDeposit.value = parseInt(deposit.value);
+            currencyTypeDeposit = parseInt(deposit.value);
+        }
     });
 
-    currenciesTransfer.forEach((item) => {
-        if (item.checked) {
-            inputCurrencyTransfer.value = parseInt(item.value);
-            currencyTypeTransfer = parseInt(item.value);
-        }
-        item.addEventListener("change", () => {
-            inputCurrencyTransfer.value = parseInt(item.value);
-            currencyTypeTransfer = parseInt(item.value);
+    currenciesTransfer.forEach((transfer) => {
+        transfer.addEventListener("change", () => {
+            inputCurrencyTransfer.value = parseInt(transfer.value);
+            currencyTypeTransfer = parseInt(transfer.value);
+            fnCalculateRevenueCost();
         });
+
+        if (transfer.checked) {
+            inputCurrencyTransfer.value = parseInt(transfer.value);
+            currencyTypeTransfer = parseInt(transfer.value);
+        }
     });
 
     typeNumerals.forEach((item) => {
@@ -204,16 +225,26 @@ const fnLoadInputsByType = (type) => {
         divCurrencyDeposit.hidden = true;
         elementsBuy.forEach((item) => item.hidden = false);
         elementsSell.forEach((item) => item.hidden = true);
+        divExchangeRateVariation.hidden = false;
+        elementsHiddenBuySell.forEach((item) => {
+            item.className = "";
+            item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
+        });
         elementsTransfer.forEach((item) => item.hidden = true);
         fnChangeCustomers(false);
     } else if (type == QuotationType.Sell) {
         divCurrencyTransa.hidden = false;
         divAmountExchange.hidden = false;
         divCommission.hidden = true;
+        divExchangeRateVariation.hidden = false;
         divCurrencyTransfer.hidden = true;
         divCurrencyDeposit.hidden = false;
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = false);
+        elementsHiddenBuySell.forEach((item) => {
+            item.className = "";
+            item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
+        });
         elementsTransfer.forEach((item) => item.hidden = true);
         fnChangeCustomers(false);
     } else {
@@ -221,7 +252,12 @@ const fnLoadInputsByType = (type) => {
         divCurrencyTransa.hidden = true;
         divCommission.hidden = false;
         divCurrencyTransfer.hidden = true;
+        divExchangeRateVariation.hidden = true;
         divCurrencyDeposit.hidden = true;
+        elementsHiddenBuySell.forEach((item) => {
+            item.className = "";
+            item.classList.add("row", "col-xl-4", "d-none", "typeBuySell");
+        });
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
@@ -229,7 +265,6 @@ const fnLoadInputsByType = (type) => {
     }
     fnCalculateRevenueCost();
 };
-
 function currencyTransaType_onClick(objElem) {
 
     let curDepositBaseDiv = document.getElementById(divnamecurDeposit + CurrencyType.Base);
@@ -254,11 +289,11 @@ function currencyTransaType_onClick(objElem) {
         curDepositAdditionalDiv.style.display = styleHide;
         curDepositForeignDiv.style.display = styleShowInline;
         curDepositBaseDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurDeposit + CurrencyType.Foreign).checked = true;
+        document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
         curTransferAdditionalDiv.style.display = styleHide;
         curTransferForeignDiv.style.display = styleShowInline;
         curTransferBaseDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurTransfer + CurrencyType.Foreign).checked = true;
+        document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
     }
 
     return true;
@@ -272,6 +307,7 @@ const fnCalculateRevenueCost = () => {
     let exchangeRateBuyTransa = fnparseFloat(inputExchangeRateBuyTransa.value);
     let exchangeRateSellTransa = fnparseFloat(inputExchangeRateSellTransa.value);
     let exchangeRateOfficialTransa = fnparseFloat(inputExchangeRateOfficialTransa.value);
+    let exchangeRateVariation = fnparseFloat(inputExchangeRateVariation.value);
     let amountTransa = fnparseFloat(inputAmountTransa.value);
     let amountCost = 0, amountRevenue = 0;
 
@@ -285,7 +321,8 @@ const fnCalculateRevenueCost = () => {
             divRevenue.hidden = false;
             divCost.hidden = true;
         }
-
+        exchangeRateVariation = exchangeRateOfficialTransa - exchangeRateBuyTransa;
+        inputExchangeRateVariation.value = formatterAmount(decimalExchange).format(exchangeRateVariation);
         amountExchange.value = formatterAmount().format(amountTransa * exchangeRateBuyTransa);
 
     } else if (inputTypeNumeral.value == QuotationType.Sell) {
@@ -304,11 +341,18 @@ const fnCalculateRevenueCost = () => {
             amountExchange.value = formatterAmount().format(0);
         } else {
             if (currencyType == CurrencyType.Foreign) {
-                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
             } else if (currencyType == CurrencyType.Additional) {
-                amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                if (currencyTypeDeposit == CurrencyType.Base) {
+                    amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
+                } else {
+                    amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                }
             }
         }
+
+        exchangeRateVariation = exchangeRateSellTransa - exchangeRateOfficialTransa;
+        inputExchangeRateVariation.value = formatterAmount(decimalExchange).format(exchangeRateVariation);
     }
     inputExchangeRateBuyTransa.value = formatterAmount(decimalExchange).format(exchangeRateBuyTransa);
     inputExchangeRateSellTransa.value = formatterAmount(decimalExchange).format(exchangeRateSellTransa);

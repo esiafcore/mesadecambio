@@ -139,9 +139,9 @@ const QuotationType = {
 }
 
 
-const fnparseFloat = (valueInput) => {
+const fnparseFloat = (valueInput, onlyNumbersPositive = false) => {
     // Verifica si valueInput es un número válido
-    if (!isNaN(valueInput) && valueInput !== "") {
+    if (!isNaN(valueInput) && typeof valueInput !== "string") {
         // Si es un número válido, conviértelo a flotante y devuélvelo
         return parseFloat(valueInput);
     }
@@ -149,7 +149,19 @@ const fnparseFloat = (valueInput) => {
     // Verifica si valueInput es una cadena antes de intentar reemplazar las comas
     if (typeof valueInput === 'string') {
         // Utiliza una expresión regular para reemplazar todas las comas
-        valueInput = valueInput.replace(/,/g, "");
+        //if (!onlyNumbersPositive) {
+        //    valueInput = valueInput.replace(/,/g, "");
+        //} else {
+        //    valueInput = valueInput.replace(/[,-]/g, "");
+        //}
+
+        if (!onlyNumbersPositive) {
+            // Eliminar comas y caracteres no numéricos
+            valueInput = valueInput.replace(/[^0-9.-]/g, "");
+        } else {
+            // Eliminar comas, signos negativos y caracteres no numéricos
+            valueInput = valueInput.replace(/[^0-9.]/g, "");
+        }
         // Verifica si el valor del input es un número después de reemplazar las comas
         if (!isNaN(valueInput.trim()) && valueInput.trim() !== "") {
             return parseFloat(valueInput.trim());

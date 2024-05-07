@@ -1,5 +1,7 @@
 ﻿@model QuotationCreateVM
 <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <div class="container-fluid">
         <div class="card">
             <div class="card-header bg-secondary bg-gradient">
@@ -25,7 +27,6 @@
             <div class="card-body">
                 <div class="container rounded p-2">
                     <div class="row">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input hidden asp-for="DataModel.Id" />
                         <input hidden asp-for="DataModel.CompanyId" />
                         <input hidden asp-for="DataModel.TotalTransfer" />
@@ -74,6 +75,133 @@
                                     <span asp-validation-for="DataModel.CustomerId" class="text-danger"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyTransa">
+                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transa</div>
+                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
+                                    @foreach (var currency in Model.CurrencyTransaList)
+                                    {
+                                        var isChecked = (currency == Model.CurrencyTransaList.First());
+
+                                        <div class="form-check mt-2 mx-1 form-check-inline"
+                                             id="@("currencyTransaType_divradio_" + currency.Numeral)">
+                                            <input name="CurrenciesTransa"
+                                                   checked="@isChecked"
+                                                   class="form-check-input border border-dark-subtle currenciesTransa" type="radio"
+                                                   onclick="return currencyTransaType_onClick(this)"
+                                                   id="@("currencyTransaType_radio_" + currency.Numeral)" value="@currency.Numeral" />
+                                            <label class="form-check-label" for="@("currencyTransaType_label_" + currency.Numeral)">@currency.Abbreviation</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyTransfer">
+                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transfer</div>
+                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
+                                    @foreach (var currency in Model.CurrencyTransferList)
+                                    {
+                                        <div class="form-check mt-2 mx-1 form-check-inline"
+                                             id="@("currencyTransferType_divradio_" + currency.Numeral)">
+                                            <input name="CurrenciesTransfer"
+                                                   class="form-check-input border border-dark-subtle currenciesTransfer" type="radio"
+                                                   id="@("currencyTransferType_radio_" + currency.Numeral)"
+                                                   value="@currency.Numeral" />
+                                            <label class="form-check-label" for="@("currencyTransferType_label_" + currency.Numeral)">@currency.Abbreviation</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyDeposit" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Deposito</div>
+                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
+                                    @foreach (var currency in Model.CurrencyDepositList)
+                                    {
+                                        <div class="form-check mt-2 mx-1 form-check-inline"
+                                             id="@("currencyDepositType_divradio_" + currency.Numeral)">
+                                            <input name="CurrenciesDeposit"
+                                                   class="form-check-input border border-dark-subtle currenciesDeposit" type="radio"
+                                                   id="@("currencyDepositType_radio_" + currency.Numeral)"
+                                                   value="@currency.Numeral" />
+                                            <label class="form-check-label" for="@("currencyDepositType_label_" + currency.Numeral)">@currency.Abbreviation</label>
+                                        </div>
+                                    }
+
+                                </div>
+                            </div>
+
+                            @*Contenedor separador, simula un espacio*@
+                            <div class="row col-xl-4 d-none typeBuySellhidden">
+                            </div>
+
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" readonly />
+                                    <span asp-validation-for="DataModel.ExchangeRateOfficialTransa" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy">
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
+                                    <span asp-validation-for="DataModel.ExchangeRateBuyTransa" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Venta</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.ExchangeRateSellTransa" id="exchangeRateSellTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
+                                    <span asp-validation-for="DataModel.ExchangeRateSellTransa" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divExchangeRateVariation" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">T/C Variación</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input id="exchangeRateVariation" class="form-control text-end border p-1 shadow decimalTC" step="any" readonly />
+                                </div>
+                            </div>
+                            @*Contenedor separador, simula un espacio*@
+                            @*  <div class="row col-xl-4 d-none typeBuySellhidden">
+                            </div> *@
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Monto</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountTransaction" id="amountTransa" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
+                                    <span asp-validation-for="DataModel.AmountTransaction" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divAmountExchange">
+                                <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
+                                    <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy" id="divCost">
+                                <div class="col-sm-5 col-lg-4 col-4">Costo</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
+                                    <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" id="divRevenue" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">Ingreso</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
+                                    <span asp-validation-for="DataModel.AmountRevenue" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCommission" hidden>
+                                <div class="col-sm-5 col-lg-4 col-4">Comisión TRF</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <input id="commission" asp-for="DataModel.AmountCommission" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
+                                    <span asp-validation-for="DataModel.AmountCommission" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Orig.</div>
                                 <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
@@ -100,117 +228,6 @@
                                         }
                                     </select>
                                     <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyTransa">
-                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transa</div>
-                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
-                                    @foreach (var currency in Model.CurrencyTransaList)
-                                    {
-                                        var isChecked = (currency == Model.CurrencyTransaList.First());
-
-                                        <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyTransaType_divradio_"+currency.Numeral)">
-                                            <input name="CurrenciesTransa"
-                                                   checked="@isChecked"
-                                                   class="form-check-input border border-dark-subtle currenciesTransa" type="radio"
-                                                   onclick="return currencyTransaType_onClick(this)"
-                                                   id="@("currencyTransaType_radio_" + currency.Numeral)" value="@currency.Numeral" />
-                                            <label class="form-check-label" for="@("currencyTransaType_label_" + currency.Numeral)">@currency.Abbreviation</label>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyTransfer">
-                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Transfer</div>
-                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
-                                    @foreach (var currency in Model.CurrencyTransferList)
-                                    {
-                                        <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyTransferType_divradio_"+currency.Numeral)">
-                                            <input name="CurrenciesTransfer"
-                                                   class="form-check-input border border-dark-subtle currenciesTransfer" type="radio"
-                                                   id="@("currencyTransferType_radio_" + currency.Numeral)"
-                                                   value="@currency.Numeral"/>
-                                            <label class="form-check-label" for="@("currencyTransferType_label_" + currency.Numeral)">@currency.Abbreviation</label>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCurrencyDeposit" hidden>
-                                <div class="col-sm-5 col-lg-4 col-4 me-2 me-md-2">Mon Deposito</div>
-                                <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-1 ms-md-1 ps-xl-2">
-                                    @foreach (var currency in Model.CurrencyDepositList)
-                                    {
-                                        <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyDepositType_divradio_"+currency.Numeral)">
-                                            <input name="CurrenciesDeposit"
-                                                   class="form-check-input border border-dark-subtle currenciesDeposit" type="radio"
-                                                   id="@("currencyDepositType_radio_" + currency.Numeral)"
-                                                   value="@currency.Numeral"/>
-                                            <label class="form-check-label" for="@("currencyDepositType_label_" + currency.Numeral)">@currency.Abbreviation</label>
-                                        </div>
-                                    }
-
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
-                                <div class="col-sm-5 col-lg-4 col-4">T/C Oficial</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.ExchangeRateOfficialTransa" id="exchangeRateOfficialTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" readonly />
-                                    <span asp-validation-for="DataModel.ExchangeRateOfficialTransa" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy">
-                                <div class="col-sm-5 col-lg-4 col-4">T/C Compra</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.ExchangeRateBuyTransa" id="exchangeRateBuyTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
-                                    <span asp-validation-for="DataModel.ExchangeRateBuyTransa" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" hidden>
-                                <div class="col-sm-5 col-lg-4 col-4">T/C Venta</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.ExchangeRateSellTransa" id="exchangeRateSellTransa" class="form-control text-end border p-1 shadow decimalTC" step="any" />
-                                    <span asp-validation-for="DataModel.ExchangeRateSellTransa" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
-                                <div class="col-sm-5 col-lg-4 col-4">Monto</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountTransaction" id="amountTransa" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
-                                    <span asp-validation-for="DataModel.AmountTransaction" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeBuy" id="divCost">
-                                <div class="col-sm-5 col-lg-4 col-4">Costo</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountCost" id="amountCost" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly/>
-                                    <span asp-validation-for="DataModel.AmountCost" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1 typeSell" id="divRevenue" hidden>
-                                <div class="col-sm-5 col-lg-4 col-4">Ingreso</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountRevenue" id="amountRevenue" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
-                                    <span asp-validation-for="DataModel.AmountRevenue" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divAmountExchange">
-                                <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.AmountExchange" id="amountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
-                                    <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divCommission" hidden>
-                                <div class="col-sm-5 col-lg-4 col-4">Comisión TRF</div>
-                                <div class="col-xl-6 col-sm-7 col-8">
-                                    <input id="commission" asp-for="DataModel.AmountCommission" class="form-control text-end border p-1 shadow decimalTransa" step="any" />
-                                    <span asp-validation-for="DataModel.AmountCommission" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>

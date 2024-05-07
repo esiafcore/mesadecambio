@@ -11,7 +11,7 @@
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
                 <div class="col-6 col-md-7 col-lg-5 col-xl-4">
-                    <a onclick="fnApproved(@Model.ModelCreateVM.DataModel.Id)" class="btn btn-info form-control btn-sm border">
+                    <a onclick="fnApproved(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed" class="btn btn-info form-control btn-sm border" hidden>
                         <i class="bi bi-check-square-fill"></i> Cerrar Cotización
                     </a>
                 </div>
@@ -58,7 +58,7 @@
                 <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1 me-1">
                     <input class="form-control text-end border p-1 shadow decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
                 </div>
-                <div class="col-8 col-md-3 col-xl-2 col-xxl-5 d-none d-xl-block">
+                <div class="col-xl-5 d-none d-xl-block">
                 </div>
             }
             else if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Sell)
@@ -69,7 +69,7 @@
                 <div class="col-8 col-md-3 col-xl-2 col-xxl-2 mb-1 me-1">
                     <input class="form-control text-end border p-1 shadow decimalTC" id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateSellTransa" readonly />
                 </div>
-                <div class="col-8 col-md-3 col-xl-2 col-xxl-5 d-none d-xl-block">
+                <div class="col-xl-5 d-none d-xl-block">
                 </div>
             }
             <div class="col-3 col-md-2 col-xl-1 mb-1 @(Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Transfer ? "offset-md-1 offset-xl-0 offset-xxl-0" : ' ')">
