@@ -114,11 +114,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 const fnGetBankAccounts = async () => {
-    $(selectBankAccountSource).select2(select2Options);
-    $(selectBankAccountTarget).select2(select2Options);
+    //$(selectBankAccountTarget).select2(select2Options);
 
-    $(selectBankAccountSource).on('select2:select', async function (e) {
-        let url = `/Exchange/Quotation/GetBankAccountTarget?idSource=${e.params.data.id}`;
+    selectBankAccountSource.addEventListener("change", async () => {
+
+        let url = `/Exchange/Quotation/GetBankAccountTarget?idSource=${selectBankAccountSource.value}`;
 
         try {
 
@@ -133,7 +133,7 @@ const fnGetBankAccounts = async () => {
                 // Agregar options
                 let option = document.createElement("option");
                 option.value = "";
-                option.text = "--Select Cta Destino--";
+                option.text = "--Select Cuenta Destino--";
                 option.disabled = true;
                 option.selected = true;
 
@@ -146,7 +146,7 @@ const fnGetBankAccounts = async () => {
                     selectBankAccountTarget.appendChild(option);
                 });
 
-                $(selectBankAccountTarget).select2(select2Options);
+                //$(selectBankAccountTarget).select2(select2Options);
 
             } else {
                 alert(jsonResponse.errorMessages);
