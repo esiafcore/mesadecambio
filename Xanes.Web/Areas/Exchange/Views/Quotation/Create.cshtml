@@ -205,7 +205,7 @@
                             <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Orig.</div>
                                 <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
-                                    <select asp-for="DataModel.BankAccountSourceId" size="7"
+                                    <select asp-for="DataModel.BankAccountSourceId" size="12"
                                             class="form-select border p-1 shadow" id="selectBankAccountSource">
                                         <option disabled selected>--Select Cuenta Bancaria--</option>
                                         @foreach (var bank in Model.BankAccountSourceList)
@@ -219,7 +219,7 @@
                             <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Dest.</div>
                                 <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
-                                    <select asp-for="DataModel.BankAccountTargetId" size="7"
+                                    <select asp-for="DataModel.BankAccountTargetId" size="12"
                                             class="form-select border p-1 shadow" id="selectBankAccountTarget">
                                         <option disabled selected>--Select Cuenta Bancaria--</option>
                                         @foreach (var bank in Model.BankAccountTargetList)

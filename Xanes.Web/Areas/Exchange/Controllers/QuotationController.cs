@@ -1080,6 +1080,7 @@ public class QuotationController : Controller
 
             objHeader.IsClosed = true;
             objHeader.Numeral = nextSeq;
+            objHeader.InternalSerial = AC.InternalSerialOfficial;
             //Seteamos campos de auditoria
             objHeader.UpdatedBy = AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
