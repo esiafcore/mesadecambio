@@ -97,6 +97,11 @@ function loadDatatable() {
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;
 
+                    let btnReClosed = `<a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-warning py-1 px-3 my-0 mx-1"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Re-Cerrar">
+                                         <i class="bi bi-check2-square fs-5"></i>
+                                     </a>`;
+
                     let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
                                      data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
                                      <i class="bi bi-eye fs-5"></i>
@@ -115,10 +120,16 @@ function loadDatatable() {
                     let buttons = `<div class="btn-group" role="group">`;
 
 
-                    if (row.isClosed) {
+                    if (row.isClosed && row.isPosted) {
                         buttons += `
                             ${btnView}
                             ${btnPrint}
+                        `;
+                    }else if (row.isClosed && !row.isPosted) {
+                        buttons += `
+                            ${btnView}
+                            ${btnPrint}
+                            ${btnReClosed}
                         `;
                     } else {
                         buttons += `

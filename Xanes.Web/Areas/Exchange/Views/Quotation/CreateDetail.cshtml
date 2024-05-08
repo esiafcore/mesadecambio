@@ -10,11 +10,22 @@
                 <h2 class="text-white text-center text-md-start py-1">Detalle - Cotización</h2>
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
-                <div class="col-6 col-md-7 col-lg-5 col-xl-4">
-                    <a onclick="fnApproved(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed" class="btn btn-info form-control btn-sm border" hidden>
-                        <i class="bi bi-check-square-fill"></i> Cerrar Cotización
-                    </a>
-                </div>
+                @if (ViewData["IsReClosed"] != null)
+                {
+                    <div class="col-6 col-md-7 col-lg-5 col-xl-4">
+                        <a onclick="fnReClosed(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed" class="btn btn-info form-control btn-sm border" hidden>
+                            <i class="bi bi-check-square-fill"></i> Re-Cerrar
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="col-6 col-md-7 col-lg-5 col-xl-4">
+                        <a onclick="fnApproved(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed" class="btn btn-info form-control btn-sm border" hidden>
+                            <i class="bi bi-check-square-fill"></i> Cerrar Cotización
+                        </a>
+                    </div>
+                }
                 <div class="col-6 col-md-5 col-xl-4">
                     <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
                         <i class="bi bi-arrow-return-left"></i> Regresar
