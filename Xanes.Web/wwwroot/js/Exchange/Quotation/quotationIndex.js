@@ -102,6 +102,11 @@ function loadDatatable() {
                                          <i class="bi bi-check2-square fs-5"></i>
                                      </a>`;
 
+                    let btnVoid = `<a onclick="fnVoid(${row.id})" class="btn btn-outline-info py-1 px-3 my-0 mx-1"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Anular">
+                                         <i class="bi bi-x-square-fill fs-5"></i>
+                                     </a>`;
+
                     let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
                                      data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
                                      <i class="bi bi-eye fs-5"></i>
@@ -120,18 +125,32 @@ function loadDatatable() {
                     let buttons = `<div class="btn-group" role="group">`;
 
 
-                    if (row.isClosed && row.isPosted) {
+                    if (row.isVoid) {
                         buttons += `
                             ${btnView}
                             ${btnPrint}
                         `;
-                    }else if (row.isClosed && !row.isPosted) {
+                    } else if (row.isClosed && row.isPosted && !row.isVoid) {
+                        buttons += `
+                            ${btnView}
+                            ${btnPrint}
+                            ${btnVoid}
+                        `;
+                    } else if (row.isClosed && !row.isPosted && !row.isVoid) {
                         buttons += `
                             ${btnView}
                             ${btnPrint}
                             ${btnReClosed}
+                            ${btnVoid}
                         `;
-                    } else {
+                    }
+                    //else if (row.isClosed && !row.isPosted && row.isVoid) {
+                    //    buttons += `
+                    //        ${btnView}
+                    //        ${btnPrint}
+                    //    `;
+                    //}
+                    else {
                         buttons += `
                             ${btnView}
                             ${btnUpdate}
@@ -146,10 +165,49 @@ function loadDatatable() {
                 }
             }
         ],
+        "createdRow": function (row, data) {
+            if (data.isVoid) {
+                $(row).addClass('table-danger bg-danger bg-opacity-50');
+            }
+        },
         searching: true,
         select: selectOptions
     });
 }
+
+
+
+const fnVoid = async (id) => {
+
+    try {
+
+        let url = `/exchange/quotation/Void?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
 
 
 const fnPrintReport = async (id) => {

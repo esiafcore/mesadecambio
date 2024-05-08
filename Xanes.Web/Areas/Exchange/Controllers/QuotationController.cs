@@ -1161,6 +1161,55 @@ public class QuotationController : Controller
         }
     }
 
+    [HttpPost, ActionName("Void")]
+    public async Task<JsonResult> VoidPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+
+        try
+        {
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            objHeader.IsVoid = true;
+            //Seteamos campos de auditoria
+            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.ClosedDate = DateTime.UtcNow;
+            objHeader.ClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ClosedIpv4 = AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            TempData["success"] = $"Cotización anulada correctamente";
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
     [HttpPost, ActionName("DeleteDetail")]
     public JsonResult DeleteDetailPost(int id)
     {
