@@ -377,7 +377,7 @@ public class QuotationController : Controller
                     //Cliente paga en Dolares
                     else if (obj.CurrencyDepositType == SD.CurrencyType.Foreign)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction / obj.ExchangeRateSellTransa);
+                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
                         obj.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
                     }
                 }

@@ -34,7 +34,6 @@
     <Relations isList="true" count="0" />
     <Report isRef="0" />
     <Resources isList="true" count="0" />
-    <UserFunctions isList="true" count="0" />
     <Variables isList="true" count="18">
       <value>,parFileImagePath,parFileImagePath,,System.String,,False,False,False,False,,_x0031_6803973931b4e6ba3eb524a9dca130a</value>
       <value>,parNameCompany,parNameCompany,,System.String,,False,False,False,False,,_x0032_cacf64e5a32473290b2ad8502c89aa4</value>
@@ -77,6 +76,7 @@
               <Expressions isList="true" count="0" />
               <IconColor>68, 114, 196</IconColor>
               <ImageURL>{parFileImagePath}</ImageURL>
+              <Margins>0,0,0,0</Margins>
               <Name>ImgLogo</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -84,11 +84,12 @@
             </ImgLogo>
             <Text4 Ref="6" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>48,0,312,10</ClientRectangle>
+              <ClientRectangle>48,0,312,8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,20,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text4</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -99,11 +100,12 @@
             </Text4>
             <Text5 Ref="7" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>48,10,312,8</ClientRectangle>
+              <ClientRectangle>48,8,312,8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,16,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text5</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -114,11 +116,12 @@
             </Text5>
             <Text44 Ref="8" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>48,18,312,8</ClientRectangle>
+              <ClientRectangle>48,16,312,10</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,14,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text44</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -136,7 +139,7 @@
         </PageHeaderBand1>
         <PageFooterBand1 Ref="9" type="PageFooterBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,250,360,10</ClientRectangle>
+          <ClientRectangle>0,260,360,10</ClientRectangle>
           <Components isList="true" count="2">
             <Pagination Ref="10" type="Text" isKey="true">
               <Border>None;[165:165:165];1;Solid;False;4;Black</Border>
@@ -146,6 +149,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Pagination</Name>
               <Page isRef="3" />
               <Parent isRef="9" />
@@ -161,6 +165,7 @@
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
+              <Margins>0,0,0,0</Margins>
               <Name>Text3</Name>
               <Page isRef="3" />
               <Parent isRef="9" />
@@ -182,6 +187,7 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Arial,8</Font>
+          <Margins>0,0,0,0</Margins>
           <Name>Text24</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -201,6 +207,7 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Arial,8</Font>
+          <Margins>0,0,0,0</Margins>
           <Name>Text45</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -227,6 +234,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Headerdatrep_code</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -243,6 +251,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Headerdatrep_IdentNumberCode</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -259,6 +268,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Headerdatrep_identNumber</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -275,6 +285,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Headerdatrep_comercialName</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -291,6 +302,7 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Headerdatrep_phoneNumber</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -308,6 +320,7 @@ Com/Vta</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text6</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -325,6 +338,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text7</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -341,6 +355,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text8</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -357,6 +372,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text1</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -373,6 +389,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text9</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -389,6 +406,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text10</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -405,6 +423,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text11</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -421,6 +440,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text12</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -437,6 +457,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text13</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -453,6 +474,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text14</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
@@ -767,6 +789,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text26</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -782,6 +805,7 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text27</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -799,6 +823,7 @@ SumD(datrep.TotalTransfer))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text28</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -816,6 +841,7 @@ SumD(datrep.TotalDeposit))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text29</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -833,6 +859,7 @@ SumD(datrep.AmountTransaction))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text32</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -848,6 +875,7 @@ SumD(datrep.AmountTransaction))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text31</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -865,6 +893,7 @@ SumD(datrep.AmountCost))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text42</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -882,6 +911,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text46</Name>
               <Page isRef="3" />
               <Parent isRef="46" />
@@ -909,6 +939,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text26</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -924,6 +955,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text30</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -940,6 +972,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text33</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -956,6 +989,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text27</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -973,6 +1007,7 @@ parAmountNetTransferBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text28</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -990,6 +1025,7 @@ parAmountNetDepositBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text29</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -1007,6 +1043,7 @@ parAmountNetBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text25</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -1024,6 +1061,7 @@ parAmountNetCostBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text35</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -1041,6 +1079,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text47</Name>
               <Page isRef="3" />
               <Parent isRef="55" />
@@ -1068,6 +1107,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text36</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1083,6 +1123,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text40</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1099,6 +1140,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text41</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1115,6 +1157,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text37</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1132,6 +1175,7 @@ parAmountNetTransferSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text38</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1149,6 +1193,7 @@ parAmountNetDepositSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text39</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1166,6 +1211,7 @@ parAmountNetSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text34</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1183,6 +1229,7 @@ parAmountNetCostSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text43</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1200,6 +1247,7 @@ parAmountNetRevenueSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text48</Name>
               <Page isRef="3" />
               <Parent isRef="65" />
@@ -1219,7 +1267,7 @@ parAmountNetRevenueSell)}</Text>
       <Conditions isList="true" count="0" />
       <Expressions isList="true" count="0" />
       <Guid>fd7fe16cf3f04d748d1a2c6609e15e4f</Guid>
-      <Margins>10,10,10,10</Margins>
+      <Margins>10,10,5,5</Margins>
       <Name>Page1</Name>
       <Orientation>Landscape</Orientation>
       <PageHeight>280</PageHeight>
@@ -1239,13 +1287,13 @@ parAmountNetRevenueSell)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/8/2024 9:46:58 AM</ReportChanged>
+  <ReportChanged>5/8/2024 11:00:54 AM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
-  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\Xanes\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
-  <ReportGuid>6adc9e059dd4468aab063f66b64c7250</ReportGuid>
+  <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
+  <ReportGuid>c6b5b721d0eb4a67b6ffeb9a887f4b14</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
-  <ReportVersion>2024.2.3.0</ReportVersion>
+  <ReportVersion>2023.4.2.0</ReportVersion>
   <Script>using System;
 using System.Drawing;
 using System.Windows.Forms;

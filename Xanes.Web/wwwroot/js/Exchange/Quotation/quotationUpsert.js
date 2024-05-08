@@ -91,18 +91,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currenciesTransa.forEach((transa) => {
-        transa.addEventListener("change", () => {
+        transa.addEventListener("change", async () => {
             currencyType = transa.value;
             inputCurrencyTransa.value = parseInt(currencyType);
             fnCalculateRevenueCost();
+            await fnTCByDate();
         });
     });
 
     currenciesDeposit.forEach((deposit) => {
-        deposit.addEventListener("change", () => {
+        deposit.addEventListener("change", async () => {
             inputCurrencyDeposit.value = parseInt(deposit.value);
             currencyTypeDeposit = parseInt(deposit.value);
             fnCalculateRevenueCost();
+            await fnTCByDate();
         });
         if (deposit.checked) {
             inputCurrencyDeposit.value = parseInt(deposit.value);
@@ -111,10 +113,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     currenciesTransfer.forEach((transfer) => {
-        transfer.addEventListener("change", () => {
+        transfer.addEventListener("change", async () => {
             inputCurrencyTransfer.value = parseInt(transfer.value);
             currencyTypeTransfer = parseInt(transfer.value);
             fnCalculateRevenueCost();
+            await fnTCByDate();
         });
 
         if (transfer.checked) {
@@ -346,7 +349,7 @@ const fnCalculateRevenueCost = () => {
                 if (currencyTypeDeposit == CurrencyType.Base) {
                     amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
                 } else {
-                    amountExchange.value = formatterAmount().format(amountTransa / exchangeRateSellTransa);
+                    amountExchange.value = formatterAmount().format(amountTransa * exchangeRateSellTransa);
                 }
             }
         }
@@ -375,14 +378,44 @@ const fnTCByDate = async () => {
         const jsonResponse = await response.json();
 
         if (jsonResponse.isSuccess) {
-            if (currencyType == CurrencyType.Foreign) {
+
+            if (inputTypeNumeral.value == QuotationType.Buy) {
+                if (currencyType == CurrencyType.Foreign) {
+                    inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeTransfer == CurrencyType.Base) {
+                        if (jsonResponse.data.currencyAdditional?.officialRate) {
+                            inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRate ?? 1;
+                        } else {
+                            inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
+                        }
+                    } else {
+                        inputExchangeRateOfficialTransa.value = 1;
+                    }
+                }
+            } else if (inputTypeNumeral.value == QuotationType.Sell) {
+                if (currencyType == CurrencyType.Foreign) {
+                    inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
+                } else if (currencyType == CurrencyType.Additional) {
+                    if (currencyTypeDeposit == CurrencyType.Base) {
+                        if (jsonResponse.data.currencyAdditional?.officialRate) {
+                            inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRate ?? 1;
+                        } else {
+                            inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
+                        }
+                    } else {
+                        inputExchangeRateOfficialTransa.value = 1;
+                    }
+                }
+            } else {
                 inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
-            } else if (currencyType == CurrencyType.Additional) {
-                inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRate ?? 1;
             }
         } else {
             inputExchangeRateOfficialTransa.value = 1;
         }
+
+        inputExchangeRateOfficialTransa.value =
+            formatterAmount(decimalExchange).format(fnparseFloat(inputExchangeRateOfficialTransa.value));
 
     } catch (error) {
         alert(error);
