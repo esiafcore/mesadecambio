@@ -630,6 +630,11 @@ public class QuotationController : Controller
             return NotFound();
         }
 
+        if (objHeader.IsClosed && !objHeader.IsPosted)
+        {
+            ViewData["IsReClosed"] = true;
+        }
+
         var objBankList = _uow.Bank
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
@@ -1106,6 +1111,56 @@ public class QuotationController : Controller
         }
     }
 
+    [HttpPost, ActionName("ReClosed")]
+    public async Task<JsonResult> ReClosedPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+
+        try
+        {
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            objHeader.IsPosted = true;
+
+            //Seteamos campos de auditoria
+            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.ClosedDate = DateTime.UtcNow;
+            objHeader.ClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ClosedIpv4 = AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            TempData["success"] = $"Cotización re-cerrada correctamente";
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
     [HttpPost, ActionName("DeleteDetail")]
     public JsonResult DeleteDetailPost(int id)
     {
@@ -1423,7 +1478,7 @@ public class QuotationController : Controller
             reportResult.Dictionary.Variables[AC.ParNameCompany].ValueObject = $"{company.Name}";
             reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = "Nota de Crédito";
             reportResult.Dictionary.Variables[AC.ParFileImagePath].ValueObject = $"{company.ImageLogoUrl}";
-            string isClosed = transaction.IsClosed ? "Cerrado" : "No Cerrado";
+            string isClosed = transaction.IsClosed ? "" : "No Cerrado";
             reportResult.Dictionary.Variables["parIsClosed"].ValueObject = isClosed;
             reportResult.ReportName = "Nota de Crédito";
 
