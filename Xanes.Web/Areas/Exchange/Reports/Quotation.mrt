@@ -28,6 +28,7 @@
     <Relations isList="true" count="0" />
     <Report isRef="0" />
     <Resources isList="true" count="0" />
+    <UserFunctions isList="true" count="0" />
     <Variables isList="true" count="7">
       <value>,parDecimalTransaction,parDecimalTransaction,,System.Int32,,False,False,False,False,,c41c691bb0104842bfe3b594f0c3bcbb</value>
       <value>,parDecimalExchangeRate,parDecimalExchangeRate,,System.Int32,,False,False,False,False,,bdde54674a3b4663b855626fd2fdeed3</value>
@@ -49,15 +50,14 @@
       <Components isList="true" count="8">
         <PageHeader Ref="4" type="PageHeaderBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,4,200,53</ClientRectangle>
+          <ClientRectangle>0,4,196,53</ClientRectangle>
           <Components isList="true" count="10">
             <Text4 Ref="5" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>72,41,128,5</ClientRectangle>
+              <ClientRectangle>72,41,122,5</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text4</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -67,13 +67,13 @@
               <VertAlignment>Center</VertAlignment>
             </Text4>
             <ImgLogo Ref="6" type="Image" isKey="true">
+              <AspectRatio>True</AspectRatio>
               <Brush>Transparent</Brush>
               <ClientRectangle>0,0,36,23</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <IconColor>68, 114, 196</IconColor>
               <ImageURL>{parFileImagePath}</ImageURL>
-              <Margins>0,0,0,0</Margins>
               <Name>ImgLogo</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -81,12 +81,11 @@
             </ImgLogo>
             <Text1 Ref="7" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>36,0,164,10</ClientRectangle>
+              <ClientRectangle>36,0,158,10</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,18,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Margins>0,0,0,0</Margins>
               <Name>Text1</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -97,12 +96,11 @@
             </Text1>
             <Text2 Ref="8" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>36,10,164,12</ClientRectangle>
+              <ClientRectangle>36,10,158,12</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,13,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Margins>0,0,0,0</Margins>
               <Name>Text2</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -113,19 +111,18 @@
             </Text2>
             <Text9 Ref="9" type="Text" isKey="true">
               <AutoWidth>True</AutoWidth>
-              <Border>None;Black;1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
-              <ClientRectangle>0,22,200,15</ClientRectangle>
+              <ClientRectangle>0,22,194,15</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10</Font>
-              <Margins>0,0,0,0</Margins>
+              <Margins>0,5,0,0</Margins>
               <Name>Text9</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
               <Text>{datrep.DescriptionGeneral}</Text>
               <TextBrush>Black</TextBrush>
-              <TextOptions>HotkeyPrefix=Show,LineLimit=True,,,,A=0,FirstTabOffset=80,DistanceBetweenTabs=40,</TextOptions>
+              <TextOptions>HotkeyPrefix=Show,LineLimit=True,,,WordWrap=True,A=0,FirstTabOffset=80,DistanceBetweenTabs=40,</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
             </Text9>
@@ -135,7 +132,6 @@
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text5</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -150,7 +146,6 @@
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text6</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -165,7 +160,6 @@
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text7</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -176,11 +170,10 @@
             </Text7>
             <Text12 Ref="13" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>72,46,128,5</ClientRectangle>
+              <ClientRectangle>72,46,122,5</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text12</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -191,11 +184,10 @@
             </Text12>
             <Text13 Ref="14" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>72,51,128,5</ClientRectangle>
+              <ClientRectangle>72,51,122,5</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text13</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
@@ -213,16 +205,15 @@
         </PageHeader>
         <PageFooterBand1 Ref="15" type="PageFooterBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,279,200,8</ClientRectangle>
+          <ClientRectangle>0,261,196,8</ClientRectangle>
           <Components isList="true" count="2">
             <Text17 Ref="16" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>126,1,74,6</ClientRectangle>
+              <ClientRectangle>126,1,68,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10</Font>
               <HorAlignment>Right</HorAlignment>
-              <Margins>0,0,0,0</Margins>
               <Name>Text17</Name>
               <Page isRef="3" />
               <Parent isRef="15" />
@@ -237,7 +228,6 @@
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Arial,8</Font>
-              <Margins>0,0,0,0</Margins>
               <Name>Text18</Name>
               <Page isRef="3" />
               <Parent isRef="15" />
@@ -258,7 +248,6 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text11</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -269,11 +258,10 @@
         </Text11>
         <Text16 Ref="19" type="Text" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>72,80,128,5</ClientRectangle>
+          <ClientRectangle>72,80,122,5</ClientRectangle>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text16</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -288,7 +276,6 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text10</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -299,11 +286,10 @@
         </Text10>
         <Text15 Ref="21" type="Text" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>72,65,128,5</ClientRectangle>
+          <ClientRectangle>72,65,122,5</ClientRectangle>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text15</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -318,7 +304,6 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text8</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -329,11 +314,10 @@
         </Text8>
         <Text14 Ref="23" type="Text" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>72,60,128,5</ClientRectangle>
+          <ClientRectangle>72,60,122,5</ClientRectangle>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Tahoma,8</Font>
-          <Margins>0,0,0,0</Margins>
           <Name>Text14</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
@@ -346,11 +330,11 @@
       <Conditions isList="true" count="0" />
       <Expressions isList="true" count="0" />
       <Guid>fd7fe16cf3f04d748d1a2c6609e15e4f</Guid>
-      <Margins>5,5,5,5</Margins>
+      <Margins>10,10,5,5</Margins>
       <Name>Page1</Name>
-      <PageHeight>297</PageHeight>
-      <PageWidth>210</PageWidth>
-      <PaperSize>A4</PaperSize>
+      <PageHeight>279</PageHeight>
+      <PageWidth>216</PageWidth>
+      <PaperSize>Letter</PaperSize>
       <Report isRef="0" />
       <StretchToPrintArea>True</StretchToPrintArea>
       <UnlimitedBreakable>False</UnlimitedBreakable>
@@ -381,13 +365,13 @@
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/8/2024 1:27:32 AM</ReportChanged>
+  <ReportChanged>5/8/2024 9:40:20 AM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
-  <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\Quotation.mrt</ReportFile>
-  <ReportGuid>45dc55fe27df4fc28c2730d1808d8ad8</ReportGuid>
+  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\Xanes\Xanes.Web\Areas\Exchange\Reports\Quotation.mrt</ReportFile>
+  <ReportGuid>7944ae956d9448e9ad7a1dd47cf37bdd</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
-  <ReportVersion>2023.4.2.0</ReportVersion>
+  <ReportVersion>2024.2.3.0</ReportVersion>
   <Script>using System;
 using System.Drawing;
 using System.Windows.Forms;
