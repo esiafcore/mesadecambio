@@ -1,4 +1,6 @@
 ﻿let dataTable, containerMain, inputDateInitial, inputDateFinal;
+let dateInitial, dateFinal;
+
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
@@ -15,11 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Función para ajustar las fechas según los criterios
 const fnAdjustmentDates = () => {
-    let dateInitial = new Date(inputDateInitial.value);
-    let dateFinal = new Date(inputDateFinal.value);
+    let dateInitialValue = new Date(inputDateInitial.value);
+    let dateFinalValue = new Date(inputDateFinal.value);
 
     // Validar si la fecha final es menor que la fecha inicial
-    if (dateFinal < dateInitial) {
+    if (dateFinalValue < dateInitialValue) {
         inputDateFinal.value = inputDateInitial.value;
     }
 
@@ -43,8 +45,17 @@ const fnAdjustmentFilterDataTable = () => {
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
     filterDate.className = 'dt-filtro-fecha col-8 d-flex gap-4';
+
+    let initialValue, finalValue;
+    if (dateInitial != undefined && dateFinal != undefined) {
+        initialValue = dateInitial;
+        finalValue = dateFinal;
+    } else {
+        initialValue = processingDate;
+        finalValue = processingDate;
+    }
     filterDate.innerHTML =
-        `Fecha inicial: <input type="date" id="dateInitial" value="${processingDate}"> Fecha final: <input type="date" id="dateFinal" value="${processingDate}" min="${processingDate}"> <button onclick="fnLoadDatatable()" id="btnFilter">Filtrar</button>`;
+        `Fecha inicial: <input type="date" id="dateInitial" value="${initialValue}"> Fecha final: <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}"> <button onclick="fnLoadDatatable()" id="btnFilter"> <i class="bi bi-funnel-fill"></i>  Filtrar</button>`;
 
     filterLength.parentNode.insertBefore(filterDate, filterLength.nextSibling);
     inputDateInitial = document.querySelector("#dateInitial");
@@ -165,9 +176,6 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
 }
 
 const fnLoadDatatable = () => {
-
-    let dateInitial, dateFinal;
-
     if (inputDateInitial != undefined && inputDateFinal != undefined) {
         dateInitial = inputDateInitial.value;
         dateFinal = inputDateFinal.value;
