@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         deposit.addEventListener("change", async () => {
             inputCurrencyDeposit.value = parseInt(deposit.value);
             currencyTypeDeposit = parseInt(deposit.value);
+            currencyTypeTransfer = currencyTypeDeposit;
             fnCalculateRevenueCost();
             await fnTCByDate();
         });
@@ -116,6 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         transfer.addEventListener("change", async () => {
             inputCurrencyTransfer.value = parseInt(transfer.value);
             currencyTypeTransfer = parseInt(transfer.value);
+            currencyTypeDeposit = currencyTypeTransfer;
             fnCalculateRevenueCost();
             await fnTCByDate();
         });

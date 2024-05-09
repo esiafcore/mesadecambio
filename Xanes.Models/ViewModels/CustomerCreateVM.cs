@@ -10,10 +10,13 @@ public class CustomerCreateVM
     [ValidateNever]
     public List<PersonType> TypeList { get; set; } = new();
 
-    [ValidateNever]
-    public IEnumerable<SelectListItem> CategoryList { get; set; }
+    //[ValidateNever]
+    //public IEnumerable<SelectListItem> CategoryList { get; set; }
 
     [ValidateNever]
-    public IEnumerable<SelectListItem> SectorList { get; set; }
+    public IEnumerable<SelectListItem> SectorSelectList { get; set; }
+
+    [ValidateNever]
+    public List<CustomerSector> SectorList { get; set; }
 
 }

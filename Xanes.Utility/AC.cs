@@ -15,7 +15,8 @@ public static class AC
     public const string XlsFormatNumeric = "#,##0.00";
     public static char SeparationCharCode = '|';
     public static string Title = "Title";
-
+    public static string DefaultDateFormatWeb = "yyyy-MM-dd";
+    public static string DefaultDateFormatView = "dd/MM/yyyy";
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";
 
@@ -23,6 +24,7 @@ public static class AC
     public const string LOCALHOSTME = "LOCALHOSTME";
     public const string Ipv4Default = "127.0.0.1";
 
+    public const string ProcessingDate = "ProcessingDate";
 
     public static char CharDefaultEmpty = '0';
     public static short RepeatCharTimes = 5;

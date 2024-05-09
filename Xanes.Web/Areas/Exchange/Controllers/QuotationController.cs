@@ -48,8 +48,11 @@ public class QuotationController : Controller
 
     public IActionResult Index()
     {
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString();
+        DateOnly dateFilter = DateOnly.Parse(processingDateString);
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter);
         return View();
     }
 
@@ -153,6 +156,8 @@ public class QuotationController : Controller
 
                     if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                     {
+                        obj.CurrencyDepositType = obj.CurrencyTransferType;
+
                         if (obj.ExchangeRateBuyTransa == 0)
                         {
                             ModelState.AddModelError("ExchangeRateBuyTransa", "El tipo de cambio de compra no puede ser cero.");
@@ -160,6 +165,8 @@ public class QuotationController : Controller
                     }
                     else
                     {
+                        obj.CurrencyTransferType = obj.CurrencyDepositType;
+
                         if (obj.ExchangeRateSellTransa == 0)
                         {
                             ModelState.AddModelError("ExchangeRateSellTransa", "El tipo de cambio de venta no puede ser cero.");
@@ -333,7 +340,7 @@ public class QuotationController : Controller
                     //Factoring paga en Dolares
                     else if (obj.CurrencyTransferType == SD.CurrencyType.Foreign)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
                         obj.ExchangeRateBuyReal = (obj.ExchangeRateBuyTransa * obj.ExchangeRateOfficialTransa);
                     }
                 }
@@ -624,7 +631,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -677,6 +684,8 @@ public class QuotationController : Controller
         model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.QuotationTypeList = objTypeList;
+        model.ModelCreateVM.CurrencySourceTarget =
+            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
         //model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
@@ -687,6 +696,36 @@ public class QuotationController : Controller
         model.DataModel = new();
         return View(model);
     }
+
+    public IActionResult ProcessingDate()
+    {
+        ProcessingDateVM model = new();
+        //Verificar si ya hay una sesion guardada anteriormente
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? string.Empty;
+        DateOnly processingDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        if (processingDateString.Trim() != string.Empty)
+        {
+            processingDate = DateOnly.Parse(processingDateString);
+        }
+        
+        model.ProcessingDate = processingDate;
+        return View(model);
+    }
+
+    [HttpPost]
+    public JsonResult ProcessingDate(string processingDate)
+    {
+        JsonResultResponse? jsonResponse = new();
+        DateOnly dateTransa = DateOnly.Parse(processingDate);
+
+        HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+
+        jsonResponse.IsSuccess = true;
+        TempData["success"] = $"Fecha de Procesamiento guardada correctamente";
+        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Home");
+        return Json(jsonResponse);
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> CreateDetail(Models.ViewModels.QuotationDetailVM objViewModel)
@@ -957,12 +996,13 @@ public class QuotationController : Controller
     }
 
     #region API_CALL
-    public JsonResult GetAll()
+    public JsonResult GetAll(string dateInitial, string dateFinal)
     {
         JsonResultResponse? jsonResponse = new();
-
+        DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
+        DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
         var objList = _uow.Quotation
-            .GetAll(x => (x.CompanyId == _companyId)
+            .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal)
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx").ToList();
 
         if (objList == null)

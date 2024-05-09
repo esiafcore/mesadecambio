@@ -1000,45 +1000,42 @@ function fnLoadDatatableDeposit() {
             });
             if (typeNumeral == QuotationType.Buy) {
                 pending = fnparseFloat(amountHeader) - total;
+                deposit = amountHeader;
             } else if (typeNumeral == QuotationType.Sell) {
+
                 if (currencyType == CurrencyType.Foreign) {
                     deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                     pending = (deposit.toFixed(decimalTransa)) - (total);
                 } else if (currencyType == CurrencyType.Additional) {
                     if (currencyTypeDeposit == CurrencyType.Foreign) {
-                        deposit = fnparseFloat(amountHeader) / fnparseFloat(TCHeader.value);
+                        deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                         pending = (deposit.toFixed(decimalTransa)) - (total);
                     } else if (currencyTypeDeposit == CurrencyType.Base) {
                         deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                         pending = (deposit.toFixed(decimalTransa)) - (total);
                     }
                 }
-            }
-
-            if (typeNumeral != QuotationType.Transfer) {
-                if (pending == 0) {
-                    document.querySelector("#btnCreateDetailDeposit").hidden = true;
-                    isPendingDeposit = false;
-                } else {
-                    document.querySelector("#btnCreateDetailDeposit").hidden = false;
-                    isPendingDeposit = true;
-                }
-
-                if (typeNumeral == QuotationType.Buy) {
-                    deposit = amountHeader;
-                }
-
             } else {
                 label = "TRC";
                 deposit = amountHeader;
                 isPendingDeposit = false;
             }
+
+            if (pending == 0) {
+                document.querySelector("#btnCreateDetailDeposit").hidden = true;
+                isPendingDeposit = false;
+            } else {
+                document.querySelector("#btnCreateDetailDeposit").hidden = false;
+                isPendingDeposit = true;
+            }
+            
             tableRowLabelDeposit.innerHTML =
                 `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
                 }`;
             tableRowLabelDeposit.value =
                 `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
                 }`;
+
             pendingDeposit = pending;
 
             $(footerCell).html(`${formatterAmount().format(total)}`);

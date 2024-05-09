@@ -9,6 +9,9 @@ public class QuotationCreateVM
     public Quotation DataModel { get; set; } = null!;
 
     [ValidateNever]
+    public string CurrencySourceTarget { get; set; } = string.Empty;
+
+    [ValidateNever]
     public IEnumerable<SelectListItem> CustomerList { get; set; } = null!;
 
     [ValidateNever]

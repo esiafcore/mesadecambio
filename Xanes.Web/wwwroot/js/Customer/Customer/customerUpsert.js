@@ -2,8 +2,8 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     let inputId = document.getElementById("DataModel_Id");
-    $("#DataModel_CategoryId").select2(select2Options);
-    $("#DataModel_SectorId").select2(select2Options);
+    //$("#DataModel_CategoryId").select2(select2Options);
+    $("#sector-select").select2(select2Options);
 
     //Setear enfoque en el search input
     $(document).on('select2:open', function (e) {

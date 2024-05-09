@@ -1,17 +1,186 @@
-﻿let dataTable, containerMain;
+﻿let dataTable, containerMain, inputDateInitial, inputDateFinal;
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
-    loadDatatable();
+    fnLoadDatatable();
     //Habilitar Tooltip
     fnEnableTooltip();
+
+    //// Crear los elementos del filtro de fecha y botón de búsqueda
+    //var filtroFecha = $('<div class="dt-filtro-fecha col-8 d-flex gap-4">Fecha de inicio: <input type="date" id="fechaInicio"> Fecha fin: <input type="date" id="fechaFin"> <button id="btnBuscar">Buscar</button></div>');
+
+    //// Insertar los elementos antes de la barra de búsqueda estándar
+    //wrapper.find('.dt-length').after(filtroFecha);
 });
 
-function loadDatatable() {
+// Función para ajustar las fechas según los criterios
+const fnAdjustmentDates = () => {
+    let dateInitial = new Date(inputDateInitial.value);
+    let dateFinal = new Date(inputDateFinal.value);
+
+    // Validar si la fecha final es menor que la fecha inicial
+    if (dateFinal < dateInitial) {
+        inputDateFinal.value = inputDateInitial.value;
+    }
+
+    // Establecer el mínimo de la fecha final como la fecha inicial
+    inputDateFinal.min = inputDateInitial.value;
+}
+
+
+const fnAdjustmentFilterDataTable = () => {
+    let wrapper = document.querySelector("#tblData_wrapper");
+
+    let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
+    let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
+    let filterLength = wrapper.querySelector(".dt-length");
+    rowIzq.classList.remove('col-md-auto', 'me-auto');
+    rowIzq.classList.add('row', 'col-md-10');
+    filterLength.classList.add("col-2");
+    rowDer.classList.remove('col-md-auto', 'ms-auto');
+    rowDer.classList.add('row', 'col-md-2');
+
+    // Crear los elementos del filtro de fecha y botón de búsqueda
+    let filterDate = document.createElement('div');
+    filterDate.className = 'dt-filtro-fecha col-8 d-flex gap-4';
+    filterDate.innerHTML =
+        `Fecha inicial: <input type="date" id="dateInitial" value="${processingDate}"> Fecha final: <input type="date" id="dateFinal" value="${processingDate}" min="${processingDate}"> <button onclick="fnLoadDatatable()" id="btnFilter">Filtrar</button>`;
+
+    filterLength.parentNode.insertBefore(filterDate, filterLength.nextSibling);
+    inputDateInitial = document.querySelector("#dateInitial");
+    inputDateFinal = document.querySelector("#dateFinal");
+
+    //Ajustamos las fechas
+    fnAdjustmentDates();
+
+    inputDateInitial.addEventListener("change", () => {
+        fnAdjustmentDates();
+    });
+};
+
+const fnVoid = async (id) => {
+
+    try {
+
+        let url = `/exchange/quotation/Void?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+const fnPrintReport = async (id) => {
+    try {
+        const url = `/exchange/quotation/ValidateDataToPrint?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.isSuccess) {
+                window.open(`${jsonResponse.data.urlRedirectTo}`, "_blank");
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+const fnDeleteRow = async (url, dateTransa, transaFullName) => {
+    let fetchOptions;
+
+    let result = await Swal.fire({
+        title: `&#191;Está seguro de eliminar la transacción?`,
+        html: `${dateTransa} ${transaFullName}<br>Este registro no se podrá recuperar`,
+        icon: "warning",
+        showCancelButton: true,
+        reverseButtons: true,
+        focusConfirm: false,
+        confirmButtonText: ButtonsText.Delete,
+        cancelButtonText: ButtonsText.Cancel,
+        customClass: {
+            confirmButton: "btn btn-danger px-3 mx-2",
+            cancelButton: "btn btn-primary px-3 mx-2"
+        },
+        buttonsStyling: false
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+    fetchOptions = {
+        method: "DELETE"
+    };
+
+    const fetchResponse = await fetch(url, fetchOptions);
+
+    if (fetchResponse.ok) {
+        let jsonResponse = await fetchResponse.json();
+
+        if (jsonResponse.isSuccess) {
+            dataTable.ajax.reload();
+            toastr.success(jsonResponse.successMessages);
+        } else {
+            toastr.success(jsonResponse.errorMessages);
+        }
+    }
+    else {
+        console.log(fetchResponse);
+    }
+}
+
+const fnLoadDatatable = () => {
+
+    let dateInitial, dateFinal;
+
+    if (inputDateInitial != undefined && inputDateFinal != undefined) {
+        dateInitial = inputDateInitial.value;
+        dateFinal = inputDateFinal.value;
+    } else {
+        dateInitial = processingDate;
+        dateFinal = processingDate;
+    }
+    //let dateFinal
+    if (dataTable) dataTable.destroy();
     dataTable = new DataTable("#tblData", {
-        dataSrc: 'data',
-        ajax: {
-            "url": '/exchange/quotation/getall',
+        "dataSrc": 'data',
+        "ajax": {
+            "url": `/exchange/quotation/getall?dateInitial=${dateInitial}&dateFinal=${dateFinal}`,
             "dataSrc": function (data) {
                 if (data.isSuccess) {
                     return data.data;
@@ -22,9 +191,10 @@ function loadDatatable() {
             },
             "complete": function () {
                 fnEnableTooltip();
+                fnAdjustmentFilterDataTable();
             }
         },
-        columns: [
+        "columns": [
             {
                 data: 'dateTransa', "width": "5%"
                 , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
@@ -170,119 +340,7 @@ function loadDatatable() {
                 $(row).addClass('table-danger bg-danger bg-opacity-50');
             }
         },
-        searching: true,
-        select: selectOptions
+        "searching": true,
+        "select": selectOptions
     });
-}
-
-
-
-const fnVoid = async (id) => {
-
-    try {
-
-        let url = `/exchange/quotation/Void?id=${id}`;
-
-        const response = await fetch(url, {
-            method: 'POST'
-        });
-
-        const jsonResponse = await response.json();
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            if (jsonResponse.urlRedirect) {
-                window.location.href = jsonResponse.urlRedirect;
-            }
-        }
-
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: "Error en la conexión",
-            text: e
-        });
-    }
-};
-
-
-const fnPrintReport = async (id) => {
-    try {
-        const url = `/exchange/quotation/ValidateDataToPrint?id=${id}`;
-
-        const response = await fetch(url, {
-            method: 'POST'
-        });
-
-        const jsonResponse = await response.json();
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            if (jsonResponse.isSuccess) {
-                window.open(`${jsonResponse.data.urlRedirectTo}`, "_blank");
-            }
-        }
-
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: "Error en la conexión",
-            text: e
-        });
-    }
-};
-
-
-
-
-const fnDeleteRow = async (url, dateTransa, transaFullName) => {
-    let fetchOptions;
-
-    let result = await Swal.fire({
-        title: `&#191;Está seguro de eliminar la transacción?`,
-        html: `${dateTransa} ${transaFullName}<br>Este registro no se podrá recuperar`,
-        icon: "warning",
-        showCancelButton: true,
-        reverseButtons: true,
-        focusConfirm: false,
-        confirmButtonText: ButtonsText.Delete,
-        cancelButtonText: ButtonsText.Cancel,
-        customClass: {
-            confirmButton: "btn btn-danger px-3 mx-2",
-            cancelButton: "btn btn-primary px-3 mx-2"
-        },
-        buttonsStyling: false
-    });
-
-    if (!result.isConfirmed) {
-        return;
-    }
-
-    fetchOptions = {
-        method: "DELETE"
-    };
-
-    const fetchResponse = await fetch(url, fetchOptions);
-
-    if (fetchResponse.ok) {
-        let jsonResponse = await fetchResponse.json();
-
-        if (jsonResponse.isSuccess) {
-            dataTable.ajax.reload();
-            toastr.success(jsonResponse.successMessages);
-        } else {
-            toastr.success(jsonResponse.errorMessages);
-        }
-    }
-    else {
-        console.log(fetchResponse);
-    }
 }

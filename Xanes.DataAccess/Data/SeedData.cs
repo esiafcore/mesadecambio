@@ -39,8 +39,8 @@ public class SeedData
                 //Id = 5809,
                 CompanyId = 1,
                 Code = "00803",
-                CategoryId = 6, //COMERCIAL
-                CategoryNumeral = 6,
+                //CategoryId = 6, //COMERCIAL
+                //CategoryNumeral = 6,
                 TypeId = 2, //JURIDICO
                 TypeNumeral = 2,
                 Identificationnumber = "J0310000122865",
@@ -60,8 +60,8 @@ public class SeedData
                 //Id = 5808,
                 CompanyId = 1,
                 Code = "00802",
-                CategoryId = 6,//COMERCIAL
-                CategoryNumeral = 6,
+                //CategoryId = 6,//COMERCIAL
+                //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
                 Identificationnumber = "0013009870051Y",
@@ -81,8 +81,8 @@ public class SeedData
                 //Id = 5807,
                 CompanyId = 1,
                 Code = "00801",
-                CategoryId = 6,//COMERCIAL
-                CategoryNumeral = 6,
+                //CategoryId = 6,//COMERCIAL
+                //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
                 Identificationnumber = "244686858",
@@ -102,8 +102,8 @@ public class SeedData
                 //Id = 5806,
                 CompanyId = 1,
                 Code = "00800",
-                CategoryId = 6, //COMERCIAL
-                CategoryNumeral = 6,
+                //CategoryId = 6, //COMERCIAL
+                //CategoryNumeral = 6,
                 TypeId = 2, //JURIDICO
                 TypeNumeral = 2,
                 Identificationnumber = "J0310000441430",
@@ -123,8 +123,8 @@ public class SeedData
                 //Id = 5805,
                 CompanyId = 1,
                 Code = "00799",
-                CategoryId = 6,//COMERCIAL
-                CategoryNumeral = 6,
+                //CategoryId = 6,//COMERCIAL
+                //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
                 Identificationnumber = "0012206860039E",

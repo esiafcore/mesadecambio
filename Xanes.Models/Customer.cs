@@ -9,16 +9,16 @@ namespace Xanes.Models;
 public class Customer: EntityInactivated, ICloneable
 {
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id Categoria")]
-    [ForeignKey(nameof(CategoryTrx))]
-    public int CategoryId { get; set; }
-    [ValidateNever]
-    public virtual CustomerCategory CategoryTrx { get; set; } = null!;
+    //[Required(ErrorMessage = "El campo {0} es requerido")]
+    //[Display(Name = "Id Categoria")]
+    //[ForeignKey(nameof(CategoryTrx))]
+    //public int CategoryId { get; set; }
+    //[ValidateNever]
+    //public virtual CustomerCategory CategoryTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Número Categoria")]
-    public int CategoryNumeral { get; set; }
+    //[Required(ErrorMessage = "El campo {0} es requerido")]
+    //[Display(Name = "Número Categoria")]
+    //public int CategoryNumeral { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id Tipo Persona")]
@@ -95,8 +95,8 @@ public class Customer: EntityInactivated, ICloneable
         {
             Id = Id,
             CompanyId = CompanyId,
-            CategoryId = CategoryId,
-            CategoryNumeral = CategoryNumeral,
+            //CategoryId = CategoryId,
+            //CategoryNumeral = CategoryNumeral,
             TypeId = TypeId,
             TypeNumeral = TypeNumeral,
             Code = Code,

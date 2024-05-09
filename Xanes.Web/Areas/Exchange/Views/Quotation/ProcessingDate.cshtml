@@ -1,0 +1,36 @@
+﻿@model ProcessingDateVM
+@{
+    ViewData["Title"] = "Fecha de Procesamiento";
+}
+
+
+<div class="container col-sm-7 col-md-6 p-2 pt-1 border border-2 m-0">
+    <h2 class="text-primary">@ViewData["Title"]</h2>
+    <hr />
+    <div class="row col-sm-12">
+        <div class="col-sm-2">
+            Fecha
+        </div>
+        <div class="col-sm-6 pb-3">
+            <input asp-for="ProcessingDate" type="date" class="form-control border border-primary border-opacity-25"
+                   id="processingDate" />
+        </div>
+    </div>
+    <div class="row col-sm-10">
+        <!-- Buttons -->
+        <div class="col-sm-6">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn-danger btn btn-sm form-control"> <i class="bi bi-x-circle"></i> Cancelar </a>
+        </div>
+        <div class="col-sm-6">
+            <button id="btnUpdateDate" class="btn btn-sm btn-success form-control" onfocus="false">
+                <i class="bi bi-disc"></i> Guardar
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Exchange/Quotation/procesingDate.js"></script>
+}

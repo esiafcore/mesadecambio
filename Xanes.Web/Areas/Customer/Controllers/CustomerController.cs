@@ -14,7 +14,7 @@ public class CustomerController : Controller
     private readonly ConfigCxc _cfgCxc;
 
     //Usada en el Upsert
-    private IEnumerable<SelectListItem> categorySelectList;
+    private List<CustomerSector> sectorList;
     private IEnumerable<SelectListItem> sectorSelectList;
     private List<PersonType> typeSelectList;
 
@@ -26,10 +26,11 @@ public class CustomerController : Controller
         _cfgCxc = _uow.ConfigCxc
             .Get(filter: x => (x.CompanyId == _companyId));
     }
+
     public IActionResult Index()
     {
         var objList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId)
-        , includeProperties: "TypeTrx,CategoryTrx,SectorTrx").ToList();
+        , includeProperties: "TypeTrx,SectorTrx").ToList();
         return View(objList);
     }
 
@@ -51,6 +52,7 @@ public class CustomerController : Controller
 
         return View(obj);
     }
+
     public async Task<IActionResult> Upsert(int? id)
     {
 
@@ -113,9 +115,9 @@ public class CustomerController : Controller
         var dataVM = new Models.ViewModels.CustomerCreateVM()
         {
             DataModel = obj,
-            CategoryList = categorySelectList,
+            //CategoryList = categorySelectList,
             TypeList = typeSelectList,
-            SectorList = sectorSelectList
+            SectorList = sectorList
         };
 
         return View(dataVM);
@@ -248,17 +250,17 @@ public class CustomerController : Controller
 
                 fnFillDataUpsertLists();
 
-                objViewModel.CategoryList = categorySelectList;
+                //objViewModel.CategoryList = categorySelectList;
                 objViewModel.TypeList = typeSelectList;
-                objViewModel.SectorList = sectorSelectList;
+                objViewModel.SectorSelectList = sectorSelectList;
                 return View(objViewModel);
             }
         }
 
         fnFillDataUpsertLists();
 
-        objViewModel.CategoryList = categorySelectList;
-        objViewModel.SectorList = sectorSelectList;
+        //objViewModel.CategoryList = categorySelectList;
+        objViewModel.SectorSelectList = sectorSelectList;
         objViewModel.TypeList = typeSelectList;
         return View(objViewModel);
 
@@ -266,20 +268,22 @@ public class CustomerController : Controller
 
     private void fnFillDataUpsertLists()
     {
-        categorySelectList = _uow.CustomerCategory
-            .GetAll(filter: x => (x.CompanyId == _companyId))
-            .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
+        //categorySelectList = _uow.CustomerCategory
+        //    .GetAll(filter: x => (x.CompanyId == _companyId))
+        //    .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
         sectorSelectList = _uow.CustomerSector
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Name });
 
+        sectorList = _uow.CustomerSector
+            .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+
         typeSelectList = _uow.PersonType
             .GetAll(filter: x => (x.CompanyId == _companyId))
             .ToList();
     }
-
-
+    
     public IActionResult Delete(int? id)
     {
         if (id == null || id == 0)
