@@ -1021,14 +1021,17 @@ function fnLoadDatatableDeposit() {
                 isPendingDeposit = false;
             }
 
-            if (pending == 0) {
-                document.querySelector("#btnCreateDetailDeposit").hidden = true;
-                isPendingDeposit = false;
-            } else {
-                document.querySelector("#btnCreateDetailDeposit").hidden = false;
-                isPendingDeposit = true;
+            if (typeNumeral != QuotationType.Transfer) {
+                if (pending == 0) {
+                    document.querySelector("#btnCreateDetailDeposit").hidden = true;
+                    isPendingDeposit = false;
+                } else {
+                    document.querySelector("#btnCreateDetailDeposit").hidden = false;
+                    isPendingDeposit = true;
+                }
+
             }
-            
+
             tableRowLabelDeposit.innerHTML =
                 `${label}: ${formatterAmount().format(fnparseFloat(deposit))}  -  Pendiente: ${formatterAmount().format(pending)
                 }`;
