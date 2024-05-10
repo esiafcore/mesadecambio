@@ -179,6 +179,17 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
 
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id BusinessExecutive")]
+    [ForeignKey(nameof(BusinessExecutiveTrx))]
+    public int BusinessExecutiveId { get; set; }
+    [ValidateNever]
+    public virtual BusinessExecutive BusinessExecutiveTrx { get; set; } = null!;
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Ejecutivo Código")]
+    public string BusinessExecutiveCode { get; set; } = null!;
+
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     [Display(Name = "Cerrado El")]

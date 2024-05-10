@@ -91,5 +91,12 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
             .HasForeignKey(x => x.CurrencyTransaId)
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired(true);
+
+        builder.HasOne(x => x.BusinessExecutiveTrx)
+            .WithMany()
+            .HasForeignKey(x => x.BusinessExecutiveId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
+
     }
 }
