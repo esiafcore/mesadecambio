@@ -37,10 +37,10 @@ const fnAdjustmentFilterDataTable = () => {
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
     let filterLength = wrapper.querySelector(".dt-length");
     rowIzq.classList.remove('col-md-auto', 'me-auto');
-    rowIzq.classList.add('row', 'col-md-10');
-    filterLength.classList.add("col-2");
+    rowIzq.classList.add('row', 'col-xl-9', "col-sm-8");
+    filterLength.classList.add("col-xl-2", "col-sm-4");
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-md-2');
+    rowDer.classList.add('row', 'col-xl-3', "col-sm-4");
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
@@ -55,7 +55,29 @@ const fnAdjustmentFilterDataTable = () => {
         finalValue = processingDate;
     }
     filterDate.innerHTML =
-        `Fecha inicial: <input type="date" id="dateInitial" value="${initialValue}"> Fecha final: <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}"> <button onclick="fnLoadDatatable()" id="btnFilter"> <i class="bi bi-funnel-fill"></i>  Filtrar</button>`;
+        `  <div class="row">
+                            <div class="row col-xl-5">
+                                <div class="col-4">
+                                    Fecha inicial:
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" id="dateInitial" value="${initialValue}">
+                                </div>
+                            </div>
+                            <div class="row col-xl-5">
+                                <div class="col-4">
+                                    Fecha final:
+                                </div>
+                                <div class="col-8">
+                                    <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
+                                </div>
+                            </div>
+                            <div class="row col-2">
+                                <button onclick="fnLoadDatatable()" class="btn btn-sm btn-secondary boder-outline col-12" id="btnFilter">
+                                    <i class="bi bi-funnel-fill"></i>  Filtrar
+                                </button>
+                            </div>
+                        </div>`;
 
     filterLength.parentNode.insertBefore(filterDate, filterLength.nextSibling);
     inputDateInitial = document.querySelector("#dateInitial");
