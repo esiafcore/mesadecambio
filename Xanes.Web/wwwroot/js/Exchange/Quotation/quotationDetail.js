@@ -1175,6 +1175,8 @@ function fnLoadDatatableTransfer() {
                     } else {
                         if (currencyTypeTransfer == CurrencyType.Base) {
                             transfer = amountExchangeDetail.value;
+                        } else {
+                            transfer = amountExchangeDetail.value;
                         }
                     }
                 } else {

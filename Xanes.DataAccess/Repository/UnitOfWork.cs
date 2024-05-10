@@ -19,6 +19,7 @@ public class UnitOfWork : IUnitOfWork
     public ICurrencyExchangeRateRepository CurrencyExchangeRate { get; private set; }
     public IQuotationTypeRepository QuotationType { get; private set; }
     public IQuotationRepository Quotation { get; private set; }
+    public IBusinessExecutiveRepository BusinessExecutive { get; private set; }
     public IQuotationDetailRepository QuotationDetail { get; private set; }
     public IConfigCxcRepository ConfigCxc { get; private set; }
     public IConfigFacRepository ConfigFac { get; private set; }
@@ -38,6 +39,7 @@ public class UnitOfWork : IUnitOfWork
         CurrencyExchangeRate = new CurrencyExchangeRateRepository(_db);
         QuotationType = new QuotationTypeRepository(_db);
         Quotation = new QuotationRepository(_db);
+        BusinessExecutive = new BusinessExecutiveRepository(_db);
         QuotationDetail = new QuotationDetailRepository(_db);
         ConfigCxc = new ConfigCxcRepository(_db);
         ConfigFac = new ConfigFacRepository(_db);

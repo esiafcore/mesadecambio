@@ -227,11 +227,6 @@ public class QuotationController : Controller
                     {
                         ModelState.AddModelError("BankAccountTargetId", $"Cuenta bancaria destino invalida");
                     }
-
-                    if (obj.AmountCommission == 0)
-                    {
-                        ModelState.AddModelError("AmountCommission", "La comisión no puede ser cero.");
-                    }
                 }
             }
 

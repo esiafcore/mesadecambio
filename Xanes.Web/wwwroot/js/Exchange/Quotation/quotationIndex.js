@@ -36,15 +36,15 @@ const fnAdjustmentFilterDataTable = () => {
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
     let filterLength = wrapper.querySelector(".dt-length");
+    filterLength.classList.add("col-xl-3", "col-sm-5", "col-xxl-2", "mb-1");
     rowIzq.classList.remove('col-md-auto', 'me-auto');
-    rowIzq.classList.add('row', 'col-xl-9', "col-sm-8");
-    filterLength.classList.add("col-xl-2", "col-sm-4");
+    rowIzq.classList.add('row', 'col-lg-9',"col-xl-10", "col-sm-8");
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-xl-3', "col-sm-4");
+    rowDer.classList.add('row', 'col-lg-3',"col-xl-2", "col-sm-4");
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
-    filterDate.className = 'dt-filtro-fecha col-8 d-flex gap-4';
+    filterDate.className = 'dt-filtro-fecha col-xl-9';
 
     let initialValue, finalValue;
     if (dateInitial != undefined && dateFinal != undefined) {
@@ -56,24 +56,24 @@ const fnAdjustmentFilterDataTable = () => {
     }
     filterDate.innerHTML =
         `  <div class="row">
-                            <div class="row col-xl-5">
-                                <div class="col-4">
+                            <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
+                                <div class="col-5 col-xxl-6 pe-0">
                                     Fecha inicial:
                                 </div>
-                                <div class="col-8">
+                                <div class="col-7 col-lg-6">
                                     <input type="date" id="dateInitial" value="${initialValue}">
                                 </div>
                             </div>
-                            <div class="row col-xl-5">
-                                <div class="col-4">
+                            <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
+                                <div class="col-5 col-xl-6">
                                     Fecha final:
                                 </div>
-                                <div class="col-8">
+                                <div class="col-7 col-lg-6">
                                     <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
                                 </div>
                             </div>
-                            <div class="row col-2">
-                                <button onclick="fnLoadDatatable()" class="btn btn-sm btn-secondary boder-outline col-12" id="btnFilter">
+                            <div class="row col-6 col-md-4 col-xl-2 mb-1">
+                                <button onclick="fnLoadDatatable()" class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
                                     <i class="bi bi-funnel-fill"></i>  Filtrar
                                 </button>
                             </div>
