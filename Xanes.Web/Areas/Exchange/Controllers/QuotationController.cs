@@ -90,6 +90,15 @@ public class QuotationController : Controller
             return NotFound();
         }
 
+        var objBusinessExecutiveList = _uow.BusinessExecutive
+            .GetAll(x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objBusinessExecutiveList == null)
+        {
+            return NotFound();
+        }
+
         objData = new Quotation
         {
             DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
@@ -105,10 +114,12 @@ public class QuotationController : Controller
         model.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.QuotationTypeList = objTypeList;
+        model.BusinessExecutiveList = objBusinessExecutiveList;
         //model.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
         model.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         model.BankAccountTargetList = new List<SelectListItem>();
         model.DataModel = objData;
+        model.DataModel.BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes);
 
         return View(model);
     }
@@ -123,7 +134,7 @@ public class QuotationController : Controller
         var objCurrencyList = new List<Currency>();
         var objTypeList = new List<QuotationType>();
         var objCustomerList = new List<Models.Customer>();
-
+        objViewModel.DataModel.BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes);
 
         Models.Quotation obj = objViewModel.DataModel;
         //Datos son validos
@@ -153,7 +164,6 @@ public class QuotationController : Controller
 
                 if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
                 {
-
                     if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                     {
                         obj.CurrencyDepositType = obj.CurrencyTransferType;
@@ -228,6 +238,19 @@ public class QuotationController : Controller
                         ModelState.AddModelError("BankAccountTargetId", $"Cuenta bancaria destino invalida");
                     }
                 }
+            }
+
+            //Verificamos si existe la moneda de la Transaccion
+            var objBusiness = _uow.BusinessExecutive.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
+
+            if (objBusiness == null)
+            {
+                ModelState.AddModelError("BusinessExecutiveId", $"Ejecutivo no encontrado");
+            }
+            else
+            {
+                obj.BusinessExecutiveCode = objBusiness.Code;
             }
 
             //Verificamos si existe el cliente
@@ -692,36 +715,6 @@ public class QuotationController : Controller
         return View(model);
     }
 
-    public IActionResult ProcessingDate()
-    {
-        ProcessingDateVM model = new();
-        //Verificar si ya hay una sesion guardada anteriormente
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? string.Empty;
-        DateOnly processingDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        if (processingDateString.Trim() != string.Empty)
-        {
-            processingDate = DateOnly.Parse(processingDateString);
-        }
-        
-        model.ProcessingDate = processingDate;
-        return View(model);
-    }
-
-    [HttpPost]
-    public JsonResult ProcessingDate(string processingDate)
-    {
-        JsonResultResponse? jsonResponse = new();
-        DateOnly dateTransa = DateOnly.Parse(processingDate);
-
-        HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
-
-        jsonResponse.IsSuccess = true;
-        TempData["success"] = $"Fecha de Procesamiento guardada correctamente";
-        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Home");
-        return Json(jsonResponse);
-    }
-
-
     [HttpPost]
     public async Task<IActionResult> CreateDetail(Models.ViewModels.QuotationDetailVM objViewModel)
     {
@@ -990,6 +983,35 @@ public class QuotationController : Controller
         return View(model);
     }
 
+    public IActionResult ProcessingDate()
+    {
+        ProcessingDateVM model = new();
+        //Verificar si ya hay una sesion guardada anteriormente
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? string.Empty;
+        DateOnly processingDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        if (processingDateString.Trim() != string.Empty)
+        {
+            processingDate = DateOnly.Parse(processingDateString);
+        }
+
+        model.ProcessingDate = processingDate;
+        return View(model);
+    }
+
+    [HttpPost]
+    public JsonResult ProcessingDate(string processingDate)
+    {
+        JsonResultResponse? jsonResponse = new();
+        DateOnly dateTransa = DateOnly.Parse(processingDate);
+
+        HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+
+        jsonResponse.IsSuccess = true;
+        TempData["success"] = $"Fecha de Procesamiento guardada correctamente";
+        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Home");
+        return Json(jsonResponse);
+    }
+
     #region API_CALL
     public JsonResult GetAll(string dateInitial, string dateFinal)
     {
@@ -1147,7 +1169,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost, ActionName("ReClosed")]
-    public async Task<JsonResult> ReClosedPost(int id)
+    public JsonResult ReClosedPost(int id)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
@@ -1197,7 +1219,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost, ActionName("Void")]
-    public async Task<JsonResult> VoidPost(int id)
+    public JsonResult VoidPost(int id)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
@@ -1343,7 +1365,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> GetCustomers(bool onlyCompanies = false)
+    public JsonResult GetCustomers(bool onlyCompanies = false)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
@@ -1372,7 +1394,7 @@ public class QuotationController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> GetBankAccountTarget(int idSource)
+    public JsonResult GetBankAccountTarget(int idSource)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();

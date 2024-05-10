@@ -57,6 +57,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area=Exchange}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Exchange}/{controller=Quotation}/{action=Index}/{id?}");
 
 app.Run();

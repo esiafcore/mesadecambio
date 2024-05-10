@@ -29,8 +29,7 @@ public class BusinessExecutive : EntityInactivated, ICloneable
     [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Segundo Apellido")]
     public string? SecondSurname { get; set; } = null!;
-
-
+    
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Cobranza")]
     public bool IsPayment { get; set; }

@@ -1,0 +1,100 @@
+﻿@model BusinessExecutiveVM;
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header bg-secondary bg-gradient">
+                <div class="row">
+                    <div class="col-12 col-md-6 pb-1">
+                        <h2 class="text-white text-center text-md-start py-1">@(Model.DataModel.Id != 0 ? "Actualizar": "Crear")  - Ejecutivo</h2>
+                    </div>
+                    <div class="row col mt-1 d-flex justify-content-end">
+                        <div class="col-6 col-md-5 col-xl-4">
+                            <button type="submit" class="btn btn-primary form-control btn-sm border">
+                                <i class="bi bi-arrow-right-circle"></i> @(Model.DataModel.Id != 0 ? "Actualizar" : "Crear")
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-5 col-xl-4">
+                            <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
+                                <i class="bi bi-arrow-return-left"></i> Regresar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="container rounded p-2">
+                    <div class="row">
+                        <input hidden asp-for="DataModel.Id" />
+                        <input hidden asp-for="DataModel.CompanyId" />
+                        <div class="row">
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Código</div>
+                                <div class="col-4">
+                                    <input asp-for="DataModel.Code" id="code" class="form-control border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.Code" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Primer Nombre</div>
+                                <div class="col-sm-7 col-xl-8 col-8">
+                                    <input asp-for="DataModel.FirstName" id="firstName" class="form-control border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Segundo Nombre</div>
+                                <div class="col-sm-7 col-xl-8 col-8">
+                                    <input asp-for="DataModel.SecondName" id="secondName" class="form-control border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Primer Apellido</div>
+                                <div class="col-sm-7 col-xl-8 col-8">
+                                    <input asp-for="DataModel.LastName" id="lastName" class="form-control border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Segundo Apellido</div>
+                                <div class="col-sm-7 col-xl-8 col-8">
+                                    <input asp-for="DataModel.SecondSurname" id="secondSurname" class="form-control border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Cobranza</div>
+                                <div class="col-1">
+                                    <input asp-for="DataModel.IsPayment" type="checkbox" id="isPayment" class="form-check border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.IsPayment" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-md-6 col-12 mb-2">
+                                <div class="col-sm-5 col-lg-4 col-4">Desembolso</div>
+                                <div class="col-1">
+                                    <input asp-for="DataModel.IsLoan" type="checkbox" id="isLoan" class="form-check border p-1 shadow" />
+                                    <span asp-validation-for="DataModel.IsLoan" class="text-danger"></span>
+                                </div>
+                            </div>
+                            @if (Model.DataModel.Id != null && Model.DataModel.Id != 0)
+                            {
+                                <div class="row col-md-6 col-12 mb-2">
+                                    <div class="col-sm-5 col-lg-4 col-4">Activo</div>
+                                    <div class="col-1">
+                                        <input asp-for="DataModel.IsActive" type="checkbox" id="isActive" class="form-check border p-1 shadow" />
+                                        <span asp-validation-for="DataModel.IsActive" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

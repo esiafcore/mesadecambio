@@ -55,7 +55,6 @@ public class CustomerController : Controller
 
     public async Task<IActionResult> Upsert(int? id)
     {
-
         Models.Customer obj;
 
         if (id == null || id == 0)
@@ -128,6 +127,7 @@ public class CustomerController : Controller
     {
 
         Models.Customer obj = objViewModel.DataModel;
+
         //Datos son validos
         if (ModelState.IsValid)
         {

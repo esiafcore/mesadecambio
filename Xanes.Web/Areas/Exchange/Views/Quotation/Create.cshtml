@@ -10,9 +10,19 @@
                         <h2 class="text-white text-center text-md-start py-1">Crear - Cotización</h2>
                     </div>
                     <div class="row col mt-1 d-flex justify-content-end">
-                        <div class="col-6 col-md-5 col-xl-4">
+                        <div class="col-6 col-md-5 col-xl-4" id="btnClosed" hidden>
+                            <a class="btn btn-warning form-control btn-sm border">
+                                <i class="bi bi-arrow-right-circle"></i> Cerrar
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-5 col-xl-4" id="btnNext">
                             <button type="submit" class="btn btn-primary form-control btn-sm border">
                                 <i class="bi bi-arrow-right-circle"></i> Siguiente
+                            </button>
+                        </div>
+                        <div class="col-6 col-md-5 col-xl-4" id="btnSave" hidden>
+                            <button type="submit" class="btn btn-primary form-control btn-sm border">
+                                <i class="bi bi-arrow-right-circle"></i> Guardar
                             </button>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4">
@@ -30,6 +40,7 @@
                         <input hidden asp-for="DataModel.Id" />
                         <input hidden asp-for="DataModel.CompanyId" />
                         <input hidden asp-for="DataModel.TotalTransfer" />
+                        <input hidden asp-for="DataModel.BusinessExecutiveCode"/>
                         <input hidden asp-for="DataModel.TotalDeposit" />
                         <input hidden asp-for="DataModel.CurrencyTransaType" id="currencyTransaType" />
                         <input hidden asp-for="DataModel.TypeNumeral" id="typeNumeral" />
@@ -196,7 +207,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Orig.</div>
@@ -224,6 +234,22 @@
                                         }
                                     </select>
                                     <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                                <div class="col-sm-5 col-lg-4 col-4">Ejecutivo</div>
+                                <div class="col-xl-6 col-sm-7 col-8">
+                                    <select asp-for="DataModel.BusinessExecutiveId"
+                                            class="form-select border p-1 shadow" id="selectBusinessExecutive">
+                                        <option disabled selected>--Select Ejecutivo--</option>
+                                        @foreach (var executive in Model.BusinessExecutiveList)
+                                        {
+                                            <option value="@executive.Id" data-loan="@executive.IsLoan" data-payment="@executive.IsPayment">@executive.Code</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DataModel.BusinessExecutiveId" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>

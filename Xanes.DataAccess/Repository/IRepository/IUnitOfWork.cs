@@ -14,6 +14,7 @@ public interface IUnitOfWork
     ICurrencyExchangeRateRepository CurrencyExchangeRate { get; }
     IQuotationTypeRepository QuotationType { get; }
     IQuotationRepository Quotation{ get; }
+    IBusinessExecutiveRepository BusinessExecutive { get; }
     IQuotationDetailRepository QuotationDetail { get; }
     IConfigCxcRepository ConfigCxc { get; }
     IConfigFacRepository ConfigFac { get; }

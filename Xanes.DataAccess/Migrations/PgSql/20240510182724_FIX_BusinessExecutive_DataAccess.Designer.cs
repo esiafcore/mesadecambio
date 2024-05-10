@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.DataAccess.Migrations
+namespace Xanes.DataAccess.Migrations.PgSql
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240510182724_FIX_BusinessExecutive_DataAccess")]
+    partial class FIX_BusinessExecutive_DataAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -719,7 +722,7 @@ namespace Xanes.DataAccess.Migrations
                             CountryCode = "NIC",
                             CountryNumber = (short)558,
                             CreatedBy = "",
-                            CreatedDate = new DateTime(2024, 5, 10, 20, 58, 56, 878, DateTimeKind.Utc).AddTicks(3197),
+                            CreatedDate = new DateTime(2024, 5, 10, 18, 27, 22, 786, DateTimeKind.Utc).AddTicks(8658),
                             CreatedHostName = "",
                             CreatedIpv4 = "",
                             IdentificationNumber = "J0310000031339",

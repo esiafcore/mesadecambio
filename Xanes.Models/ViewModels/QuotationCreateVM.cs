@@ -32,4 +32,7 @@ public class QuotationCreateVM
     [ValidateNever]
     public List<QuotationType> QuotationTypeList { get; set; } = new();
 
+    [ValidateNever]
+    public List<BusinessExecutive> BusinessExecutiveList { get; set; } = new();
+
 }

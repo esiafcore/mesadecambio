@@ -11,7 +11,6 @@ public interface IRepository<T> where T : class
     //void Update(T entity);
     void Remove(T entity);
     void RemoveRange(IEnumerable<T> entities);
-
     Task<bool> IsExists(Expression<Func<T, bool>>? filter = null);
     bool RemoveByFilter(Expression<Func<T, bool>> filter);
 

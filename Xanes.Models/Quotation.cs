@@ -186,7 +186,6 @@ public class Quotation : Entity, ICloneable
     [ValidateNever]
     public virtual BusinessExecutive BusinessExecutiveTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Ejecutivo Código")]
     public string BusinessExecutiveCode { get; set; } = null!;
 

@@ -1,0 +1,35 @@
+﻿@model BusinessExecutiveVM;
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header bg-secondary bg-gradient">
+            <div class="row mb-1">
+                <div class="col-12 col-md-6 pb-1">
+                    <h2 class="text-white text-center text-md-start py-1">Eliminar - Ejecutivo</h2>
+                </div>
+                <div class="row col mt-1 d-flex justify-content-end">
+                    <div class="col-6 col-md-5 col-xl-4">
+                        <a onclick="fndeleteRow(@Model.DataModel.Id)" class="btn btn-danger form-control btn-sm border">
+                            <i class="bi bi-check-square-fill"></i> Eliminar
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-5 col-xl-4">
+                        <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
+                            <i class="bi bi-arrow-return-left"></i> Regresar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="container rounded p-2">
+                <partial name="_Detail" model="@Model" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/Exchange/BusinessExecutive/businessExecutiveDelete.js"></script>
+}

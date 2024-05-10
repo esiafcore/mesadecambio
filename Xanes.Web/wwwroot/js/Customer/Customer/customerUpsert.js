@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function personType_onClick(objElem) {
-    let currentValue = objElem.valueAsNumber;
+    let currentValue = objElem.value;
 
     if (currentValue == PersonType.Natural) {
         personNaturalDiv.style.display = styleShow;

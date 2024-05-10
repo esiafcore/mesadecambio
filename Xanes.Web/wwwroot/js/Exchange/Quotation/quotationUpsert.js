@@ -5,6 +5,7 @@
 let inputsFormatTransa, inputsFormatExchange;
 let containerMain, selectCustomer, selectBankAccountTarget, selectBankAccountSource;
 let elementsHiddenBuySell, divExchangeRateVariation, inputExchangeRateVariation, inputCommission;
+let selectBusinessExecutive;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -42,6 +43,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectBankAccountTarget = document.querySelector("#selectBankAccountTarget");
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid col-md-12 col-xxl-10 col-11 m-1";
+    selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
+
+    selectBusinessExecutive.addEventListener("change", () => {
+
+
+    });
+
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 

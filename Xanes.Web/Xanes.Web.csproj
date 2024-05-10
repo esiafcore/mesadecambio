@@ -52,6 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Detail.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Upsert.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\Quotation\CreateDetail.cshtml" />
   </ItemGroup>
 
@@ -74,6 +77,18 @@
     <Content Include="License\license.key">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Upsert.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Detail.cshtml" />
   </ItemGroup>
 
 </Project>

@@ -15,6 +15,7 @@ public class QuotationTypeController : Controller
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
     }
+
     public IActionResult Index()
     {
         var objList = _uow.QuotationType
