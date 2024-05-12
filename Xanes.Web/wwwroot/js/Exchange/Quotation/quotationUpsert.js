@@ -189,6 +189,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Evento enviar form para crear
     const formCreate = document.getElementById("formUpsert");
     formCreate.addEventListener("submit", fnCreateFormSubmit);
+    //selectCustomer.focus();
 });
 
 const fnSaveReturn = () => {
@@ -382,6 +383,7 @@ const fnChangeCustomers = async (onlyCompanies) => {
                 // Selecciona el primer elemento
                 selectCustomer.value = options[0].value;
             }
+            $(selectCustomer).select2('focus');
 
         } else {
             alert(jsonResponse.errorMessages);

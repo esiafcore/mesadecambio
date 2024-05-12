@@ -25,7 +25,6 @@
                     <th>Identificación</th>
                     <th>Razón Social</th>
                     <th>Tipo</th>
-                    <th>Categoria</th>
                     <th>Sector</th>
                     <th>Activo?</th>
                     <th></th>
@@ -39,7 +38,6 @@
                         <td>@itm.Identificationnumber</td>
                         <td>@itm.BusinessName</td>
                         <td>@itm.TypeTrx.Code</td>
-                        @* <td>@itm.CategoryTrx.Code</td> *@
                         <td>@itm.SectorTrx.Name.Trim()</td>
                         <td class="text-center">@(itm.IsActive ? AC.Si : AC.No)</td>
                         <td>
