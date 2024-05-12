@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectCustomer = document.querySelector("#selectCustomer");
     selectBankAccountSource = document.querySelector("#selectBankAccountSource");
     selectBankAccountTarget = document.querySelector("#selectBankAccountTarget");
+
+    //Accedemos al contenedor principal y modificamos la clase
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid col-md-12 col-xxl-10 col-11 m-1";
     selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
@@ -189,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Evento enviar form para crear
     const formCreate = document.getElementById("formUpsert");
     formCreate.addEventListener("submit", fnCreateFormSubmit);
-    //selectCustomer.focus();
+    fnEnableTooltip();
 });
 
 const fnSaveReturn = () => {
@@ -215,7 +217,6 @@ const fnSaveClosed = () => {
     isClosed = true;
     btnSaveNext.click();
 }
-
 
 const fnCreateFormSubmit = async (event) => {
 
@@ -325,14 +326,14 @@ const fnGetBankAccounts = async () => {
 
             if (jsonResponse.isSuccess) {
                 selectBankAccountTarget.innerHTML = "";
-                // Agregar options
-                let option = document.createElement("option");
-                option.value = "";
-                option.text = "--Select Cuenta Destino--";
-                option.disabled = true;
-                option.selected = true;
+                //// Agregar options
+                //let option = document.createElement("option");
+                //option.value = "";
+                //option.text = "--Select Cuenta Destino--";
+                //option.disabled = true;
+                //option.selected = true;
 
-                selectBankAccountTarget.insertBefore(option, selectBankAccountTarget.firstChild);
+                //selectBankAccountTarget.insertBefore(option, selectBankAccountTarget.firstChild);
 
                 jsonResponse.data.forEach((item) => {
 
@@ -410,6 +411,7 @@ const fnLoadOptionSelectBusiness = (type) => {
     }
 };
 
+//Funcion para ocultar o mostrar los elementos en base al tipo
 const fnLoadInputsByType = (type) => {
     if (type == QuotationType.Buy) {
         divCurrencyTransa.hidden = false;

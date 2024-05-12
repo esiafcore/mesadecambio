@@ -73,7 +73,9 @@ const fnAdjustmentFilterDataTable = () => {
                                 </div>
                             </div>
                             <div class="row col-6 col-md-4 col-xl-2 mb-1">
-                                <button onclick="fnLoadDatatable()" class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
+                                <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-title="Filtrar"
+                                class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
                                     <i class="bi bi-funnel-fill"></i>  Filtrar
                                 </button>
                             </div>
@@ -89,6 +91,8 @@ const fnAdjustmentFilterDataTable = () => {
     inputDateInitial.addEventListener("change", () => {
         fnAdjustmentDates();
     });
+
+    fnEnableTooltip();
 };
 
 const fnVoid = async (id) => {

@@ -10,6 +10,8 @@ let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurr
 let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTargetTransfer;
 let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
 let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
+
+let bgRow = 'bg-success bg-opacity-75 bg-gradient';
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
     currenciesDeposit = document.querySelectorAll(".currenciesDeposit");
@@ -138,14 +140,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
             var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNodeAfter).removeClass(bgRow);
 
             indexDataTableBankSourceDeposit = indexes;
 
             // Selecciona la fila deseada
             var selectedRow = dataTableBankSourceDeposit.row(indexes);
             var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNode).addClass(bgRow);
         }
     });
 
@@ -154,14 +156,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
             var selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
             var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNodeAfter).removeClass(bgRow);
 
             indexDataTableBankSourceTransfer = indexes;
 
             // Selecciona la fila deseada
             var selectedRow = dataTableBankSourceTransfer.row(indexes);
             var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNode).addClass(bgRow);
         }
     });
 
@@ -170,14 +172,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
             var selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
             var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNodeAfter).removeClass(bgRow);
 
             indexDataTableBankTargetTransfer = indexes;
 
             // Selecciona la fila deseada
             var selectedRow = dataTableBankTargetTransfer.row(indexes);
             var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+            $(selectedRowNode).addClass(bgRow);
         }
     });
     //Habilitar Tooltip
@@ -669,7 +671,7 @@ const fnSelectTableSourceDeposit = async (index = 0) => {
     var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
     indexDataTableBankSourceDeposit = index;
     var selectedRowNodeAfter = selectedRowAfter.node();
-    $(selectedRowNodeAfter).removeClass('bg-info-subtle bg-opacity-75 bg-gradient');
+    $(selectedRowNodeAfter).removeClass(bgRow);
 
     // Selecciona la fila deseada
     var selectedRow = dataTableBankSourceDeposit.row(index);
@@ -683,7 +685,7 @@ const fnSelectTableSourceDeposit = async (index = 0) => {
     // Obtiene el nodo HTML de la fila seleccionada
     var selectedRowNode = selectedRow.node();
 
-    $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+    $(selectedRowNode).addClass(bgRow);
 };
 function fnLoadDatatableBankTransferSource(index = 0) {
     if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
@@ -718,7 +720,7 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 // Obtiene el nodo HTML de la fila seleccionada
                 var selectedRowNode = selectedRow.node();
 
-                $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+                $(selectedRowNode).addClass(bgRow);
             }
         },
         "columns": [
@@ -792,7 +794,7 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 // Obtiene el nodo HTML de la fila seleccionada
                 var selectedRowNode = selectedRow.node();
 
-                $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
+                $(selectedRowNode).addClass(bgRow);
             }
         },
         "columns": [

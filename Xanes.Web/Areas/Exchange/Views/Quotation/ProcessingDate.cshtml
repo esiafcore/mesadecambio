@@ -19,10 +19,12 @@
     <div class="row col-sm-10">
         <!-- Buttons -->
         <div class="col-sm-6">
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn-danger btn btn-sm form-control"> <i class="bi bi-x-circle"></i> Cancelar </a>
+            <a asp-area="Exchange" asp-controller="Quotation" asp-action="Index"
+               data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Cancelar" class="btn-danger btn btn-sm form-control"> <i class="bi bi-x-circle"></i> Cancelar </a>
         </div>
         <div class="col-sm-6">
-            <button id="btnUpdateDate" class="btn btn-sm btn-success form-control" onfocus="false">
+            <button id="btnUpdateDate" class="btn btn-sm btn-success form-control"
+                    data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Guardar" onfocus="false">
                 <i class="bi bi-disc"></i> Guardar
             </button>
         </div>

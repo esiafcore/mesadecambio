@@ -921,7 +921,6 @@ public class QuotationController : Controller
         return Json(jsonResponse);
     }
 
-
     [HttpPost]
     public IActionResult Update(Models.ViewModels.QuotationCreateVM objViewModel)
     {
@@ -981,7 +980,7 @@ public class QuotationController : Controller
             objQt.AmountTransaction = obj.AmountTransaction;
             objQt.DateTransa = obj.DateTransa;
             objQt.ExchangeRateBuyTransa = obj.ExchangeRateBuyTransa;
-            objQt.ExchangeRateSellReal = obj.ExchangeRateSellReal;
+            objQt.ExchangeRateSellTransa = obj.ExchangeRateSellTransa;
 
             //Seteamos campos de auditoria
             objQt.UpdatedBy = AC.LOCALHOSTME;
@@ -1036,7 +1035,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -1395,7 +1394,7 @@ public class QuotationController : Controller
 
         jsonResponse.IsSuccess = true;
         TempData["success"] = $"Fecha de Procesamiento guardada correctamente";
-        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Home");
+        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
         return Json(jsonResponse);
     }
 

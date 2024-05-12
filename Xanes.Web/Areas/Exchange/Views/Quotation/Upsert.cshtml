@@ -7,28 +7,33 @@
             <div class="card-header bg-secondary bg-gradient">
                 <div class="row">
                     <div class="col-12 col-md-6 pb-1">
-                        <h2 class="text-white text-center text-md-start py-1">Crear - Cotización</h2>
+                        <h2 class="text-white text-center text-md-start py-1">@(Model.DataModel.Id != 0 ? "Actualizar" : "Crear") - Cotización</h2>
                     </div>
                     <div class="row col mt-1 d-flex justify-content-end">
                         <div class="col-6 col-md-5 col-xl-4" id="btnSaveClosed" onclick="fnSaveClosed()" hidden>
-                            <a class="btn btn-danger form-control btn-sm border">
-                                <i class="bi bi-arrow-right-circle"></i> Cerrar
+                            <a class="btn btn-info form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Cerrar y Guardar">
+                                <i class="bi bi-check-square-fill"></i> Cerrar
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnNext">
-                            <a class="btn btn-primary form-control btn-sm border" onclick="fnSaveNext()">
+                            <a class="btn btn-primary form-control btn-sm border" 
+                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Siguiente" 
+                             onclick="fnSaveNext()">
                                 <i class="bi bi-arrow-right-circle"></i> Siguiente
                             </a>
                             <button type="submit" id="btnSaveNext" hidden>
                             </button>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnSaveReturn" hidden>
-                            <a class="btn btn-success form-control btn-sm border" onclick="fnSaveReturn()">
-                                <i class="bi bi-arrow-right-circle"></i> Guardar
+                            <a class="btn btn-success form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Guardar y Regresar" onclick="fnSaveReturn()">
+                                <i class="bi bi-disc"></i> Guardar
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4">
-                            <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
+                            <a asp-action="Index" class="btn btn-secondary form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Regresar">
                                 <i class="bi bi-arrow-return-left"></i> Regresar
                             </a>
                         </div>
@@ -186,7 +191,7 @@
                                 </div>
                             </div>
                             <div class="row col-xl-4 col-md-6 col-12 mb-1" id="divAmountExchange">
-                                <div class="col-sm-5 col-lg-4 col-4">Monto Mesa/C</div>
+                                <div class="col-sm-5 col-lg-4 col-4">Monto M/C</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
                                     <input asp-for="DataModel.AmountExchange" id="amountExchange" name="AmountExchange" class="form-control text-end border p-1 shadow decimalTransa" step="any" readonly />
                                     <span asp-validation-for="DataModel.AmountExchange" class="text-danger"></span>
@@ -220,7 +225,7 @@
                                 <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountSourceId" name="BankAccountSourceId" size="12"
                                             class="form-select border p-1 shadow" id="selectBankAccountSource">
-                                        <option disabled selected>--Select Cuenta Bancaria--</option>
+                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
                                         @foreach (var bank in Model.BankAccountSourceList)
                                         {
                                             <option value="@bank.Value">@bank.Text</option>
@@ -234,7 +239,7 @@
                                 <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountTargetId" size="12"
                                             class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
-                                        <option disabled selected>--Select Cuenta Bancaria--</option>
+                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
                                         @foreach (var bank in Model.BankAccountTargetList)
                                         {
                                             <option value="@bank.Value">@bank.Text</option>
@@ -250,7 +255,7 @@
                                 <div class="col-xl-6 col-sm-7 col-8">
                                     <select asp-for="DataModel.BusinessExecutiveId"
                                             class="form-select border p-1 shadow" name="BusinessExecutiveId" id="selectBusinessExecutive">
-                                        <option disabled selected>--Select Ejecutivo--</option>
+                                        @* <option disabled selected>--Select Ejecutivo--</option> *@
                                         @foreach (var executive in Model.BusinessExecutiveList)
                                         {
                                             <option value="@executive.Id" data-loan="@executive.IsLoan" data-payment="@executive.IsPayment">@executive.Code</option>
