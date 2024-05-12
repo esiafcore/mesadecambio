@@ -3,57 +3,60 @@
 <div class="row">
     <input hidden asp-for="DataModel.Id" />
     <input hidden asp-for="DataModel.CompanyId" />
+
     <div class="row">
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Código</div>
             <div class="col-4">
                 <input asp-for="DataModel.Code" id="code" class="form-control border p-1 shadow" readonly />
                 <span asp-validation-for="DataModel.Code" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+    </div>
+    <div class="row">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Primer Nombre</div>
             <div class="col-sm-7 col-xl-8 col-8">
                 <input asp-for="DataModel.FirstName" id="firstName" class="form-control border p-1 shadow" readonly />
                 <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Segundo Nombre</div>
             <div class="col-sm-7 col-xl-8 col-8">
                 <input asp-for="DataModel.SecondName" id="secondName" class="form-control border p-1 shadow" readonly />
                 <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Primer Apellido</div>
             <div class="col-sm-7 col-xl-8 col-8">
                 <input asp-for="DataModel.LastName" id="lastName" class="form-control border p-1 shadow" readonly />
                 <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Segundo Apellido</div>
             <div class="col-sm-7 col-xl-8 col-8">
                 <input asp-for="DataModel.SecondSurname" id="secondSurname" class="form-control border p-1 shadow" readonly />
                 <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Cobranza</div>
             <div class="col-1">
                 <input asp-for="DataModel.IsPayment" type="checkbox" id="isPayment" class="form-check border p-1 shadow" disabled />
                 <span asp-validation-for="DataModel.IsPayment" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Desembolso</div>
             <div class="col-1">
                 <input asp-for="DataModel.IsLoan" type="checkbox" id="isLoan" class="form-check border p-1 shadow" disabled />
                 <span asp-validation-for="DataModel.IsLoan" class="text-danger"></span>
             </div>
         </div>
-        <div class="row col-md-6 col-12 mb-2">
+        <div class="row col-lg-6 col-12 mb-2">
             <div class="col-sm-5 col-lg-4 col-4">Activo</div>
             <div class="col-1">
                 <input asp-for="DataModel.IsActive" type="checkbox" id="isActive" class="form-check border p-1 shadow" disabled />
