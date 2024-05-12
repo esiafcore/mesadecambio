@@ -6,6 +6,8 @@ public static class AC
 {
     public static string Si = "Si";
     public static string No = "No";
+    public static string Error = "error";
+    public static string Success = "success";
     public const string CodeEmpty = "00000";
     public const int DecimalTransa = 2;
     public const int DecimalExchange = 4;

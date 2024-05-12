@@ -7,10 +7,18 @@ let containerMain, selectCustomer, selectBankAccountTarget, selectBankAccountSou
 let elementsHiddenBuySell, divExchangeRateVariation, inputExchangeRateVariation, inputCommission;
 let selectBusinessExecutive;
 
+//Variables para los contenedores de los botones
+let btnSave, btnNext, btnClosed;
+//Bton de salvar o siguiente
+let btnSaveNext = document.querySelector("#btnSaveNext");
+
+//Variables para saber si hay que redirigir al home o al detalle y mostrar el mensaje al crear
+let redirectHome = false, redirectDetail = true, showMessages = true;
+let isClosed = false;
+
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
-    firstCurrency = document.querySelector("#currencyTransaType_radio_2");
     inputExchangeRateBuyTransa = document.querySelector("#exchangeRateBuyTransa");
     inputExchangeRateSellTransa = document.querySelector("#exchangeRateSellTransa");
     inputExchangeRateOfficialTransa = document.querySelector("#exchangeRateOfficialTransa");
@@ -44,12 +52,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid col-md-12 col-xxl-10 col-11 m-1";
     selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
+    btnSave = document.querySelector("#btnSaveReturn");
+    btnNext = document.querySelector("#btnNext");
+    btnClosed = document.querySelector("#btnSaveClosed");
 
-    selectBusinessExecutive.addEventListener("change", () => {
+    $(selectBusinessExecutive).select2(select2Options);
 
+    var selectedOptionActive = $(selectBusinessExecutive).find(':selected');
 
+    if (selectedOptionActive[0].dataset.loan === "True" || selectedOptionActive[0].dataset.payment === "True") {
+        fnHiddenButton(true);
+    } else {
+        fnHiddenButton(false);
+    }
+
+    //Evento para el select de ejecutivo
+    $(selectBusinessExecutive).on('select2:select', function (e) {
+        // Obtiene la opción seleccionada
+        let selectedOption = e.params.data.element;
+
+        if (selectedOption.dataset.loan === "True" || selectedOption.dataset.payment === "True") {
+            fnHiddenButton(true);
+        } else {
+            fnHiddenButton(false);
+        }
     });
 
+    //Formateamos todos los inputs de transacciones
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 
@@ -60,11 +89,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 item.value = formatterAmount().format(fnparseFloat(item.value));
             }
-
+            //Funcion para re hacer los calculos
             fnCalculateRevenueCost();
         });
     });
 
+    //Formateamos todos los inputs de tipo de cambio
     inputsFormatExchange.forEach((item) => {
         item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
 
@@ -75,21 +105,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
                 item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
             }
+            //Funcion para re hacer los calculos
             fnCalculateRevenueCost();
         });
     });
 
+    //Funcion para el evento de la cuenta bancaria de origen
     await fnGetBankAccounts();
 
     //Setear enfoque en el search input
     $(document).on('select2:open', function (e) {
         document.querySelector(`[aria-controls="select2-${e.target.id}-results"]`).focus();
     });
-
-    currencyType = firstCurrency.value;
-    inputCurrencyTransa.value = parseInt(currencyType);
-    //Por defecto la moneda es dolar
-    currencyTransaType_onClick(firstCurrency);
 
     //Obtenemos el tipo de cambio en base a la fecha
     await fnTCByDate();
@@ -98,15 +125,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         await fnTCByDate();
     });
 
+    //Monedas de la transaccion
     currenciesTransa.forEach((transa) => {
+        if (transa.checked) {
+            inputCurrencyTransa.value = parseInt(transa.value);
+            currencyType = parseInt(transa.value);
+        }
+
         transa.addEventListener("change", async () => {
-            currencyType = transa.value;
+            currencyType = parseInt(transa.value);
             inputCurrencyTransa.value = parseInt(currencyType);
             fnCalculateRevenueCost();
             await fnTCByDate();
         });
     });
 
+    //Por defecto la moneda es dolar
+    currencyTransaType_onClick(inputCurrencyTransa);
+
+    //Monedas del deposito
     currenciesDeposit.forEach((deposit) => {
         deposit.addEventListener("change", async () => {
             inputCurrencyDeposit.value = parseInt(deposit.value);
@@ -121,6 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    //Monedas de la transferencia
     currenciesTransfer.forEach((transfer) => {
         transfer.addEventListener("change", async () => {
             inputCurrencyTransfer.value = parseInt(transfer.value);
@@ -136,6 +174,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    //Tipos de cotizacion
     typeNumerals.forEach((item) => {
         if (item.checked) inputTypeNumeral.value = parseInt(item.value);
         item.addEventListener("change", () => {
@@ -144,11 +183,132 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
+    //Funcion para ocultar los elementos en dependencia del tipo de cotizacion
     fnLoadInputsByType(inputTypeNumeral.value);
+
+    // Evento enviar form para crear
+    const formCreate = document.getElementById("formUpsert");
+    formCreate.addEventListener("submit", fnCreateFormSubmit);
 });
 
+const fnSaveReturn = () => {
+    redirectHome = true;
+    redirectDetail = false;
+    showMessages = true;
+    isClosed = false;
+    btnSaveNext.click();
+}
+
+const fnSaveNext = () => {
+    redirectHome = false;
+    redirectDetail = true;
+    showMessages = true;
+    isClosed = false;
+    btnSaveNext.click();
+}
+
+const fnSaveClosed = () => {
+    redirectHome = false;
+    redirectDetail = false;
+    showMessages = false;
+    isClosed = true;
+    btnSaveNext.click();
+}
+
+
+const fnCreateFormSubmit = async (event) => {
+
+    try {
+        event.preventDefault();
+        const formObject = event.currentTarget;
+
+        const url = `${formObject.action}?redirectHome=${redirectHome}&redirectDetail=${redirectDetail}&showMessages=${showMessages}`;
+        const formData = new FormData(formObject);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: 'error',
+                text: errorMessage.errorMessages
+            });
+        } else {
+            const jsonResponse = await response.json();
+            if (!jsonResponse.isSuccess) {
+                Swal.fire({
+                    icon: 'error',
+                    text: jsonResponse.errorMessages
+                });
+            } else {
+                if (jsonResponse.urlRedirect) {
+                    window.location.href = jsonResponse.urlRedirect;
+                }
+
+                if (isClosed) {
+                    await fnApproved(jsonResponse.data.id);
+                }
+            }
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
+    }
+}
+
+const fnHiddenButton = (isExecutiveLoanOrPayment) => {
+
+    if (isExecutiveLoanOrPayment) {
+        btnNext.hidden = true;
+        btnClosed.hidden = false;
+        btnSave.hidden = false;
+    } else {
+        btnNext.hidden = false;
+        btnClosed.hidden = true;
+        btnSave.hidden = true;
+    }
+};
+
+const fnApproved = async (id) => {
+
+    try {
+
+        let url = `/exchange/quotation/Approved?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
 const fnGetBankAccounts = async () => {
-    //$(selectBankAccountTarget).select2(select2Options);
 
     selectBankAccountSource.addEventListener("change", async () => {
 
@@ -174,10 +334,13 @@ const fnGetBankAccounts = async () => {
                 selectBankAccountTarget.insertBefore(option, selectBankAccountTarget.firstChild);
 
                 jsonResponse.data.forEach((item) => {
-                    let option = document.createElement("option");
-                    option.value = item.value;
-                    option.text = item.text;
-                    selectBankAccountTarget.appendChild(option);
+
+                    if (item.value != selectBankAccountSource.value) {
+                        let option = document.createElement("option");
+                        option.value = item.value;
+                        option.text = item.text;
+                        selectBankAccountTarget.appendChild(option);
+                    }
                 });
 
                 //$(selectBankAccountTarget).select2(select2Options);
@@ -229,6 +392,22 @@ const fnChangeCustomers = async (onlyCompanies) => {
     }
 };
 
+const fnLoadOptionSelectBusiness = (type) => {
+    if (type != QuotationType.Transfer) {
+        $(selectBusinessExecutive).find('option').each(function () {
+            if ($(this).data('loan') === "True" || $(this).data('payment') === "True") {
+                $(this).prop('disabled', false);
+            }
+        });
+    } else {
+        $(selectBusinessExecutive).find('option').each(function () {
+            if ($(this).data('loan') === "True" || $(this).data('payment') === "True") {
+                $(this).prop('disabled', true);
+            }
+        });
+    }
+};
+
 const fnLoadInputsByType = (type) => {
     if (type == QuotationType.Buy) {
         divCurrencyTransa.hidden = false;
@@ -276,6 +455,7 @@ const fnLoadInputsByType = (type) => {
         elementsTransfer.forEach((item) => item.hidden = false);
         fnChangeCustomers(true);
     }
+    fnLoadOptionSelectBusiness(type);
     fnCalculateRevenueCost();
 };
 function currencyTransaType_onClick(objElem) {
@@ -292,21 +472,21 @@ function currencyTransaType_onClick(objElem) {
         curDepositForeignDiv.style.display = styleHide;
         curDepositBaseDiv.style.display = styleShowInline;
         curDepositAdditionalDiv.style.display = styleHide;
-        document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
+        //document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
         curTransferForeignDiv.style.display = styleHide;
         curTransferBaseDiv.style.display = styleShowInline;
         curTransferAdditionalDiv.style.display = styleHide;
-        document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
+        //document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
     }
     else if (currentValue == CurrencyType.Additional) {
         curDepositAdditionalDiv.style.display = styleHide;
         curDepositForeignDiv.style.display = styleShowInline;
         curDepositBaseDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
+        //document.getElementById(radnamecurDeposit + CurrencyType.Base).checked = true;
         curTransferAdditionalDiv.style.display = styleHide;
         curTransferForeignDiv.style.display = styleShowInline;
         curTransferBaseDiv.style.display = styleShowInline;
-        document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
+        //document.getElementById(radnamecurTransfer + CurrencyType.Base).checked = true;
     }
 
     return true;

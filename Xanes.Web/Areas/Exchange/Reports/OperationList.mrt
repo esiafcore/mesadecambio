@@ -84,7 +84,7 @@
             </ImgLogo>
             <Text4 Ref="6" type="Text" isKey="true">
               <Brush>Transparent</Brush>
-              <ClientRectangle>48,0,312,8</ClientRectangle>
+              <ClientRectangle>48,2,312,8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,20,Bold</Font>
@@ -493,12 +493,12 @@ Oficial</Text>
         <Data Ref="30" type="DataBand" isKey="true">
           <Brush>Transparent</Brush>
           <BusinessObjectGuid>3cf0d9c4e6904b81a595386bed5f4a06</BusinessObjectGuid>
-          <ClientRectangle>0,50,360,10</ClientRectangle>
+          <ClientRectangle>0,50,360,6</ClientRectangle>
           <Components isList="true" count="15">
             <Datadatrep_code Ref="31" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>0,0,16,8</ClientRectangle>
+              <ClientRectangle>0,0,16,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -516,7 +516,7 @@ Oficial</Text>
             <Datadatrep_identNumber Ref="32" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>38,0,24,8</ClientRectangle>
+              <ClientRectangle>38,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -534,7 +534,7 @@ Oficial</Text>
             <Datadatrep_isActive Ref="33" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>296,0,16,8</ClientRectangle>
+              <ClientRectangle>296,0,16,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -552,7 +552,7 @@ Oficial</Text>
             <Datadatrep_identNumberCode Ref="34" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>16,0,22,8</ClientRectangle>
+              <ClientRectangle>16,0,22,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -570,7 +570,7 @@ Oficial</Text>
             <Datadatrep_comercialName Ref="35" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>62,0,58,8</ClientRectangle>
+              <ClientRectangle>62,0,58,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -587,7 +587,7 @@ Oficial</Text>
             <Text2 Ref="36" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>336,0,24,8</ClientRectangle>
+              <ClientRectangle>336,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -605,7 +605,7 @@ Oficial</Text>
             <Text15 Ref="37" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>312,0,24,8</ClientRectangle>
+              <ClientRectangle>312,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -623,7 +623,7 @@ Oficial</Text>
             <Text16 Ref="38" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>284,0,12,8</ClientRectangle>
+              <ClientRectangle>284,0,12,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -640,7 +640,7 @@ Oficial</Text>
             <Text17 Ref="39" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>260,0,24,8</ClientRectangle>
+              <ClientRectangle>260,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -658,7 +658,7 @@ Oficial</Text>
             <Text18 Ref="40" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>236,0,24,8</ClientRectangle>
+              <ClientRectangle>236,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -676,7 +676,7 @@ Oficial</Text>
             <Text19 Ref="41" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>214,0,22,8</ClientRectangle>
+              <ClientRectangle>214,0,22,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -694,7 +694,7 @@ Oficial</Text>
             <Text20 Ref="42" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>190,0,24,8</ClientRectangle>
+              <ClientRectangle>190,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -712,7 +712,7 @@ Oficial</Text>
             <Text21 Ref="43" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>168,0,22,8</ClientRectangle>
+              <ClientRectangle>168,0,22,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -730,7 +730,7 @@ Oficial</Text>
             <Text22 Ref="44" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>144,0,24,8</ClientRectangle>
+              <ClientRectangle>144,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -748,7 +748,7 @@ Oficial</Text>
             <Text23 Ref="45" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
-              <ClientRectangle>120,0,24,8</ClientRectangle>
+              <ClientRectangle>120,0,24,6</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
@@ -779,7 +779,7 @@ Oficial</Text>
         </Data>
         <FooterBand1 Ref="46" type="FooterBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,68,360,2</ClientRectangle>
+          <ClientRectangle>0,64,360,2</ClientRectangle>
           <Components isList="true" count="8">
             <Text26 Ref="47" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
@@ -929,7 +929,7 @@ SumD(datrep.AmountRevenue))}</Text>
         </FooterBand1>
         <FooterBand2 Ref="55" type="FooterBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,78,360,2</ClientRectangle>
+          <ClientRectangle>0,74,360,2</ClientRectangle>
           <Components isList="true" count="9">
             <Text26 Ref="56" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
@@ -1097,7 +1097,7 @@ parAmountNetRevenueBuy)}</Text>
         </FooterBand2>
         <FooterBand3 Ref="65" type="FooterBand" isKey="true">
           <Brush>Transparent</Brush>
-          <ClientRectangle>0,88,360,7</ClientRectangle>
+          <ClientRectangle>0,84,360,7</ClientRectangle>
           <Components isList="true" count="9">
             <Text36 Ref="66" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
@@ -1287,10 +1287,10 @@ parAmountNetRevenueSell)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/8/2024 11:00:54 AM</ReportChanged>
+  <ReportChanged>5/12/2024 12:00:08 AM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
-  <ReportGuid>c6b5b721d0eb4a67b6ffeb9a887f4b14</ReportGuid>
+  <ReportGuid>eda9bf835eb646e897efcf0ba3746273</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2023.4.2.0</ReportVersion>

@@ -569,7 +569,6 @@ const fnReClosed = async (id) => {
     }
 };
 
-
 const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
     if (quotationDetailType == QuotationDetailType.Deposit) {
         document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
@@ -659,6 +658,7 @@ const fnVerificateIsPending = () => {
 const fnBtnAddPendingDeposit = () => {
     amountDeposit.value = formatterAmount().format(fnparseFloat(pendingDeposit));
 };
+
 const fnBtnAddPendingTransfer = () => {
     amountTransfer.value = formatterAmount().format(fnparseFloat(pendingTransfer));
 
@@ -685,7 +685,6 @@ const fnSelectTableSourceDeposit = async (index = 0) => {
 
     $(selectedRowNode).addClass('bg-info-subtle bg-opacity-75 bg-gradient');
 };
-
 function fnLoadDatatableBankTransferSource(index = 0) {
     if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
     dataTableBankSourceTransfer = new DataTable("#tblBankSourceTransfer", {

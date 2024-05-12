@@ -292,7 +292,13 @@ const fnLoadDatatable = () => {
                 data: null, "width": "10%", orderable: false
                 , "render": (data, type, row) => {
 
-                    let btnUpdate = `<a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
+                    let urlUpdate = `/exchange/quotation/CreateDetail?id=${row.id}`;
+
+                    if (row.isLoan || row.isPayment) {
+                        urlUpdate = `/exchange/quotation/Upsert?id=${row.id}`;
+                    }
+
+                    let btnUpdate = `<a href="${urlUpdate}" class="btn btn-primary py-1 px-3 my-0 mx-1"
                                         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;

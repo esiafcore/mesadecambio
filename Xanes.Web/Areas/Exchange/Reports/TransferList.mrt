@@ -1167,10 +1167,10 @@ parAmountNetMBO)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/8/2024 11:00:02 AM</ReportChanged>
+  <ReportChanged>5/11/2024 11:58:28 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\TransferList.mrt</ReportFile>
-  <ReportGuid>2a7547b838834503a038a220152a6cee</ReportGuid>
+  <ReportGuid>ddfeab7f7a6c44aab27c4a5c106a3dca</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2023.4.2.0</ReportVersion>
