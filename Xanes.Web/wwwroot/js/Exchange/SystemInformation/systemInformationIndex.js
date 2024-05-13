@@ -52,12 +52,6 @@ const fnsendFormValidate = async (event) => {
 
         if (plainFormData.ReportType == SystemInformationReportType.Operation) {
 
-            //plainFormData.FiscalYear = parseInt(plainFormData.FiscalYear);
-            //plainFormData.FiscalMonth = parseInt(plainFormData.FiscalMonth);
-            //plainFormData.TransactionFacSubtype = parseInt(plainFormData.TransactionFacSubtype);
-            //plainFormData.CurrencyType = parseInt(plainFormData.CurrencyType);
-            //plainFormData.TransactionOrderBy = parseInt(plainFormData.TransactionOrderBy);
-
             resultResponse = await fnvalidateOperation(plainFormData);
         }
 

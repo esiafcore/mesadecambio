@@ -1,19 +1,95 @@
 ﻿let dataTable, containerMain, inputDateInitial, inputDateFinal;
 let dateInitial, dateFinal;
-
+let dateFinalReport = document.querySelector("#dateFinalReport");
+let dateInitialReport = document.querySelector("#dateInitialReport");
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
     fnLoadDatatable();
     //Habilitar Tooltip
     fnEnableTooltip();
-
+    
     //// Crear los elementos del filtro de fecha y botón de búsqueda
     //var filtroFecha = $('<div class="dt-filtro-fecha col-8 d-flex gap-4">Fecha de inicio: <input type="date" id="fechaInicio"> Fecha fin: <input type="date" id="fechaFin"> <button id="btnBuscar">Buscar</button></div>');
 
     //// Insertar los elementos antes de la barra de búsqueda estándar
     //wrapper.find('.dt-length').after(filtroFecha);
+
+    // Evento enviar form para crear
+    const formPrint = document.getElementById("formPrint");
+    formPrint.addEventListener("submit", fnPrintFormSubmit);
 });
+
+
+const fnPrintFormSubmit = async (event) => {
+
+    try {
+        let resultResponse = {
+            isSuccess: true
+        };
+        event.preventDefault();
+        const formObject = event.currentTarget;
+
+        const url = `${formObject.action}`;
+        const formData = new FormData(formObject);
+        //const plainFormData = Object.fromEntries(formData.entries());
+        const plainFormData = Object.fromEntries([...formData.entries()].filter(([key, _]) => !key.startsWith("__")));
+        plainFormData.ReportType = parseInt(plainFormData.ReportType);
+
+        resultResponse = await fnvalidateOperation(plainFormData);
+
+        // Continuar flujo normal del formulario
+        if (resultResponse.isSuccess) {
+            formObject.submit();
+        } 
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
+    }
+}
+
+const fnvalidateOperation = async (plainFormData) => {
+    const resultResponse = {
+        isSuccess: true
+    };
+
+    // Validar que existan registros disponibles
+    const url = `${window.location.origin}/Exchange/SystemInformation/VerificationDataForOperation`;
+    const formDataJsonString = JSON.stringify(plainFormData);
+    let fetchOptions = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: formDataJsonString
+    };
+
+    const response = await fetch(url, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage
+        });
+    } else {
+        let jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            fnShowModalMessages(jsonResponse);
+            resultResponse.isSuccess = false;
+            return resultResponse;
+        }
+    }
+
+    return resultResponse;
+};
+
 
 // Función para ajustar las fechas según los criterios
 const fnAdjustmentDates = () => {
@@ -27,6 +103,9 @@ const fnAdjustmentDates = () => {
 
     // Establecer el mínimo de la fecha final como la fecha inicial
     inputDateFinal.min = inputDateInitial.value;
+
+    dateInitialReport.value = inputDateInitial.value;
+    dateFinalReport.value = inputDateFinal.value;
 }
 
 
@@ -54,32 +133,48 @@ const fnAdjustmentFilterDataTable = () => {
         initialValue = processingDate;
         finalValue = processingDate;
     }
+    //let initialValue, finalValue;
+    //if (dateInitial != undefined && dateFinal != undefined) {
+    //    const dateInitialSplit = dateInitial.split('/');
+    //    let dateInitialFormat = `${dateInitialSplit[2]}-${dateInitialSplit[1]}-${dateInitialSplit[0]}`;
+    //    initialValue = dateInitialFormat;
+    //    alert(dateInitialFormat)
+
+    //    finalValue = dateFinal;
+    //} else {
+    //    const dateSplit = processingDate.split('/');
+    //    let dateFormat = `${dateSplit[0]}-${dateSplit[1]}-${dateSplit[2]}`;
+    //    alert(dateFormat)
+    //    initialValue = dateFormat;
+    //    finalValue = dateFormat;
+    //}
+
     filterDate.innerHTML =
         `  <div class="row">
-                            <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
-                                <div class="col-5 col-xxl-6 pe-0">
-                                    Fecha inicial:
-                                </div>
-                                <div class="col-7 col-lg-6">
-                                    <input type="date" id="dateInitial" value="${initialValue}">
-                                </div>
-                            </div>
-                            <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
-                                <div class="col-5 col-xl-6">
-                                    Fecha final:
-                                </div>
-                                <div class="col-7 col-lg-6">
-                                    <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
-                                </div>
-                            </div>
-                            <div class="row col-6 col-md-4 col-xl-2 mb-1">
-                                <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-placement="top"
-                                data-bs-title="Filtrar"
-                                class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
-                                    <i class="bi bi-funnel-fill"></i>  Filtrar
-                                </button>
-                            </div>
-                        </div>`;
+                <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
+                    <div class="col-5 col-xxl-6 pe-0">
+                        Fecha inicial:
+                    </div>
+                    <div class="col-7 col-lg-6">
+                        <input type="date" id="dateInitial" value="${initialValue}">
+                    </div>
+                </div>
+                <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
+                    <div class="col-5 col-xl-6">
+                        Fecha final:
+                    </div>
+                    <div class="col-7 col-lg-6">
+                        <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
+                    </div>
+                </div>
+                <div class="row col-6 col-md-4 col-xl-2 mb-1">
+                    <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-placement="top"
+                    data-bs-title="Filtrar"
+                    class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
+                        <i class="bi bi-funnel-fill"></i>  Filtrar
+                    </button>
+                </div>
+            </div>`;
 
     filterLength.parentNode.insertBefore(filterDate, filterLength.nextSibling);
     inputDateInitial = document.querySelector("#dateInitial");
@@ -91,6 +186,9 @@ const fnAdjustmentFilterDataTable = () => {
     inputDateInitial.addEventListener("change", () => {
         fnAdjustmentDates();
     });
+
+    dateInitialReport.value = initialValue;
+    dateFinalReport.value = finalValue;
 
     fnEnableTooltip();
 };
@@ -276,6 +374,13 @@ const fnLoadDatatable = () => {
             {
                 data: 'amountCost', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: false
+            },
+            {
+                data: 'businessExecutiveTrx.code', "width": "5%"
+                , render: function (data, type, row) {
+                    return `${data}`;
+                }
                 , orderable: false
             },
             {

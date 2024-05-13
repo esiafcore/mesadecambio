@@ -327,7 +327,6 @@ public class CustomerController : Controller
         return RedirectToAction("Index", "Customer");
     }
 
-
     [HttpGet]
     public FileResult ExportExcel()
     {
@@ -420,4 +419,41 @@ public class CustomerController : Controller
         }
     }
 
+    //[HttpPost]
+    //[ValidateAntiForgeryToken]
+    //public IActionResult Import(Models.ViewModels.ImportVM objImportViewModel)
+    //{
+    //    List<string> ErrorListMessages = new List<string>();
+    //    var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
+
+    //    var hoja = workbook.Worksheet(1);
+
+    //    var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+    //    var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+
+    //    for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
+    //    {
+    //        var fila = hoja.Row(i);
+
+    //        var type = fila.Cell(1).GetString();
+    //        if (string.IsNullOrWhiteSpace(type))
+    //        {
+    //            ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. ");
+    //        }
+
+    //        var sector = fila.Cell(2).GetString();
+    //        if (string.IsNullOrWhiteSpace(sector))
+    //        {
+    //            ErrorListMessages.Add($"El sector está vacio en la fila:{i}. ");
+    //        }
+
+    //        var numberIdent = fila.Cell(3).GetString();
+    //        if (string.IsNullOrWhiteSpace(numberIdent))
+    //        {
+    //            ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. ");
+    //        }
+
+    //    }
+
+    //}
 }

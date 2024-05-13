@@ -52,8 +52,10 @@ public class QuotationController : Controller
         DateOnly dateFilter = DateOnly.Parse(processingDateString);
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
-        ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter);
-        return View();
+        ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter.ToString(AC.DefaultDateFormatWeb));
+        TransactionReportVM modelVM = new();
+
+        return View(modelVM);
     }
 
     public IActionResult Upsert(int id = 0)
@@ -1405,7 +1407,7 @@ public class QuotationController : Controller
         DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
         var objList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal)
-            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx").ToList();
+            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx").ToList();
 
         if (objList == null)
         {

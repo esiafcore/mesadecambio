@@ -1,35 +1,48 @@
-﻿
+﻿@model TransactionReportVM
+
 <div class="card shadow border-0 mt-1">
-    <div class="card-header bg-secondary bg-gradient ms-0 py-1">
-        <div class="row align-items-center">
-            <div class="col-8 text-center">
-                <h3 class="text-white py-1">Transacciones</h3>
-            </div>
-            <div class="col-4 text-end">
-                <a asp-controller="Quotation" asp-action="Upsert" class="btn btn-info border"
-                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nuevo Cotización">
-                    <i class="bi bi-plus-circle"></i> Nuevo
-                </a>
+    <form method="post" id="formPrint" asp-area="Exchange" asp-controller="SystemInformation" asp-action="PrintTransaOperationList" target="_blank" onsubmit="fnsendFormValidate(event)">
+        <input asp-for="ReportType" value="@((short)SD.ReportTransaType.Operation)" name="ReportType" hidden />
+        <input asp-for="DateTransaInitial" name="DateTransaInitial" type="date" id="dateInitialReport" hidden />
+        <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />
+        <div class="card-header bg-secondary bg-gradient ms-0 py-1">
+            <div class="row align-items-center">
+                <div class="col-8 text-center">
+                    <h3 class="text-white py-1">Transacciones</h3>
+                </div>
+                <div class="col-4 text-end">
+
+                    <button class="btn btn-secondary border" type="submit"
+                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir Operaciones">
+                        <i class="bi bi-printer-fill"></i> Imprimir
+                    </button>
+                    <a asp-controller="Quotation" asp-action="Upsert" class="btn btn-info border"
+                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nuevo Cotización">
+                        <i class="bi bi-plus-circle"></i> Nuevo
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
+
     <div class="card-body px-3 py-1">
-        <table id="tblData" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
+        <table id="tblData" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
             <thead>
-            <tr>
-                <th data-priority="2">Fecha</th>
-                <th data-priority="3"># Transa</th>
-                <th>Cliente</th>
-                <th>Mon<br />Ori-Des</th>
-                <th>T/C<br />Com</th>
-                <th>T/C<br />Vta</th>
-                <th data-priority="4">Monto</th>
-                <th>Ingreso</th>
-                <th>Costo</th>
-                <th>Cerra<br />?</th>
-                <th>Conta<br />?</th>
-                <th data-priority="1"></th>
-            </tr>
+                <tr>
+                    <th data-priority="2">Fecha</th>
+                    <th data-priority="3"># Transa</th>
+                    <th>Cliente</th>
+                    <th>Mon<br />Ori-Des</th>
+                    <th>T/C<br />Com</th>
+                    <th>T/C<br />Vta</th>
+                    <th data-priority="4">Monto</th>
+                    <th>Ingreso</th>
+                    <th>Costo</th>
+                    <th>Eje</th>
+                    <th>Cerra<br />?</th>
+                    <th>Conta<br />?</th>
+                    <th data-priority="1"></th>
+                </tr>
             </thead>
         </table>
     </div>
@@ -38,8 +51,8 @@
 @section Scripts {
     <script>
         let decimalTransa = @Html.Raw(@ViewBag.DecimalTransa);
-        let decimalExchange = @Html.Raw(@ViewBag.DecimalExchange);
         let processingDate = @Html.Raw(@ViewBag.ProcessingDate);
+        let decimalExchange = @Html.Raw(@ViewBag.DecimalExchange);
 
     </script>
     <script src="~/js/Exchange/Quotation/quotationIndex.js"></script>
