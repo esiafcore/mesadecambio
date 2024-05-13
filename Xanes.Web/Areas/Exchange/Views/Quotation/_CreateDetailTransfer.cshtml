@@ -1,13 +1,13 @@
 ﻿@model QuotationDetailVM
 
-<form method="post" asp-action="CreateDetail">
-    <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailTransfer" hidden />
-    <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" hidden/>
-    <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" hidden/>
-    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" hidden/>
-    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" hidden/>
-    <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" id="bankTargetTransfer" hidden />
-    <input asp-for="DataModel.BankSourceId" value="@Model.DataModel.BankTargetId" id="bankSourceTransfer" hidden />
+<form id="formDetailTransfer" method="post" asp-action="CreateDetail">
+    <input asp-for="DataModel.Id" value="@Model.DataModel.Id" id="idDetailTransfer" name="Id" hidden />
+    <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" name="ParentId" hidden />
+    <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" name="CompanyId" hidden />
+    <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" name="QuotationDetailType" hidden />
+    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" name="CurrencyDetailId" hidden />
+    <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" id="bankTargetTransfer" name="BankTargetId" hidden />
+    <input asp-for="DataModel.BankSourceId" value="@Model.DataModel.BankTargetId" id="bankSourceTransfer" name="BankSourceId" hidden />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="modal-dialog modal-dialog-centered">
@@ -25,7 +25,7 @@
                         Monto
                     </div>
                     <div class="col-3 ms-4">
-                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" class="form-control border p-1 decimalTransa text-end" />
+                        <input id="amountTransfer" asp-for="DataModel.AmountDetail" name="AmountDetail" class="form-control border p-1 decimalTransa text-end" />
                         <span class="text-danger" asp-validation-for="DataModel.AmountDetail"></span>
                     </div>
                     <div class="col d-flex justify-content-start">
@@ -86,10 +86,12 @@
             </div>
 
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-sm btn-danger" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-sm btn-danger"
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Cancelar" data-bs-dismiss="modal">
                     <i class="bi bi-x-square"></i> Cancelar
                 </button>
-                <button type="submit" class="btn btn-sm btn-primary">
+                <button type="submit" class="btn btn-sm btn-primary"
+                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Salvar">
                     <i class="bi bi-floppy"></i> Salvar
                 </button>
             </div>

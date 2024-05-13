@@ -9,12 +9,14 @@
                 </div>
                 <div class="row col mt-1 d-flex justify-content-end">
                     <div class="col-6 col-md-5 col-xl-4">
-                        <a onclick="fndeleteRow(@Model.DataModel.Id)" class="btn btn-danger form-control btn-sm border">
+                        <a onclick="fndeleteRow(@Model.DataModel.Id)" class="btn btn-danger form-control btn-sm border"
+                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-check-square-fill"></i> Eliminar
                         </a>
                     </div>
                     <div class="col-6 col-md-5 col-xl-4">
-                        <a asp-action="Index" class="btn btn-secondary form-control btn-sm border">
+                        <a asp-action="Index" class="btn btn-secondary form-control btn-sm border"
+                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Regresar">
                             <i class="bi bi-arrow-return-left"></i> Regresar
                         </a>
                     </div>

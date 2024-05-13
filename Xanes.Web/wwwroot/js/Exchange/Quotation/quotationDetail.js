@@ -11,6 +11,7 @@ let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTarget
 let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
 let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
 
+//Variable para el color de fondo seleccionado en la tablas del detalle
 let bgRow = 'bg-success bg-opacity-75 bg-gradient';
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
@@ -56,38 +57,20 @@ document.addEventListener("DOMContentLoaded", async function () {
     divExchangeRateVariation = document.querySelector("#divExchangeRateVariation");
     inputExchangeRateVariation = document.querySelector("#exchangeRateVariation");
     btnQuotationClosed = document.querySelector("#btnQuotationClosed");
-    currencies.forEach((item) => {
-        if (item.checked) {
-            currencyType = item.value;
-        }
-    });
 
-    currenciesDeposit.forEach((item) => {
-        if (item.checked) {
-            currencyTypeDeposit = parseInt(item.value);
-        }
-    });
+    //Obtenemos el tipo de cambio en base a la fecha
+    await fnTCByDate();
 
-    currenciesTransfer.forEach((item) => {
-        if (item.checked) {
-            currencyTypeTransfer = parseInt(item.value);
-        }
-    });
+    //Funcion para obtener el valor de las monedas seleccionadas
+    fnGetCurrencyValues();
 
+    //Funcion que formatea los inputs transaccionales y inputs de T/Cambio
+    fnFormatInputValues();
 
     typeNumerals.forEach((item) => {
         if (item.checked) {
             typeNumeral = item.value;
         }
-    });
-
-    fnLoadInputsByType(typeNumeral);
-
-    //Obtenemos el tipo de cambio en base a la fecha
-    await fnTCByDate();
-
-    inputDateTransa.addEventListener('change', async () => {
-        await fnTCByDate();
     });
 
     //Aplicar select2
@@ -98,6 +81,140 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.querySelector(`[aria-controls="select2-${e.target.id}-results"]`).focus();
     });
 
+    //Evento del cambio en la fecha, para obtener el tc/Oficial
+    inputDateTransa.addEventListener('change', async () => {
+        await fnTCByDate();
+    });
+
+    //Si el usuario cambio el monto o el tc transaccional, calculamos nuevamente
+    document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
+        fnCalculateRevenueCost();
+    }));
+
+    fnLoadInputsByType(typeNumeral);
+    fnCalculateRevenueCost();
+
+    $(selectBankAccountSource).select2(select2Options);
+    $(selectBankAccountTarget).select2(select2Options);
+
+    fnLoadDatatableDeposit();
+    fnLoadDatatableTransfer();
+    fnLoadDatatableBankDeposit();
+    fnLoadDatatableBankTransferSource();
+    fnLoadDatatableBankTransferTarget();
+    fnChangeSelectDataTableDetails();
+
+    // Evento enviar form para crear
+    const formDetailDeposit = document.getElementById("formDetailDeposit");
+    formDetailDeposit.addEventListener("submit", fnCreateDetailFormSubmit);
+    fnEnableTooltip();
+
+    // Evento enviar form para crear
+    const formDetailTransfer = document.getElementById("formDetailTransfer");
+    formDetailTransfer.addEventListener("submit", fnCreateDetailFormSubmit);
+
+    // Evento enviar form para actualizar la cabecera
+    const formUpdateHeader = document.getElementById("formUpdateHeader");
+    formUpdateHeader.addEventListener("submit", fnCreateDetailFormSubmit);
+    fnEnableTooltip();
+});
+
+const fnCreateDetailFormSubmit = async (event) => {
+
+    try {
+        event.preventDefault();
+        const formObject = event.currentTarget;
+
+        const url = `${formObject.action}`;
+        const formData = new FormData(formObject);
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: 'error',
+                text: errorMessage.errorMessages
+            });
+        } else {
+            const jsonResponse = await response.json();
+            if (!jsonResponse.isSuccess) {
+                Swal.fire({
+                    icon: 'error',
+                    text: jsonResponse.errorMessages
+                });
+            } else {
+                if (jsonResponse.urlRedirect) {
+                    window.location.href = jsonResponse.urlRedirect;
+                }
+            }
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
+    }
+}
+
+
+
+const fnChangeSelectDataTableDetails = () => {
+    dataTableBankSourceDeposit.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
+            inputBankTargetDeposit.value = inputBankSourceDeposit.value;
+
+            let selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
+            let selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass(bgRow);
+
+            indexDataTableBankSourceDeposit = indexes;
+
+            // Selecciona la fila deseada
+            let selectedRow = dataTableBankSourceDeposit.row(indexes);
+            let selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass(bgRow);
+        }
+    });
+    dataTableBankSourceTransfer.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
+            let selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
+            let selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass(bgRow);
+
+            indexDataTableBankSourceTransfer = indexes;
+
+            // Selecciona la fila deseada
+            let selectedRow = dataTableBankSourceTransfer.row(indexes);
+            let selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass(bgRow);
+        }
+    });
+    dataTableBankTargetTransfer.on('select', async function (e, dt, type, indexes) {
+        if (type === 'row') {
+            inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
+            let selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
+            let selectedRowNodeAfter = selectedRowAfter.node();
+            $(selectedRowNodeAfter).removeClass(bgRow);
+
+            indexDataTableBankTargetTransfer = indexes;
+
+            // Selecciona la fila deseada
+            let selectedRow = dataTableBankTargetTransfer.row(indexes);
+            let selectedRowNode = selectedRow.node();
+            $(selectedRowNode).addClass(bgRow);
+        }
+    });
+};
+
+const fnFormatInputValues = () => {
     inputsFormatTransa.forEach((item) => {
         item.value = formatterAmount().format(fnparseFloat(item.value));
 
@@ -117,74 +234,27 @@ document.addEventListener("DOMContentLoaded", async function () {
             item.value = formatterAmount(decimalExchange).format(fnparseFloat(item.value));
         });
     });
+};
 
-    document.querySelectorAll("#amountTransa, #exchangeRateSellTransa, #exchangeRateBuyTransa").forEach((item) => item.addEventListener("change", () => {
-        fnCalculateRevenueCost();
-    }));
-
-    fnCalculateRevenueCost();
-
-    $(selectBankAccountSource).select2(select2Options);
-    $(selectBankAccountTarget).select2(select2Options);
-
-    fnLoadDatatableDeposit();
-    fnLoadDatatableTransfer();
-    fnLoadDatatableBankDeposit();
-    fnLoadDatatableBankTransferSource();
-    fnLoadDatatableBankTransferTarget();
-
-    dataTableBankSourceDeposit.on('select', async function (e, dt, type, indexes) {
-        if (type === 'row') {
-            inputBankSourceDeposit.value = await fnGetBankId(dataTableBankSourceDeposit);
-            inputBankTargetDeposit.value = inputBankSourceDeposit.value;
-
-            var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
-            var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass(bgRow);
-
-            indexDataTableBankSourceDeposit = indexes;
-
-            // Selecciona la fila deseada
-            var selectedRow = dataTableBankSourceDeposit.row(indexes);
-            var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass(bgRow);
+const fnGetCurrencyValues = () => {
+    currencies.forEach((item) => {
+        if (item.checked) {
+            currencyType = item.value;
         }
     });
 
-    dataTableBankSourceTransfer.on('select', async function (e, dt, type, indexes) {
-        if (type === 'row') {
-            inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
-            var selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
-            var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass(bgRow);
-
-            indexDataTableBankSourceTransfer = indexes;
-
-            // Selecciona la fila deseada
-            var selectedRow = dataTableBankSourceTransfer.row(indexes);
-            var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass(bgRow);
+    currenciesDeposit.forEach((item) => {
+        if (item.checked) {
+            currencyTypeDeposit = parseInt(item.value);
         }
     });
 
-    dataTableBankTargetTransfer.on('select', async function (e, dt, type, indexes) {
-        if (type === 'row') {
-            inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
-            var selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
-            var selectedRowNodeAfter = selectedRowAfter.node();
-            $(selectedRowNodeAfter).removeClass(bgRow);
-
-            indexDataTableBankTargetTransfer = indexes;
-
-            // Selecciona la fila deseada
-            var selectedRow = dataTableBankTargetTransfer.row(indexes);
-            var selectedRowNode = selectedRow.node();
-            $(selectedRowNode).addClass(bgRow);
+    currenciesTransfer.forEach((item) => {
+        if (item.checked) {
+            currencyTypeTransfer = parseInt(item.value);
         }
     });
-    //Habilitar Tooltip
-    fnEnableTooltip();
-});
+}
 
 const fnChangeCustomers = async (onlyCompanies) => {
     let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
@@ -208,7 +278,7 @@ const fnChangeCustomers = async (onlyCompanies) => {
             });
 
             $(selectCustomer).select2(select2Options);
-            var options = selectCustomer.getElementsByTagName('option');
+            let options = selectCustomer.getElementsByTagName('option');
             if (options.length > 0) {
                 // Selecciona el primer elemento
                 selectCustomer.value = options[0].value;
@@ -268,14 +338,14 @@ function formatOption(option) {
         return option.text;
     }
 
-    var thumbnailUrl = option.element.dataset.thumbnail;
+    let thumbnailUrl = option.element.dataset.thumbnail;
 
     if (thumbnailUrl) {
-        var $option = $(
+        let $option = $(
             '<span><img src="' + thumbnailUrl + '" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" />' + option.text + '</span>'
         );
     } else {
-        var $option = $('<span>' + option.text + '</span>');
+        let $option = $('<span>' + option.text + '</span>');
     }
 
     return $option;
@@ -396,16 +466,17 @@ const fnShowModalDeposit = async () => {
     $('#modalCreateDeposit').modal('show');
 };
 
+//Funcion para obtener el banco seleccionado en base al datatable
 const fnGetBankId = async (table) => {
     let dataRow = table.rows({ selected: true }).data().toArray();
     let id;
     dataRow.forEach(async (item) => {
         id = item.id;
     });
-
     return id;
 };
 
+//Funcion para mostrar el modal de transferencia
 const fnShowModalTransfer = () => {
     fnClearModalTransfer();
     document.querySelector("#staticBackdropLabelTransfer").innerHTML = "Nueva Transferencia";
@@ -456,6 +527,7 @@ const fnShowModalTransfer = () => {
     //});
 };
 
+//Funcion para eliminar los detalles
 const fndeleteRow = async (id) => {
     let result = await Swal.fire({
         title: `&#191;Está seguro de eliminar el detalle?`,
@@ -507,11 +579,12 @@ const fndeleteRow = async (id) => {
     }
 };
 
-const fnApproved = async (id) => {
+//Funcion para cerrar la cotizacion
+const fnClosed = async (id) => {
 
     try {
 
-        let url = `/exchange/quotation/Approved?id=${id}`;
+        let url = `/exchange/quotation/Closed?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'
@@ -539,6 +612,7 @@ const fnApproved = async (id) => {
     }
 };
 
+//Funcion para re-cerrar la cotizacion
 const fnReClosed = async (id) => {
 
     try {
@@ -571,18 +645,18 @@ const fnReClosed = async (id) => {
     }
 };
 
+//Funcion para actualizar los detalles
 const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
     if (quotationDetailType == QuotationDetailType.Deposit) {
         document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
         idDetailDeposit.value = id;
 
-        // Busca la fila que contiene el ID especificado
         let rowDataToSelect = null;
         dataTableBankSourceDeposit.rows().every(function (index, element) {
-            var rowData = this.data();
+            let rowData = this.data();
             if (rowData.id === bankSource) {
-                rowDataToSelect = index; // Asigna el índice de la fila directamente
-                return false; // Termina la iteración una vez que se encuentra la fila
+                rowDataToSelect = index; 
+                return false;
             }
         });
 
@@ -600,13 +674,12 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
         idDetailTransfer.value = id;
         amountTransfer.value = formatterAmount().format(amount);
 
-        // Busca la fila que contiene el ID especificado
         let rowDataToSelectSource = null;
         dataTableBankSourceTransfer.rows().every(function (index, element) {
-            var rowData = this.data();
+            let rowData = this.data();
             if (rowData.id === bankSource) {
-                rowDataToSelectSource = index; // Asigna el índice de la fila directamente
-                return false; // Termina la iteración una vez que se encuentra la fila
+                rowDataToSelectSource = index; // Asigna el índice de la fila 
+                return false; 
             }
         });
 
@@ -616,13 +689,12 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
             fnLoadDatatableBankTransferSource(rowDataToSelectSource);
         }
 
-        // Busca la fila que contiene el ID especificado
         let rowDataToSelectTarget = null;
         dataTableBankTargetTransfer.rows().every(function (index, element) {
-            var rowData = this.data();
+            let rowData = this.data();
             if (rowData.id === bankTarget) {
-                rowDataToSelectTarget = index; // Asigna el índice de la fila directamente
-                return false; // Termina la iteración una vez que se encuentra la fila
+                rowDataToSelectTarget = index;
+                return false; 
             }
         });
 
@@ -632,23 +704,12 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
             fnLoadDatatableBankTransferTarget(rowDataToSelectTarget);
         }
 
-        //[...selectBankSourceTransfer.options].forEach((opt) => {
-        //    if (opt.value == bankSource) {
-        //        opt.selected = true;
-        //        return;
-        //    }
-        //});
-        //[...selectBankTargetTransfer.options].forEach((opt) => {
-        //    if (opt.value == bankTarget) {
-        //        opt.selected = true;
-        //        return;
-        //    }
-        //});
         document.querySelector("#infoModalTransfer").innerHTML = tableRowLabelTransfer.value;
         $('#modalCreateTransfer').modal('show');
     }
 };
 
+//Funcion para verificar si se puede cerrar o no
 const fnVerificateIsPending = () => {
     if (isPendingDeposit == false && isPendingTransfer == false) {
         btnQuotationClosed.hidden = false;
@@ -657,10 +718,11 @@ const fnVerificateIsPending = () => {
     }
 };
 
+//Funcion para asignar el pendiente al monto del detalle en deposito
 const fnBtnAddPendingDeposit = () => {
     amountDeposit.value = formatterAmount().format(fnparseFloat(pendingDeposit));
 };
-
+//Funcion para asignar el pendiente al monto del detalle en transferencia
 const fnBtnAddPendingTransfer = () => {
     amountTransfer.value = formatterAmount().format(fnparseFloat(pendingTransfer));
 
@@ -668,25 +730,24 @@ const fnBtnAddPendingTransfer = () => {
 
 const fnSelectTableSourceDeposit = async (index = 0) => {
 
-    var selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
+    let selectedRowAfter = dataTableBankSourceDeposit.row(indexDataTableBankSourceDeposit);
     indexDataTableBankSourceDeposit = index;
-    var selectedRowNodeAfter = selectedRowAfter.node();
+    let selectedRowNodeAfter = selectedRowAfter.node();
     $(selectedRowNodeAfter).removeClass(bgRow);
 
-    // Selecciona la fila deseada
-    var selectedRow = dataTableBankSourceDeposit.row(index);
+    let selectedRow = dataTableBankSourceDeposit.row(index);
 
-    // Deselecciona todas las filas
     dataTableBankSourceDeposit.rows().deselect();
 
     // Selecciona la fila deseada
     selectedRow.select();
 
-    // Obtiene el nodo HTML de la fila seleccionada
-    var selectedRowNode = selectedRow.node();
+    let selectedRowNode = selectedRow.node();
 
     $(selectedRowNode).addClass(bgRow);
 };
+
+//*********************** Funciones de los datatables *****************************
 function fnLoadDatatableBankTransferSource(index = 0) {
     if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
     dataTableBankSourceTransfer = new DataTable("#tblBankSourceTransfer", {
@@ -709,7 +770,7 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 indexDataTableBankSourceTransfer = index;
                 inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
                 // Selecciona la fila deseada
-                var selectedRow = dataTableBankSourceTransfer.row(index);
+                let selectedRow = dataTableBankSourceTransfer.row(index);
 
                 // Deselecciona todas las filas
                 dataTableBankSourceTransfer.rows().deselect();
@@ -718,7 +779,7 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 selectedRow.select();
 
                 // Obtiene el nodo HTML de la fila seleccionada
-                var selectedRowNode = selectedRow.node();
+                let selectedRowNode = selectedRow.node();
 
                 $(selectedRowNode).addClass(bgRow);
             }
@@ -783,7 +844,7 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 indexDataTableBankTargetTransfer = index;
                 inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
                 // Selecciona la fila deseada
-                var selectedRow = dataTableBankTargetTransfer.row(index);
+                let selectedRow = dataTableBankTargetTransfer.row(index);
 
                 // Deselecciona todas las filas
                 dataTableBankTargetTransfer.rows().deselect();
@@ -792,7 +853,7 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 selectedRow.select();
 
                 // Obtiene el nodo HTML de la fila seleccionada
-                var selectedRowNode = selectedRow.node();
+                let selectedRowNode = selectedRow.node();
 
                 $(selectedRowNode).addClass(bgRow);
             }

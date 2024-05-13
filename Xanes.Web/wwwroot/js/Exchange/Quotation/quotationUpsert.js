@@ -251,7 +251,7 @@ const fnCreateFormSubmit = async (event) => {
                 }
 
                 if (isClosed) {
-                    await fnApproved(jsonResponse.data.id);
+                    await fnClosed(jsonResponse.data.id);
                 }
             }
         }
@@ -278,11 +278,11 @@ const fnHiddenButton = (isExecutiveLoanOrPayment) => {
     }
 };
 
-const fnApproved = async (id) => {
+const fnClosed = async (id) => {
 
     try {
 
-        let url = `/exchange/quotation/Approved?id=${id}`;
+        let url = `/exchange/quotation/Closed?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'
