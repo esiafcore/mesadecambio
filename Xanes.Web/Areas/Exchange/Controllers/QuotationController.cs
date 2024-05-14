@@ -790,7 +790,7 @@ public class QuotationController : Controller
             }
 
             //Crear
-            if (obj.Id == 0)
+                if (obj.Id == 0)
             {
                 //Obtenemos el secuencial en borrador
                 var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
