@@ -367,8 +367,8 @@ public class CustomerController : Controller
             worksheet.Cell(4, 2).Value = "Sector";
             worksheet.Cell(4, 3).Value = "Código";
             worksheet.Cell(4, 4).Value = "# Ident.";
-            worksheet.Cell(4, 5).Value = "Nombre Comercial";
-            worksheet.Cell(4, 6).Value = "Razón Social";
+            worksheet.Cell(4, 5).Value = "Razón Social";
+            worksheet.Cell(4, 6).Value = "Nombre Comercial";
             worksheet.Cell(4, 7).Value = "Primer Nombre";
             worksheet.Cell(4, 8).Value = "Segundo Nombre";
             worksheet.Cell(4, 9).Value = "Primer Apellido";
@@ -384,8 +384,8 @@ public class CustomerController : Controller
                 worksheet.Cell(rowNum, 2).Value = item.SectorTrx.Code;
                 worksheet.Cell(rowNum, 3).Value = item.Code;
                 worksheet.Cell(rowNum, 4).Value = item.Identificationnumber;
-                worksheet.Cell(rowNum, 5).Value = item.CommercialName;
-                worksheet.Cell(rowNum, 6).Value = item.BusinessName;
+                worksheet.Cell(rowNum, 5).Value = item.BusinessName;
+                worksheet.Cell(rowNum, 6).Value = item.CommercialName;
                 worksheet.Cell(rowNum, 7).Value = item.FirstName;
                 worksheet.Cell(rowNum, 8).Value = item.SecondName;
                 worksheet.Cell(rowNum, 9).Value = item.LastName;
