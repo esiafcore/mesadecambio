@@ -1248,7 +1248,6 @@ public class QuotationController : Controller
                 _uow.QuotationDetail.Add(obj);
                 _uow.Save();
                 TempData[AC.Success] = $"Cotización creada correctamente";
-
             }
             else
             {
@@ -1400,13 +1399,13 @@ public class QuotationController : Controller
     }
 
     #region API_CALL
-    public JsonResult GetAll(string dateInitial, string dateFinal)
+    public JsonResult GetAll(string dateInitial, string dateFinal, bool includeVoid = false)
     {
         JsonResultResponse? jsonResponse = new();
         DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
         DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
         var objList = _uow.Quotation
-            .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal)
+            .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx").ToList();
 
         if (objList == null)

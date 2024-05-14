@@ -5,6 +5,11 @@ using Xanes.Models;
 using Xanes.Utility;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Azure;
+using System.Net;
+using Xanes.Models.ViewModels;
+using System.Text;
+using Xanes.Models.Shared;
 
 
 namespace Xanes.Web.Areas.Customer.Controllers;
@@ -45,7 +50,7 @@ public class CustomerController : Controller
         }
 
         var obj = _uow.Customer.Get(filter: x => (x.Id == id)
-        , includeProperties: "TypeTrx,CategoryTrx,SectorTrx"
+        , includeProperties: "TypeTrx,SectorTrx"
         , isTracking: false);
 
         if (obj == null)
@@ -295,7 +300,7 @@ public class CustomerController : Controller
         }
 
         var obj = _uow.Customer.Get(filter: x => (x.Id == id)
-            , includeProperties: "TypeTrx,CategoryTrx"
+            , includeProperties: "TypeTrx"
             , isTracking: false);
 
         if (obj == null)
@@ -330,7 +335,7 @@ public class CustomerController : Controller
     [HttpGet]
     public FileResult ExportExcel()
     {
-        var objCustomerList = _uow.Customer.GetAll(filter:x=>(x.CompanyId == _companyId), includeProperties: "TypeTrx,SectorTrx").ToList();
+        var objCustomerList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId), includeProperties: "TypeTrx,SectorTrx").ToList();
 
         return GenerarExcel("Clientes.xlsx", objCustomerList);
     }
@@ -419,41 +424,228 @@ public class CustomerController : Controller
         }
     }
 
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public IActionResult Import(Models.ViewModels.ImportVM objImportViewModel)
-    //{
-    //    List<string> ErrorListMessages = new List<string>();
-    //    var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
+    [HttpGet]
+    public IActionResult Import()
+    {
+        // Titulo de la pagina
+        ViewData[AC.Title] = $"Clientes - Importar";
+        ImportVM modelVm = new();
+        return View(modelVm);
+    }
 
-    //    var hoja = workbook.Worksheet(1);
 
-    //    var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
-    //    var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+    [HttpPost]
+    public JsonResult Import([FromForm] ImportVM objImportViewModel)
+    {
+        List<string> ErrorListMessages = new List<string>();
+        var errorsMessagesBuilder = new StringBuilder();
+        JsonResultResponse? jsonResponse = new();
+        List<Models.Customer> objCustomerList = new();
 
-    //    for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
-    //    {
-    //        var fila = hoja.Row(i);
+        if (objImportViewModel.FileExcel is null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"No hay registros para importar";
+            return Json(jsonResponse);
+        }
 
-    //        var type = fila.Cell(1).GetString();
-    //        if (string.IsNullOrWhiteSpace(type))
-    //        {
-    //            ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. ");
-    //        }
+        var objTypeList = _uow.PersonType
+            .GetAll(filter: x => x.CompanyId == _companyId)
+            .ToList();
 
-    //        var sector = fila.Cell(2).GetString();
-    //        if (string.IsNullOrWhiteSpace(sector))
-    //        {
-    //            ErrorListMessages.Add($"El sector está vacio en la fila:{i}. ");
-    //        }
+        if (objTypeList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"Tipo de persona no encontrado";
+            return Json(jsonResponse);
+        }
 
-    //        var numberIdent = fila.Cell(3).GetString();
-    //        if (string.IsNullOrWhiteSpace(numberIdent))
-    //        {
-    //            ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. ");
-    //        }
+        var objSectorList = _uow.CustomerSector
+            .GetAll(filter: x => x.CompanyId == _companyId)
+            .ToList();
+        if (objSectorList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"Sector de cliente no encontrado";
+            return Json(jsonResponse);
+        }
 
-    //    }
+        var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
 
-    //}
+        var hoja = workbook.Worksheet(1);
+
+        var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+        var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+
+        for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
+        {
+            var fila = hoja.Row(i);
+
+            var type = fila.Cell(1).GetString();
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. ");
+            }
+
+            var sector = fila.Cell(2).GetString();
+            if (string.IsNullOrWhiteSpace(sector))
+            {
+                ErrorListMessages.Add($"El sector está vacio en la fila:{i}. ");
+            }
+
+            var code = fila.Cell(3).GetString();
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                ErrorListMessages.Add($"El código está vacio en la fila:{i}. ");
+            }
+
+            var numberIdent = fila.Cell(4).GetString();
+            if (string.IsNullOrWhiteSpace(numberIdent))
+            {
+                ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. ");
+            }
+
+            var businessName = fila.Cell(5).GetString();
+            if (string.IsNullOrWhiteSpace(businessName))
+            {
+                ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. ");
+            }
+
+            var commercialName = fila.Cell(6).GetString();
+            //if (string.IsNullOrWhiteSpace(commercialName))
+            //{
+            //    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
+            //}
+
+            var address = fila.Cell(7).GetString();
+            //if (string.IsNullOrWhiteSpace(address))
+            //{
+            //    ErrorListMessages.Add($"La dirección está vacia en la fila:{i}. ");
+            //}
+
+            var isBank = fila.Cell(8).GetString();
+            if (string.IsNullOrWhiteSpace(isBank))
+            {
+                ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. ");
+            }
+
+            var isSystem = fila.Cell(9).GetString();
+            if (string.IsNullOrWhiteSpace(isSystem))
+            {
+                ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. ");
+            }
+
+            var objType = objTypeList.FirstOrDefault(x => x.Code == type);
+            if (objType == null)
+            {
+                ErrorListMessages.Add($"El tipo no fue encontrado en la fila:{i}. ");
+            }
+
+            var objSector = objSectorList.FirstOrDefault(x => x.Code == sector);
+            if (objSector == null)
+            {
+                ErrorListMessages.Add($"El sector no fue encontrado en la fila:{i}. ");
+            }
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+            var objCustomer = new Models.Customer();
+            objCustomer.Code = code;
+            objCustomer.CompanyId = _companyId;
+            objCustomer.TypeId = objType.Id;
+            objCustomer.TypeNumeral = objType.Numeral;
+            objCustomer.SectorId = objSector.Id;
+            objCustomer.Identificationnumber = numberIdent;
+            objCustomer.AddressPrimary = address;
+            objCustomer.CreatedBy = AC.LOCALHOSTME;
+            objCustomer.CreatedDate = DateTime.UtcNow;
+            objCustomer.CreatedHostName = AC.LOCALHOSTPC;
+            objCustomer.CreatedIpv4 = AC.Ipv4Default;
+            if (objType.Numeral == (int)SD.PersonType.NaturalPerson)
+            {
+                var nameSplit = businessName.Split(" ");
+                objCustomer.FirstName = nameSplit[0];
+                objCustomer.SecondName = nameSplit[1] == "." ? "" : nameSplit[1];
+                objCustomer.LastName = nameSplit[2];
+                objCustomer.SecondSurname = nameSplit[3] == "." ? "" : nameSplit[3];
+                businessName = businessName.Replace(".", "");
+                objCustomer.BusinessName = businessName;
+                objCustomer.CommercialName = businessName;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(commercialName))
+                {
+                    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
+                }
+                else
+                {
+                    objCustomer.BusinessName = businessName;
+                    objCustomer.CommercialName = commercialName;
+                }
+            }
+
+            if (isBank == "S")
+            {
+                objCustomer.IsBank = true;
+            }
+            else if (isBank == "N")
+            {
+                objCustomer.IsBank = false;
+            }
+            else
+            {
+                ErrorListMessages.Add($"Es banco es invalido en la fila:{i}. ");
+            }
+
+            if (isSystem == "S")
+            {
+                objCustomer.IsSystemRow = true;
+            }
+            else if (isSystem == "N")
+            {
+                objCustomer.IsSystemRow = false;
+            }
+            else
+            {
+                ErrorListMessages.Add($"Es del sistema es invalido en la fila:{i}. ");
+            }
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+            objCustomerList.Add(objCustomer);
+        }
+
+        foreach (var customer in objCustomerList)
+        {
+            _uow.Customer.Add(customer);
+        }
+
+        _uow.Save();
+
+        jsonResponse.SuccessMessages = "Importación exitosamente";
+        jsonResponse.IsSuccess = true;
+        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Customer");
+        return Json(jsonResponse);
+    }
 }

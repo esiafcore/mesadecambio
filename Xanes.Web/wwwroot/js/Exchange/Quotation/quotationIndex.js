@@ -2,13 +2,14 @@
 let dateInitial, dateFinal;
 let dateFinalReport = document.querySelector("#dateFinalReport");
 let dateInitialReport = document.querySelector("#dateInitialReport");
+let inputIncludeVoid, includeVoid;
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
     fnLoadDatatable();
     //Habilitar Tooltip
     fnEnableTooltip();
-    
+
     //// Crear los elementos del filtro de fecha y botón de búsqueda
     //var filtroFecha = $('<div class="dt-filtro-fecha col-8 d-flex gap-4">Fecha de inicio: <input type="date" id="fechaInicio"> Fecha fin: <input type="date" id="fechaFin"> <button id="btnBuscar">Buscar</button></div>');
 
@@ -41,7 +42,7 @@ const fnPrintFormSubmit = async (event) => {
         // Continuar flujo normal del formulario
         if (resultResponse.isSuccess) {
             formObject.submit();
-        } 
+        }
 
     } catch (error) {
         Swal.fire({
@@ -111,55 +112,45 @@ const fnAdjustmentDates = () => {
 
 const fnAdjustmentFilterDataTable = () => {
     let wrapper = document.querySelector("#tblData_wrapper");
-
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
+    let rowCen = document.createElement("div");
+    rowCen.className = "row col-xl-8 col-lg-7";
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
-    let filterLength = wrapper.querySelector(".dt-length");
-    filterLength.classList.add("col-xl-3", "col-sm-5", "col-xxl-2", "mb-1");
     rowIzq.classList.remove('col-md-auto', 'me-auto');
-    rowIzq.classList.add('row', 'col-lg-9',"col-xl-10", "col-sm-8");
+    rowIzq.classList.add('row', 'col-lg-2', "col-xl-2", "col-sm-4");
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-lg-3',"col-xl-2", "col-sm-4");
+    rowDer.classList.add('row', 'col-lg-2', "col-xl-2", "col-sm-4");
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
-    filterDate.className = 'dt-filtro-fecha col-xl-9';
+    filterDate.className = 'dt-filtro-fecha';
 
-    let initialValue, finalValue;
-    if (dateInitial != undefined && dateFinal != undefined) {
+    let initialValue, finalValue, includeVoidValue;
+    if (dateInitial != undefined && dateFinal != undefined && includeVoid != undefined) {
         initialValue = dateInitial;
         finalValue = dateFinal;
+        if (includeVoid) {
+            includeVoidValue = "checked";
+        } else {
+            includeVoidValue = "";
+        }
     } else {
         initialValue = processingDate;
         finalValue = processingDate;
+        includeVoidValue = "";
     }
-    //let initialValue, finalValue;
-    //if (dateInitial != undefined && dateFinal != undefined) {
-    //    const dateInitialSplit = dateInitial.split('/');
-    //    let dateInitialFormat = `${dateInitialSplit[2]}-${dateInitialSplit[1]}-${dateInitialSplit[0]}`;
-    //    initialValue = dateInitialFormat;
-    //    alert(dateInitialFormat)
-
-    //    finalValue = dateFinal;
-    //} else {
-    //    const dateSplit = processingDate.split('/');
-    //    let dateFormat = `${dateSplit[0]}-${dateSplit[1]}-${dateSplit[2]}`;
-    //    alert(dateFormat)
-    //    initialValue = dateFormat;
-    //    finalValue = dateFormat;
-    //}
 
     filterDate.innerHTML =
         `  <div class="row">
-                <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
-                    <div class="col-5 col-xxl-6 pe-0">
+                <div class="row col-5 m-0 col-md-5 col-xl-5 col-xxl-3 mb-1">
+                    <div class="col-5 col-sm-6 col-xxl-6 pe-0">
                         Fecha inicial:
                     </div>
-                    <div class="col-7 col-lg-6">
+                    <div class="col-7 col-sm-6 col-lg-6">
                         <input type="date" id="dateInitial" value="${initialValue}">
                     </div>
                 </div>
-                <div class="row col-md-6 col-xl-5 col-xxl-4 me-2 mb-1">
+                <div class="row col-5 m-0 col-md-6 col-xl-5 col-xxl-3 mb-1">
                     <div class="col-5 col-xl-6">
                         Fecha final:
                     </div>
@@ -167,7 +158,15 @@ const fnAdjustmentFilterDataTable = () => {
                         <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
                     </div>
                 </div>
-                <div class="row col-6 col-md-4 col-xl-2 mb-1">
+                 <div class="row col-5 m-0 col-md-5 col-xl-5 col-xxl-2 mb-1">
+                     <div class="col-8">
+                         Anulados
+                     </div>
+                     <div class="col-1">
+                         <input type="checkbox" id="includeVoid" ${includeVoidValue}>
+                     </div>
+                 </div>
+                <div class="row col-4 col-sm-3 col-xl-2 mb-1">
                     <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-placement="top"
                     data-bs-title="Filtrar"
                     class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
@@ -176,10 +175,13 @@ const fnAdjustmentFilterDataTable = () => {
                 </div>
             </div>`;
 
-    filterLength.parentNode.insertBefore(filterDate, filterLength.nextSibling);
+    rowCen.appendChild(filterDate);
+    let container = rowIzq.parentElement;
+    container.insertBefore(rowCen, rowDer);
+
     inputDateInitial = document.querySelector("#dateInitial");
     inputDateFinal = document.querySelector("#dateFinal");
-
+    inputIncludeVoid = document.querySelector("#includeVoid");
     //Ajustamos las fechas
     fnAdjustmentDates();
 
@@ -300,19 +302,21 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
 }
 
 const fnLoadDatatable = () => {
-    if (inputDateInitial != undefined && inputDateFinal != undefined) {
+    if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
         dateInitial = inputDateInitial.value;
         dateFinal = inputDateFinal.value;
+        includeVoid = inputIncludeVoid.checked;
     } else {
         dateInitial = processingDate;
         dateFinal = processingDate;
+        includeVoid = false;
     }
     //let dateFinal
     if (dataTable) dataTable.destroy();
     dataTable = new DataTable("#tblData", {
         "dataSrc": 'data',
         "ajax": {
-            "url": `/exchange/quotation/getall?dateInitial=${dateInitial}&dateFinal=${dateFinal}`,
+            "url": `/exchange/quotation/getall?dateInitial=${dateInitial}&dateFinal=${dateFinal}&includeVoid=${includeVoid}`,
             "dataSrc": function (data) {
                 if (data.isSuccess) {
                     return data.data;
@@ -402,9 +406,11 @@ const fnLoadDatatable = () => {
                 , "render": (data, type, row) => {
 
                     let urlUpdate = `/exchange/quotation/CreateDetail?id=${row.id}`;
+                    let urlReClosed = urlUpdate;
 
                     if (row.isLoan || row.isPayment) {
                         urlUpdate = `/exchange/quotation/Upsert?id=${row.id}`;
+                        urlReClosed = urlUpdate;
                     }
 
                     let btnUpdate = `<a href="${urlUpdate}" class="btn btn-primary py-1 px-3 my-0 mx-1"
@@ -412,7 +418,7 @@ const fnLoadDatatable = () => {
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;
 
-                    let btnReClosed = `<a href="/exchange/quotation/CreateDetail?id=${row.id}" class="btn btn-warning py-1 px-3 my-0 mx-1"
+                    let btnReClosed = `<a href="${urlReClosed}" class="btn btn-warning py-1 px-3 my-0 mx-1"
                                         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Re-Cerrar">
                                          <i class="bi bi-check2-square fs-5"></i>
                                      </a>`;
