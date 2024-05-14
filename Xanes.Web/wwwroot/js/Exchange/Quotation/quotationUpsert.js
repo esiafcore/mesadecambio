@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnNext = document.querySelector("#btnNext");
     btnClosed = document.querySelector("#btnSaveClosed");
     btnReClosed = document.querySelector("#btnSaveReClosed");
-    isClosedElement = document.querySelector("#isClosedElement");
+    isClosedElement = document.querySelector("#isClosedElement").value;
     $(selectBusinessExecutive).select2(select2Options);
 
     var selectedOptionActive = $(selectBusinessExecutive).find(':selected');
@@ -283,7 +283,7 @@ const fnHiddenButton = (isExecutiveLoanOrPayment) => {
 
     if (isExecutiveLoanOrPayment) {
         btnNext.hidden = true;
-        if (isClosedElement.value == "true") {
+        if (isClosedElement == "True") {
             btnClosed.hidden = true;
             btnReClosed.hidden = false;
         } else {
@@ -362,7 +362,6 @@ const fnReClosed = async (id) => {
         });
     }
 };
-
 
 const fnGetBankAccounts = async () => {
 

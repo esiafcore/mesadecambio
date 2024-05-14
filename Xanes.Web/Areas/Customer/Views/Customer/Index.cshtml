@@ -23,8 +23,7 @@
         </div>
     </div>
     <div class="card-body px-3 py-1">
-
-        <table class="table table-bordered table-striped">
+        <table id="tblData" class="table table-hover table-bordered table-striped responsive nowrap" style="width:100%">
             <thead>
                 <tr>
                     <th>Código</th>
@@ -33,49 +32,60 @@
                     <th>Tipo</th>
                     <th>Sector</th>
                     <th>Activo?</th>
-                    <th></th>
+                    <th data-priority="1"></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var itm in Model.OrderBy(x => x.BusinessName))
-                {
-                    <tr>
-                        <td>@itm.Code</td>
-                        <td>@itm.Identificationnumber</td>
-                        <td>@itm.BusinessName</td>
-                        <td>@itm.TypeTrx.Code</td>
-                        <td>@itm.SectorTrx.Name.Trim()</td>
-                        <td class="text-center">@(itm.IsActive ? AC.Si : AC.No)</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a asp-controller="Customer" asp-action="Detail" 
-                                    asp-route-id="@itm.Id" class="btn btn-success py-1 px-3 my-0 mx-2"
-                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
-                                    <i class="bi bi-eye fs-4"></i>
-                                </a>
-                            </div>
-                            <div class="btn-group" role="group">
-                                <a asp-controller="Customer" asp-action="Upsert" 
-                                    asp-route-id="@itm.Id" class="btn btn-primary py-1 px-3 my-0 mx-2"
-                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
-                                    <i class="bi bi-pencil-square fs-4"></i>
-                                </a>
-                                <a asp-controller="Customer" asp-action="Delete" 
-                                    asp-route-id="@itm.Id" class="btn btn-danger py-1 px-3 my-0 mx-2"
-                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
-                                    <i class="bi bi-trash-fill fs-4"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
         </table>
+        @*  <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+        <th>Código</th>
+        <th>Identificación</th>
+        <th>Razón Social</th>
+        <th>Tipo</th>
+        <th>Sector</th>
+        <th>Activo?</th>
+        <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var itm in Model.OrderBy(x => x.BusinessName))
+        {
+        <tr>
+        <td>@itm.Code</td>
+        <td>@itm.Identificationnumber</td>
+        <td>@itm.BusinessName</td>
+        <td>@itm.TypeTrx.Code</td>
+        <td>@itm.SectorTrx.Name.Trim()</td>
+        <td class="text-center">@(itm.IsActive ? AC.Si : AC.No)</td>
+        <td>
+        <div class="btn-group" role="group">
+        <a asp-controller="Customer" asp-action="Detail"
+        asp-route-id="@itm.Id" class="btn btn-success py-1 px-3 my-0 mx-2"
+        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
+        <i class="bi bi-eye fs-4"></i>
+        </a>
+        </div>
+        <div class="btn-group" role="group">
+        <a asp-controller="Customer" asp-action="Upsert"
+        asp-route-id="@itm.Id" class="btn btn-primary py-1 px-3 my-0 mx-2"
+        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+        <i class="bi bi-pencil-square fs-4"></i>
+        </a>
+        <a asp-controller="Customer" asp-action="Delete"
+        asp-route-id="@itm.Id" class="btn btn-danger py-1 px-3 my-0 mx-2"
+        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+        <i class="bi bi-trash-fill fs-4"></i>
+        </a>
+        </div>
+        </td>
+        </tr>
+        }
+        </tbody>
+        </table> *@
     </div>
 </div>
 
 @section Scripts {
-    @{
-        <script src="~/js/Customer/Customer/customerIndex.js"></script>
-    }
+    <script src="~/js/Customer/Customer/customerIndex.js"></script>
 }

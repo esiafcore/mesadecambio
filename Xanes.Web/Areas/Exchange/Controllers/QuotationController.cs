@@ -1318,7 +1318,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -1337,6 +1337,8 @@ public class QuotationController : Controller
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+        model.ModelCreateVM.CurrencySourceTarget =
+            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
         return View(model);
     }
 
@@ -1347,7 +1349,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -1366,6 +1368,8 @@ public class QuotationController : Controller
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+        model.ModelCreateVM.CurrencySourceTarget =
+            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
         return View(model);
     }
 

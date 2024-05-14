@@ -648,4 +648,30 @@ public class CustomerController : Controller
         jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Customer");
         return Json(jsonResponse);
     }
+
+    public JsonResult GetAll()
+    {
+        JsonResultResponse? jsonResponse = new();
+        var objList = _uow.Customer
+            .GetAll(x => (x.CompanyId == _companyId), includeProperties: "SectorTrx,TypeTrx").ToList();
+
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
+        if (objList.Count <= 0)
+        {
+            jsonResponse.IsInfo = true;
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
+    }
 }
