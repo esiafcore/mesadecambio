@@ -313,16 +313,23 @@ const fnExportExcel = async () => {
             method: 'GET'
         });
 
-        //const jsonResponse = await response.json();
-        //if (!jsonResponse.isSuccess) {
-        //    Swal.fire({
-        //        icon: 'error',
-        //        title: 'Error',
-        //        text: jsonResponse.errorMessages
-        //    });
-        //} else {
-           
-        //}
+        // Convertir la respuesta a un blob
+        const blob = await response.blob();
+
+        // Crear una URL para el blob
+        const blobUrl = window.URL.createObjectURL(blob);
+
+
+        // Crear un enlace temporal
+        const link = document.createElement('a');
+        link.href = blobUrl;
+
+        link.download = 'ListadoCotizaciones.xlsx';
+
+        // Simular clic en el enlace
+        link.click();
+
+        window.URL.revokeObjectURL(blobUrl);
     }
     catch (e) {
         Swal.fire({

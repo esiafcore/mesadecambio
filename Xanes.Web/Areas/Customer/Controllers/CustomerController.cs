@@ -418,7 +418,7 @@ public class CustomerController : Controller
             using (MemoryStream stream = new MemoryStream())
             {
                 wb.SaveAs(stream);
-                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                return File(stream.ToArray(), AC.ContentTypeExcel,
                     nombreArchivo);
             }
         }

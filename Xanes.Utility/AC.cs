@@ -14,6 +14,7 @@ public static class AC
     public const int ParDecimalExchange = 4;
     public const int DecimalExchangeDouble = 8;
     public const string XlsFormatRateExchange = "#,##0.0000";
+
     public const string XlsFormatNumeric = "#,##0.00";
     public static char SeparationCharCode = '|';
     public static string Title = "Title";
@@ -21,6 +22,7 @@ public static class AC
     public static string DefaultDateFormatView = "dd/MM/yyyy";
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";
+    public const string ContentTypeExcel = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     public const string LOCALHOSTPC = "LOCALHOSTPC";
     public const string LOCALHOSTME = "LOCALHOSTME";

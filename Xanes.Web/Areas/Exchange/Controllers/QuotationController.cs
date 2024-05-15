@@ -1821,40 +1821,147 @@ public class QuotationController : Controller
 
     #region EXPORT - IMPORT
 
-    //[HttpGet]
-    //public FileResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
-    //{
-    //    DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
-    //    DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+    [HttpGet]
+    public FileResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
+    {
+        DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
+        DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
 
-    //    var objQuotationList = _uow.Quotation
-    //        .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
-    //            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx").ToList();
+        var objQuotationList = _uow.Quotation
+            .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
+                , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx,BankAccountSourceTrx,BankAccountTargetTrx").ToList();
 
-    //    return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
-    //}
+        return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
+    }
 
-    //private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
-    //{
-    //    using (XLWorkbook wb = new XLWorkbook())
-    //    {
-    //        int sheetIndex = 1; // Inicializar el índice de la hoja de trabajo
+    private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
+    {
+        using (XLWorkbook wb = new XLWorkbook())
+        {
+            int sheetIndex = 1; // Inicializar el índice de la hoja de trabajo
 
-    //        foreach (var header in listEntities)
-    //        {
-    //            var sheetName = $"{header.TypeTrx.Code}_{header.Numeral.ToString().PadLeft(3,AC.CharDefaultEmpty)}_{header.DateTransa}";
-    //            var worksheet = wb.Worksheets.Add(sheetName);
-    //            var headerRow = worksheet.Row(1);
+            foreach (var header in listEntities)
+            {
+                var sheetName = $"{header.TypeTrx.Code}_{header.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}_{header.DateTransa.ToString(AC.DefaultDateFormatWeb)}";
+                var worksheet = wb.Worksheets.Add(sheetName);
 
-    //            headerRow.Style.Font.Bold = true;
-    //            headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
-    //            headerRow = worksheet.Row(3);
-    //            headerRow.Style.Font.Bold = true;
-    //            headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+                var objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
 
-    //        }
-    //    }
-    //}
+                // Escribir el nombre de la compañía en la primera fila
+                worksheet.Cell(1, 1).Value = objCompany.Name;
+                worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
+                worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+                worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+
+                var headerRow = worksheet.Row(3);
+                headerRow.Style.Font.Bold = true;
+                headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
+                headerRow = worksheet.Row(5);
+                headerRow.Style.Font.Bold = true;
+                headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
+                headerRow = worksheet.Row(7);
+                headerRow.Style.Font.Bold = true;
+                headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+
+                worksheet.Cell(3, 1).Value = "Tipo";
+                worksheet.Cell(3, 2).Value = "Fecha";
+                worksheet.Cell(3, 3).Value = "Cliente Código";
+                worksheet.Cell(3, 4).Value = "Cliente Nombre";
+                worksheet.Cell(3, 5).Value = "Mon Transa";
+                worksheet.Cell(3, 6).Value = "Mon Deposito";
+                worksheet.Cell(3, 7).Value = "Mon Transfer";
+                worksheet.Cell(3, 8).Value = "T/C Oficial";
+                worksheet.Cell(3, 9).Value = "T/C Compra";
+                worksheet.Cell(3, 10).Value = "T/C Venta";
+
+                worksheet.Cell(4, 1).Value = header.TypeTrx.Code;
+                worksheet.Cell(4, 2).SetValue(header.DateTransa.ToDateTimeConvert());
+                worksheet.Cell(4, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(4, 3).Value = header.CustomerTrx.Code;
+                worksheet.Cell(4, 4).Value = header.CustomerTrx.BusinessName;
+                worksheet.Cell(4, 5).Value = (short)header.CurrencyTransaType;
+                worksheet.Cell(4, 6).Value = (short)header.CurrencyDepositType;
+                worksheet.Cell(4, 7).Value = (short)header.CurrencyTransferType;
+                worksheet.Cell(4, 8).Value = header.ExchangeRateOfficialTransa;
+                worksheet.Cell(4, 8).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(4, 9).Value = header.ExchangeRateBuyTransa;
+                worksheet.Cell(4, 9).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(4, 10).Value = header.ExchangeRateSellTransa;
+                worksheet.Cell(4, 10).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+
+                worksheet.Cell(5, 1).Value = "Monto";
+                worksheet.Cell(5, 2).Value = "Monto M/C";
+                worksheet.Cell(5, 3).Value = "Costo";
+                worksheet.Cell(5, 4).Value = "Ingreso";
+                worksheet.Cell(5, 5).Value = "Comisión TRF";
+                worksheet.Cell(5, 6).Value = "Cta Ban Origen";
+                worksheet.Cell(5, 7).Value = "Cta Ban Destino";
+                worksheet.Cell(5, 8).Value = "Ejecutivo";
+                worksheet.Cell(5, 9).Value = "Cerrado";
+                worksheet.Cell(5, 10).Value = "Contabilizado";
+
+                worksheet.Cell(6, 1).Value = header.AmountTransaction;
+                worksheet.Cell(6, 1).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                worksheet.Cell(6, 2).Value = header.AmountExchange;
+                worksheet.Cell(6, 2).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                worksheet.Cell(6, 3).Value = header.AmountCost;
+                worksheet.Cell(6, 3).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                worksheet.Cell(6, 4).Value = header.AmountRevenue;
+                worksheet.Cell(6, 4).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                worksheet.Cell(6, 5).Value = header.AmountCommission;
+                worksheet.Cell(6, 5).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                worksheet.Cell(6, 6).Value = header.BankAccountSourceTrx?.Code ?? "";
+                worksheet.Cell(6, 7).Value = header.BankAccountTargetTrx?.Code ?? "";
+                worksheet.Cell(6, 8).Value = header.BusinessExecutiveTrx.Code;
+                worksheet.Cell(6, 9).Value = header.IsClosed ? "S" : "N";
+                worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
+
+                worksheet.Cell(7, 1).Value = "Banco Origen";
+                worksheet.Cell(7, 2).Value = "Cta Ban Origen";
+                worksheet.Cell(7, 3).Value = "Banco Destino";
+                worksheet.Cell(7, 4).Value = "Cta Ban Destino";
+                worksheet.Cell(7, 5).Value = "Importe";
+
+                sheetIndex++;
+
+                var children = _uow.QuotationDetail.GetAll(filter: x =>
+                    (x.CompanyId == _companyId && x.ParentId == header.Id), includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+                
+                int rowNum = 8;
+
+                foreach (var detail in children)
+                {
+                    worksheet.Cell(rowNum, 1).Value = detail.BankSourceTrx.Code;
+                    worksheet.Cell(rowNum, 2).Value = header.BankAccountSourceTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 3).Value = detail.BankTargetTrx.Code;
+                    worksheet.Cell(rowNum, 4).Value = header.BankAccountTargetTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 5).Value = detail.AmountDetail;
+                    worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                    rowNum++;
+                }
+
+                worksheet.Column(1).AdjustToContents();
+                worksheet.Column(2).AdjustToContents();
+                worksheet.Column(3).AdjustToContents();
+                worksheet.Column(4).AdjustToContents();
+                worksheet.Column(5).AdjustToContents();
+                worksheet.Column(6).AdjustToContents();
+                worksheet.Column(7).AdjustToContents();
+                worksheet.Column(8).AdjustToContents();
+                worksheet.Column(9).AdjustToContents();
+                worksheet.Column(10).AdjustToContents();
+            }
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                wb.SaveAs(stream);
+                return File(stream.ToArray(),
+                    AC.ContentTypeExcel,
+                    nombreArchivo);
+            }
+        }
+    }
 
 
     #endregion
