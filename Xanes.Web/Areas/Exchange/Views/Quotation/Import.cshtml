@@ -1,0 +1,54 @@
+﻿@model ImportVM
+
+<form id="formImport" method="post" asp-controller="Quotation" asp-action="Import" enctype="multipart/form-data">
+    <div class="container col-xl-8 col-xxl-7 col-12 p-1 border border-primary border-opacity-25 m-0">
+        <div class="row mb-2 w-100 mx-0">
+            <div class="col-12 col-xl-8 pt-2">
+                <h3 class="text-primary">@ViewData[AC.Title]</h3>
+            </div>
+
+            <div class="row col mt-1 d-flex justify-content-end g-1">
+                <div class="col-6 col-sm-4 col-lg-3 col-xl-6">
+                    <a asp-controller="Quotation" asp-action="Index" data-bs-toggle="tooltip" data-bs-title="Regresar"
+                       class="btn-primary btn btn-sm form-control">
+                        <i class="bi bi-arrow-return-left"></i> Regresar
+                    </a>
+                </div>
+
+                <div class="col-6 col-sm-4 col-lg-3 col-xl-6">
+                    <button type="submit" class="btn btn-success btn-sm form-control" data-bs-toggle="tooltip" data-bs-title="Importar Excel">
+                        <i class="bi bi-box-arrow-in-down"></i> Importar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-1" />
+
+        <!--ROW 1 -->
+        <div class="row">
+            <div class="col-3 col-xl-2 pt-1 my-1">
+                <label asp-for="FileExcel">Archivo Excel</label>
+            </div>
+            <div class="col-8 my-1">
+                <input type="file" asp-for="FileExcel" class="form-control p-1 border border-primary border-opacity-25"
+                       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="FileExcel" id="FileExcel" />
+            </div>
+        </div>
+@* 
+        <!--ROW 2 -->
+        <div class="row d-none observation">
+            <div class="col-12 pt-1 my-1">
+                <label class="fs-labelform">Observaciones</label>
+            </div>
+            <div class="col-12 my-1">
+                <textarea rows="5" class="form-control p-1 border border-primary border-opacity-25" id="message-area" readonly></textarea>
+            </div>
+        </div> *@
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/Exchange/Quotation/quotationImport.js"></script>
+}

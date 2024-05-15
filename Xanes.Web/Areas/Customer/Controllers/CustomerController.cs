@@ -418,7 +418,7 @@ public class CustomerController : Controller
             using (MemoryStream stream = new MemoryStream())
             {
                 wb.SaveAs(stream);
-                return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                return File(stream.ToArray(), AC.ContentTypeExcel,
                     nombreArchivo);
             }
         }
@@ -517,19 +517,19 @@ public class CustomerController : Controller
             //    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
             //}
 
-            var address = fila.Cell(7).GetString();
+            var address = fila.Cell(11).GetString();
             //if (string.IsNullOrWhiteSpace(address))
             //{
             //    ErrorListMessages.Add($"La dirección está vacia en la fila:{i}. ");
             //}
 
-            var isBank = fila.Cell(8).GetString();
+            var isBank = fila.Cell(12).GetString();
             if (string.IsNullOrWhiteSpace(isBank))
             {
                 ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. ");
             }
 
-            var isSystem = fila.Cell(9).GetString();
+            var isSystem = fila.Cell(13).GetString();
             if (string.IsNullOrWhiteSpace(isSystem))
             {
                 ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. ");

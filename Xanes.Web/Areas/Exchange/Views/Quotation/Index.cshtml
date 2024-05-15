@@ -7,11 +7,18 @@
         <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />
         <div class="card-header bg-secondary bg-gradient ms-0 py-1">
             <div class="row align-items-center">
-                <div class="col-8 text-center">
+                <div class="col-7 text-center">
                     <h3 class="text-white py-1">Transacciones</h3>
                 </div>
-                <div class="col-4 text-end">
-
+                <div class="col-5 text-end">
+                    <a onclick="fnExportExcel()" class="btn btn-warning border"
+                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Exportar a Excel">
+                        <i class="bi bi-arrow-up-square-fill"></i> Exportar
+                    </a>
+                    <a asp-controller="Quotation" asp-action="Import"
+                       data-bs-toggle="tooltip" data-bs-title="Importar Excel" class="btn btn-success border">
+                        <i class="bi bi-box-arrow-in-down"></i> Importar
+                    </a>
                     <button class="btn btn-secondary border" type="submit"
                             data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir Operaciones">
                         <i class="bi bi-printer-fill"></i> Imprimir
