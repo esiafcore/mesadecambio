@@ -46,7 +46,7 @@ const fnimportSubmit = async (event) => {
                     confirmButtonText: "Aceptar",
                     buttonsStyling: false,
                     customClass: {
-                        confirmButton: 'app-bg-primary'
+                        confirmButton: 'bg-primary text-white border'
                     }
                 });
 
