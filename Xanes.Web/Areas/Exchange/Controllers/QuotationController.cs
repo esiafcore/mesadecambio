@@ -1900,6 +1900,8 @@ public class QuotationController : Controller
                 worksheet.Cell(5, 8).Value = "Ejecutivo";
                 worksheet.Cell(5, 9).Value = "Cerrado";
                 worksheet.Cell(5, 10).Value = "Contabilizado";
+                worksheet.Cell(5, 11).Value = "Anulado";
+
 
                 worksheet.Cell(6, 1).Value = header.AmountTransaction;
                 worksheet.Cell(6, 1).Style.NumberFormat.Format = AC.XlsFormatNumeric;
@@ -1916,6 +1918,7 @@ public class QuotationController : Controller
                 worksheet.Cell(6, 8).Value = header.BusinessExecutiveTrx.Code;
                 worksheet.Cell(6, 9).Value = header.IsClosed ? "S" : "N";
                 worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
+                worksheet.Cell(6, 11).Value = header.IsVoid ? "S" : "N";
 
                 worksheet.Cell(7, 1).Value = "Banco Origen";
                 worksheet.Cell(7, 2).Value = "Cta Ban Origen";
@@ -1951,6 +1954,7 @@ public class QuotationController : Controller
                 worksheet.Column(8).AdjustToContents();
                 worksheet.Column(9).AdjustToContents();
                 worksheet.Column(10).AdjustToContents();
+                worksheet.Column(11).AdjustToContents();
             }
 
             using (MemoryStream stream = new MemoryStream())
@@ -1961,6 +1965,15 @@ public class QuotationController : Controller
                     nombreArchivo);
             }
         }
+    }
+
+    [HttpGet]
+    public IActionResult Import()
+    {
+        // Titulo de la pagina
+        ViewData[AC.Title] = $"Cotizaciones - Importar";
+        ImportVM modelVm = new();
+        return View(modelVm);
     }
 
 
