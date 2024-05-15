@@ -35,7 +35,7 @@
                 <div class="row col-12 col-md-6">
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                    <select id="sector-select" class="form-select border-0 shadow select2me">
+                    <select id="sector-select" asp-for="DataModel.SectorId" class="form-select border-0 shadow select2me">
                         <option disabled selected>--Select Sector--</option>
                         @foreach (var sector in Model.SectorList.Where(s => s.Depthnumber == 1))
                         {

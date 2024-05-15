@@ -258,35 +258,34 @@ const fnPrintReport = async (id) => {
 };
 
 const fnDeleteRow = async (url, dateTransa, transaFullName) => {
-    let fetchOptions;
+    try {
+        let fetchOptions;
 
-    let result = await Swal.fire({
-        title: `&#191;Está seguro de eliminar la transacción?`,
-        html: `${dateTransa} ${transaFullName}<br>Este registro no se podrá recuperar`,
-        icon: "warning",
-        showCancelButton: true,
-        reverseButtons: true,
-        focusConfirm: false,
-        confirmButtonText: ButtonsText.Delete,
-        cancelButtonText: ButtonsText.Cancel,
-        customClass: {
-            confirmButton: "btn btn-danger px-3 mx-2",
-            cancelButton: "btn btn-primary px-3 mx-2"
-        },
-        buttonsStyling: false
-    });
+        let result = await Swal.fire({
+            title: `&#191;Está seguro de eliminar la transacción?`,
+            html: `${dateTransa} ${transaFullName}<br>Este registro no se podrá recuperar`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: ButtonsText.Delete,
+            cancelButtonText: ButtonsText.Cancel,
+            customClass: {
+                confirmButton: "btn btn-danger px-3 mx-2",
+                cancelButton: "btn btn-primary px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
 
-    if (!result.isConfirmed) {
-        return;
-    }
+        if (!result.isConfirmed) {
+            return;
+        }
 
-    fetchOptions = {
-        method: "DELETE"
-    };
+        fetchOptions = {
+            method: "DELETE"
+        };
 
-    const fetchResponse = await fetch(url, fetchOptions);
-
-    if (fetchResponse.ok) {
+        const fetchResponse = await fetch(url, fetchOptions);
         let jsonResponse = await fetchResponse.json();
 
         if (jsonResponse.isSuccess) {
@@ -296,10 +295,43 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
             toastr.success(jsonResponse.errorMessages);
         }
     }
-    else {
-        console.log(fetchResponse);
+    catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
     }
 }
+
+
+const fnExportExcel = async () => {
+    try {
+        let url =
+            `/exchange/quotation/exportexcel?dateInitial=${dateInitial}&dateFinal=${dateFinal}&includeVoid=${includeVoid}`;
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+
+        //const jsonResponse = await response.json();
+        //if (!jsonResponse.isSuccess) {
+        //    Swal.fire({
+        //        icon: 'error',
+        //        title: 'Error',
+        //        text: jsonResponse.errorMessages
+        //    });
+        //} else {
+           
+        //}
+    }
+    catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
 
 const fnLoadDatatable = () => {
     if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {

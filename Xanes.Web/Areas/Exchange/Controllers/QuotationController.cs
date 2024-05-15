@@ -8,6 +8,7 @@ using Xanes.Models.ViewModels;
 using Xanes.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
+using ClosedXML.Excel;
 using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
@@ -790,7 +791,7 @@ public class QuotationController : Controller
             }
 
             //Crear
-                if (obj.Id == 0)
+            if (obj.Id == 0)
             {
                 //Obtenemos el secuencial en borrador
                 var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
@@ -1272,7 +1273,6 @@ public class QuotationController : Controller
                 _uow.Save();
 
                 TempData[AC.Success] = $"Cotización actualizada correctamente";
-
             }
 
             //Actualizamos los totales del padre
@@ -1288,7 +1288,6 @@ public class QuotationController : Controller
             objHeader.UpdatedIpv4 = AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
-
         }
         else
         {
@@ -1680,7 +1679,6 @@ public class QuotationController : Controller
             }
 
             int parentId = objDetail.ParentId;
-
             _uow.QuotationDetail.Remove(objDetail);
             _uow.Save();
 
@@ -1704,7 +1702,6 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-
             objHeader.TotalDeposit = objDetails
                 .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
                 .Sum(x => x.AmountDetail);
@@ -1717,7 +1714,6 @@ public class QuotationController : Controller
             objHeader.UpdatedIpv4 = AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
-
 
             jsonResponse.IsSuccess = true;
             jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
@@ -1822,6 +1818,47 @@ public class QuotationController : Controller
     }
 
     #endregion
+
+    #region EXPORT - IMPORT
+
+    //[HttpGet]
+    //public FileResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
+    //{
+    //    DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
+    //    DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+
+    //    var objQuotationList = _uow.Quotation
+    //        .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
+    //            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx").ToList();
+
+    //    return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
+    //}
+
+    //private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
+    //{
+    //    using (XLWorkbook wb = new XLWorkbook())
+    //    {
+    //        int sheetIndex = 1; // Inicializar el índice de la hoja de trabajo
+
+    //        foreach (var header in listEntities)
+    //        {
+    //            var sheetName = $"{header.TypeTrx.Code}_{header.Numeral.ToString().PadLeft(3,AC.CharDefaultEmpty)}_{header.DateTransa}";
+    //            var worksheet = wb.Worksheets.Add(sheetName);
+    //            var headerRow = worksheet.Row(1);
+
+    //            headerRow.Style.Font.Bold = true;
+    //            headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
+    //            headerRow = worksheet.Row(3);
+    //            headerRow.Style.Font.Bold = true;
+    //            headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+
+    //        }
+    //    }
+    //}
+
+
+    #endregion
+
 
     #region REPORT
 
