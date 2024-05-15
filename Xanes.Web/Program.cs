@@ -7,7 +7,11 @@ using Xanes.Web.CustomMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAntiforgery(x => x.SuppressXFrameOptionsHeader = true);
+//Remover Server Header
+builder.WebHost.UseKestrel(x =>
+{
+    x.AddServerHeader = false;
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -29,18 +33,6 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 app.UseMiddleware<ContentSecurityPolicyMiddleware>();
-
-//Content Security Policy
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-Xss-Protection", "1; mode=block");
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-    context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
-    //context.Response.Headers.Add("Content-Security-Policy", "default-src 'self'");
-    await next();
-});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
