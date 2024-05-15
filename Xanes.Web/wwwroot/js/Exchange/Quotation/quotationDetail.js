@@ -162,8 +162,6 @@ const fnCreateDetailFormSubmit = async (event) => {
     }
 }
 
-
-
 const fnChangeSelectDataTableDetails = () => {
     dataTableBankSourceDeposit.on('select', async function (e, dt, type, indexes) {
         if (type === 'row') {

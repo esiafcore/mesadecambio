@@ -7,7 +7,7 @@
         <Alias>datrep</Alias>
         <BusinessObjects isList="true" count="0" />
         <Category />
-        <Columns isList="true" count="14">
+        <Columns isList="true" count="15">
           <value>ORIGINAL,IsClosed,IsClosed,IsClosed,System.Boolean,_x0038_bc3d5b4b199401c8334b62cdfa2d3d3</value>
           <value>DateTransa,System.DateTime</value>
           <value>CustomerFullName,System.String</value>
@@ -22,6 +22,7 @@
           <value>ClosedBy,System.String</value>
           <value>CreatedBy,System.String</value>
           <value>Id,System.Int32</value>
+          <value>ExecutiveCode,System.String</value>
         </Columns>
         <Dictionary isRef="1" />
         <Guid>3cf0d9c4e6904b81a595386bed5f4a06</Guid>
@@ -632,6 +633,7 @@ Oficial</Text>
               <Name>Text16</Name>
               <Page isRef="3" />
               <Parent isRef="30" />
+              <Text>{datrep.ExecutiveCode}</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
@@ -1287,10 +1289,10 @@ parAmountNetRevenueSell)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/12/2024 12:00:08 AM</ReportChanged>
+  <ReportChanged>5/14/2024 2:10:52 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
-  <ReportGuid>eda9bf835eb646e897efcf0ba3746273</ReportGuid>
+  <ReportGuid>ddc6887a953140c69e184ad08c2b7cf7</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2023.4.2.0</ReportVersion>

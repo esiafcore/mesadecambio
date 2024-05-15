@@ -8,13 +8,13 @@ let elementsHiddenBuySell, divExchangeRateVariation, inputExchangeRateVariation,
 let selectBusinessExecutive;
 
 //Variables para los contenedores de los botones
-let btnSave, btnNext, btnClosed;
+let btnSave, btnNext, btnClosed, btnReClosed;
 //Bton de salvar o siguiente
 let btnSaveNext = document.querySelector("#btnSaveNext");
 
 //Variables para saber si hay que redirigir al home o al detalle y mostrar el mensaje al crear
 let redirectHome = false, redirectDetail = true, showMessages = true;
-let isClosed = false;
+let isClosed = false, isReClosed = false, isClosedElement;
 
 document.addEventListener("DOMContentLoaded", async () => {
     inputDateTransa = document.querySelector("#dateTransa");
@@ -57,7 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     btnSave = document.querySelector("#btnSaveReturn");
     btnNext = document.querySelector("#btnNext");
     btnClosed = document.querySelector("#btnSaveClosed");
-
+    btnReClosed = document.querySelector("#btnSaveReClosed");
+    isClosedElement = document.querySelector("#isClosedElement").value;
     $(selectBusinessExecutive).select2(select2Options);
 
     var selectedOptionActive = $(selectBusinessExecutive).find(':selected');
@@ -199,6 +200,7 @@ const fnSaveReturn = () => {
     redirectDetail = false;
     showMessages = true;
     isClosed = false;
+    isReClosed = false;
     btnSaveNext.click();
 }
 
@@ -207,6 +209,7 @@ const fnSaveNext = () => {
     redirectDetail = true;
     showMessages = true;
     isClosed = false;
+    isReClosed = false;
     btnSaveNext.click();
 }
 
@@ -215,6 +218,15 @@ const fnSaveClosed = () => {
     redirectDetail = false;
     showMessages = false;
     isClosed = true;
+    btnSaveNext.click();
+}
+
+const fnSaveReClosed = () => {
+    redirectHome = false;
+    redirectDetail = false;
+    showMessages = false;
+    isClosed = false;
+    isReClosed = true;
     btnSaveNext.click();
 }
 
@@ -252,6 +264,8 @@ const fnCreateFormSubmit = async (event) => {
 
                 if (isClosed) {
                     await fnClosed(jsonResponse.data.id);
+                }else if (isReClosed) {
+                    await fnReClosed(jsonResponse.data.id);
                 }
             }
         }
@@ -269,11 +283,18 @@ const fnHiddenButton = (isExecutiveLoanOrPayment) => {
 
     if (isExecutiveLoanOrPayment) {
         btnNext.hidden = true;
-        btnClosed.hidden = false;
+        if (isClosedElement == "True") {
+            btnClosed.hidden = true;
+            btnReClosed.hidden = false;
+        } else {
+            btnClosed.hidden = false;
+            btnReClosed.hidden = true;
+        }
         btnSave.hidden = false;
     } else {
         btnNext.hidden = false;
         btnClosed.hidden = true;
+        btnReClosed.hidden = true;
         btnSave.hidden = true;
     }
 };
@@ -283,6 +304,38 @@ const fnClosed = async (id) => {
     try {
 
         let url = `/exchange/quotation/Closed?id=${id}`;
+
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    }
+};
+
+const fnReClosed = async (id) => {
+
+    try {
+
+        let url = `/exchange/quotation/ReClosed?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'

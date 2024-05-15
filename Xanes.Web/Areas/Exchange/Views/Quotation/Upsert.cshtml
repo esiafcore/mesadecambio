@@ -16,6 +16,12 @@
                                 <i class="bi bi-check-square-fill"></i> Cerrar
                             </a>
                         </div>
+                        <div class="col-6 col-md-5 col-xl-4" id="btnSaveReClosed" onclick="fnSaveReClosed()" hidden>
+                            <a class="btn btn-info form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Re-Cerrar y Guardar">
+                                <i class="bi bi-check-square-fill"></i> Re-Cerrar
+                            </a>
+                        </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnNext">
                             <a class="btn btn-primary form-control btn-sm border" 
                              data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Siguiente" 
@@ -45,7 +51,13 @@
                 <div class="container rounded p-2">
                     <div class="row">
                         <input hidden asp-for="DataModel.Id" name="Id" />
+                        <input hidden asp-for="DataModel.IsLoan" name="IsLoan" />
+                        <input hidden asp-for="DataModel.IsPosted" name="IsPosted" />
+                        <input hidden asp-for="DataModel.IsClosed" name="IsClosed"/>
+                        <input hidden asp-for="DataModel.IsClosed" value="@Model.DataModel.IsClosed" id="isClosedElement" />
+                        <input hidden asp-for="DataModel.IsPayment" name="IsPayment" />
                         <input hidden asp-for="DataModel.CompanyId" name="CompanyId" />
+                        <input hidden asp-for="DataModel.InternalSerial" name="InternalSerial" />
                         <input hidden asp-for="DataModel.BusinessExecutiveCode" name="BusinessExecutiveCode" />
                         <input hidden asp-for="DataModel.TotalTransfer" name="TotalTransfer" />
                         <input hidden asp-for="DataModel.TotalDeposit" name="TotalDeposit" />
@@ -284,5 +296,5 @@
     @{
         <partial name="_ValidationScriptsPartial" />
     }
-    <script src="~/js/Exchange/Quotation/quotationUpsert.js"></script>
+    <script defer src="~/js/Exchange/Quotation/quotationUpsert.js"></script>
 }

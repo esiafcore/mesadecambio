@@ -7,7 +7,7 @@
         <Alias>datrep</Alias>
         <BusinessObjects isList="true" count="0" />
         <Category />
-        <Columns isList="true" count="18">
+        <Columns isList="true" count="19">
           <value>ORIGINAL,IsClosed,IsClosed,IsClosed,System.Boolean,_x0038_bc3d5b4b199401c8334b62cdfa2d3d3</value>
           <value>ORIGINAL,DateTransa,DateTransa,DateTransa,System.DateTime,_x0032_a7f015765234e8d96d0c2751a9abf0a</value>
           <value>ORIGINAL,CustomerFullName,CustomerFullName,CustomerFullName,System.String,ae016f9bbd594b28b394ae7928ae795f</value>
@@ -26,6 +26,7 @@
           <value>ORIGINAL,AmountTransactionBase,AmountTransactionBase,AmountTransactionBase,System.Decimal,_x0037_7be8fc040cc49ac940ac57f64a4e8ed</value>
           <value>ORIGINAL,AmountTransactionForeign,AmountTransactionForeign,AmountTransactionForeign,System.Decimal,_x0032_a249cffea6a4a2782ffdc4d26106c55</value>
           <value>ORIGINAL,AmountTransactionAdditional,AmountTransactionAdditional,AmountTransactionAdditional,System.Decimal,fdc2f43ff4074c9f91ccdb87dbe5347f</value>
+          <value>ORIGINAL,ExecutiveCode,ExecutiveCode,ExecutiveCode,System.String,_x0034_3053e429b6a400ab631704f6ab14a34</value>
         </Columns>
         <Dictionary isRef="1" />
         <Guid>3cf0d9c4e6904b81a595386bed5f4a06</Guid>
@@ -544,6 +545,7 @@ Oficial</Text>
               <Name>Text16</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
+              <Text>{datrep.ExecutiveCode}</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
@@ -1091,10 +1093,10 @@ parAmountNetMBO)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/11/2024 11:59:33 PM</ReportChanged>
+  <ReportChanged>5/14/2024 2:13:10 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\DepositList.mrt</ReportFile>
-  <ReportGuid>82341419b41947138d1b38436a7dc687</ReportGuid>
+  <ReportGuid>0ced9c8e996a4016889714dd766716e9</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2023.4.2.0</ReportVersion>

@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let inputId = document.getElementById("DataModel_Id");
     //$("#DataModel_CategoryId").select2(select2Options);
     $("#sector-select").select2(select2Options);
+    $("#sector-select").select2('focus');
+
 
     //Setear enfoque en el search input
     $(document).on('select2:open', function (e) {
@@ -20,9 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     inputSecondSurname.addEventListener("change", naturalNames_onChange);
 
     personType_onClick(personLegalRad);
-
-    //setear el foco al crear o editar
-    document.getElementById("DataModel_Code").focus();
 
     inputTypeNumeral = document.querySelector("#typeNumeral");
     typeNumerals = document.querySelectorAll(".typeNumerals");
@@ -44,12 +43,17 @@ function personType_onClick(objElem) {
     let currentValue = objElem.value;
 
     if (currentValue == PersonType.Natural) {
-        personNaturalDiv.style.display = styleShow;
+
+        personNaturalDiv.forEach((item) => {
+            item.style.display = styleShow;
+        });
         personLegalDiv.style.display = styleHide;
     }
     else if (currentValue == PersonType.Legal) {
         personLegalDiv.style.display = styleShow;
-        personNaturalDiv.style.display = styleHide;
+        personNaturalDiv.forEach((item) => {
+            item.style.display = styleHide;
+        });
     }
 }
 
