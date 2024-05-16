@@ -29,7 +29,7 @@ public class CurrencyExchangeRateController : Controller
         var objList = _uow.CurrencyExchangeRate
             .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
                 includeProperties: "CurrencyTrx")
-            .OrderBy(x => x.DateTransa)
+            .OrderByDescending(x => x.DateTransa)
             .ToList();
 
         var currencyList = _uow.Currency

@@ -5,11 +5,11 @@ namespace Xanes.Web.CustomMiddleware;
 
 public class ContentSecurityPolicyMiddleware
 {
-    private readonly RequestDelegate _requestDelegate;
+    private readonly RequestDelegate _next;
 
-    public ContentSecurityPolicyMiddleware(RequestDelegate requestDelegate)
+    public ContentSecurityPolicyMiddleware(RequestDelegate next)
     {
-        _requestDelegate = requestDelegate;
+        _next = next;
     }
 
     public async Task Invoke(HttpContext context)
@@ -29,6 +29,14 @@ public class ContentSecurityPolicyMiddleware
                 "img-src 'self' 'unsafe-inline' data: https://vmi531999.contaboserver.net:7201 https://localhost http://www.w3.org ;");
         }
 
-        await _requestDelegate(context);
+        context.Response.Headers.Add("X-Frame-Options", "DENY");
+        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+        context.Response.Headers.Add("Permissions-Policy", "camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), usb=()");
+        context.Response.Headers.Remove("X-Powered-By");
+        context.Response.Headers.Remove("Server");
+
+        await _next(context);
     }
 }
