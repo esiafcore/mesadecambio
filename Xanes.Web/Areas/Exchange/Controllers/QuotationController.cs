@@ -13,6 +13,7 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
 using static Stimulsoft.Report.Help.StiHelpProvider;
+using PersonType = Xanes.Models.PersonType;
 using QuotationType = Xanes.Models.QuotationType;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
@@ -1930,7 +1931,7 @@ public class QuotationController : Controller
 
                 var children = _uow.QuotationDetail.GetAll(filter: x =>
                     (x.CompanyId == _companyId && x.ParentId == header.Id), includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-                
+
                 int rowNum = 8;
 
                 foreach (var detail in children)
@@ -1976,6 +1977,455 @@ public class QuotationController : Controller
         return View(modelVm);
     }
 
+    [HttpPost]
+    public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
+    {
+        List<string> ErrorListMessages = new List<string>();
+        var errorsMessagesBuilder = new StringBuilder();
+        JsonResultResponse? jsonResponse = new();
+        List<Models.Customer> objCustomerList = new();
+        List<Models.Quotation> objQuotationList = new();
+        List<Models.QuotationDetail> objQuotationDetailList = new();
+        Models.QuotationType? objQuotationType = new();
+        Models.Customer? objCustomer = new();
+        Models.BusinessExecutive? objBusiness = new();
+        Models.BankAccount? objBankAccountSource = new();
+        Models.BankAccount? objBankAccountTarget = new();
+        Models.Bank? objBankSource = new();
+        Models.Bank? objBankTarget = new();
+        int countMaxId = 0;
+
+        try
+        {
+            if (objImportViewModel.FileExcel is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"No hay registros para importar";
+                return Json(jsonResponse);
+            }
+
+            var objCurrencyList = _uow.Currency.GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+            if (objCurrencyList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Moneda no encontrada";
+                return Json(jsonResponse);
+            }
+
+            using (var stream = objImportViewModel.FileExcel.OpenReadStream())
+            {
+                using (var workbook = new XLWorkbook(stream))
+                {
+                    foreach (var worksheet in workbook.Worksheets)
+                    {
+                        int pageNumber = worksheet.Position; // Obtener el número de la página
+                        string sheetName = worksheet.Name;
+                        int firstRowNumber = 4;
+                        int secondRowNumber = 6;
+
+                        var header = new Quotation();
+                        var countMaxIdDataBase = await _uow.Quotation.NextId();
+                        if (countMaxIdDataBase > countMaxId)
+                        {
+                            countMaxId = countMaxIdDataBase;
+                        }
+                        else
+                        {
+                            countMaxId++;
+                        }
+
+                        header.Id = countMaxId;
+                        header.CompanyId = _companyId;
+                        var type = worksheet.Cell(4, 1).GetString().Trim();
+                        if (string.IsNullOrWhiteSpace(type))
+                        {
+                            ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                        }
+                        else
+                        {
+                            //En dependencia del tipo validamos los demas campos
+
+                            objQuotationType = _uow.QuotationType.Get(filter: x =>
+                                (x.CompanyId == _companyId && x.Code.ToUpper() == type.ToUpper()));
+
+                            if (objQuotationType == null)
+                            {
+                                ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                            }
+                            else
+                            {
+                                header.TypeId = objQuotationType.Id;
+                                header.TypeNumeral = (SD.QuotationType)objQuotationType.Numeral;
+
+                                var date = worksheet.Cell(4, 2).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(date))
+                                {
+                                    ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                }
+                                else
+                                {
+                                    DateOnly dateTransa = DateOnly.Parse(date.Split(" ")[0]);
+                                    header.DateTransa = dateTransa;
+                                }
+
+                                var customerCode = worksheet.Cell(4, 3).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(customerCode))
+                                {
+                                    ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                }
+                                else
+                                {
+                                    objCustomer = _uow.Customer.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == customerCode));
+
+                                    if (objCustomer == null)
+                                    {
+                                        ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        header.CustomerId = objCustomer.Id;
+                                    }
+                                }
+
+                                var amountTransa = worksheet.Cell(6, 1).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(amountTransa))
+                                {
+                                    ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                }
+                                else
+                                {
+                                    header.AmountTransaction = decimal.Parse(amountTransa);
+                                }
+
+                                var businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(businessExecutive))
+                                {
+                                    ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                }
+                                else
+                                {
+                                    objBusiness = _uow.BusinessExecutive.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == businessExecutive));
+
+                                    if (objBusiness == null)
+                                    {
+                                        ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        header.BusinessExecutiveCode = objBusiness.Code;
+                                        header.BusinessExecutiveId = objBusiness.Id;
+                                    }
+                                }
+
+                                var isClosed = worksheet.Cell(6, 9).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isClosed))
+                                {
+                                    ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                }
+                                else
+                                {
+                                    if (isClosed == "S")
+                                    {
+                                        header.IsClosed = true;
+                                    }
+                                    else if (isClosed == "N")
+                                    {
+                                        header.IsClosed = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                }
+
+                                var isPosted = worksheet.Cell(6, 10).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isPosted))
+                                {
+                                    ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                }
+                                else
+                                {
+                                    if (isPosted == "S")
+                                    {
+                                        header.IsPosted = true;
+                                    }
+                                    else if (isPosted == "N")
+                                    {
+                                        header.IsPosted = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                }
+
+                                var isVoid = worksheet.Cell(6, 11).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isVoid))
+                                {
+                                    ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                }
+                                else
+                                {
+                                    if (isVoid == "S")
+                                    {
+                                        header.IsVoid = true;
+                                    }
+                                    else if (isVoid == "N")
+                                    {
+                                        header.IsVoid = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                }
+
+
+                                if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
+                                {
+                                    var monTransa = worksheet.Cell(4, 5).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(monTransa))
+                                    {
+                                        ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        int currencyTypeTransa = int.Parse(monTransa);
+
+                                        if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransa))
+                                        {
+                                            header.CurrencyTransaId = objCurrencyList
+                                                .First(x => x.Numeral == currencyTypeTransa).Id;
+
+                                            header.CurrencyTransaType = (CurrencyType)currencyTypeTransa;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                    }
+
+                                    if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
+                                    {
+                                        var monTransfer = worksheet.Cell(4, 7).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(monTransfer))
+                                        {
+                                            ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            int currencyTypeTransfer = int.Parse(monTransfer);
+
+                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransfer))
+                                            {
+                                                header.CurrencyTransferId = objCurrencyList
+                                                    .First(x => x.Numeral == currencyTypeTransfer).Id;
+
+                                                header.CurrencyTransferType = (CurrencyType)currencyTypeTransfer;
+                                            }
+                                            else
+                                            {
+                                                ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            }
+                                        }
+
+                                        var exchangeBuy = worksheet.Cell(4, 9).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(exchangeBuy))
+                                        {
+                                            ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var monDeposit = worksheet.Cell(4, 6).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(monDeposit))
+                                        {
+                                            ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            int currencyTypeDeposit = int.Parse(monDeposit);
+
+                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeDeposit))
+                                            {
+                                                header.CurrencyDepositId = objCurrencyList
+                                                    .First(x => x.Numeral == currencyTypeDeposit).Id;
+
+                                                header.CurrencyDepositType = (CurrencyType)currencyTypeDeposit;
+                                            }
+                                            else
+                                            {
+                                                ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            }
+                                        }
+
+                                        var exchangeSell = worksheet.Cell(4, 10).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(exchangeSell))
+                                        {
+                                            ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var commission = worksheet.Cell(6, 5).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(commission))
+                                    {
+                                        ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        header.AmountCommission = decimal.Parse(commission);
+                                    }
+
+                                    var bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankAccountSource))
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        objBankAccountSource = _uow.BankAccount.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankAccountSource));
+
+                                        if (objBankAccountSource == null)
+                                        {
+                                            ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            header.BankAccountSourceId = objBankAccountSource.Id;
+                                        }
+                                    }
+
+                                    var bankAccountTarget = worksheet.Cell(6, 7).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankAccountTarget))
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        objBankAccountTarget = _uow.BankAccount.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankAccountTarget));
+
+                                        if (objBankAccountTarget == null)
+                                        {
+                                            ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            header.BankAccountTargetId = objBankAccountTarget.Id;
+                                        }
+                                    }
+                                }
+
+                                objQuotationList.Add(header);
+
+                                var firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+                                var lastUsedRow = worksheet.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+                                short lineNumber = 1;
+                                for (int i = firstRowUsed + 7; i <= lastUsedRow; i++)
+                                {
+                                    var detail = new QuotationDetail();
+                                    detail.CompanyId = _companyId;
+                                    detail.ParentId = header.Id;
+                                    var bankSource = worksheet.Cell(i, 1).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankSource))
+                                    {
+                                        ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. ");
+                                    }
+                                    else
+                                    {
+                                        objBankSource = _uow.Bank.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankSource));
+
+                                        if (objBankSource == null)
+                                        {
+                                            ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            detail.BankSourceId = objBankSource.Id;
+                                        }
+                                    }
+
+                                    var bankTarget = worksheet.Cell(i, 3).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankTarget))
+                                    {
+                                        ErrorListMessages.Add($"El banco destino está vacio - En la hoja {sheetName} fila:{i}. ");
+                                    }
+                                    else
+                                    {
+                                        objBankTarget = _uow.Bank.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankTarget));
+
+                                        if (objBankTarget == null)
+                                        {
+                                            ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                        else
+                                        {
+                                            detail.BankTargetId = objBankTarget.Id;
+                                        }
+                                    }
+
+                                    var amountDetail = worksheet.Cell(i, 5).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(amountDetail))
+                                    {
+                                        ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. ");
+                                    }
+                                    else
+                                    {
+                                        detail.AmountDetail = decimal.Parse(amountDetail);
+                                    }
+
+                                    detail.LineNumber = lineNumber;
+                                    ++lineNumber;
+                                    objQuotationDetailList.Add(detail);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+            await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
+
+            jsonResponse.SuccessMessages = "Importación exitosamente";
+            jsonResponse.IsSuccess = true;
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+    }
 
     #endregion
 
