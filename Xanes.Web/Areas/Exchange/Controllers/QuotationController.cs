@@ -767,7 +767,7 @@ public class QuotationController : Controller
                 obj.CurrencyTransferId = objBankAccountSource.CurrencyId;
             }
 
-            //Verificamos si existe la moneda de la Transaccion
+            //Verificamos si existe el ejecutivo
             objBusinessExecutive = _uow.BusinessExecutive.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
 
@@ -1984,6 +1984,7 @@ public class QuotationController : Controller
         var errorsMessagesBuilder = new StringBuilder();
         JsonResultResponse? jsonResponse = new();
         List<Models.Customer> objCustomerList = new();
+        List<Models.CurrencyExchangeRate>? objCurrencyExchangeRateList = new();
         List<Models.Quotation> objQuotationList = new();
         List<Models.QuotationDetail> objQuotationDetailList = new();
         Models.QuotationType? objQuotationType = new();
@@ -1994,6 +1995,7 @@ public class QuotationController : Controller
         Models.Bank? objBankSource = new();
         Models.Bank? objBankTarget = new();
         int countMaxId = 0;
+        int countMaxSeq = 0;
 
         try
         {
@@ -2018,7 +2020,6 @@ public class QuotationController : Controller
                 {
                     foreach (var worksheet in workbook.Worksheets)
                     {
-                        int pageNumber = worksheet.Position; // Obtener el número de la página
                         string sheetName = worksheet.Name;
                         int firstRowNumber = 4;
                         int secondRowNumber = 6;
@@ -2096,6 +2097,10 @@ public class QuotationController : Controller
                                 else
                                 {
                                     header.AmountTransaction = decimal.Parse(amountTransa);
+                                    if (header.AmountTransaction <= 0)
+                                    {
+                                        ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    }
                                 }
 
                                 var businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
@@ -2182,6 +2187,19 @@ public class QuotationController : Controller
                                     }
                                 }
 
+                                var exchangeOfficial = worksheet.Cell(4, 8).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(exchangeOfficial))
+                                {
+                                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                }
+                                else
+                                {
+                                    header.ExchangeRateOfficialTransa = decimal.Parse(exchangeOfficial);
+                                    if (header.ExchangeRateOfficialTransa <= 0)
+                                    {
+                                        ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    }
+                                }
 
                                 if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
                                 {
@@ -2224,6 +2242,8 @@ public class QuotationController : Controller
                                                     .First(x => x.Numeral == currencyTypeTransfer).Id;
 
                                                 header.CurrencyTransferType = (CurrencyType)currencyTypeTransfer;
+                                                header.CurrencyDepositType = header.CurrencyTransaType;
+                                                header.CurrencyDepositId = header.CurrencyTransaId;
                                             }
                                             else
                                             {
@@ -2239,6 +2259,10 @@ public class QuotationController : Controller
                                         else
                                         {
                                             header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
+                                            if (header.ExchangeRateBuyTransa <= 0)
+                                            {
+                                                ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            }
                                         }
                                     }
                                     else
@@ -2258,6 +2282,8 @@ public class QuotationController : Controller
                                                     .First(x => x.Numeral == currencyTypeDeposit).Id;
 
                                                 header.CurrencyDepositType = (CurrencyType)currencyTypeDeposit;
+                                                header.CurrencyTransferType = header.CurrencyTransaType;
+                                                header.CurrencyTransferId = header.CurrencyTransaId;
                                             }
                                             else
                                             {
@@ -2273,6 +2299,10 @@ public class QuotationController : Controller
                                         else
                                         {
                                             header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
+                                            if (header.ExchangeRateSellTransa <= 0)
+                                            {
+                                                ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            }
                                         }
                                     }
                                 }
@@ -2286,6 +2316,10 @@ public class QuotationController : Controller
                                     else
                                     {
                                         header.AmountCommission = decimal.Parse(commission);
+                                        if (header.AmountCommission < 0)
+                                        {
+                                            ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        }
                                     }
 
                                     var bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
@@ -2339,6 +2373,7 @@ public class QuotationController : Controller
                                     var detail = new QuotationDetail();
                                     detail.CompanyId = _companyId;
                                     detail.ParentId = header.Id;
+                                    detail.CurrencyDetailId = header.CurrencyTransaId;
                                     var bankSource = worksheet.Cell(i, 1).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(bankSource))
                                     {
@@ -2360,11 +2395,7 @@ public class QuotationController : Controller
                                     }
 
                                     var bankTarget = worksheet.Cell(i, 3).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(bankTarget))
-                                    {
-                                        ErrorListMessages.Add($"El banco destino está vacio - En la hoja {sheetName} fila:{i}. ");
-                                    }
-                                    else
+                                    if (!string.IsNullOrWhiteSpace(bankTarget))
                                     {
                                         objBankTarget = _uow.Bank.Get(filter: x =>
                                             (x.CompanyId == _companyId && x.Code == bankTarget));
@@ -2387,6 +2418,10 @@ public class QuotationController : Controller
                                     else
                                     {
                                         detail.AmountDetail = decimal.Parse(amountDetail);
+                                        if (detail.AmountDetail <= 0)
+                                        {
+                                            ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. ");
+                                        }
                                     }
 
                                     detail.LineNumber = lineNumber;
@@ -2411,6 +2446,208 @@ public class QuotationController : Controller
                 jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
                 return Json(jsonResponse);
             }
+
+            foreach (var header in objQuotationList)
+            {
+                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                {
+                    if (header.TypeNumeral == SD.QuotationType.Buy)
+                    {
+                        //TC COMPRA MENOR AL TC OFICIAL
+                        if (header.ExchangeRateBuyTransa < header.ExchangeRateOfficialTransa)
+                        {
+                            header.AmountRevenue = (header.ExchangeRateOfficialTransa - header.ExchangeRateBuyTransa) * header.AmountTransaction;
+                            header.AmountCost = 0;
+                        }
+                        //TC COMPRA MAYOR AL TC OFICIAL
+                        else
+                        {
+                            header.AmountCost = (header.ExchangeRateBuyTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
+                            header.AmountRevenue = 0;
+                        }
+
+                        //Compra de dolares 
+                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        {
+                            //Factoring paga en Cordobas
+                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
+                            }
+                        }
+                        //Compra de Euros
+                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        {
+                            //Factoring paga en Cordobas
+                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
+
+                            }
+                            //Factoring paga en Dolares
+                            else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = (header.ExchangeRateBuyTransa * header.ExchangeRateOfficialTransa);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //TC VENTA MENOR AL TC OFICIAL
+                        if (header.ExchangeRateSellTransa < header.ExchangeRateOfficialTransa)
+                        {
+                            header.AmountCost = (header.ExchangeRateOfficialTransa - header.ExchangeRateSellTransa) * header.AmountTransaction;
+                            header.AmountRevenue = 0;
+                        }
+                        //TC VENTA MAYOR AL TC OFICIAL
+                        else
+                        {
+                            header.AmountRevenue = (header.ExchangeRateSellTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
+                            header.AmountCost = 0;
+                        }
+
+                        //Venta de dolares 
+                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        {
+                            //Cliente paga en Cordobas
+                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
+                            }
+                        }
+                        //Venta de Euros
+                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        {
+                            //Cliente paga en Cordobas
+                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
+
+                            }
+                            //Cliente paga en Dolares
+                            else if (header.CurrencyDepositType == SD.CurrencyType.Foreign)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = (header.ExchangeRateSellTransa * header.ExchangeRateOfficialTransa);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    header.CurrencyTransaType = objBankAccountSource.CurrencyType;
+                    header.CurrencyDepositType = objBankAccountSource.CurrencyType;
+                    header.CurrencyTransferType = objBankAccountSource.CurrencyType;
+                    header.CurrencyTransaId = objBankAccountSource.CurrencyId;
+                    header.CurrencyDepositId = objBankAccountSource.CurrencyId;
+                    header.CurrencyTransferId = objBankAccountSource.CurrencyId;
+
+                    objQuotationDetailList = objQuotationDetailList.Where(x => x.ParentId != header.Id).ToList();
+
+                    var objDetailBankAccountTarget = new QuotationDetail()
+                    {
+                        ParentId = header.Id,
+                        CompanyId = header.CompanyId,
+                        QuotationDetailType = QuotationDetailType.CreditTransfer,
+                        LineNumber = 1,
+                        CurrencyDetailId = header.CurrencyTransaId,
+                        BankSourceId = objBankAccountTarget.ParentId,
+                        BankTargetId = objBankAccountTarget.ParentId,
+                        AmountDetail = header.AmountTransaction,
+                        CreatedBy = AC.LOCALHOSTME,
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedHostName = AC.LOCALHOSTPC,
+                        CreatedIpv4 = AC.Ipv4Default
+                    };
+
+                    objQuotationDetailList.Add(objDetailBankAccountTarget);
+
+                    var objDetailBankAccountSource = new QuotationDetail()
+                    {
+                        ParentId = header.Id,
+                        CompanyId = header.CompanyId,
+                        QuotationDetailType = QuotationDetailType.DebitTransfer,
+                        LineNumber = 1,
+                        CurrencyDetailId = header.CurrencyTransaId,
+                        BankTargetId = objBankAccountSource.ParentId,
+                        BankSourceId = objBankAccountSource.ParentId,
+                        AmountDetail = header.AmountTransaction,
+                        CreatedBy = AC.LOCALHOSTME,
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedHostName = AC.LOCALHOSTPC,
+                        CreatedIpv4 = AC.Ipv4Default
+                    };
+
+                    objQuotationDetailList.Add(objDetailBankAccountSource);
+                }
+
+                header.BusinessExecutiveCode = objBusiness.Code;
+                header.IsLoan = objBusiness.IsLoan;
+                header.IsPayment = objBusiness.IsPayment;
+
+                //Seteamos campos de auditoria
+                header.CreatedBy = AC.LOCALHOSTME;
+                header.CreatedDate = DateTime.UtcNow;
+                header.CreatedHostName = AC.LOCALHOSTPC;
+                header.CreatedIpv4 = AC.Ipv4Default;
+
+                if (!header.IsClosed)
+                {
+                    //Obtenemos el secuencial en borrador
+                    var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
+                        SD.TypeSequential.Draft, true);
+                    header.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+                    header.InternalSerial = AC.InternalSerialDraft;
+                    header.IsPosted = false;
+                    header.IsClosed = false;
+                    header.IsVoid = false;
+                }
+                else
+                {
+                    var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
+                        x.TypeNumeral == header.TypeNumeral &&
+                        x.DateTransa == header.DateTransa &&
+                        x.InternalSerial == AC.InternalSerialOfficial);
+                    if (nextSeq > countMaxSeq)
+                    {
+                        countMaxSeq = nextSeq;
+                    }
+                    else
+                    {
+                        countMaxSeq++;
+                    }
+                    header.Numeral = countMaxSeq;
+                    header.InternalSerial = AC.InternalSerialOfficial;
+                    header.ClosedBy = AC.LOCALHOSTME;
+                    header.ClosedDate = DateTime.UtcNow;
+                    header.ClosedHostName = AC.LOCALHOSTPC;
+                    header.ClosedIpv4 = AC.Ipv4Default;
+                }
+
+                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                {
+                    var childrens = objQuotationDetailList
+                        .Where(x => x.ParentId == header.Id).ToList();
+
+                    foreach (var detail in childrens)
+                    {
+                        if (detail.BankTargetId != 0)
+                        {
+                            detail.QuotationDetailType = QuotationDetailType.Transfer;
+                        }
+                        else
+                        {
+                            detail.QuotationDetailType = QuotationDetailType.Deposit;
+                        }
+                    }
+                }
+            }
+
 
             await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
 
@@ -2545,7 +2782,7 @@ public class QuotationController : Controller
             foreach (var detail in detailDistinct)
             {
                 bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{transaction.Numeral}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+                numberReferenTarget += $"{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
             }
 
             // Remover la coma adicional al final, si es necesario

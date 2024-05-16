@@ -33,7 +33,7 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
             await _db.Quotations
                 .Where(x => x.Id == id)
                 .ExecuteDeleteAsync();
-            
+
             await transaction.CommitAsync();
             return await Task.FromResult(true);
         }
@@ -56,9 +56,22 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
         await using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
-            await dbSet.AddRangeAsync(entityList);
-            await _db.Set<QuotationDetail>().AddRangeAsync(entityDetailList);
-            await _db.SaveChangesAsync();
+            foreach (var entity in entityList)
+            {
+                var details = entityDetailList.Where(x => x.ParentId == entity.Id).ToList();
+
+                entity.Id = 0;
+                await dbSet.AddAsync(entity);
+                await _db.SaveChangesAsync();
+
+                foreach (var detail in details)
+                {
+                    detail.ParentId = entity.Id;
+                }
+                await _db.Set<QuotationDetail>().AddRangeAsync(details);
+                await _db.SaveChangesAsync();
+            }
+
             await transaction.CommitAsync();
         }
         catch (DbUpdateException ex)
@@ -90,7 +103,7 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
     public async Task<int> NextId()
     {
         IQueryable<Quotation> query = _db.Set<Quotation>();
-       
+
         // Si no hay elementos, asigna 0 como valor predeterminado
         int nextId = query.Any() ? query.Max(x => x.Id) : 0;
 

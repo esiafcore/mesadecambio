@@ -199,6 +199,25 @@ const fnVoid = async (id) => {
 
     try {
 
+        let result = await Swal.fire({
+            title: `&#191;Está seguro de anular la cotización?`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: "Aceptar",
+            cancelButtonText: "Cancelar",
+            customClass: {
+                confirmButton: "btn btn-primary px-3 mx-2",
+                cancelButton: "btn btn-danger px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
         let url = `/exchange/quotation/Void?id=${id}`;
 
         const response = await fetch(url, {
