@@ -35,4 +35,7 @@ public class QuotationCreateVM
     [ValidateNever]
     public List<BusinessExecutive> BusinessExecutiveList { get; set; } = new();
 
+    [ValidateNever]
+    public DateOnly ProcessingDate { get; set; }
+
 }

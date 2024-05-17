@@ -37,7 +37,6 @@ public class QuotationController : Controller
         _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
         _hostEnvironment = hostEnvironment;
-
         _parametersReport = new();
         var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
         // Verificar si el archivo existe
@@ -64,7 +63,11 @@ public class QuotationController : Controller
     {
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString(AC.DefaultDateFormatWeb);
+        DateOnly processingDate = DateOnly.Parse(processingDateString);
+
         QuotationCreateVM model = new();
+        model.ProcessingDate = processingDate;
         Quotation objData = new();
 
         var objCurrencyList = _uow.Currency
@@ -560,7 +563,6 @@ public class QuotationController : Controller
         var objBankAccountSource = new BankAccount();
         var objCurrency = new Currency();
         var objBusinessExecutive = new BusinessExecutive();
-
 
         if (ModelState.IsValid)
         {
@@ -1376,14 +1378,8 @@ public class QuotationController : Controller
     public IActionResult ProcessingDate()
     {
         ProcessingDateVM model = new();
-        //Verificar si ya hay una sesion guardada anteriormente
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? string.Empty;
-        DateOnly processingDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        if (processingDateString.Trim() != string.Empty)
-        {
-            processingDate = DateOnly.Parse(processingDateString);
-        }
-
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString();
+        DateOnly processingDate = DateOnly.Parse(processingDateString);
         model.ProcessingDate = processingDate;
         return View(model);
     }
@@ -1921,11 +1917,14 @@ public class QuotationController : Controller
                 worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
                 worksheet.Cell(6, 11).Value = header.IsVoid ? "S" : "N";
 
-                worksheet.Cell(7, 1).Value = "Banco Origen";
-                worksheet.Cell(7, 2).Value = "Cta Ban Origen";
-                worksheet.Cell(7, 3).Value = "Banco Destino";
-                worksheet.Cell(7, 4).Value = "Cta Ban Destino";
-                worksheet.Cell(7, 5).Value = "Importe";
+                worksheet.Cell(7, 1).Value = "#";
+                worksheet.Cell(7, 2).Value = "Banco Origen";
+                worksheet.Cell(7, 3).Value = "Cta Ban Origen";
+                worksheet.Cell(7, 4).Value = "Banco Destino";
+                worksheet.Cell(7, 5).Value = "Cta Ban Destino";
+                worksheet.Cell(7, 6).Value = "Importe";
+                worksheet.Cell(7, 7).Value = "Tipo";
+
 
                 sheetIndex++;
 
@@ -1936,12 +1935,14 @@ public class QuotationController : Controller
 
                 foreach (var detail in children)
                 {
-                    worksheet.Cell(rowNum, 1).Value = detail.BankSourceTrx.Code;
-                    worksheet.Cell(rowNum, 2).Value = header.BankAccountSourceTrx?.Code ?? "";
-                    worksheet.Cell(rowNum, 3).Value = detail.BankTargetTrx.Code;
-                    worksheet.Cell(rowNum, 4).Value = header.BankAccountTargetTrx?.Code ?? "";
-                    worksheet.Cell(rowNum, 5).Value = detail.AmountDetail;
-                    worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                    worksheet.Cell(rowNum, 1).Value = detail.LineNumber;
+                    worksheet.Cell(rowNum, 2).Value = detail.BankSourceTrx.Code;
+                    worksheet.Cell(rowNum, 3).Value = header.BankAccountSourceTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 4).Value = detail.BankTargetTrx.Code;
+                    worksheet.Cell(rowNum, 5).Value = header.BankAccountTargetTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 6).Value = detail.AmountDetail;
+                    worksheet.Cell(rowNum, 6).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                    worksheet.Cell(rowNum, 7).Value = (short)detail.QuotationDetailType;
                     rowNum++;
                 }
 
@@ -2367,14 +2368,13 @@ public class QuotationController : Controller
 
                                 var firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
                                 var lastUsedRow = worksheet.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
-                                short lineNumber = 1;
                                 for (int i = firstRowUsed + 7; i <= lastUsedRow; i++)
                                 {
                                     var detail = new QuotationDetail();
                                     detail.CompanyId = _companyId;
                                     detail.ParentId = header.Id;
                                     detail.CurrencyDetailId = header.CurrencyTransaId;
-                                    var bankSource = worksheet.Cell(i, 1).GetString().Trim();
+                                    var bankSource = worksheet.Cell(i, 2).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(bankSource))
                                     {
                                         ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. ");
@@ -2394,7 +2394,7 @@ public class QuotationController : Controller
                                         }
                                     }
 
-                                    var bankTarget = worksheet.Cell(i, 3).GetString().Trim();
+                                    var bankTarget = worksheet.Cell(i, 4).GetString().Trim();
                                     if (!string.IsNullOrWhiteSpace(bankTarget))
                                     {
                                         objBankTarget = _uow.Bank.Get(filter: x =>
@@ -2410,7 +2410,7 @@ public class QuotationController : Controller
                                         }
                                     }
 
-                                    var amountDetail = worksheet.Cell(i, 5).GetString().Trim();
+                                    var amountDetail = worksheet.Cell(i, 6).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(amountDetail))
                                     {
                                         ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. ");
@@ -2424,8 +2424,25 @@ public class QuotationController : Controller
                                         }
                                     }
 
-                                    detail.LineNumber = lineNumber;
-                                    ++lineNumber;
+                                    var typeDetail = worksheet.Cell(i, 7).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(typeDetail))
+                                    {
+                                        ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    }
+                                    else
+                                    {
+                                        short quotationDetailType = short.Parse(typeDetail);
+
+                                        if (Enum.IsDefined(typeof(QuotationDetailType), quotationDetailType))
+                                        {
+                                            detail.QuotationDetailType = (QuotationDetailType)quotationDetailType;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        }
+                                    }
+
                                     objQuotationDetailList.Add(detail);
                                 }
 
@@ -2633,16 +2650,18 @@ public class QuotationController : Controller
                 {
                     var childrens = objQuotationDetailList
                         .Where(x => x.ParentId == header.Id).ToList();
+                    int lineNumberDeposit = 1, lineNumberTransfer = 1;
 
                     foreach (var detail in childrens)
                     {
-                        if (detail.BankTargetId != 0)
+                        if (detail.QuotationDetailType == QuotationDetailType.Deposit)
                         {
-                            detail.QuotationDetailType = QuotationDetailType.Transfer;
-                        }
-                        else
+                            detail.LineNumber = lineNumberDeposit;
+                            lineNumberDeposit++;
+                        }else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
                         {
-                            detail.QuotationDetailType = QuotationDetailType.Deposit;
+                            detail.LineNumber = lineNumberTransfer;
+                            lineNumberTransfer++;
                         }
                     }
                 }
@@ -2844,6 +2863,4 @@ public class QuotationController : Controller
     }
 
     #endregion
-
-
 }

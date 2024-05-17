@@ -88,7 +88,7 @@
                             <div class="row col-xl-4 col-md-6 col-12 mb-1">
                                 <div class="col-sm-5 col-lg-4 col-4">Fecha</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.DateTransa" type="date" id="dateTransa" class="form-control border p-1 shadow" name="DateTransa" />
+                                    <input asp-for="DataModel.DateTransa" type="date" min="@Model.ProcessingDate.ToString(AC.DefaultDateFormatWeb)" id="dateTransa" class="form-control border p-1 shadow" name="DateTransa" />
                                     <span asp-validation-for="DataModel.DateTransa" class="text-danger"></span>
                                 </div>
                             </div>

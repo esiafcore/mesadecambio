@@ -54,7 +54,7 @@
                 @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
                 {
                     <div class="row col-xl-4 col-md-6 col-12 mb-1">
-                        <div class="col-sm-5 col-lg-4 col-4">
+                        <div class="col-sm-5 col-lg-4 col-xxl-4 col-xl-5 col-4 p-xl-0">
                             <h5 class="text-white fs-6">Mon Origen-Destino</h5>
                         </div>
                         <div class="col-xl-6 col-sm-7 col-8">
@@ -80,7 +80,7 @@
                 </div>
                 @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
                 {
-                    <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                    <div class="row col-xl-4 col-md-6 col-12 mb-1 d-none d-xl-block">
                     </div>
                 }
                 <div class="row col-xl-4 col-md-6 col-12 mb-1">
@@ -110,7 +110,7 @@
                                    id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateBuyTransa" readonly />
                         </div>
                     </div>
-                    <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                    <div class="row col-xl-4 col-md-6 col-12 mb-1 d-none d-xl-block">
                     </div>
                 }
                 else if (Model.ModelCreateVM.DataModel.TypeNumeral == SD.QuotationType.Sell)
@@ -124,7 +124,7 @@
                                    id="TCHeader" value="@Model.ModelCreateVM.DataModel.ExchangeRateSellTransa" readonly />
                         </div>
                     </div>
-                    <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                    <div class="row col-xl-4 col-md-6 col-12 mb-1 d-none d-xl-block">
                     </div>
                 }
                 <div class="row col-xl-4 col-md-6 col-12 mb-1">
