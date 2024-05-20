@@ -610,7 +610,8 @@ public class QuotationController : Controller
 
                 if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                 {
-                    obj.CurrencyDepositType = obj.CurrencyTransferType;
+                    obj.CurrencyDepositType = obj.CurrencyTransaType;
+                    obj.CurrencyDepositId = objCurrency.Id;
 
                     if (obj.ExchangeRateBuyTransa == 0)
                     {
@@ -631,7 +632,6 @@ public class QuotationController : Controller
                     }
 
                     obj.CurrencyTransferId = objCurrency.Id;
-                    obj.CurrencyDepositId = objCurrency.Id;
 
                     //TC COMPRA MENOR AL TC OFICIAL
                     if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
@@ -676,7 +676,8 @@ public class QuotationController : Controller
                 }
                 else
                 {
-                    obj.CurrencyTransferType = obj.CurrencyDepositType;
+                    obj.CurrencyTransferType = obj.CurrencyTransaType;
+                    obj.CurrencyTransferId = objCurrency.Id;
 
                     if (obj.ExchangeRateSellTransa == 0)
                     {
@@ -696,7 +697,6 @@ public class QuotationController : Controller
                         return Json(jsonResponse);
                     }
 
-                    obj.CurrencyTransferId = objCurrency.Id;
                     obj.CurrencyDepositId = objCurrency.Id;
 
                     //TC VENTA MENOR AL TC OFICIAL
@@ -1229,17 +1229,6 @@ public class QuotationController : Controller
                 obj.BankTargetId = obj.BankSourceId;
             }
 
-            //Obtenemos los hijos
-            var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
-                     x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-
-            if (objDetails == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
-                return Json(jsonResponse);
-            }
-
             if (obj.Id == 0)
             {
                 //Seteamos campos de auditoria
@@ -1255,7 +1244,9 @@ public class QuotationController : Controller
             }
             else
             {
-                var objDetail = objDetails.First(x => x.Id == obj.Id);
+                var objDetail = _uow.QuotationDetail.Get(filter: x =>
+                    x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.Id == obj.Id);
+
                 if (objDetail == null)
                 {
                     jsonResponse.IsSuccess = false;
@@ -1278,12 +1269,23 @@ public class QuotationController : Controller
                 TempData[AC.Success] = $"Cotización actualizada correctamente";
             }
 
+            //Obtenemos los hijos
+            var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
+                x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+            if (objDetails == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
+                return Json(jsonResponse);
+            }
+
             //Actualizamos los totales del padre
             objHeader.TotalDeposit = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit || x.QuotationDetailType == QuotationDetailType.CreditTransfer)
                 .Sum(x => x.AmountDetail);
             objHeader.TotalTransfer = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer || x.QuotationDetailType == QuotationDetailType.DebitTransfer)
                 .Sum(x => x.AmountDetail);
             objHeader.UpdatedBy = AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
@@ -1819,7 +1821,7 @@ public class QuotationController : Controller
     #region EXPORT - IMPORT
 
     [HttpGet]
-    public FileResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
+    public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
     {
         DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
         DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
@@ -1827,6 +1829,11 @@ public class QuotationController : Controller
         var objQuotationList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
                 , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx,BankAccountSourceTrx,BankAccountTargetTrx").ToList();
+
+        if (objQuotationList == null || objQuotationList.Count == 0)
+        {
+            return NoContent();
+        }
 
         return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
     }
@@ -2041,7 +2048,7 @@ public class QuotationController : Controller
                         var type = worksheet.Cell(4, 1).GetString().Trim();
                         if (string.IsNullOrWhiteSpace(type))
                         {
-                            ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                            ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                         }
                         else
                         {
@@ -2052,7 +2059,7 @@ public class QuotationController : Controller
 
                             if (objQuotationType == null)
                             {
-                                ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                             }
                             else
                             {
@@ -2062,7 +2069,7 @@ public class QuotationController : Controller
                                 var date = worksheet.Cell(4, 2).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(date))
                                 {
-                                    ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2073,7 +2080,7 @@ public class QuotationController : Controller
                                 var customerCode = worksheet.Cell(4, 3).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(customerCode))
                                 {
-                                    ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2082,7 +2089,7 @@ public class QuotationController : Controller
 
                                     if (objCustomer == null)
                                     {
-                                        ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2093,21 +2100,21 @@ public class QuotationController : Controller
                                 var amountTransa = worksheet.Cell(6, 1).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(amountTransa))
                                 {
-                                    ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                 }
                                 else
                                 {
                                     header.AmountTransaction = decimal.Parse(amountTransa);
                                     if (header.AmountTransaction <= 0)
                                     {
-                                        ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                 }
 
                                 var businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(businessExecutive))
                                 {
-                                    ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2116,7 +2123,7 @@ public class QuotationController : Controller
 
                                     if (objBusiness == null)
                                     {
-                                        ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2128,7 +2135,7 @@ public class QuotationController : Controller
                                 var isClosed = worksheet.Cell(6, 9).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(isClosed))
                                 {
-                                    ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2142,14 +2149,14 @@ public class QuotationController : Controller
                                     }
                                     else
                                     {
-                                        ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                 }
 
                                 var isPosted = worksheet.Cell(6, 10).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(isPosted))
                                 {
-                                    ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2163,14 +2170,14 @@ public class QuotationController : Controller
                                     }
                                     else
                                     {
-                                        ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                 }
 
                                 var isVoid = worksheet.Cell(6, 11).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(isVoid))
                                 {
-                                    ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                    ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                 }
                                 else
                                 {
@@ -2184,21 +2191,21 @@ public class QuotationController : Controller
                                     }
                                     else
                                     {
-                                        ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                 }
 
                                 var exchangeOfficial = worksheet.Cell(4, 8).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(exchangeOfficial))
                                 {
-                                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                 }
                                 else
                                 {
                                     header.ExchangeRateOfficialTransa = decimal.Parse(exchangeOfficial);
                                     if (header.ExchangeRateOfficialTransa <= 0)
                                     {
-                                        ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                     }
                                 }
 
@@ -2207,7 +2214,7 @@ public class QuotationController : Controller
                                     var monTransa = worksheet.Cell(4, 5).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(monTransa))
                                     {
-                                        ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2222,7 +2229,7 @@ public class QuotationController : Controller
                                         }
                                         else
                                         {
-                                            ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                     }
 
@@ -2231,7 +2238,7 @@ public class QuotationController : Controller
                                         var monTransfer = worksheet.Cell(4, 7).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(monTransfer))
                                         {
-                                            ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2248,21 +2255,21 @@ public class QuotationController : Controller
                                             }
                                             else
                                             {
-                                                ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                                ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                             }
                                         }
 
                                         var exchangeBuy = worksheet.Cell(4, 9).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(exchangeBuy))
                                         {
-                                            ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
                                             header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
                                             if (header.ExchangeRateBuyTransa <= 0)
                                             {
-                                                ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                                ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                             }
                                         }
                                     }
@@ -2271,7 +2278,7 @@ public class QuotationController : Controller
                                         var monDeposit = worksheet.Cell(4, 6).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(monDeposit))
                                         {
-                                            ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2288,21 +2295,21 @@ public class QuotationController : Controller
                                             }
                                             else
                                             {
-                                                ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                                ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                             }
                                         }
 
                                         var exchangeSell = worksheet.Cell(4, 10).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(exchangeSell))
                                         {
-                                            ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
                                             header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
                                             if (header.ExchangeRateSellTransa <= 0)
                                             {
-                                                ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                                ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                             }
                                         }
                                     }
@@ -2312,21 +2319,21 @@ public class QuotationController : Controller
                                     var commission = worksheet.Cell(6, 5).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(commission))
                                     {
-                                        ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                     else
                                     {
                                         header.AmountCommission = decimal.Parse(commission);
                                         if (header.AmountCommission < 0)
                                         {
-                                            ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                            ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                         }
                                     }
 
                                     var bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(bankAccountSource))
                                     {
-                                        ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2335,7 +2342,7 @@ public class QuotationController : Controller
 
                                         if (objBankAccountSource == null)
                                         {
-                                            ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2346,7 +2353,7 @@ public class QuotationController : Controller
                                     var bankAccountTarget = worksheet.Cell(6, 7).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(bankAccountTarget))
                                     {
-                                        ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. ");
+                                        ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2355,7 +2362,7 @@ public class QuotationController : Controller
 
                                         if (objBankAccountTarget == null)
                                         {
-                                            ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2377,7 +2384,7 @@ public class QuotationController : Controller
                                     var bankSource = worksheet.Cell(i, 2).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(bankSource))
                                     {
-                                        ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. ");
+                                        ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. |");
                                     }
                                     else
                                     {
@@ -2386,7 +2393,7 @@ public class QuotationController : Controller
 
                                         if (objBankSource == null)
                                         {
-                                            ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2402,7 +2409,7 @@ public class QuotationController : Controller
 
                                         if (objBankTarget == null)
                                         {
-                                            ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                         else
                                         {
@@ -2413,21 +2420,21 @@ public class QuotationController : Controller
                                     var amountDetail = worksheet.Cell(i, 6).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(amountDetail))
                                     {
-                                        ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. ");
+                                        ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. |");
                                     }
                                     else
                                     {
                                         detail.AmountDetail = decimal.Parse(amountDetail);
                                         if (detail.AmountDetail <= 0)
                                         {
-                                            ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. ");
+                                            ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. |");
                                         }
                                     }
 
                                     var typeDetail = worksheet.Cell(i, 7).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(typeDetail))
                                     {
-                                        ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                        ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                     }
                                     else
                                     {
@@ -2439,7 +2446,7 @@ public class QuotationController : Controller
                                         }
                                         else
                                         {
-                                            ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. ");
+                                            ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
                                         }
                                     }
 
@@ -2650,6 +2657,16 @@ public class QuotationController : Controller
                 {
                     var childrens = objQuotationDetailList
                         .Where(x => x.ParentId == header.Id).ToList();
+
+                    //Actualizamos los totales del padre
+                    header.TotalDeposit = childrens
+                        .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                        .Sum(x => x.AmountDetail);
+                    header.TotalTransfer = childrens
+                        .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                        .Sum(x => x.AmountDetail);
+
+
                     int lineNumberDeposit = 1, lineNumberTransfer = 1;
 
                     foreach (var detail in childrens)
@@ -2658,7 +2675,8 @@ public class QuotationController : Controller
                         {
                             detail.LineNumber = lineNumberDeposit;
                             lineNumberDeposit++;
-                        }else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                        }
+                        else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
                         {
                             detail.LineNumber = lineNumberTransfer;
                             lineNumberTransfer++;

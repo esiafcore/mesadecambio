@@ -8,7 +8,7 @@ let inputsFormatTransa, inputsFormatExchange, inputAmountTransa, inputDateTransa
 let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurrencyTransfer, divCurrencyDeposit, elementsTransfer, elementsSell, elementsBuy,
     selectBankAccountSource, selectBankAccountTarget, inputAmountCost, inputAmountRevenue, currencyTypeDeposit, currencyTypeTransfer, currenciesTransa, currenciesDeposit, currenciesTransfer;
 let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTargetTransfer;
-let indexDataTableBankSourceTransfer, indexDataTableBankTargetTransfer, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
+let indexDataTableBankSourceTransfer = 0, indexDataTableBankTargetTransfer = 0, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
 let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
 
 //Variable para el color de fondo seleccionado en la tablas del detalle
@@ -482,47 +482,6 @@ const fnShowModalTransfer = () => {
     fnLoadDatatableBankTransferSource();
     fnLoadDatatableBankTransferTarget();
     $('#modalCreateTransfer').modal('show');
-
-    //$('#modalCreateTransfer').on('shown.bs.modal', function () {
-    //    // Inicializar Select2 en el elemento de selección
-    //    $(selectBankSourceTransfer).select2({
-    //        templateResult: formatOption,
-    //        language: customMessagesSelect,
-    //        allowClear: true,
-    //        minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
-    //        dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
-    //        dropdownParent: $('#modalCreateTransfer'),
-    //        maximumSelectionLength: totalOptionsSource, // Establecer el tamaño máximo del menú desplegable
-    //        openOnEnter: true
-    //    });
-    //    $(selectBankTargetTransfer).select2({
-    //        templateResult: formatOption,
-    //        language: customMessagesSelect,
-    //        allowClear: true,
-    //        minimumResultsForSearch: -1, // Mostrar todos los elementos sin barra de búsqueda
-    //        dropdownAutoWidth: true, // Ajustar automáticamente el ancho del menú desplegable
-    //        dropdownParent: $('#modalCreateTransfer'),
-    //        maximumSelectionLength: totalOptionsTarget // Establecer el tamaño máximo del menú desplegable
-    //    });
-    //    $(selectBankSourceTransfer).select2('open');
-    //    $(selectBankTargetTransfer).select2('open');
-    //});
-    //$('#selectBankSourceTransfer').select2({
-    //    templateResult: formatOption,
-    //    language: customMessagesSelect,
-    //    allowClear: true,
-    //    minimumResultsForSearch: Infinity,
-    //    width: "resolve",
-    //    dropdownParent: $('#modalCreateTransfer')
-    //});
-    //$('#selectBankTargetTransfer').select2({
-    //    templateResult: formatOption,
-    //    language: customMessagesSelect,
-    //    allowClear: true,
-    //    minimumResultsForSearch: Infinity,
-    //    width: "resolve",
-    //    dropdownParent: $('#modalCreateTransfer')
-    //});
 };
 
 //Funcion para eliminar los detalles
@@ -745,6 +704,44 @@ const fnSelectTableSourceDeposit = async (index = 0) => {
     $(selectedRowNode).addClass(bgRow);
 };
 
+const fnSelectTableSourceTransfer = async (index = 0) => {
+
+    let selectedRowAfter = dataTableBankSourceTransfer.row(indexDataTableBankSourceTransfer);
+    indexDataTableBankSourceTransfer = index;
+    let selectedRowNodeAfter = selectedRowAfter.node();
+    $(selectedRowNodeAfter).removeClass(bgRow);
+
+    let selectedRow = dataTableBankSourceTransfer.row(index);
+
+    dataTableBankSourceTransfer.rows().deselect();
+
+    // Selecciona la fila deseada
+    selectedRow.select();
+
+    let selectedRowNode = selectedRow.node();
+
+    $(selectedRowNode).addClass(bgRow);
+};
+
+const fnSelectTableTargetTransfer = async (index = 0) => {
+
+    let selectedRowAfter = dataTableBankTargetTransfer.row(indexDataTableBankTargetTransfer);
+    indexDataTableBankTargetTransfer = index;
+    let selectedRowNodeAfter = selectedRowAfter.node();
+    $(selectedRowNodeAfter).removeClass(bgRow);
+
+    let selectedRow = dataTableBankTargetTransfer.row(index);
+
+    dataTableBankTargetTransfer.rows().deselect();
+
+    // Selecciona la fila deseada
+    selectedRow.select();
+
+    let selectedRowNode = selectedRow.node();
+
+    $(selectedRowNode).addClass(bgRow);
+};
+
 //*********************** Funciones de los datatables *****************************
 function fnLoadDatatableBankTransferSource(index = 0) {
     if (dataTableBankSourceTransfer) dataTableBankSourceTransfer.destroy();
@@ -765,27 +762,13 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 }
             },
             "complete": async function () {
-                indexDataTableBankSourceTransfer = index;
-                inputBankSourceTransfer.value = await fnGetBankId(dataTableBankSourceTransfer);
-                // Selecciona la fila deseada
-                let selectedRow = dataTableBankSourceTransfer.row(index);
-
-                // Deselecciona todas las filas
-                dataTableBankSourceTransfer.rows().deselect();
-
-                // Selecciona la fila deseada
-                selectedRow.select();
-
-                // Obtiene el nodo HTML de la fila seleccionada
-                let selectedRowNode = selectedRow.node();
-
-                $(selectedRowNode).addClass(bgRow);
+                await fnSelectTableSourceTransfer(index);
             }
         },
         "columns": [
             {
                 data: null, "width":
-                    "15%", orderable: false,
+                    "30%", orderable: false,
                 "className": "text-center align-middle",
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
@@ -798,11 +781,12 @@ function fnLoadDatatableBankTransferSource(index = 0) {
             {
                 data: 'code',
                 orderable: false,
-                "width": "85%"
+                "width": "70%"
             }
         ],
         "searching": false,
         "paging": false,
+        "autoWidth": false,
         "select": {
             info: false,
             items: 'row',
@@ -839,27 +823,13 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 }
             },
             "complete": async function () {
-                indexDataTableBankTargetTransfer = index;
-                inputBankTargetTransfer.value = await fnGetBankId(dataTableBankTargetTransfer);
-                // Selecciona la fila deseada
-                let selectedRow = dataTableBankTargetTransfer.row(index);
-
-                // Deselecciona todas las filas
-                dataTableBankTargetTransfer.rows().deselect();
-
-                // Selecciona la fila deseada
-                selectedRow.select();
-
-                // Obtiene el nodo HTML de la fila seleccionada
-                let selectedRowNode = selectedRow.node();
-
-                $(selectedRowNode).addClass(bgRow);
+                await fnSelectTableTargetTransfer(index);
             }
         },
         "columns": [
             {
                 data: null, "width":
-                    "15%", orderable: false,
+                    "30%", orderable: false,
                 "className": "text-center align-middle",
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
@@ -872,11 +842,12 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
             {
                 data: 'code',
                 orderable: false,
-                "width": "85%"
+                "width": "70%"
             }
         ],
         "searching": false,
         "paging": false,
+        "autoWidth": false,
         "select": {
             info: false,
             items: 'row',
@@ -900,7 +871,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
         "dataSrc": 'data',
         "ajax": {
             "url": `/admin/bank/GetAll`,
-            "dataSrc": function (data) {
+            "dataSrc": function(data) {
                 if (data.isSuccess) {
                     return data.data;
                 } else {
@@ -912,14 +883,16 @@ function fnLoadDatatableBankDeposit(index = 0) {
                     return [];
                 }
             },
-            "complete": async function () {
+            "complete": async function() {
                 await fnSelectTableSourceDeposit(index);
             }
         },
         "columns": [
             {
-                data: null, "width":
-                    "15%", orderable: false,
+                data: null,
+                "width":
+                    "30%",
+                orderable: false,
                 "className": "text-center align-middle",
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
@@ -932,11 +905,12 @@ function fnLoadDatatableBankDeposit(index = 0) {
             {
                 data: 'code',
                 orderable: false,
-                "width": "85%"
+                "width": "70%"
             }
         ],
         "searching": false,
         "paging": false,
+        "autoWidth": false,
         "ordering": false,
         "select": {
             info: false,
@@ -1012,12 +986,12 @@ function fnLoadDatatableDeposit() {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
                          onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId}, '${QuotationDetailType.Deposit}')"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
                         <a class="btn btn-danger py-1 px-3 my-0 mx-1"
                             onclick="fndeleteRow(${data.id})"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
                     </div>`;
@@ -1158,12 +1132,12 @@ function fnLoadDatatableTransfer() {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
                             onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId},'${QuotationDetailType.Transfer}')"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
                         <a class="btn btn-danger py-1 px-3 my-0 mx-1"
                             onclick="fndeleteRow(${data.id})"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
                     </div>`;

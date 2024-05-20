@@ -21,11 +21,11 @@ function loadDatatable() {
                 "render": (data, type, row) => {
                     return `<div class="btn-group" role="group">
                         <a href="/admin/bank/upsert?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-2"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                             <i class="bi bi-pencil-square fs-5"></i>
                         </a>
                         <a onClick="fnDeleteRow('/admin/bank/delete?id=${row.id}','${row.code}','${row.name}')" class="btn btn-danger py-1 px-3 my-0 mx-2" 
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                             <i class="bi bi-trash-fill fs-5"></i>
                         </a>
 

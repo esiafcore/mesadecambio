@@ -14,7 +14,7 @@
                 {
                     <div class="col-6 col-md-7 col-lg-5 col-xl-4">
                         <a onclick="fnReClosed(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed"
-                           class="btn btn-info form-control btn-sm border" data-bs-toggle="tooltip" data-bs-placement="top"
+                           class="btn btn-info form-control btn-sm border" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                            data-bs-title="Re-Cerrar" hidden>
                             <i class="bi bi-check-square-fill"></i> Re-Cerrar
                         </a>
@@ -25,13 +25,13 @@
                     <div class="col-6 col-md-7 col-lg-5 col-xl-4">
                         <a onclick="fnClosed(@Model.ModelCreateVM.DataModel.Id)"
                            id="btnQuotationClosed" class="btn btn-info form-control btn-sm border"
-                           data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Cerrar Cotización" hidden>
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Cerrar Cotización" hidden>
                             <i class="bi bi-check-square-fill"></i> Cerrar
                         </a>
                     </div>
                 }
                 <div class="col-6 col-md-5 col-xl-4">
-                    <a asp-action="Index" data-bs-toggle="tooltip" data-bs-placement="top"
+                    <a asp-action="Index" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                        data-bs-title="Regresar" class="btn btn-secondary form-control btn-sm border">
                         <i class="bi bi-arrow-return-left"></i> Regresar
                     </a>
@@ -160,7 +160,7 @@
 
                 <div class="col d-flex justify-content-end text-end d-none d-md-block">
                     <a type="button" class="btn btn-success btn-sm border fs-3"
-                       data-bs-toggle="tooltip" data-bs-title="Actualizar" onclick="fnShowModalUpdateHeader()">
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Actualizar" onclick="fnShowModalUpdateHeader()">
                         <i class="bi bi-pencil-square"></i>
                     </a>
                 </div>
@@ -172,7 +172,7 @@
                         <div class="col-sm-5 col-lg-2 col-4">
                             <h5 class="text-white fs-6">Cta Ban Origen</h5>
                         </div>
-                        <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-5">
+                        <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-lg-5">
                             <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountSourceTrx.Name" readonly />
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                         <div class="col-sm-5 col-lg-2 col-4">
                             <h5 class="text-white fs-6">Cta Ban Destino</h5>
                         </div>
-                        <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-5">
+                        <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-lg-5">
                             <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountTargetTrx.Name" readonly />
                         </div>
                     </div>
@@ -188,7 +188,7 @@
             }
             <div class="col d-flex justify-content-end text-end d-block d-md-none">
                 <a type="button" class="btn btn-success btn-sm border fs-3"
-                   data-bs-toggle="tooltip" data-bs-title="Actualizar" onclick="fnShowModalUpdateHeader()">
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Actualizar" onclick="fnShowModalUpdateHeader()">
                     <i class="bi bi-pencil-square"></i>
                 </a>
             </div>
@@ -237,7 +237,7 @@
                         @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
                         {
                             <a type="button" class="btn btn-info fs-2"
-                               data-bs-toggle="tooltip" data-bs-title="Crear" id="btnCreateDetailTransfer"
+                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Crear" id="btnCreateDetailTransfer"
                                onclick="fnShowModalTransfer()">
                                 <i class="bi bi-plus"></i>
                             </a>
