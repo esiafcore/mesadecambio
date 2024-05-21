@@ -4,10 +4,14 @@ using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models.ViewModels;
 using Xanes.Models;
 using Xanes.Utility;
-using Microsoft.DotNet.MSIdentity.Shared;
-using Newtonsoft.Json;
-using System.Text;
 using Xanes.Models.Shared;
+using System.Text.Json;
+using System.Text;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
+using static Xanes.Utility.SD;
+
 
 namespace Xanes.Web.Areas.Admin.Controllers;
 [Area("Admin")]
@@ -16,21 +20,21 @@ public class CurrencyExchangeRateController : Controller
     private readonly IUnitOfWork _uow;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
-
+    private readonly int _decimalTransa;
+    private readonly int _decimalExchange;
     public CurrencyExchangeRateController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
         _configuration = configuration;
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+        _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
+        _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
     }
 
     public IActionResult Index(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
     {
-        var objList = _uow.CurrencyExchangeRate
-            .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
-                includeProperties: "CurrencyTrx")
-            .OrderByDescending(x => x.DateTransa)
-            .ToList();
+        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
+        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
         var currencyList = _uow.Currency
             .GetAll(filter: x => (x.CompanyId == _companyId)
@@ -48,12 +52,40 @@ public class CurrencyExchangeRateController : Controller
 
         var objViewModel = new CurrencyExchangeRateIndexVM()
         {
-            DataModelList = objList,
             CurrencyList = currencyList,
             CurrencySelected = currencyType
         };
 
         return View(objViewModel);
+    }
+
+    public JsonResult GetAll(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
+    {
+        JsonResultResponse? jsonResponse = new();
+        var objList = _uow.CurrencyExchangeRate
+            .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
+                includeProperties: "CurrencyTrx")
+            .OrderByDescending(x => x.DateTransa)
+            .ToList();
+
+        if (objList == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
+        if (objList.Count <= 0)
+        {
+            jsonResponse.IsInfo = true;
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
     }
 
     // DETALLE
@@ -268,7 +300,7 @@ public class CurrencyExchangeRateController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> GetCurrencyExchangeRate(string date)
+    public JsonResult GetCurrencyExchangeRate(string date)
     {
         JsonResultResponse? jsonResponse = new();
         DateOnly dateTransa = DateOnly.Parse(date);
@@ -298,7 +330,6 @@ public class CurrencyExchangeRateController : Controller
         return Json(jsonResponse);
     }
 
-
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
@@ -325,4 +356,265 @@ public class CurrencyExchangeRateController : Controller
         TempData["success"] = "Exchange Rate deleted successfully";
         return RedirectToAction("Index", "CurrencyExchangeRate", new { currencyType = currencyType });
     }
+
+    #region EXPORT - IMPORT
+
+    [HttpGet]
+    public IActionResult ExportExcel(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
+    {
+        var objList = _uow.CurrencyExchangeRate
+            .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
+                includeProperties: "CurrencyTrx")
+            .OrderByDescending(x => x.DateTransa)
+            .ToList();
+
+        if (objList == null || objList.Count == 0)
+        {
+            return NoContent();
+        }
+
+        return GenerarExcel("TiposDeCambio.xlsx", objList);
+    }
+
+    private FileResult GenerarExcel(string nombreArchivo, List<Models.CurrencyExchangeRate> listEntities)
+    {
+        using (XLWorkbook wb = new XLWorkbook())
+        {
+            var worksheet = wb.Worksheets.Add("TiposDeCambio");
+
+            var objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
+
+            // Escribir el nombre de la compañía en la primera fila
+            worksheet.Cell(1, 1).Value = objCompany.Name;
+            worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
+            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+            // Escribir el título del excel en la segunda fila
+            worksheet.Cell(2, 1).Value = "Listado de Tipos de Cambio";
+            worksheet.Range(2, 1, 2, 7).Merge().Style.Font.Bold = true;
+            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+
+            var headerRow = worksheet.Row(4);
+            headerRow.Style.Font.Bold = true;
+            headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+
+            worksheet.Cell(4, 1).Value = "Moneda";
+            worksheet.Cell(4, 2).Value = "Fecha";
+            worksheet.Cell(4, 3).Value = "T/C Oficial";
+            worksheet.Cell(4, 4).Value = "T/C Compra";
+            worksheet.Cell(4, 5).Value = "T/C Venta";
+
+            int rowNum = 5;
+            foreach (var item in listEntities)
+            {
+                worksheet.Cell(rowNum, 1).Value = (short)item.CurrencyType;
+                worksheet.Cell(rowNum, 2).SetValue(item.DateTransa.ToDateTimeConvert());
+                worksheet.Cell(rowNum, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(rowNum, 3).Value = item.OfficialRate;
+                worksheet.Cell(rowNum, 3).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(rowNum, 4).Value = item.BuyRate;
+                worksheet.Cell(rowNum, 4).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(rowNum, 5).Value = item.SellRate;
+                worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                rowNum++;
+            }
+
+            worksheet.Column(1).AdjustToContents();
+            worksheet.Column(2).AdjustToContents();
+            worksheet.Column(3).AdjustToContents();
+            worksheet.Column(4).AdjustToContents();
+            worksheet.Column(5).AdjustToContents();
+
+
+            // Asignar un nombre a la página del excel
+            wb.Worksheet(1).Name = "Data";
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                wb.SaveAs(stream);
+                return File(stream.ToArray(), AC.ContentTypeExcel,
+                    nombreArchivo);
+            }
+        }
+    }
+
+    [HttpGet]
+    public IActionResult Import()
+    {
+        // Titulo de la pagina
+        ViewData[AC.Title] = $"Tipos de Cambio - Importar";
+        ImportVM modelVm = new();
+        return View(modelVm);
+    }
+
+    [HttpPost]
+    public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
+    {
+        List<string> ErrorListMessages = new List<string>();
+        var errorsMessagesBuilder = new StringBuilder();
+        JsonResultResponse? jsonResponse = new();
+        List<CurrencyExchangeRate>? objList = new();
+        try
+        {
+            if (objImportViewModel.FileExcel is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"No hay registros para importar";
+                return Json(jsonResponse);
+            }
+
+            var objCurrencyList = _uow.Currency.GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+            if (objCurrencyList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Moneda no encontrada";
+                return Json(jsonResponse);
+            }
+
+            var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
+
+            var hoja = workbook.Worksheet(1);
+
+            var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+            var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+
+
+            for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
+            {
+                var fila = hoja.Row(i);
+                var obj = new Models.CurrencyExchangeRate();
+                obj.CompanyId = _companyId;
+                obj.CreatedBy = AC.LOCALHOSTME;
+                obj.CreatedDate = DateTime.UtcNow;
+                obj.CreatedHostName = AC.LOCALHOSTPC;
+                obj.CreatedIpv4 = AC.Ipv4Default;
+                var currency = fila.Cell(1).GetString();
+                if (string.IsNullOrWhiteSpace(currency))
+                {
+                    ErrorListMessages.Add($"La moneda está vacia - En la fila:{i}. |");
+                }
+                else
+                {
+                    int currencyType = int.Parse(currency);
+
+                    if (Enum.IsDefined(typeof(SD.CurrencyType), currencyType))
+                    {
+                        obj.CurrencyId = objCurrencyList
+                            .First(x => x.Numeral == currencyType).Id;
+
+                        obj.CurrencyType = (SD.CurrencyType)currencyType;
+                    }
+                    else
+                    {
+                        ErrorListMessages.Add($"La moneda  es invalida - En la fila:{i}. |");
+                    }
+                }
+
+
+                var date = fila.Cell(2).GetString();
+                if (string.IsNullOrWhiteSpace(date))
+                {
+                    ErrorListMessages.Add($"La fecha está vacia - En la fila:{i}. |");
+                }
+                else
+                {
+                    DateOnly dateTransa = DateOnly.Parse(date.Split(" ")[0]);
+                    obj.DateTransa = dateTransa;
+                }
+
+                var exchangeOfficial = fila.Cell(3).GetString();
+                if (string.IsNullOrWhiteSpace(exchangeOfficial))
+                {
+                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la fila:{i}. |");
+                }
+                else
+                {
+                    obj.OfficialRate = decimal.Parse(exchangeOfficial);
+                    if (obj.OfficialRate < 0)
+                    {
+                        ErrorListMessages.Add(
+                            $"El tipo de cambio oficial no puede ser menor  a cero - En la fila:{i}. |");
+                    }
+                }
+
+                var exchangeBuy = fila.Cell(4).GetString();
+                if (string.IsNullOrWhiteSpace(exchangeBuy))
+                {
+                    ErrorListMessages.Add($"El tipo de cambio compra está vacio - En la fila:{i}. |");
+                }
+                else
+                {
+                    obj.BuyRate = decimal.Parse(exchangeBuy);
+                    if (obj.BuyRate < 0)
+                    {
+                        ErrorListMessages.Add(
+                            $"El tipo de cambio compra no puede ser menor a cero - En la fila:{i}. |");
+                    }
+                }
+
+                var exchangeSell = fila.Cell(5).GetString();
+                if (string.IsNullOrWhiteSpace(exchangeSell))
+                {
+                    ErrorListMessages.Add($"El tipo de cambio venta está vacio - En la fila:{i}. |");
+                }
+                else
+                {
+                    obj.SellRate = decimal.Parse(exchangeSell);
+                    if (obj.SellRate < 0)
+                    {
+                        ErrorListMessages.Add(
+                            $"El tipo de cambio venta no puede ser menor a cero - En la fila:{i}. |");
+                    }
+                }
+
+                // Verificar si ya existe moneda - fecha
+                var objExist = await _uow.CurrencyExchangeRate
+                    .IsExists(filter: x => (x.CompanyId == _companyId)
+                                           && (x.DateTransa == obj.DateTransa)
+                                           && (x.CurrencyType == obj.CurrencyType)
+                                           && (x.Id != obj.Id));
+                if (objExist)
+                {
+                    ErrorListMessages.Add(
+                        $"El tipo de cambio para {objCurrencyList
+                            .First(x => x.Id == obj.CurrencyId).Abbreviation} _ {obj.DateTransa} ya existe - En la fila:{i}. |");
+                }
+
+                objList.Add(obj);
+            }
+
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+
+            await _uow.CurrencyExchangeRate.ImportRangeAsync(objList);
+
+            jsonResponse.SuccessMessages = "Importación exitosamente";
+            jsonResponse.IsSuccess = true;
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "CurrencyExchangeRate");
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+
+    }
+
+    #endregion
+
 }

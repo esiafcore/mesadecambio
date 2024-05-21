@@ -435,7 +435,7 @@ public class CustomerController : Controller
 
 
     [HttpPost]
-    public JsonResult Import([FromForm] ImportVM objImportViewModel)
+    public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
     {
         List<string> ErrorListMessages = new List<string>();
         var errorsMessagesBuilder = new StringBuilder();
@@ -484,31 +484,31 @@ public class CustomerController : Controller
             var type = fila.Cell(1).GetString();
             if (string.IsNullOrWhiteSpace(type))
             {
-                ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. |");
             }
 
             var sector = fila.Cell(2).GetString();
             if (string.IsNullOrWhiteSpace(sector))
             {
-                ErrorListMessages.Add($"El sector está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"El sector está vacio en la fila:{i}. |");
             }
 
             var code = fila.Cell(3).GetString();
             if (string.IsNullOrWhiteSpace(code))
             {
-                ErrorListMessages.Add($"El código está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"El código está vacio en la fila:{i}. |");
             }
 
             var numberIdent = fila.Cell(4).GetString();
             if (string.IsNullOrWhiteSpace(numberIdent))
             {
-                ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. |");
             }
 
             var businessName = fila.Cell(5).GetString();
             if (string.IsNullOrWhiteSpace(businessName))
             {
-                ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. ");
+                ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. |");
             }
 
             var commercialName = fila.Cell(6).GetString();
@@ -526,25 +526,25 @@ public class CustomerController : Controller
             var isBank = fila.Cell(12).GetString();
             if (string.IsNullOrWhiteSpace(isBank))
             {
-                ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. |");
             }
 
             var isSystem = fila.Cell(13).GetString();
             if (string.IsNullOrWhiteSpace(isSystem))
             {
-                ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. ");
+                ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. |");
             }
 
             var objType = objTypeList.FirstOrDefault(x => x.Code == type);
             if (objType == null)
             {
-                ErrorListMessages.Add($"El tipo no fue encontrado en la fila:{i}. ");
+                ErrorListMessages.Add($"El tipo no fue encontrado en la fila:{i}. |");
             }
 
             var objSector = objSectorList.FirstOrDefault(x => x.Code == sector);
             if (objSector == null)
             {
-                ErrorListMessages.Add($"El sector no fue encontrado en la fila:{i}. ");
+                ErrorListMessages.Add($"El sector no fue encontrado en la fila:{i}. |");
             }
 
             if (ErrorListMessages.Count > 0)
@@ -586,7 +586,7 @@ public class CustomerController : Controller
             {
                 if (string.IsNullOrWhiteSpace(commercialName))
                 {
-                    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
+                    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. |");
                 }
                 else
                 {
@@ -605,7 +605,7 @@ public class CustomerController : Controller
             }
             else
             {
-                ErrorListMessages.Add($"Es banco es invalido en la fila:{i}. ");
+                ErrorListMessages.Add($"Es banco es invalido en la fila:{i}. |");
             }
 
             if (isSystem == "S")
@@ -618,7 +618,7 @@ public class CustomerController : Controller
             }
             else
             {
-                ErrorListMessages.Add($"Es del sistema es invalido en la fila:{i}. ");
+                ErrorListMessages.Add($"Es del sistema es invalido en la fila:{i}. |");
             }
 
             if (ErrorListMessages.Count > 0)
@@ -636,12 +636,13 @@ public class CustomerController : Controller
             objCustomerList.Add(objCustomer);
         }
 
-        foreach (var customer in objCustomerList)
-        {
-            _uow.Customer.Add(customer);
-        }
+        //foreach (var customer in objCustomerList)
+        //{
+        //    _uow.Customer.Add(customer);
+        //}
 
-        _uow.Save();
+        //_uow.Save();
+        await _uow.Customer.ImportRangeAsync(objCustomerList);
 
         jsonResponse.SuccessMessages = "Importación exitosamente";
         jsonResponse.IsSuccess = true;

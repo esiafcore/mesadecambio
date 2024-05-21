@@ -7,4 +7,7 @@ public interface ICustomerRepository : IRepository<Customer>
 {
     void Update(Customer obj);
     Task<long> NextSequentialNumber(Expression<Func<Customer, bool>>? filter = null);
+
+    Task ImportRangeAsync(List<Customer> entityList);
+
 }

@@ -328,7 +328,6 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
     }
 }
 
-
 const fnExportExcel = async () => {
     try {
         let url =
@@ -428,7 +427,18 @@ const fnLoadDatatable = () => {
             {
                 data: 'currencyTransaTrx.code', "width": "5%"
                 , render: function (data, type, row) {
-                    return `${row.currencyTransaTrx.code} - ${row.currencyTransferTrx.code}`;
+                    let currencyTarget = "";
+
+                    if (row.typeNumeral == QuotationType.Transfer) {
+                        currencyTarget = row.currencyTransferTrx.code;
+                    } else if (row.typeNumeral == QuotationType.Sell) {
+                        currencyTarget = row.currencyDepositTrx.code;
+                    } else {
+                        currencyTarget = row.currencyTransferTrx.code;
+                    }
+
+                    return `${row.currencyTransaTrx.code} - ${currencyTarget}`;
+
                 }
                 , orderable: false
             },

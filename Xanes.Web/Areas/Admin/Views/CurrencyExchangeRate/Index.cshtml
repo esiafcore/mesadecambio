@@ -3,19 +3,26 @@
 <div class="card shadow border-0 mt-1">
     <div class="card-header bg-secondary bg-gradient ms-0 py-1">
         <div class="row align-items-center">
-            <div class="col-8 text-center">
-                <h3 class="text-white py-1">Tipos de Cambios</h3>
+            <div class="col-7 text-center">
+                <h3 class="text-white py-1">Tipos de Cambio</h3>
             </div>
-            <div class="col-4 text-end">
-                <a id="btn-upsertexchange" asp-controller="CurrencyExchangeRate" asp-action="Upsert"
-                asp-route-currencyType="@((short)Model.CurrencySelected)"
-                   class="btn btn-info">
+            <div class="col-5 text-end">
+                <a onclick="fnExportExcel()" class="btn btn-warning border"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
+                    <i class="bi bi-arrow-up-square"></i> Exportar
+                </a>
+                <a asp-controller="CurrencyExchangeRate" asp-action="Import"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
+                    <i class="bi bi-box-arrow-in-down"></i> Importar
+                </a>
+                <a class="btn btn-info border" asp-controller="CurrencyExchangeRate" asp-action="Upsert"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" id="btn-upsertexchange"
+                   asp-route-currencyType="@((short)Model.CurrencySelected)" data-bs-placement="top" data-bs-title="Nuevo T/Cambio">
                     <i class="bi bi-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
     </div>
-
     <div class="card-body px-3 py-1">
         <div class="mt-1 pb-1 pt-1 col-12 col-md-4">
             <div class="py-2 border-0 shadow">
@@ -25,63 +32,32 @@
                 @foreach (var itemCurrency in Model.CurrencyList)
                 {
                     <div class="form-check form-check-inline">
-                        <input name="CurrencyType" class="form-check-input" type="radio" id="@($"radioBtn{itemCurrency.Value}")"
+                        <input name="CurrencyType" class="form-check-input currencies" type="radio" id="@($"radioBtn{itemCurrency.Value}")"
                                value="@itemCurrency.Value" checked="@(itemCurrency.Selected)" onchange="fnupdateLinkParameter(this)">
                         <label class="form-check-label" for="@($"radioBtn{itemCurrency.Value}")">@itemCurrency.Text</label>
                     </div>
                 }
             </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Moneda</th>
-                        <th>Oficial</th>
-                        <th>Creado</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody class="table-content">
-                    @foreach (var item in Model.DataModelList)
-                    {
-                        <tr>
-                            <td>@item.DateTransa</td>
-                            <td>@item.CurrencyTrx.Abbreviation</td>
-                            <td class="text-end">@item.OfficialRate.ToString($"N{AC.DecimalExchange}")</td>
-                            <td>@item.CreatedDate.ToLocalTime()</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a asp-controller="CurrencyExchangeRate" asp-action="Detail"
-                                        asp-route-id="@item.Id" class="btn btn-success py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-eye"></i> Ver
-                                    </a>
-                                </div>
-                                <div class="btn-group" role="group">
-                                    <a asp-controller="CurrencyExchangeRate" asp-action="Upsert"
-                                        asp-route-id="@item.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                    <a asp-controller="CurrencyExchangeRate" asp-action="Delete"
-                                        asp-route-id="@item.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-trash-fill"></i> Eliminar
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+        <table id="tblData" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
+            <thead>
+            <tr>
+                <th data-priority="2">Fecha</th>
+                <th>Moneda</th>
+                <th>Oficial</th>
+                <th>Creado</th>
+                <th data-priority="1"></th>
+            </tr>
+            </thead>
+        </table>
 
-                    }
-
-                </tbody>
-            </table>
-
-        </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        <script src="~/js/Admin/CurrencyExchangeRate/currencyExchangeRateIndex.js"></script>
-    }
+    <script>
+        let decimalTransa = @Html.Raw(@ViewBag.DecimalTransa);
+        let decimalExchange = @Html.Raw(@ViewBag.DecimalExchange);
+    </script>
+    <script src="~/js/Admin/CurrencyExchangeRate/currencyExchangeRateIndex.js"></script>
 }
