@@ -56,17 +56,17 @@ const fnLoadDatatable = () => {
                 , "render": (data, type, row) => {
 
                     let btnUpdate = `<a href="/customer/customer/Upsert?id=${row.id}" class="btn btn-primary py-1 px-3 my-0 mx-1"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;
 
                     let btnView = `<a href="/customer/customer/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
-                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
+                                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Ver">
                                      <i class="bi bi-eye fs-5"></i>
                                    </a>`;
 
                     let btnDelete = `<a href="/customer/customer/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
-                                         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                                           <i class="bi bi-trash-fill fs-5"></i>
                                      </a> `;
 

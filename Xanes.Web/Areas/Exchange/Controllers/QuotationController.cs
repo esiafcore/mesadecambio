@@ -13,6 +13,7 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
 using static Stimulsoft.Report.Help.StiHelpProvider;
+using PersonType = Xanes.Models.PersonType;
 using QuotationType = Xanes.Models.QuotationType;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
@@ -36,7 +37,6 @@ public class QuotationController : Controller
         _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
         _hostEnvironment = hostEnvironment;
-
         _parametersReport = new();
         var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
         // Verificar si el archivo existe
@@ -63,7 +63,11 @@ public class QuotationController : Controller
     {
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString(AC.DefaultDateFormatWeb);
+        DateOnly processingDate = DateOnly.Parse(processingDateString);
+
         QuotationCreateVM model = new();
+        model.ProcessingDate = processingDate;
         Quotation objData = new();
 
         var objCurrencyList = _uow.Currency
@@ -560,7 +564,6 @@ public class QuotationController : Controller
         var objCurrency = new Currency();
         var objBusinessExecutive = new BusinessExecutive();
 
-
         if (ModelState.IsValid)
         {
             if (obj.CompanyId != _companyId)
@@ -607,7 +610,8 @@ public class QuotationController : Controller
 
                 if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                 {
-                    obj.CurrencyDepositType = obj.CurrencyTransferType;
+                    obj.CurrencyDepositType = obj.CurrencyTransaType;
+                    obj.CurrencyDepositId = objCurrency.Id;
 
                     if (obj.ExchangeRateBuyTransa == 0)
                     {
@@ -628,7 +632,6 @@ public class QuotationController : Controller
                     }
 
                     obj.CurrencyTransferId = objCurrency.Id;
-                    obj.CurrencyDepositId = objCurrency.Id;
 
                     //TC COMPRA MENOR AL TC OFICIAL
                     if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
@@ -673,7 +676,8 @@ public class QuotationController : Controller
                 }
                 else
                 {
-                    obj.CurrencyTransferType = obj.CurrencyDepositType;
+                    obj.CurrencyTransferType = obj.CurrencyTransaType;
+                    obj.CurrencyTransferId = objCurrency.Id;
 
                     if (obj.ExchangeRateSellTransa == 0)
                     {
@@ -693,7 +697,6 @@ public class QuotationController : Controller
                         return Json(jsonResponse);
                     }
 
-                    obj.CurrencyTransferId = objCurrency.Id;
                     obj.CurrencyDepositId = objCurrency.Id;
 
                     //TC VENTA MENOR AL TC OFICIAL
@@ -766,7 +769,7 @@ public class QuotationController : Controller
                 obj.CurrencyTransferId = objBankAccountSource.CurrencyId;
             }
 
-            //Verificamos si existe la moneda de la Transaccion
+            //Verificamos si existe el ejecutivo
             objBusinessExecutive = _uow.BusinessExecutive.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
 
@@ -1226,17 +1229,6 @@ public class QuotationController : Controller
                 obj.BankTargetId = obj.BankSourceId;
             }
 
-            //Obtenemos los hijos
-            var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
-                     x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-
-            if (objDetails == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
-                return Json(jsonResponse);
-            }
-
             if (obj.Id == 0)
             {
                 //Seteamos campos de auditoria
@@ -1252,7 +1244,9 @@ public class QuotationController : Controller
             }
             else
             {
-                var objDetail = objDetails.First(x => x.Id == obj.Id);
+                var objDetail = _uow.QuotationDetail.Get(filter: x =>
+                    x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.Id == obj.Id);
+
                 if (objDetail == null)
                 {
                     jsonResponse.IsSuccess = false;
@@ -1275,12 +1269,23 @@ public class QuotationController : Controller
                 TempData[AC.Success] = $"Cotización actualizada correctamente";
             }
 
+            //Obtenemos los hijos
+            var objDetails = _uow.QuotationDetail.GetAll(filter: x =>
+                x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id, includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+            if (objDetails == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
+                return Json(jsonResponse);
+            }
+
             //Actualizamos los totales del padre
             objHeader.TotalDeposit = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit || x.QuotationDetailType == QuotationDetailType.CreditTransfer)
                 .Sum(x => x.AmountDetail);
             objHeader.TotalTransfer = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer || x.QuotationDetailType == QuotationDetailType.DebitTransfer)
                 .Sum(x => x.AmountDetail);
             objHeader.UpdatedBy = AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
@@ -1375,14 +1380,8 @@ public class QuotationController : Controller
     public IActionResult ProcessingDate()
     {
         ProcessingDateVM model = new();
-        //Verificar si ya hay una sesion guardada anteriormente
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? string.Empty;
-        DateOnly processingDate = DateOnly.FromDateTime(DateTime.UtcNow);
-        if (processingDateString.Trim() != string.Empty)
-        {
-            processingDate = DateOnly.Parse(processingDateString);
-        }
-
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString();
+        DateOnly processingDate = DateOnly.Parse(processingDateString);
         model.ProcessingDate = processingDate;
         return View(model);
     }
@@ -1822,7 +1821,7 @@ public class QuotationController : Controller
     #region EXPORT - IMPORT
 
     [HttpGet]
-    public FileResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
+    public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
     {
         DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
         DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
@@ -1830,6 +1829,11 @@ public class QuotationController : Controller
         var objQuotationList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
                 , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx,BankAccountSourceTrx,BankAccountTargetTrx").ToList();
+
+        if (objQuotationList == null || objQuotationList.Count == 0)
+        {
+            return NoContent();
+        }
 
         return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
     }
@@ -1920,27 +1924,32 @@ public class QuotationController : Controller
                 worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
                 worksheet.Cell(6, 11).Value = header.IsVoid ? "S" : "N";
 
-                worksheet.Cell(7, 1).Value = "Banco Origen";
-                worksheet.Cell(7, 2).Value = "Cta Ban Origen";
-                worksheet.Cell(7, 3).Value = "Banco Destino";
-                worksheet.Cell(7, 4).Value = "Cta Ban Destino";
-                worksheet.Cell(7, 5).Value = "Importe";
+                worksheet.Cell(7, 1).Value = "#";
+                worksheet.Cell(7, 2).Value = "Banco Origen";
+                worksheet.Cell(7, 3).Value = "Cta Ban Origen";
+                worksheet.Cell(7, 4).Value = "Banco Destino";
+                worksheet.Cell(7, 5).Value = "Cta Ban Destino";
+                worksheet.Cell(7, 6).Value = "Importe";
+                worksheet.Cell(7, 7).Value = "Tipo";
+
 
                 sheetIndex++;
 
                 var children = _uow.QuotationDetail.GetAll(filter: x =>
                     (x.CompanyId == _companyId && x.ParentId == header.Id), includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-                
+
                 int rowNum = 8;
 
                 foreach (var detail in children)
                 {
-                    worksheet.Cell(rowNum, 1).Value = detail.BankSourceTrx.Code;
-                    worksheet.Cell(rowNum, 2).Value = header.BankAccountSourceTrx?.Code ?? "";
-                    worksheet.Cell(rowNum, 3).Value = detail.BankTargetTrx.Code;
-                    worksheet.Cell(rowNum, 4).Value = header.BankAccountTargetTrx?.Code ?? "";
-                    worksheet.Cell(rowNum, 5).Value = detail.AmountDetail;
-                    worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                    worksheet.Cell(rowNum, 1).Value = detail.LineNumber;
+                    worksheet.Cell(rowNum, 2).Value = detail.BankSourceTrx.Code;
+                    worksheet.Cell(rowNum, 3).Value = header.BankAccountSourceTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 4).Value = detail.BankTargetTrx.Code;
+                    worksheet.Cell(rowNum, 5).Value = header.BankAccountTargetTrx?.Code ?? "";
+                    worksheet.Cell(rowNum, 6).Value = detail.AmountDetail;
+                    worksheet.Cell(rowNum, 6).Style.NumberFormat.Format = AC.XlsFormatNumeric;
+                    worksheet.Cell(rowNum, 7).Value = (short)detail.QuotationDetailType;
                     rowNum++;
                 }
 
@@ -1976,6 +1985,721 @@ public class QuotationController : Controller
         return View(modelVm);
     }
 
+    [HttpPost]
+    public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
+    {
+        List<string> ErrorListMessages = new List<string>();
+        var errorsMessagesBuilder = new StringBuilder();
+        JsonResultResponse? jsonResponse = new();
+        List<Models.Customer> objCustomerList = new();
+        List<Models.CurrencyExchangeRate>? objCurrencyExchangeRateList = new();
+        List<Models.Quotation> objQuotationList = new();
+        List<Models.QuotationDetail> objQuotationDetailList = new();
+        Models.QuotationType? objQuotationType = new();
+        Models.Customer? objCustomer = new();
+        Models.BusinessExecutive? objBusiness = new();
+        Models.BankAccount? objBankAccountSource = new();
+        Models.BankAccount? objBankAccountTarget = new();
+        Models.Bank? objBankSource = new();
+        Models.Bank? objBankTarget = new();
+        int countMaxId = 0;
+        int countMaxSeq = 0;
+
+        try
+        {
+            if (objImportViewModel.FileExcel is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"No hay registros para importar";
+                return Json(jsonResponse);
+            }
+
+            var objCurrencyList = _uow.Currency.GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
+            if (objCurrencyList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Moneda no encontrada";
+                return Json(jsonResponse);
+            }
+
+            using (var stream = objImportViewModel.FileExcel.OpenReadStream())
+            {
+                using (var workbook = new XLWorkbook(stream))
+                {
+                    foreach (var worksheet in workbook.Worksheets)
+                    {
+                        string sheetName = worksheet.Name;
+                        int firstRowNumber = 4;
+                        int secondRowNumber = 6;
+
+                        var header = new Quotation();
+                        var countMaxIdDataBase = await _uow.Quotation.NextId();
+                        if (countMaxIdDataBase > countMaxId)
+                        {
+                            countMaxId = countMaxIdDataBase;
+                        }
+                        else
+                        {
+                            countMaxId++;
+                        }
+
+                        header.Id = countMaxId;
+                        header.CompanyId = _companyId;
+                        var type = worksheet.Cell(4, 1).GetString().Trim();
+                        if (string.IsNullOrWhiteSpace(type))
+                        {
+                            ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                        }
+                        else
+                        {
+                            //En dependencia del tipo validamos los demas campos
+
+                            objQuotationType = _uow.QuotationType.Get(filter: x =>
+                                (x.CompanyId == _companyId && x.Code.ToUpper() == type.ToUpper()));
+
+                            if (objQuotationType == null)
+                            {
+                                ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                            }
+                            else
+                            {
+                                header.TypeId = objQuotationType.Id;
+                                header.TypeNumeral = (SD.QuotationType)objQuotationType.Numeral;
+
+                                var date = worksheet.Cell(4, 2).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(date))
+                                {
+                                    ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    DateOnly dateTransa = DateOnly.Parse(date.Split(" ")[0]);
+                                    header.DateTransa = dateTransa;
+                                }
+
+                                var customerCode = worksheet.Cell(4, 3).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(customerCode))
+                                {
+                                    ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    objCustomer = _uow.Customer.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == customerCode));
+
+                                    if (objCustomer == null)
+                                    {
+                                        ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.CustomerId = objCustomer.Id;
+                                    }
+                                }
+
+                                var amountTransa = worksheet.Cell(6, 1).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(amountTransa))
+                                {
+                                    ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    header.AmountTransaction = decimal.Parse(amountTransa);
+                                    if (header.AmountTransaction <= 0)
+                                    {
+                                        ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                }
+
+                                var businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(businessExecutive))
+                                {
+                                    ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    objBusiness = _uow.BusinessExecutive.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == businessExecutive));
+
+                                    if (objBusiness == null)
+                                    {
+                                        ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.BusinessExecutiveCode = objBusiness.Code;
+                                        header.BusinessExecutiveId = objBusiness.Id;
+                                    }
+                                }
+
+                                var isClosed = worksheet.Cell(6, 9).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isClosed))
+                                {
+                                    ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    if (isClosed == "S")
+                                    {
+                                        header.IsClosed = true;
+                                    }
+                                    else if (isClosed == "N")
+                                    {
+                                        header.IsClosed = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                }
+
+                                var isPosted = worksheet.Cell(6, 10).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isPosted))
+                                {
+                                    ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    if (isPosted == "S")
+                                    {
+                                        header.IsPosted = true;
+                                    }
+                                    else if (isPosted == "N")
+                                    {
+                                        header.IsPosted = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                }
+
+                                var isVoid = worksheet.Cell(6, 11).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isVoid))
+                                {
+                                    ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    if (isVoid == "S")
+                                    {
+                                        header.IsVoid = true;
+                                    }
+                                    else if (isVoid == "N")
+                                    {
+                                        header.IsVoid = false;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                }
+
+                                var exchangeOfficial = worksheet.Cell(4, 8).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(exchangeOfficial))
+                                {
+                                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    header.ExchangeRateOfficialTransa = decimal.Parse(exchangeOfficial);
+                                    if (header.ExchangeRateOfficialTransa <= 0)
+                                    {
+                                        ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                }
+
+                                if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
+                                {
+                                    var monTransa = worksheet.Cell(4, 5).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(monTransa))
+                                    {
+                                        ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        int currencyTypeTransa = int.Parse(monTransa);
+
+                                        if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransa))
+                                        {
+                                            header.CurrencyTransaId = objCurrencyList
+                                                .First(x => x.Numeral == currencyTypeTransa).Id;
+
+                                            header.CurrencyTransaType = (CurrencyType)currencyTypeTransa;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+
+                                    if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
+                                    {
+                                        var monTransfer = worksheet.Cell(4, 7).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(monTransfer))
+                                        {
+                                            ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            int currencyTypeTransfer = int.Parse(monTransfer);
+
+                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransfer))
+                                            {
+                                                header.CurrencyTransferId = objCurrencyList
+                                                    .First(x => x.Numeral == currencyTypeTransfer).Id;
+
+                                                header.CurrencyTransferType = (CurrencyType)currencyTypeTransfer;
+                                                header.CurrencyDepositType = header.CurrencyTransaType;
+                                                header.CurrencyDepositId = header.CurrencyTransaId;
+                                            }
+                                            else
+                                            {
+                                                ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                            }
+                                        }
+
+                                        var exchangeBuy = worksheet.Cell(4, 9).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(exchangeBuy))
+                                        {
+                                            ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
+                                            if (header.ExchangeRateBuyTransa <= 0)
+                                            {
+                                                ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var monDeposit = worksheet.Cell(4, 6).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(monDeposit))
+                                        {
+                                            ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            int currencyTypeDeposit = int.Parse(monDeposit);
+
+                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeDeposit))
+                                            {
+                                                header.CurrencyDepositId = objCurrencyList
+                                                    .First(x => x.Numeral == currencyTypeDeposit).Id;
+
+                                                header.CurrencyDepositType = (CurrencyType)currencyTypeDeposit;
+                                                header.CurrencyTransferType = header.CurrencyTransaType;
+                                                header.CurrencyTransferId = header.CurrencyTransaId;
+                                            }
+                                            else
+                                            {
+                                                ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                            }
+                                        }
+
+                                        var exchangeSell = worksheet.Cell(4, 10).GetString().Trim();
+                                        if (string.IsNullOrWhiteSpace(exchangeSell))
+                                        {
+                                            ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
+                                            if (header.ExchangeRateSellTransa <= 0)
+                                            {
+                                                ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var commission = worksheet.Cell(6, 5).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(commission))
+                                    {
+                                        ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.AmountCommission = decimal.Parse(commission);
+                                        if (header.AmountCommission < 0)
+                                        {
+                                            ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                        }
+                                    }
+
+                                    var bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankAccountSource))
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        objBankAccountSource = _uow.BankAccount.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankAccountSource));
+
+                                        if (objBankAccountSource == null)
+                                        {
+                                            ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            header.BankAccountSourceId = objBankAccountSource.Id;
+                                        }
+                                    }
+
+                                    var bankAccountTarget = worksheet.Cell(6, 7).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankAccountTarget))
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        objBankAccountTarget = _uow.BankAccount.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankAccountTarget));
+
+                                        if (objBankAccountTarget == null)
+                                        {
+                                            ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            header.BankAccountTargetId = objBankAccountTarget.Id;
+                                        }
+                                    }
+                                }
+
+                                objQuotationList.Add(header);
+
+                                var firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+                                var lastUsedRow = worksheet.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+                                for (int i = firstRowUsed + 7; i <= lastUsedRow; i++)
+                                {
+                                    var detail = new QuotationDetail();
+                                    detail.CompanyId = _companyId;
+                                    detail.ParentId = header.Id;
+                                    detail.CurrencyDetailId = header.CurrencyTransaId;
+                                    var bankSource = worksheet.Cell(i, 2).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(bankSource))
+                                    {
+                                        ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. |");
+                                    }
+                                    else
+                                    {
+                                        objBankSource = _uow.Bank.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankSource));
+
+                                        if (objBankSource == null)
+                                        {
+                                            ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            detail.BankSourceId = objBankSource.Id;
+                                        }
+                                    }
+
+                                    var bankTarget = worksheet.Cell(i, 4).GetString().Trim();
+                                    if (!string.IsNullOrWhiteSpace(bankTarget))
+                                    {
+                                        objBankTarget = _uow.Bank.Get(filter: x =>
+                                            (x.CompanyId == _companyId && x.Code == bankTarget));
+
+                                        if (objBankTarget == null)
+                                        {
+                                            ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                        else
+                                        {
+                                            detail.BankTargetId = objBankTarget.Id;
+                                        }
+                                    }
+
+                                    var amountDetail = worksheet.Cell(i, 6).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(amountDetail))
+                                    {
+                                        ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. |");
+                                    }
+                                    else
+                                    {
+                                        detail.AmountDetail = decimal.Parse(amountDetail);
+                                        if (detail.AmountDetail <= 0)
+                                        {
+                                            ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. |");
+                                        }
+                                    }
+
+                                    var typeDetail = worksheet.Cell(i, 7).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(typeDetail))
+                                    {
+                                        ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        short quotationDetailType = short.Parse(typeDetail);
+
+                                        if (Enum.IsDefined(typeof(QuotationDetailType), quotationDetailType))
+                                        {
+                                            detail.QuotationDetailType = (QuotationDetailType)quotationDetailType;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+
+                                    objQuotationDetailList.Add(detail);
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+            foreach (var header in objQuotationList)
+            {
+                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                {
+                    if (header.TypeNumeral == SD.QuotationType.Buy)
+                    {
+                        //TC COMPRA MENOR AL TC OFICIAL
+                        if (header.ExchangeRateBuyTransa < header.ExchangeRateOfficialTransa)
+                        {
+                            header.AmountRevenue = (header.ExchangeRateOfficialTransa - header.ExchangeRateBuyTransa) * header.AmountTransaction;
+                            header.AmountCost = 0;
+                        }
+                        //TC COMPRA MAYOR AL TC OFICIAL
+                        else
+                        {
+                            header.AmountCost = (header.ExchangeRateBuyTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
+                            header.AmountRevenue = 0;
+                        }
+
+                        //Compra de dolares 
+                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        {
+                            //Factoring paga en Cordobas
+                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
+                            }
+                        }
+                        //Compra de Euros
+                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        {
+                            //Factoring paga en Cordobas
+                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
+
+                            }
+                            //Factoring paga en Dolares
+                            else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
+                                header.ExchangeRateBuyReal = (header.ExchangeRateBuyTransa * header.ExchangeRateOfficialTransa);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //TC VENTA MENOR AL TC OFICIAL
+                        if (header.ExchangeRateSellTransa < header.ExchangeRateOfficialTransa)
+                        {
+                            header.AmountCost = (header.ExchangeRateOfficialTransa - header.ExchangeRateSellTransa) * header.AmountTransaction;
+                            header.AmountRevenue = 0;
+                        }
+                        //TC VENTA MAYOR AL TC OFICIAL
+                        else
+                        {
+                            header.AmountRevenue = (header.ExchangeRateSellTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
+                            header.AmountCost = 0;
+                        }
+
+                        //Venta de dolares 
+                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        {
+                            //Cliente paga en Cordobas
+                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
+                            }
+                        }
+                        //Venta de Euros
+                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        {
+                            //Cliente paga en Cordobas
+                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
+
+                            }
+                            //Cliente paga en Dolares
+                            else if (header.CurrencyDepositType == SD.CurrencyType.Foreign)
+                            {
+                                header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
+                                header.ExchangeRateSellReal = (header.ExchangeRateSellTransa * header.ExchangeRateOfficialTransa);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    header.CurrencyTransaType = objBankAccountSource.CurrencyType;
+                    header.CurrencyDepositType = objBankAccountSource.CurrencyType;
+                    header.CurrencyTransferType = objBankAccountSource.CurrencyType;
+                    header.CurrencyTransaId = objBankAccountSource.CurrencyId;
+                    header.CurrencyDepositId = objBankAccountSource.CurrencyId;
+                    header.CurrencyTransferId = objBankAccountSource.CurrencyId;
+
+                    objQuotationDetailList = objQuotationDetailList.Where(x => x.ParentId != header.Id).ToList();
+
+                    var objDetailBankAccountTarget = new QuotationDetail()
+                    {
+                        ParentId = header.Id,
+                        CompanyId = header.CompanyId,
+                        QuotationDetailType = QuotationDetailType.CreditTransfer,
+                        LineNumber = 1,
+                        CurrencyDetailId = header.CurrencyTransaId,
+                        BankSourceId = objBankAccountTarget.ParentId,
+                        BankTargetId = objBankAccountTarget.ParentId,
+                        AmountDetail = header.AmountTransaction,
+                        CreatedBy = AC.LOCALHOSTME,
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedHostName = AC.LOCALHOSTPC,
+                        CreatedIpv4 = AC.Ipv4Default
+                    };
+
+                    objQuotationDetailList.Add(objDetailBankAccountTarget);
+
+                    var objDetailBankAccountSource = new QuotationDetail()
+                    {
+                        ParentId = header.Id,
+                        CompanyId = header.CompanyId,
+                        QuotationDetailType = QuotationDetailType.DebitTransfer,
+                        LineNumber = 1,
+                        CurrencyDetailId = header.CurrencyTransaId,
+                        BankTargetId = objBankAccountSource.ParentId,
+                        BankSourceId = objBankAccountSource.ParentId,
+                        AmountDetail = header.AmountTransaction,
+                        CreatedBy = AC.LOCALHOSTME,
+                        CreatedDate = DateTime.UtcNow,
+                        CreatedHostName = AC.LOCALHOSTPC,
+                        CreatedIpv4 = AC.Ipv4Default
+                    };
+
+                    objQuotationDetailList.Add(objDetailBankAccountSource);
+                }
+
+                header.BusinessExecutiveCode = objBusiness.Code;
+                header.IsLoan = objBusiness.IsLoan;
+                header.IsPayment = objBusiness.IsPayment;
+
+                //Seteamos campos de auditoria
+                header.CreatedBy = AC.LOCALHOSTME;
+                header.CreatedDate = DateTime.UtcNow;
+                header.CreatedHostName = AC.LOCALHOSTPC;
+                header.CreatedIpv4 = AC.Ipv4Default;
+
+                if (!header.IsClosed)
+                {
+                    //Obtenemos el secuencial en borrador
+                    var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
+                        SD.TypeSequential.Draft, true);
+                    header.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+                    header.InternalSerial = AC.InternalSerialDraft;
+                    header.IsPosted = false;
+                    header.IsClosed = false;
+                    header.IsVoid = false;
+                }
+                else
+                {
+                    var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
+                        x.TypeNumeral == header.TypeNumeral &&
+                        x.DateTransa == header.DateTransa &&
+                        x.InternalSerial == AC.InternalSerialOfficial);
+                    if (nextSeq > countMaxSeq)
+                    {
+                        countMaxSeq = nextSeq;
+                    }
+                    else
+                    {
+                        countMaxSeq++;
+                    }
+                    header.Numeral = countMaxSeq;
+                    header.InternalSerial = AC.InternalSerialOfficial;
+                    header.ClosedBy = AC.LOCALHOSTME;
+                    header.ClosedDate = DateTime.UtcNow;
+                    header.ClosedHostName = AC.LOCALHOSTPC;
+                    header.ClosedIpv4 = AC.Ipv4Default;
+                }
+
+                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                {
+                    var childrens = objQuotationDetailList
+                        .Where(x => x.ParentId == header.Id).ToList();
+
+                    //Actualizamos los totales del padre
+                    header.TotalDeposit = childrens
+                        .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit)
+                        .Sum(x => x.AmountDetail);
+                    header.TotalTransfer = childrens
+                        .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
+                        .Sum(x => x.AmountDetail);
+
+
+                    int lineNumberDeposit = 1, lineNumberTransfer = 1;
+
+                    foreach (var detail in childrens)
+                    {
+                        if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                        {
+                            detail.LineNumber = lineNumberDeposit;
+                            lineNumberDeposit++;
+                        }
+                        else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                        {
+                            detail.LineNumber = lineNumberTransfer;
+                            lineNumberTransfer++;
+                        }
+                    }
+                }
+            }
+
+
+            await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
+
+            jsonResponse.SuccessMessages = "Importación exitosamente";
+            jsonResponse.IsSuccess = true;
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+    }
 
     #endregion
 
@@ -2095,7 +2819,7 @@ public class QuotationController : Controller
             foreach (var detail in detailDistinct)
             {
                 bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{transaction.Numeral}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+                numberReferenTarget += $"{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
             }
 
             // Remover la coma adicional al final, si es necesario
@@ -2157,6 +2881,4 @@ public class QuotationController : Controller
     }
 
     #endregion
-
-
 }

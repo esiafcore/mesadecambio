@@ -167,8 +167,8 @@ const fnAdjustmentFilterDataTable = () => {
                      </div>
                  </div>
                 <div class="row col-4 col-sm-3 col-xl-2 mb-1">
-                    <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-placement="top"
-                    data-bs-title="Filtrar"
+                    <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                    data-bs-placement="top" data-bs-title="Filtrar"
                     class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
                         <i class="bi bi-funnel-fill"></i>  Filtrar
                     </button>
@@ -199,11 +199,33 @@ const fnVoid = async (id) => {
 
     try {
 
+        let result = await Swal.fire({
+            title: `&#191;Está seguro de anular la cotización?`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: "Aceptar",
+            cancelButtonText: "Cancelar",
+            customClass: {
+                confirmButton: "btn btn-primary px-3 mx-2",
+                cancelButton: "btn btn-danger px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
+
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        fntoggleLoading();
+
         let url = `/exchange/quotation/Void?id=${id}`;
 
-        const response = await fetch(url, {
-            method: 'POST'
-        });
+        const response = await fetch(url,
+            {
+                method: 'POST'
+            });
 
         const jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
@@ -224,6 +246,8 @@ const fnVoid = async (id) => {
             title: "Error en la conexión",
             text: e
         });
+    } finally {
+        fntoggleLoading();
     }
 };
 
@@ -312,6 +336,20 @@ const fnExportExcel = async () => {
         const response = await fetch(url, {
             method: 'GET'
         });
+
+        if (response.status === 204) {
+            Swal.fire({
+                icon: 'warning',
+                title: "No hay registros",
+                text: "No se encontraron registros para exportar en el rango de fechas especificado."
+            });
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error('Error en la respuesta del servidor');
+        }
+
 
         // Convertir la respuesta a un blob
         const blob = await response.blob();
@@ -453,32 +491,32 @@ const fnLoadDatatable = () => {
                     }
 
                     let btnUpdate = `<a href="${urlUpdate}" class="btn btn-primary py-1 px-3 my-0 mx-1"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Editar">
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;
 
                     let btnReClosed = `<a href="${urlReClosed}" class="btn btn-warning py-1 px-3 my-0 mx-1"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Re-Cerrar">
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
                                          <i class="bi bi-check2-square fs-5"></i>
                                      </a>`;
 
                     let btnVoid = `<a onclick="fnVoid(${row.id})" class="btn btn-outline-info py-1 px-3 my-0 mx-1"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Anular">
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Anular">
                                          <i class="bi bi-x-square-fill fs-5"></i>
                                      </a>`;
 
                     let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
-                                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ver">
+                                     data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Ver">
                                      <i class="bi bi-eye fs-5"></i>
                                    </a>`;
 
                     let btnDelete = `<a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
-                                         data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Eliminar">
+                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                                           <i class="bi bi-trash-fill fs-5"></i>
                                      </a> `;
 
                     let btnPrint = `<a onclick="fnPrintReport('${row.id}')" class="btn btn-outline-primary py-1 px-3 my-0 mx-1" 
-                                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir">
+                                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Imprimir">
                                         <i class="bi bi-printer fs-5"></i>
                                     </a> `;
 

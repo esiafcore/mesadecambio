@@ -37,6 +37,13 @@ const selectOptions = {
     className: 'bg-info bg-opacity-75 bg-gradient'
 }
 
+function fntoggleLoading(textContent = "Cargando...") {
+    const loading = document.getElementById("loading");
+    const loadingText = document.getElementById("loading-text");
+    loadingText.innerHTML = textContent;
+    loading.classList.toggle("loading-show");
+}
+
 const fnShowModalMessages = (data, titulo = "") => {
     let icono = "error";
 

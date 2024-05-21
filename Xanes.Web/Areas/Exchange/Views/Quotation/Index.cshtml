@@ -12,19 +12,19 @@
                 </div>
                 <div class="col-5 text-end">
                     <a onclick="fnExportExcel()" class="btn btn-warning border"
-                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Exportar a Excel">
-                        <i class="bi bi-arrow-up-square-fill"></i> Exportar
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
+                        <i class="bi bi-arrow-up-square"></i> Exportar
                     </a>
                     <a asp-controller="Quotation" asp-action="Import"
-                       data-bs-toggle="tooltip" data-bs-title="Importar Excel" class="btn btn-success border">
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
                         <i class="bi bi-box-arrow-in-down"></i> Importar
                     </a>
                     <button class="btn btn-secondary border" type="submit"
-                            data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Imprimir Operaciones">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Imprimir Operaciones">
                         <i class="bi bi-printer-fill"></i> Imprimir
                     </button>
-                    <a asp-controller="Quotation" asp-action="Upsert" class="btn btn-info border"
-                       data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Nuevo Cotización">
+                    <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" data-bs-placement="top" data-bs-title="Nuevo Cotización">
                         <i class="bi bi-plus-circle"></i> Nuevo
                     </a>
                 </div>
