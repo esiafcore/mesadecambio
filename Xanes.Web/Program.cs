@@ -7,11 +7,11 @@ using Xanes.Web.CustomMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Remover Server Header
-builder.WebHost.UseKestrel(x =>
-{
-    x.AddServerHeader = false;
-});
+////Remover Server Header
+//builder.WebHost.UseKestrel(x =>
+//{
+//    x.AddServerHeader = false;
+//});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
