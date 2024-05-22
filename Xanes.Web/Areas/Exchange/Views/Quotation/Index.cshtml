@@ -5,27 +5,27 @@
         <input asp-for="ReportType" value="@((short)SD.ReportTransaType.Operation)" name="ReportType" hidden />
         <input asp-for="DateTransaInitial" name="DateTransaInitial" type="date" id="dateInitialReport" hidden />
         <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />
-        <div class="card-header bg-secondary bg-gradient ms-0 py-1">
+        <div class="card-header ms-0 py-1">
             <div class="row align-items-center">
                 <div class="col-7 text-center">
-                    <h3 class="text-white py-1">Transacciones</h3>
+                    <h3 class="text-black py-1">Transacciones</h3>
                 </div>
                 <div class="col-5 text-end">
-                    <a onclick="fnExportExcel()" class="btn btn-warning border"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
-                        <i class="bi bi-arrow-up-square"></i> Exportar
-                    </a>
-                    <a asp-controller="Quotation" asp-action="Import"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
-                        <i class="bi bi-box-arrow-in-down"></i> Importar
+                    <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" data-bs-placement="top" data-bs-title="Nuevo Cotización">
+                        <i class="bi bi-plus-circle"></i> Nuevo
                     </a>
                     <button class="btn btn-secondary border" type="submit"
                             data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Imprimir Operaciones">
                         <i class="bi bi-printer-fill"></i> Imprimir
                     </button>
-                    <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" data-bs-placement="top" data-bs-title="Nuevo Cotización">
-                        <i class="bi bi-plus-circle"></i> Nuevo
+                    <a onclick="fnExportExcel()" class="btn btn-outline-warning bg-gradient border"
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
+                        <i class="bi bi-arrow-up-square"></i> Exportar
+                    </a>
+                    <a asp-controller="Quotation" asp-action="Import"
+                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-outline-success bg-gradient border">
+                        <i class="bi bi-box-arrow-in-down"></i> Importar
                     </a>
                 </div>
             </div>

@@ -1,12 +1,16 @@
 ﻿@model List<Customer>
 
 <div class="card shadow border-0 mt-1">
-    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+    <div class="card-header bg-secondary ml-0 py-1">
         <div class="row align-items-center">
             <div class="col-8 text-center">
                 <h3 class="text-white py-1">Clientes</h3>
             </div>
             <div class="col-4 text-end">
+                <a asp-controller="Customer" asp-action="Upsert" class="btn btn-info border"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Nuevo Cliente">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
                 <a asp-controller="Customer" asp-action="ExportExcel" class="btn btn-warning border"
                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
                     <i class="bi bi-arrow-up-square-fill"></i> Exportar
@@ -14,10 +18,6 @@
                 <a asp-controller="Customer" asp-action="Import"
                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
                     <i class="bi bi-box-arrow-in-down"></i> Importar
-                </a>
-                <a asp-controller="Customer" asp-action="Upsert" class="btn btn-info border"
-                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Nuevo Cliente">
-                    <i class="bi bi-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
