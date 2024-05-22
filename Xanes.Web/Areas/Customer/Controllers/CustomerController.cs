@@ -131,35 +131,56 @@ public class CustomerController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upsert(Models.ViewModels.CustomerCreateVM objViewModel)
+    public async Task<IActionResult> Upsert([FromForm] Models.Customer obj)
     {
+        StringBuilder errorsMessagesBuilder = new();
+        JsonResultResponse? jsonResponse = new();
 
-        Models.Customer obj = objViewModel.DataModel;
+        //if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+        //{
+        //    obj.BusinessName = string.Empty;
+        //    obj.CommercialName = string.Empty;
+        //}
+        //else
+        //{
+        //    obj.FirstName = string.Empty;
+        //    obj.SecondName = string.Empty;
+        //    obj.LastName = string.Empty;
+        //    obj.CommercialName = string.Empty;
+
+        //}
 
         //Datos son validos
         if (ModelState.IsValid)
         {
             if (obj.CompanyId != _companyId)
             {
-                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Id de la compañía no puede ser distinto de {_companyId}";
+                return Json(jsonResponse);
             }
 
             if (obj.BusinessName.Trim().ToLower() == ".")
             {
-                ModelState.AddModelError("businessname", "Razón Social no puede ser .");
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Razón Social no puede ser .";
+                return Json(jsonResponse);
             }
 
             if (obj.CommercialName.Trim().ToLower() == ".")
             {
-                ModelState.AddModelError("commercialname", "Nombre Comercial no puede ser .");
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Nombre Comercial no puede ser .";
+                return Json(jsonResponse);
             }
 
             if (obj.Code.Trim().ToLower() == ".")
             {
-                ModelState.AddModelError("code", "Código no puede ser .");
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Código no puede ser .";
+                return Json(jsonResponse);
             }
 
-            if (!ModelState.IsValid) return View(objViewModel);
 
             //Verificamos si existe el tipo
             var objType = _uow.PersonType.Get(filter: x =>
@@ -167,13 +188,12 @@ public class CustomerController : Controller
 
             if (objType == null)
             {
-                ModelState.AddModelError("", $"Tipo de persona no encontrada");
-            }
-            else
-            {
-                obj.TypeId = objType.Id;
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Tipo de persona no encontrada";
+                return Json(jsonResponse);
             }
 
+            obj.TypeId = objType.Id;
 
             //Creando
             if (obj.Id == 0)
@@ -186,10 +206,11 @@ public class CustomerController : Controller
                                                 && (x.Code.Trim() == obj.Code.Trim()));
                     if (isExist)
                     {
-                        ModelState.AddModelError("code", $"Código {obj.Code} ya existe");
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = $"Código {obj.Code} ya existe";
+                        return Json(jsonResponse);
                     }
                 }
-
 
                 //Validar si identificación ya existe
                 bool isIdentificationExist = await _uow
@@ -201,28 +222,26 @@ public class CustomerController : Controller
                 {
                     if (isIdentificationExist)
                     {
-                        ModelState.AddModelError("Identificationnumber", $"# Identificación {obj.Code} ya existe");
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = $"# Identificación {obj.Code} ya existe";
+                        return Json(jsonResponse);
                     }
                 }
 
-                if (ModelState.IsValid)
+                if (_cfgCxc.IsAutomaticallyCustomerCode)
                 {
-                    if (_cfgCxc.IsAutomaticallyCustomerCode)
-                    {
-                        var nextSequential = await _uow
-                            .Customer
-                            .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
-                                                               && (x.InternalSerial == AC.InternalSerialOfficial));
+                    var nextSequential = await _uow
+                        .Customer
+                        .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
+                                                           && (x.InternalSerial == AC.InternalSerialOfficial));
 
-                        obj.Code = nextSequential.ToString()
-                            .PadLeft(AC.RepeatCharTimes, AC.CharDefaultEmpty);
-                    }
-
-                    _uow.Customer.Add(obj);
-                    _uow.Save();
-                    TempData["success"] = "Customer created successfully";
-                    return RedirectToAction("Index", "Customer");
+                    obj.Code = nextSequential.ToString()
+                        .PadLeft(AC.RepeatCharTimes, AC.CharDefaultEmpty);
                 }
+
+                _uow.Customer.Add(obj);
+                _uow.Save();
+                TempData["success"] = "Customer created successfully";
             }
             else
             {
@@ -233,7 +252,9 @@ public class CustomerController : Controller
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
-                    ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = $"Código {obj.Code} ya existe";
+                    return Json(jsonResponse);
                 }
 
                 //Validar que identificación no está repetido
@@ -244,34 +265,37 @@ public class CustomerController : Controller
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
-                    ModelState.AddModelError("", $"Identificación {obj.Identificationnumber} ya existe");
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = $"Identificación {obj.Identificationnumber} ya existe";
+                    return Json(jsonResponse);
                 }
 
-                //Datos son validos
-                if (ModelState.IsValid)
-                {
-                    _uow.Customer.Update(obj);
-                    _uow.Save();
-                    TempData["success"] = "Customer updated successfully";
-                    return RedirectToAction("Index", "Customer");
-                }
+                _uow.Customer.Update(obj);
+                _uow.Save();
+                TempData["success"] = "Customer updated successfully";
 
-                fnFillDataUpsertLists();
-
-                //objViewModel.CategoryList = categorySelectList;
-                objViewModel.TypeList = typeSelectList;
-                objViewModel.SectorSelectList = sectorSelectList;
-                return View(objViewModel);
             }
+
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Customer");
+            jsonResponse.IsSuccess = true;
+        }
+        else
+        {
+            var listErrorMessages = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+            foreach (var item in listErrorMessages)
+            {
+                errorsMessagesBuilder.Append(item);
+            }
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+            return Json(jsonResponse);
+
         }
 
-        fnFillDataUpsertLists();
-
-        //objViewModel.CategoryList = categorySelectList;
-        objViewModel.SectorSelectList = sectorSelectList;
-        objViewModel.TypeList = typeSelectList;
-        return View(objViewModel);
-
+        return Json(jsonResponse);
     }
 
     private void fnFillDataUpsertLists()

@@ -1,7 +1,7 @@
 ﻿@model CustomerCreateVM
 
 <div class="card shadow border-0 mt-1">
-    <div class="card-header bg-secondary bg-gradient ml-0 py-1">
+    <div class="card-header bg-secondary bg-gradient py-1">
         <div class="row">
             <div class="col-12 text-center">
                 <h3 class="text-white py-1">@(Model.DataModel.Id != 0 ? "Editar" : "Crear")  Cliente</h3>
@@ -9,11 +9,13 @@
         </div>
     </div>
     <div class="card-body px-3 py-1">
-        <form method="post">
+        <form id="formUpsert" method="post" asp-action="Upsert">
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input hidden asp-for="DataModel.Id" />
-            <input hidden asp-for="DataModel.CompanyId" />
-            <input hidden asp-for="DataModel.TypeNumeral" id="typeNumeral" />
+            <input hidden asp-for="DataModel.Id" name="Id"/>
+            <input hidden asp-for="DataModel.CompanyId" name="CompanyId"/>
+            <input hidden asp-for="DataModel.SectorId" name="SectorId" id="sectorId"/>
+            <input hidden asp-for="DataModel.TypeNumeral" name="TypeNumeral" id="typeNumeral"/>
             <div class="row">
                 <div class="row col-12 col-md-6">
                     <div class="col-12 col-md-2">Tipo</div>
@@ -25,27 +27,34 @@
                                        class="form-check-input border border-dark-subtle typeNumerals" type="radio"
                                        id="@("personType_radio_" + personType.Numeral)"
                                        value="@personType.Numeral"
-                                       onclick="return personType_onClick(this)" />
+                                       onclick="return personType_onClick(this)"/>
                                 <label class="form-check-label" for="@("personType_label_" + personType.Numeral)">@personType.Code</label>
                             </div>
                         }
                     </div>
-                    <span asp-validation-for="DataModel.TypeId" class="text-danger"></span>
+                    <span asp-validation-for="DataModel.TypeNumeral" class="text-danger"></span>
                 </div>
                 <div class="row col-12 col-md-6">
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                    <select id="sector-select" asp-for="DataModel.SectorId" class="form-select border-0 shadow select2me">
-                        <option disabled selected>--Select Sector--</option>
+                    <select id="sector-select" class="form-select border-0 shadow select2me">
                         @foreach (var sector in Model.SectorList.Where(s => s.Depthnumber == 1))
                         {
                             <optgroup label="@sector.Name" data-sector-id="@sector.Id">
                                 @foreach (var subsector in Model.SectorList.Where(s => s.ParentId == sector.Id))
                                 {
-                                    <option value="@subsector.Id" data-parent="@subsector.ParentId" data-depth="@subsector.Depthnumber">@subsector.Name</option>
+                                    var isCheckedSub = (subsector.Id == Model.DataModel.SectorId);
+
+
+                                    <option value="@subsector.Id" data-parent="@subsector.ParentId" 
+                                            data-depth="@subsector.Depthnumber"
+                                            selected="@isCheckedSub">@subsector.Name</option>
                                     @foreach (var detail in Model.SectorList.Where(s => s.ParentId == subsector.Id))
                                     {
-                                        <option class="ms-3" value="@detail.Id" data-parent="@detail.ParentId" data-depth="@detail.Depthnumber">@detail.Name</option>
+                                        var isChecked = (detail.Id == Model.DataModel.SectorId);
+
+                                        <option class="ms-3" value="@detail.Id" data-parent="@detail.ParentId" 
+                                                selected="@isChecked" data-depth="@detail.Depthnumber" >@detail.Name</option>
                                     }
                                 }
                             </optgroup>
@@ -60,66 +69,66 @@
                     @if (Model.DataModel.Id != 0)
                     {
                         <input asp-for="DataModel.Code" type="text" readonly
-                               class="form-control border-0 shadow" />
+                               class="form-control border-0 shadow" name="Code"/>
                     }
                     else
                     {
-                        <input asp-for="DataModel.Code" type="text"
-                               class="form-control border-0 shadow" />
+                        <input asp-for="DataModel.Code" type="text" name="Code"
+                               class="form-control border-0 shadow"/>
                     }
                     <label asp-for="DataModel.Code" class="ms-2"></label>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
-                    <input asp-for="DataModel.Identificationnumber" type="text"
-                           class="form-control border-0 shadow" />
+                    <input asp-for="DataModel.Identificationnumber" type="text" name="Identificationnumber"
+                           class="form-control border-0 shadow"/>
                     <label asp-for="DataModel.Identificationnumber" class="ms-2"></label>
                     <span asp-validation-for="DataModel.Identificationnumber" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" onchange="" />
+                    <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" name="FirstName" onchange=""/>
                     <label asp-for="DataModel.FirstName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.SecondName" type="text" class="form-control border-0 shadow" />
+                    <input asp-for="DataModel.SecondName" type="text" class="form-control border-0 shadow" name="SecondName"/>
                     <label asp-for="DataModel.SecondName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.LastName" type="text" class="form-control border-0 shadow" />
+                    <input asp-for="DataModel.LastName" type="text" class="form-control border-0 shadow" name="LastName"/>
                     <label asp-for="DataModel.LastName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.SecondSurname" type="text" class="form-control border-0 shadow" />
+                    <input asp-for="DataModel.SecondSurname" type="text" class="form-control border-0 shadow" name="SecondSurname"/>
                     <label asp-for="DataModel.SecondSurname" class="ms-2"></label>
                     <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
                 </div>
                 @* Nombre para persona natural *@
-              @*   <div id="personNatural_div" class="row m-0 p-0">
+                @*   <div id="personNatural_div" class="row m-0 p-0">
                 </div> *@
 
                 @* Nombre para persona juridica*@
                 <div id="personLegal_div" class="row m-0 p-0">
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
-                        <input asp-for="DataModel.CommercialName" type="text" class="form-control border-0 shadow" />
+                        <input asp-for="DataModel.CommercialName" type="text" class="form-control border-0 shadow" name="CommercialName" id="commercialName"/>
                         <label asp-for="DataModel.CommercialName" class="ms-2"></label>
                         <span asp-validation-for="DataModel.CommercialName" class="text-danger"></span>
                     </div>
                     <div class="form-floating mt-1 pb-1 pt-1 col-md-12">
-                        <input asp-for="DataModel.BusinessName" type="text" class="form-control border-0 shadow" />
+                        <input asp-for="DataModel.BusinessName" type="text" class="form-control border-0 shadow" name="BusinessName" id="businessName"/>
                         <label asp-for="DataModel.BusinessName" class="ms-2"></label>
                         <span asp-validation-for="DataModel.BusinessName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-floating pb-1 pt-2 col-md-12">
                     <label asp-for="DataModel.AddressPrimary" class="ms-2 text-muted"></label>
-                    <textarea asp-for="DataModel.AddressPrimary" class="form-control border-0 shadow">
-                        </textarea>
+                    <textarea asp-for="DataModel.AddressPrimary" class="form-control border-0 shadow" name="AddressPrimary">
+                    </textarea>
                 </div>
                 <div class="form-floating pb-1 pt-2 col-md-12">
                     <div class="form-check mt-3 align-items-center">
-                        <input type="checkbox" class="form-check-input" asp-for="DataModel.IsBank" />
+                        <input type="checkbox" class="form-check-input" asp-for="DataModel.IsBank" name="IsBank"/>
                         <label asp-for="DataModel.IsBank" class="ms-2">
                             @Html.DisplayNameFor(m => m.DataModel.IsBank)
                         </label>
@@ -130,7 +139,7 @@
                 {
                     <div class="form-floating pb-1 pt-2 col-md-6">
                         <div class="form-check mt-3 align-items-center">
-                            <input type="checkbox" readonly="readonly" disabled class="form-check-input" asp-for="DataModel.IsActive" />
+                            <input type="checkbox" readonly="readonly" disabled class="form-check-input" asp-for="DataModel.IsActive" name="IsActive"/>
                             <label asp-for="DataModel.IsActive" class="ms-2">
                                 @Html.DisplayNameFor(m => m.DataModel.IsActive)
                             </label>
@@ -141,7 +150,7 @@
                 {
                     <div class="form-floating pb-1 pt-2 col-md-6">
                         <div class="form-check mt-3 align-items-center">
-                            <input type="checkbox" class="form-check-input" asp-for="DataModel.IsActive" />
+                            <input type="checkbox" class="form-check-input" asp-for="DataModel.IsActive" name="IsActive"/>
                             <label asp-for="DataModel.IsActive" class="ms-2">
                                 @Html.DisplayNameFor(m => m.DataModel.IsActive)
                             </label>
@@ -191,10 +200,12 @@
         let inputSecondName = document.getElementById("DataModel_SecondName");
         let inputLastName = document.getElementById("DataModel_LastName");
         let inputSecondSurname = document.getElementById("DataModel_SecondSurname");
+        let inputCommercialName = document.getElementById("commercialName");
+        let inputBusinessName = document.getElementById("businessName");
+
     </script>
 
-    @{
-        <partial name="_ValidationScriptsPartial" />
-        <script src="~/js/Customer/Customer/customerUpsert.js"></script>
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script defer src="~/js/Customer/Customer/customerUpsert.js"></script>
+
 }

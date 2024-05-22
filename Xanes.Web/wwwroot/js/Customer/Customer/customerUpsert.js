@@ -1,4 +1,5 @@
 ﻿let typeNumeral, inputTypeNumeral, typeNumerals;
+let personName = "";
 document.addEventListener("DOMContentLoaded", () => {
 
     let inputId = document.getElementById("DataModel_Id");
@@ -20,6 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
     inputSecondName.addEventListener("change", naturalNames_onChange);
     inputLastName.addEventListener("change", naturalNames_onChange);
     inputSecondSurname.addEventListener("change", naturalNames_onChange);
+    inputCommercialName.addEventListener("change",() => {
+        inputFirstName.value = inputCommercialName.value;
+        inputLastName.value = inputCommercialName.value;
+    });
+    inputBusinessName.addEventListener("change", () => {
+        inputFirstName.value = inputBusinessName.value;
+        inputLastName.value = inputBusinessName.value;
+    });
+
 
     personType_onClick(personLegalRad);
 
@@ -37,7 +47,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     inputTypeNumeral.value = typeNumeral;
 
+    // Evento enviar form para upsert
+    const formUpsert = document.getElementById("formUpsert");
+    formUpsert.addEventListener("submit", fnCreateFormSubmit);
+
 });
+
+
+const fnCreateFormSubmit = async (event) => {
+
+    try {
+
+        document.querySelector("#sectorId").value = document.querySelector("#sector-select").value;
+
+        fntoggleLoading();
+
+        event.preventDefault();
+        const formObject = event.currentTarget;
+
+        const url =
+            `${formObject.action}`;
+        const formData = new FormData(formObject);
+
+        const response = await fetch(url,
+            {
+                method: 'POST',
+                body: formData
+            });
+
+        if (!response.ok) {
+            const errorMessage = await response.json();
+            Swal.fire({
+                icon: 'error',
+                text: errorMessage.errorMessages
+            });
+        } else {
+            const jsonResponse = await response.json();
+            if (!jsonResponse.isSuccess) {
+                Swal.fire({
+                    icon: 'error',
+                    text: jsonResponse.errorMessages
+                });
+            } else {
+                if (jsonResponse.urlRedirect) {
+                    window.location.href = jsonResponse.urlRedirect;
+                }
+            }
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
+    } finally {
+        fntoggleLoading();
+    }
+}
+
 
 function personType_onClick(objElem) {
     let currentValue = objElem.value;
@@ -62,7 +130,7 @@ function naturalNames_onChange(e) {
     //Hay dato y tipo de persona es natural
     if (e.target.value && personNaturalRad.checked) {
         //Concatenar los 4 campos
-        let personName = "";
+        
         if (inputFirstName.value) {
             personName = inputFirstName.value.trim();
         }
@@ -79,6 +147,8 @@ function naturalNames_onChange(e) {
             personName = `${personName.trim()} ${inputSecondSurname.value.trim()}`;
         }
 
+        document.querySelector("#commercialName").value = personName;
+        document.querySelector("#businessName").value = personName;
         console.log(personName);
     }
 }

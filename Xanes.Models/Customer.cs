@@ -70,11 +70,11 @@ public class Customer: EntityInactivated, ICloneable
 
     [MaxLength(550, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Razón Social")]
-    public string BusinessName { get; set; } = null!;
+    public string BusinessName { get; set; } = string.Empty;
 
     [MaxLength(550, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Nombre Comercial")]
-    public string CommercialName { get; set; } = null!;
+    public string CommercialName { get; set; } = string.Empty;
 
     [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
     [Display(Name = "Dirección Principal")]
