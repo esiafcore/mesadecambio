@@ -521,6 +521,21 @@ public class SystemInformationController : Controller
 
             foreach (var transaction in transactionList)
             {
+                var currency = "";
+
+                if (transaction.TypeNumeral == SD.QuotationType.Buy ||
+                    transaction.TypeNumeral == SD.QuotationType.Transfer)
+                {
+                    currency =
+                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}";
+                }
+                else
+                {
+                    currency =
+                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyDepositTrx.Code}";
+                }
+
+
                 var transa = new TransaODTVM
                 {
                     Id = transaction.Id,
@@ -528,6 +543,7 @@ public class SystemInformationController : Controller
                     TypeNumeral = transaction.TypeNumeral,
                     NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}",
                     CustomerFullName = transaction.CustomerTrx.CommercialName,
+                    CurrencySourceTarget = currency,
                     ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
                     ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
                     AmountTransaction = transaction.AmountTransaction,

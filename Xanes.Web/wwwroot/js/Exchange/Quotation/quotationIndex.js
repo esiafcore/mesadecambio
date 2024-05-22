@@ -3,6 +3,7 @@ let dateInitial, dateFinal;
 let dateFinalReport = document.querySelector("#dateFinalReport");
 let dateInitialReport = document.querySelector("#dateInitialReport");
 let inputIncludeVoid, includeVoid;
+let searchValue;
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
@@ -19,8 +20,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Evento enviar form para crear
     const formPrint = document.getElementById("formPrint");
     formPrint.addEventListener("submit", fnPrintFormSubmit);
-});
 
+    searchValue = document.querySelector("#dt-search-0");
+    searchValue.addEventListener("change", () => {
+        sessionStorage.setItem('searchValue', searchValue.value);
+    });
+
+});
 
 const fnPrintFormSubmit = async (event) => {
 
@@ -91,7 +97,6 @@ const fnvalidateOperation = async (plainFormData) => {
     return resultResponse;
 };
 
-
 // Función para ajustar las fechas según los criterios
 const fnAdjustmentDates = () => {
     let dateInitialValue = new Date(inputDateInitial.value);
@@ -108,7 +113,6 @@ const fnAdjustmentDates = () => {
     dateInitialReport.value = inputDateInitial.value;
     dateFinalReport.value = inputDateFinal.value;
 }
-
 
 const fnAdjustmentFilterDataTable = () => {
     let wrapper = document.querySelector("#tblData_wrapper");
@@ -382,16 +386,63 @@ const fnExportExcel = async () => {
     }
 };
 
-const fnLoadDatatable = () => {
-    if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
-        dateInitial = inputDateInitial.value;
-        dateFinal = inputDateFinal.value;
-        includeVoid = inputIncludeVoid.checked;
-    } else {
-        dateInitial = processingDate;
-        dateFinal = processingDate;
-        includeVoid = false;
+// Función para establecer el valor del input y filtrar la DataTable
+const fnSetSearchValue = (value) => {
+
+    if (!searchValue) {
+        searchValue = document.querySelector("#dt-search-0");
     }
+    
+    // Establece el valor del input
+    searchValue.value = value;
+
+    // Utiliza DataTables para aplicar el filtro
+    dataTable.search(value).draw();
+}
+
+
+const fnLoadDatatable = () => {
+
+    let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));
+
+    if (isNewEntry) {
+        isNewEntry = false;
+
+        if (sessionObjFilter) {
+            dateInitial = sessionObjFilter.dateInitial;
+            dateFinal = sessionObjFilter.dateFinal;
+            includeVoid = sessionObjFilter.includeVoid;
+        } else {
+            if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
+                dateInitial = inputDateInitial.value;
+                dateFinal = inputDateFinal.value;
+                includeVoid = inputIncludeVoid.checked;
+            } else {
+                dateInitial = processingDate;
+                dateFinal = processingDate;
+                includeVoid = false;
+            }
+        }
+    } else {
+        if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
+            dateInitial = inputDateInitial.value;
+            dateFinal = inputDateFinal.value;
+            includeVoid = inputIncludeVoid.checked;
+        } else {
+            dateInitial = processingDate;
+            dateFinal = processingDate;
+            includeVoid = false;
+        }
+    }
+
+    const objFilter = {
+        dateInitial,
+        dateFinal,
+        includeVoid
+    }
+
+    sessionStorage.setItem('objFilter', JSON.stringify(objFilter));
+
     //let dateFinal
     if (dataTable) dataTable.destroy();
     dataTable = new DataTable("#tblData", {
@@ -409,6 +460,12 @@ const fnLoadDatatable = () => {
             "complete": function () {
                 fnEnableTooltip();
                 fnAdjustmentFilterDataTable();
+
+                let sessionSearchValue = sessionStorage.getItem('searchValue');
+
+                if (sessionSearchValue) {
+                    fnSetSearchValue(sessionSearchValue);
+                }
             }
         },
         "columns": [

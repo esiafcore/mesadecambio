@@ -54,6 +54,7 @@ public class QuotationController : Controller
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
         ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter.ToString(AC.DefaultDateFormatWeb));
+        ViewBag.IsNewEntry = JsonSerializer.Serialize(true);
         TransactionReportVM modelVM = new();
 
         return View(modelVM);
@@ -961,6 +962,8 @@ public class QuotationController : Controller
             jsonResponse.ErrorMessages = $"Cliente no encontrado";
             return Json(jsonResponse);
         }
+
+        objQt.CustomerId = obj.CustomerId;
 
         if (objQt.TypeNumeral == SD.QuotationType.Buy)
         {
@@ -1953,6 +1956,8 @@ public class QuotationController : Controller
                 worksheet.Cell(7, 7).Value = "Tipo";
                 worksheet.Cell(7, 8).Value = "Asiento contable Id";
                 worksheet.Cell(7, 9).Value = "Transaccion bancaria id";
+                worksheet.Cell(7, 10).Value = "Asiento contable fee Id";
+                worksheet.Cell(7, 11).Value = "Transaccion bancaria fee id";
 
                 sheetIndex++;
 
@@ -1973,6 +1978,8 @@ public class QuotationController : Controller
                     worksheet.Cell(rowNum, 7).Value = (short)detail.QuotationDetailType;
                     worksheet.Cell(rowNum, 8).Value = detail.JournalEntryId?.ToString();
                     worksheet.Cell(rowNum, 9).Value = detail.BankTransactionId?.ToString();
+                    worksheet.Cell(rowNum, 10).Value = detail.JournalEntryTransferFeeId?.ToString();
+                    worksheet.Cell(rowNum, 11).Value = detail.BankTransactionTransferFeeId?.ToString();
 
                     rowNum++;
                 }
