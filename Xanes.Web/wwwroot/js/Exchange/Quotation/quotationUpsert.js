@@ -233,16 +233,21 @@ const fnSaveReClosed = () => {
 const fnCreateFormSubmit = async (event) => {
 
     try {
+        fntoggleLoading();
+
         event.preventDefault();
         const formObject = event.currentTarget;
 
-        const url = `${formObject.action}?redirectHome=${redirectHome}&redirectDetail=${redirectDetail}&showMessages=${showMessages}`;
+        const url =
+            `${formObject.action}?redirectHome=${redirectHome}&redirectDetail=${redirectDetail}&showMessages=${
+                showMessages}`;
         const formData = new FormData(formObject);
 
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
+        const response = await fetch(url,
+            {
+                method: 'POST',
+                body: formData
+            });
 
         if (!response.ok) {
             const errorMessage = await response.json();
@@ -264,7 +269,7 @@ const fnCreateFormSubmit = async (event) => {
 
                 if (isClosed) {
                     await fnClosed(jsonResponse.data.id);
-                }else if (isReClosed) {
+                } else if (isReClosed) {
                     await fnReClosed(jsonResponse.data.id);
                 }
             }
@@ -276,6 +281,8 @@ const fnCreateFormSubmit = async (event) => {
             text: error
         });
 
+    } finally {
+        fntoggleLoading();
     }
 }
 

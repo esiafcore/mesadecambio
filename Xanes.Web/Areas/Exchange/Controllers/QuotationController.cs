@@ -63,12 +63,20 @@ public class QuotationController : Controller
     {
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString(AC.DefaultDateFormatWeb);
-        DateOnly processingDate = DateOnly.Parse(processingDateString);
-
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
         QuotationCreateVM model = new();
-        model.ProcessingDate = processingDate;
         Quotation objData = new();
+
+        if (processingDateString != null)
+        {
+            DateOnly processingDate = DateOnly.Parse(processingDateString);
+            model.ProcessingDate = processingDate;
+        }
+        else
+        {
+            model.ExistProcessingDate = false;
+        }
+
 
         var objCurrencyList = _uow.Currency
             .GetAll(x => (x.CompanyId == _companyId))
@@ -1390,9 +1398,17 @@ public class QuotationController : Controller
     public JsonResult ProcessingDate(string processingDate)
     {
         JsonResultResponse? jsonResponse = new();
-        DateOnly dateTransa = DateOnly.Parse(processingDate);
 
-        HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+        if (processingDate != null)
+        {
+            DateOnly dateTransa = DateOnly.Parse(processingDate);
+
+            HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+        }
+        else
+        {
+            HttpContext.Session.Remove(AC.ProcessingDate);
+        }
 
         jsonResponse.IsSuccess = true;
         TempData[AC.Success] = $"Fecha de Procesamiento guardada correctamente";
@@ -1869,30 +1885,34 @@ public class QuotationController : Controller
                 headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
 
                 worksheet.Cell(3, 1).Value = "Tipo";
-                worksheet.Cell(3, 2).Value = "Fecha";
-                worksheet.Cell(3, 3).Value = "Cliente Código";
-                worksheet.Cell(3, 4).Value = "Cliente Nombre";
-                worksheet.Cell(3, 5).Value = "Mon Transa";
-                worksheet.Cell(3, 6).Value = "Mon Deposito";
-                worksheet.Cell(3, 7).Value = "Mon Transfer";
-                worksheet.Cell(3, 8).Value = "T/C Oficial";
-                worksheet.Cell(3, 9).Value = "T/C Compra";
-                worksheet.Cell(3, 10).Value = "T/C Venta";
+                worksheet.Cell(3, 2).Value = "# Transa";
+                worksheet.Cell(3, 3).Value = "Fecha";
+                worksheet.Cell(3, 4).Value = "Cliente Código";
+                worksheet.Cell(3, 5).Value = "Cliente Nombre";
+                worksheet.Cell(3, 6).Value = "Mon Transa";
+                worksheet.Cell(3, 7).Value = "Mon Deposito";
+                worksheet.Cell(3, 8).Value = "Mon Transfer";
+                worksheet.Cell(3, 9).Value = "T/C Oficial";
+                worksheet.Cell(3, 10).Value = "T/C Compra";
+                worksheet.Cell(3, 11).Value = "T/C Venta";
+                worksheet.Cell(3, 12).Value = "Preservar Numeración";
 
                 worksheet.Cell(4, 1).Value = header.TypeTrx.Code;
-                worksheet.Cell(4, 2).SetValue(header.DateTransa.ToDateTimeConvert());
-                worksheet.Cell(4, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
-                worksheet.Cell(4, 3).Value = header.CustomerTrx.Code;
-                worksheet.Cell(4, 4).Value = header.CustomerTrx.BusinessName;
-                worksheet.Cell(4, 5).Value = (short)header.CurrencyTransaType;
-                worksheet.Cell(4, 6).Value = (short)header.CurrencyDepositType;
-                worksheet.Cell(4, 7).Value = (short)header.CurrencyTransferType;
-                worksheet.Cell(4, 8).Value = header.ExchangeRateOfficialTransa;
-                worksheet.Cell(4, 8).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
-                worksheet.Cell(4, 9).Value = header.ExchangeRateBuyTransa;
+                worksheet.Cell(4, 2).Value = header.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty);
+                worksheet.Cell(4, 3).SetValue(header.DateTransa.ToDateTimeConvert());
+                worksheet.Cell(4, 3).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(4, 4).Value = header.CustomerTrx.Code;
+                worksheet.Cell(4, 5).Value = header.CustomerTrx.BusinessName;
+                worksheet.Cell(4, 6).Value = (short)header.CurrencyTransaType;
+                worksheet.Cell(4, 7).Value = (short)header.CurrencyDepositType;
+                worksheet.Cell(4, 8).Value = (short)header.CurrencyTransferType;
+                worksheet.Cell(4, 9).Value = header.ExchangeRateOfficialTransa;
                 worksheet.Cell(4, 9).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
-                worksheet.Cell(4, 10).Value = header.ExchangeRateSellTransa;
+                worksheet.Cell(4, 10).Value = header.ExchangeRateBuyTransa;
                 worksheet.Cell(4, 10).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(4, 11).Value = header.ExchangeRateSellTransa;
+                worksheet.Cell(4, 11).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+                worksheet.Cell(4, 12).Value = "N";
 
                 worksheet.Cell(5, 1).Value = "Monto";
                 worksheet.Cell(5, 2).Value = "Monto M/C";
@@ -1931,7 +1951,8 @@ public class QuotationController : Controller
                 worksheet.Cell(7, 5).Value = "Cta Ban Destino";
                 worksheet.Cell(7, 6).Value = "Importe";
                 worksheet.Cell(7, 7).Value = "Tipo";
-
+                worksheet.Cell(7, 8).Value = "Asiento contable Id";
+                worksheet.Cell(7, 9).Value = "Transaccion bancaria id";
 
                 sheetIndex++;
 
@@ -1950,6 +1971,9 @@ public class QuotationController : Controller
                     worksheet.Cell(rowNum, 6).Value = detail.AmountDetail;
                     worksheet.Cell(rowNum, 6).Style.NumberFormat.Format = AC.XlsFormatNumeric;
                     worksheet.Cell(rowNum, 7).Value = (short)detail.QuotationDetailType;
+                    worksheet.Cell(rowNum, 8).Value = detail.JournalEntryId?.ToString();
+                    worksheet.Cell(rowNum, 9).Value = detail.BankTransactionId?.ToString();
+
                     rowNum++;
                 }
 
@@ -1964,6 +1988,7 @@ public class QuotationController : Controller
                 worksheet.Column(9).AdjustToContents();
                 worksheet.Column(10).AdjustToContents();
                 worksheet.Column(11).AdjustToContents();
+                worksheet.Column(12).AdjustToContents();
             }
 
             using (MemoryStream stream = new MemoryStream())
@@ -2031,7 +2056,7 @@ public class QuotationController : Controller
                         string sheetName = worksheet.Name;
                         int firstRowNumber = 4;
                         int secondRowNumber = 6;
-
+                        var isPreserverNumber = false;
                         var header = new Quotation();
                         var countMaxIdDataBase = await _uow.Quotation.NextId();
                         if (countMaxIdDataBase > countMaxId)
@@ -2066,7 +2091,13 @@ public class QuotationController : Controller
                                 header.TypeId = objQuotationType.Id;
                                 header.TypeNumeral = (SD.QuotationType)objQuotationType.Numeral;
 
-                                var date = worksheet.Cell(4, 2).GetString().Trim();
+                                var numeral = worksheet.Cell(4, 2).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(numeral))
+                                {
+                                    ErrorListMessages.Add($"El número de transacción está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+
+                                var date = worksheet.Cell(4, 3).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(date))
                                 {
                                     ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2077,7 +2108,7 @@ public class QuotationController : Controller
                                     header.DateTransa = dateTransa;
                                 }
 
-                                var customerCode = worksheet.Cell(4, 3).GetString().Trim();
+                                var customerCode = worksheet.Cell(4, 4).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(customerCode))
                                 {
                                     ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2195,7 +2226,7 @@ public class QuotationController : Controller
                                     }
                                 }
 
-                                var exchangeOfficial = worksheet.Cell(4, 8).GetString().Trim();
+                                var exchangeOfficial = worksheet.Cell(4, 9).GetString().Trim();
                                 if (string.IsNullOrWhiteSpace(exchangeOfficial))
                                 {
                                     ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2211,7 +2242,7 @@ public class QuotationController : Controller
 
                                 if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
                                 {
-                                    var monTransa = worksheet.Cell(4, 5).GetString().Trim();
+                                    var monTransa = worksheet.Cell(4, 6).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(monTransa))
                                     {
                                         ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2235,7 +2266,7 @@ public class QuotationController : Controller
 
                                     if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                                     {
-                                        var monTransfer = worksheet.Cell(4, 7).GetString().Trim();
+                                        var monTransfer = worksheet.Cell(4, 8).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(monTransfer))
                                         {
                                             ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2259,7 +2290,7 @@ public class QuotationController : Controller
                                             }
                                         }
 
-                                        var exchangeBuy = worksheet.Cell(4, 9).GetString().Trim();
+                                        var exchangeBuy = worksheet.Cell(4, 10).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(exchangeBuy))
                                         {
                                             ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2275,7 +2306,7 @@ public class QuotationController : Controller
                                     }
                                     else
                                     {
-                                        var monDeposit = worksheet.Cell(4, 6).GetString().Trim();
+                                        var monDeposit = worksheet.Cell(4, 7).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(monDeposit))
                                         {
                                             ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2299,7 +2330,7 @@ public class QuotationController : Controller
                                             }
                                         }
 
-                                        var exchangeSell = worksheet.Cell(4, 10).GetString().Trim();
+                                        var exchangeSell = worksheet.Cell(4, 11).GetString().Trim();
                                         if (string.IsNullOrWhiteSpace(exchangeSell))
                                         {
                                             ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
@@ -2368,6 +2399,27 @@ public class QuotationController : Controller
                                         {
                                             header.BankAccountTargetId = objBankAccountTarget.Id;
                                         }
+                                    }
+                                }
+
+                                var preserverNumber = worksheet.Cell(4, 12).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(isVoid))
+                                {
+                                    ErrorListMessages.Add($"Preservar numeración está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    if (preserverNumber == "S")
+                                    {
+                                        header.Numeral = int.Parse(numeral);
+                                    }
+                                    else if (preserverNumber == "N")
+                                    {
+                                        header.Numeral = 0;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"Preservar numeración es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
                                     }
                                 }
 
@@ -2622,10 +2674,15 @@ public class QuotationController : Controller
 
                 if (!header.IsClosed)
                 {
-                    //Obtenemos el secuencial en borrador
-                    var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
-                        SD.TypeSequential.Draft, true);
-                    header.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+                    if (header.Numeral == 0)
+                    {
+                        //Obtenemos el secuencial en borrador
+                        var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
+                            SD.TypeSequential.Draft, true);
+
+                        header.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+                    }
+
                     header.InternalSerial = AC.InternalSerialDraft;
                     header.IsPosted = false;
                     header.IsClosed = false;
@@ -2633,19 +2690,24 @@ public class QuotationController : Controller
                 }
                 else
                 {
-                    var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
+                    if (header.Numeral == 0)
+                    {
+                        var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
                         x.TypeNumeral == header.TypeNumeral &&
                         x.DateTransa == header.DateTransa &&
                         x.InternalSerial == AC.InternalSerialOfficial);
-                    if (nextSeq > countMaxSeq)
-                    {
-                        countMaxSeq = nextSeq;
+                        if (nextSeq > countMaxSeq)
+                        {
+                            countMaxSeq = nextSeq;
+                        }
+                        else
+                        {
+                            countMaxSeq++;
+                        }
+
+                        header.Numeral = countMaxSeq;
                     }
-                    else
-                    {
-                        countMaxSeq++;
-                    }
-                    header.Numeral = countMaxSeq;
+
                     header.InternalSerial = AC.InternalSerialOfficial;
                     header.ClosedBy = AC.LOCALHOSTME;
                     header.ClosedDate = DateTime.UtcNow;
@@ -2819,7 +2881,7 @@ public class QuotationController : Controller
             foreach (var detail in detailDistinct)
             {
                 bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
             }
 
             // Remover la coma adicional al final, si es necesario

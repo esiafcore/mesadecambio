@@ -168,4 +168,14 @@ public static class SD
         { (short)ReportTransaType.Deposit,"_TransaTypeDeposit"},
         { (short)ReportTransaType.Transfer,"_TransaTypeTransfer"}
     };
+
+
+    /// <summary>
+    /// Utilizado para saber el tipo de contenido que lleva el ACTION VERB
+    /// </summary>
+    public enum ContentType
+    {
+        Json,
+        MultipartFormData,
+    }
 }

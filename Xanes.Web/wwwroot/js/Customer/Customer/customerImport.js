@@ -31,10 +31,18 @@ const fnimportSubmit = async (event) => {
 
         } else {
             if (!jsonResult.isSuccess) {
+                const formatMsg = jsonResult.errorMessages.replace(/\|/g, "\n");
                 Swal.fire({
                     icon: 'error',
-                    text: jsonResult.errorMessages
+                    title: "Error en importación",
+                    text: "Revisar observaciones"
                 });
+
+                // Habilitar text area
+                const divObservation = document.querySelector(".observation");
+                const textareaInput = document.getElementById("message-area");
+                textareaInput.value = formatMsg;
+                divObservation.classList.remove("d-none");
 
             } else {
                 const result = await Swal.fire({

@@ -23,6 +23,8 @@ public static class AC
     public const string ImagesBankFolder = @"images\banks\";
     public const string ImagesBankSufix = "banks";
     public const string ContentTypeExcel = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public const string ContentTypeZip = "application/zip";
+    public const string PaginationHeaderName = "x-pagination";
 
     public const string LOCALHOSTPC = "LOCALHOSTPC";
     public const string LOCALHOSTME = "LOCALHOSTME";
