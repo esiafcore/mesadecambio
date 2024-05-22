@@ -49,7 +49,7 @@ public class QuotationController : Controller
 
     public IActionResult Index()
     {
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString();
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
         DateOnly dateFilter = DateOnly.Parse(processingDateString);
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
