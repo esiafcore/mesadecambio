@@ -70,6 +70,20 @@ public class QuotationDetail: Entity, ICloneable
     public Guid? BankTransactionId { get; set; }
 
     [Required]
+    [Display(Name = "Está Contabilizado el Comprobante")]
+    public bool IsJournalEntryTransferFeePosted { get; set; }
+
+    [Display(Name = "Uid Comprobante")]
+    public Guid? JournalEntryTransferFeeId { get; set; }
+
+    [Required]
+    [Display(Name = "Está Aprobado la transacción Bancaria")]
+    public bool IsBankTransactionTransferFeePosted { get; set; }
+
+    [Display(Name = "Uid Transacción")]
+    public Guid? BankTransactionTransferFeeId { get; set; }
+
+    [Required]
     [Display(Name = "Está Contabilizado el Comprobante Anulación")]
     public bool IsJournalEntryVoidPosted { get; set; }
 
@@ -82,6 +96,20 @@ public class QuotationDetail: Entity, ICloneable
 
     [Display(Name = "Uid Transacción")]
     public Guid? BankTransactionVoidId { get; set; }
+
+    [Required]
+    [Display(Name = "Está Contabilizado el Comprobante Anulación")]
+    public bool IsJournalEntryTransferFeeVoidPosted { get; set; }
+
+    [Display(Name = "Uid Comprobante Anulación")]
+    public Guid? JournalEntryTransferFeeVoidId { get; set; }
+
+    [Required]
+    [Display(Name = "Está Aprobado la transacción Bancaria")]
+    public bool IsBankTransactionTransferFeeVoidPosted { get; set; }
+
+    [Display(Name = "Uid Transacción")]
+    public Guid? BankTransactionTransferFeeVoidId { get; set; }
 
     public object Clone()
     {

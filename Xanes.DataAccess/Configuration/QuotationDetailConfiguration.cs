@@ -15,8 +15,12 @@ public class QuotationDetailConfiguration : IEntityTypeConfiguration<QuotationDe
         builder.Property(b => b.AmountDetail).HasPrecision(18, 4);
         builder.Property(b => b.IsBankTransactionPosted).HasDefaultValue(false);
         builder.Property(b => b.IsBankTransactionVoidPosted).HasDefaultValue(false);
+        builder.Property(b => b.IsBankTransactionTransferFeePosted).HasDefaultValue(false);
+        builder.Property(b => b.IsBankTransactionTransferFeeVoidPosted).HasDefaultValue(false);
         builder.Property(b => b.IsJournalEntryPosted).HasDefaultValue(false);
         builder.Property(b => b.IsJournalEntryVoidPosted).HasDefaultValue(false);
+        builder.Property(b => b.IsJournalEntryTransferFeePosted).HasDefaultValue(false);
+        builder.Property(b => b.IsJournalEntryTransferFeeVoidPosted).HasDefaultValue(false);
         builder.Property(b => b.QuotationDetailType).HasDefaultValue(SD.QuotationDetailType.Deposit)
             .HasSentinel(default);
 
