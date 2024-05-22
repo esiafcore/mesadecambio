@@ -87,7 +87,7 @@ public class Company : ICloneable
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     [Display(Name = "Creado El")]
-    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedDate { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
 
     [Display(Name = "Creado Por")]
     [StringLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
