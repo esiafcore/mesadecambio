@@ -5,7 +5,6 @@ using Xanes.DataAccess.Repository.IRepository;
 
 namespace Xanes.DataAccess.Repository;
 
-
 public class Repository<T> : IRepository<T> where T : class
 {
     private readonly ApplicationDbContext _db;
@@ -40,7 +39,6 @@ public class Repository<T> : IRepository<T> where T : class
     {
         dbSet.Add(entity);
     }
-
 
     public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
     {
@@ -87,4 +85,6 @@ public class Repository<T> : IRepository<T> where T : class
         query = query.Where(filter);
         return query.ExecuteDelete() > 0;
     }
+
+
 }

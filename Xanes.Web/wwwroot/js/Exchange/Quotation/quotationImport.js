@@ -10,6 +10,7 @@
 const fnimportSubmit = async (event) => {
 
     try {
+        fntoggleLoading();
 
         event.preventDefault();
         const formObject = event.currentTarget;
@@ -17,10 +18,11 @@ const fnimportSubmit = async (event) => {
         const url = formObject.action;
         const formData = new FormData(formObject);
 
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
+        const response = await fetch(url,
+            {
+                method: 'POST',
+                body: formData
+            });
 
         const jsonResult = await response.json();
         if (!response.ok) {
@@ -71,5 +73,7 @@ const fnimportSubmit = async (event) => {
             icon: 'error',
             text: error
         });
+    } finally {
+        fntoggleLoading();
     }
 };

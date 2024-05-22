@@ -330,11 +330,15 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
 
 const fnExportExcel = async () => {
     try {
+        fntoggleLoading();
+
         let url =
-            `/exchange/quotation/exportexcel?dateInitial=${dateInitial}&dateFinal=${dateFinal}&includeVoid=${includeVoid}`;
-        const response = await fetch(url, {
-            method: 'GET'
-        });
+            `/exchange/quotation/exportexcel?dateInitial=${dateInitial}&dateFinal=${dateFinal}&includeVoid=${includeVoid
+            }`;
+        const response = await fetch(url,
+            {
+                method: 'GET'
+            });
 
         if (response.status === 204) {
             Swal.fire({
@@ -367,13 +371,14 @@ const fnExportExcel = async () => {
         link.click();
 
         window.URL.revokeObjectURL(blobUrl);
-    }
-    catch (e) {
+    } catch (e) {
         Swal.fire({
             icon: 'error',
             title: "Error en la conexión",
             text: e
         });
+    } finally {
+        fntoggleLoading();
     }
 };
 

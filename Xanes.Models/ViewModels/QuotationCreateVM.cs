@@ -38,4 +38,7 @@ public class QuotationCreateVM
     [ValidateNever]
     public DateOnly ProcessingDate { get; set; }
 
+    [ValidateNever] 
+    public bool ExistProcessingDate { get; set; } = true;
+
 }

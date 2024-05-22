@@ -23,9 +23,9 @@
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnNext">
-                            <a class="btn btn-primary form-control btn-sm border" 
-                             data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Siguiente" 
-                             onclick="fnSaveNext()">
+                            <a class="btn btn-primary form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Siguiente"
+                               onclick="fnSaveNext()">
                                 <i class="bi bi-arrow-right-circle"></i> Siguiente
                             </a>
                             <button type="submit" id="btnSaveNext" hidden>
@@ -53,7 +53,7 @@
                         <input hidden asp-for="DataModel.Id" name="Id" />
                         <input hidden asp-for="DataModel.IsLoan" name="IsLoan" />
                         <input hidden asp-for="DataModel.IsPosted" name="IsPosted" />
-                        <input hidden asp-for="DataModel.IsClosed" name="IsClosed"/>
+                        <input hidden asp-for="DataModel.IsClosed" name="IsClosed" />
                         <input hidden asp-for="DataModel.IsClosed" value="@Model.DataModel.IsClosed" id="isClosedElement" />
                         <input hidden asp-for="DataModel.IsPayment" name="IsPayment" />
                         <input hidden asp-for="DataModel.CompanyId" name="CompanyId" />
@@ -85,13 +85,24 @@
                                     <span asp-validation-for="DataModel.TypeNumeral" class="text-danger"></span>
                                 </div>
                             </div>
+                            @{
+                                var minimo = "";
+
+                                if (Model.ExistProcessingDate)
+                                {
+                                    minimo = Model.ProcessingDate.ToString(AC.DefaultDateFormatWeb);
+                                }
+                            }
+
                             <div class="row col-xl-4 col-md-6 col-12 mb-1">
                                 <div class="col-sm-5 col-lg-4 col-4">Fecha</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
-                                    <input asp-for="DataModel.DateTransa" type="date" min="@Model.ProcessingDate.ToString(AC.DefaultDateFormatWeb)" id="dateTransa" class="form-control border p-1 shadow" name="DateTransa" />
+                                    <input asp-for="DataModel.DateTransa" type="date" min="@minimo"
+                                           id="dateTransa" class="form-control border p-1 shadow" name="DateTransa" />
                                     <span asp-validation-for="DataModel.DateTransa" class="text-danger"></span>
                                 </div>
                             </div>
+
                         </div>
                         <div class="row">
                             <div class="row col-xl-8 col-12 ps-2 mb-1" id="divCustomer">
