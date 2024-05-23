@@ -123,7 +123,7 @@ public class QuotationController : Controller
         {
             objData = new Quotation
             {
-                DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
+                DateTransa = DateOnly.FromDateTime(DateTime.Now),
                 TypeNumeral = SD.QuotationType.Buy,
                 CurrencyTransaType = SD.CurrencyType.Foreign,
                 CurrencyTransferType = SD.CurrencyType.Base,
@@ -1391,7 +1391,7 @@ public class QuotationController : Controller
     public IActionResult ProcessingDate()
     {
         ProcessingDateVM model = new();
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.UtcNow).ToString();
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
         DateOnly processingDate = DateOnly.Parse(processingDateString);
         model.ProcessingDate = processingDate;
         return View(model);
@@ -1840,7 +1840,7 @@ public class QuotationController : Controller
     #region EXPORT - IMPORT
 
     [HttpGet]
-    public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = false)
+    public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
     {
         DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
         DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
@@ -2014,6 +2014,17 @@ public class QuotationController : Controller
         // Titulo de la pagina
         ViewData[AC.Title] = $"Cotizaciones - Importar";
         ImportVM modelVm = new();
+        return View(modelVm);
+    }
+
+    [HttpGet]
+    public IActionResult Export()
+    {
+        // Titulo de la pagina
+        ViewData[AC.Title] = $"Cotizaciones - Exportar";
+        TransactionReportVM modelVm = new();
+        modelVm.DateTransaFinal = DateOnly.FromDateTime(DateTime.Now);
+        modelVm.DateTransaInitial = DateOnly.FromDateTime(DateTime.Now);
         return View(modelVm);
     }
 

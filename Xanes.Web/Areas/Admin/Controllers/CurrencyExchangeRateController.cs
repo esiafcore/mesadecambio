@@ -126,7 +126,7 @@ public class CurrencyExchangeRateController : Controller
             obj = new CurrencyExchangeRate()
             {
                 CompanyId = _companyId,
-                DateTransa = DateOnly.FromDateTime(DateTime.UtcNow),
+                DateTransa = DateOnly.FromDateTime(DateTime.Now),
                 CurrencyType = currencyType,
                 CurrencyTrx = currencyCurrent
             };

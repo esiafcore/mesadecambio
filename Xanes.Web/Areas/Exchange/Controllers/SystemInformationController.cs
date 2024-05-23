@@ -424,8 +424,8 @@ public class SystemInformationController : Controller
             var modelVm = new TransactionReportVM()
             {
                 ReportType = typeReport,
-                DateTransaInitial = DateOnly.FromDateTime(DateTime.UtcNow),
-                DateTransaFinal = DateOnly.FromDateTime(DateTime.UtcNow)
+                DateTransaInitial = DateOnly.FromDateTime(DateTime.Now),
+                DateTransaFinal = DateOnly.FromDateTime(DateTime.Now)
             };
 
             resultResponse.Data = modelVm;
@@ -449,8 +449,8 @@ public class SystemInformationController : Controller
             var modelVm = new TransactionReportVM()
             {
                 ReportType = typeReport,
-                DateTransaInitial = DateOnly.FromDateTime(DateTime.UtcNow),
-                DateTransaFinal = DateOnly.FromDateTime(DateTime.UtcNow)
+                DateTransaInitial = DateOnly.FromDateTime(DateTime.Now),
+                DateTransaFinal = DateOnly.FromDateTime(DateTime.Now)
             };
 
             resultResponse.Data = modelVm;
@@ -474,8 +474,8 @@ public class SystemInformationController : Controller
             var modelVm = new TransactionReportVM()
             {
                 ReportType = typeReport,
-                DateTransaInitial = DateOnly.FromDateTime(DateTime.UtcNow),
-                DateTransaFinal = DateOnly.FromDateTime(DateTime.UtcNow)
+                DateTransaInitial = DateOnly.FromDateTime(DateTime.Now),
+                DateTransaFinal = DateOnly.FromDateTime(DateTime.Now)
             };
 
             resultResponse.Data = modelVm;
