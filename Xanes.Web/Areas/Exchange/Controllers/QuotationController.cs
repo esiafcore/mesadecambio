@@ -56,7 +56,7 @@ public class QuotationController : Controller
         ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter.ToString(AC.DefaultDateFormatWeb));
         ViewBag.IsNewEntry = JsonSerializer.Serialize(true);
         TransactionReportVM modelVM = new();
-
+        ViewData[AC.Title] = "Listado de Transacciones";
         return View(modelVM);
     }
 

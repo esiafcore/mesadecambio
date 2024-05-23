@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const formPrint = document.getElementById("formPrint");
     formPrint.addEventListener("submit", fnPrintFormSubmit);
 
-    searchValue = document.querySelector("#dt-search-0");
-    searchValue.addEventListener("change", () => {
-        sessionStorage.setItem('searchValue', searchValue.value);
-    });
+    //searchValue = document.querySelector("#dt-search-0");
+    //searchValue.addEventListener("change", () => {
+    //    sessionStorage.setItem('searchValue', searchValue.value);
+    //});
 
 });
 
@@ -392,7 +392,7 @@ const fnSetSearchValue = (value) => {
     if (!searchValue) {
         searchValue = document.querySelector("#dt-search-0");
     }
-    
+
     // Establece el valor del input
     searchValue.value = value;
 
@@ -635,6 +635,11 @@ const fnLoadDatatable = () => {
                 }
             }
         ],
+        "layout": {
+            topRight: {
+                buttons: ['excel', 'colvis']
+            }
+        },
         "createdRow": function (row, data) {
             if (data.isVoid) {
                 $(row).addClass('table-danger bg-danger bg-opacity-50');
