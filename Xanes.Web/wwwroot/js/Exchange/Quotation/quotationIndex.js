@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const formPrint = document.getElementById("formPrint");
     formPrint.addEventListener("submit", fnPrintFormSubmit);
 
-    //searchValue = document.querySelector("#dt-search-0");
-    //searchValue.addEventListener("change", () => {
-    //    sessionStorage.setItem('searchValue', searchValue.value);
-    //});
+    searchValue = document.querySelector("#dt-search-0");
+    searchValue.addEventListener("change", () => {
+        sessionStorage.setItem('searchValue', searchValue.value);
+    });
 
 });
 
