@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Xanes.DataAccess\Xanes.DataAccess.csproj" />
+    <ProjectReference Include="..\Xanes.LoggerService\Xanes.LoggerService.csproj" />
     <ProjectReference Include="..\Xanes.Models\Xanes.Models.csproj" />
     <ProjectReference Include="..\Xanes.Utility\Xanes.Utility.csproj" />
   </ItemGroup>

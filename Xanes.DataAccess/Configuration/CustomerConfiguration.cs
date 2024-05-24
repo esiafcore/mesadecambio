@@ -17,7 +17,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                 , "customers_idx_2010")
             .IsUnique();
 
-        builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.Identificationnumber }
+        builder.HasIndex(x => new { x.CompanyId, x.TypeId, x.IdentificationNumber }
                 , "customers_idx_2020")
             .IsUnique();
 

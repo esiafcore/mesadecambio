@@ -5,28 +5,28 @@ using Xanes.Utility;
 
 namespace Xanes.DataAccess.ServicesApi.Service;
 
-public class QuotationLegacyService : BaseService, IQuotationLegacyService
+public class CustomerLegacyService : BaseService, ICustomerLegacyService
 {
     private string _actionUrl;
     private IConfiguration _configuration;
 
-    public QuotationLegacyService(IHttpClientFactory httpClient,
+    public CustomerLegacyService(IHttpClientFactory httpClient,
         IConfiguration configuration
     ) : base(httpClient, configuration)
     {
         // configuration.GetValue<string>("ServicesUrl:Version")
-        _actionUrl = string.Format("{0}quotationslegacy"
+        _actionUrl = string.Format("{0}customerslegacy"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
         _configuration = configuration;
     }
 
-    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate)
+    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber)
     {
         return SendAsync(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?beginDate={1}&endDate={2}&pagina={3}&recordsPorPagina={4}",
-                _actionUrl, beginDate.ToString(AC.DefaultDateFormatWeb), endDate.ToString(AC.DefaultDateFormatWeb), pageNumber, pageSize),
+            Url = string.Format("{0}?pagina={1}&recordsPorPagina={2}",
+                _actionUrl, pageNumber, pageSize),
             Token = token
         });
     }

@@ -4,6 +4,7 @@ using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Web.CustomMiddleware;
+using Xanes.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 //});
 
 // Add services to the container.
+builder.Services.ConfigureLoggerService();
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureHttpClientService();
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
         ,x => x.MigrationsAssembly("Xanes.DataAccess"));

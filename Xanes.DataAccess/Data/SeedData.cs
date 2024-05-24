@@ -43,7 +43,7 @@ public class SeedData
                 //CategoryNumeral = 6,
                 TypeId = 2, //JURIDICO
                 TypeNumeral = 2,
-                Identificationnumber = "J0310000122865",
+                IdentificationNumber = "J0310000122865",
                 FirstName = string.Empty,
                 SecondName = string.Empty,
                 LastName = string.Empty,
@@ -64,7 +64,7 @@ public class SeedData
                 //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
-                Identificationnumber = "0013009870051Y",
+                IdentificationNumber = "0013009870051Y",
                 FirstName = "MIGUEL",
                 SecondName = "FERNANDO",
                 LastName = "RAMIREZ",
@@ -85,7 +85,7 @@ public class SeedData
                 //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
-                Identificationnumber = "244686858",
+                IdentificationNumber = "244686858",
                 FirstName = "JIMMY",
                 SecondName = "ALEXANDER",
                 LastName = "SANDOVAL",
@@ -106,7 +106,7 @@ public class SeedData
                 //CategoryNumeral = 6,
                 TypeId = 2, //JURIDICO
                 TypeNumeral = 2,
-                Identificationnumber = "J0310000441430",
+                IdentificationNumber = "J0310000441430",
                 FirstName = string.Empty,
                 SecondName = string.Empty,
                 LastName = string.Empty,
@@ -127,7 +127,7 @@ public class SeedData
                 //CategoryNumeral = 6,
                 TypeId = 1, //NATURAL
                 TypeNumeral = 1,
-                Identificationnumber = "0012206860039E",
+                IdentificationNumber = "0012206860039E",
                 FirstName = "MEYLING",
                 SecondName = "RAQUEL",
                 LastName = "SANCHEZ",

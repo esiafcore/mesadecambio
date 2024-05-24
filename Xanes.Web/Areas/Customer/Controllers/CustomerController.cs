@@ -215,7 +215,7 @@ public class CustomerController : Controller
                 //Validar si identificación ya existe
                 bool isIdentificationExist = await _uow
                     .Customer.IsExists(x => (x.CompanyId == obj.CompanyId)
-                                            && (x.Identificationnumber.Trim() == obj.Identificationnumber.Trim())
+                                            && (x.IdentificationNumber.Trim() == obj.IdentificationNumber.Trim())
                                             && (x.TypeNumeral == obj.TypeNumeral));
 
                 if (isIdentificationExist)
@@ -261,12 +261,12 @@ public class CustomerController : Controller
                 objExists = _uow.Customer
                     .Get(filter: x => (x.CompanyId == _companyId)
                                       & (x.TypeId == obj.TypeId)
-                                      & (x.Identificationnumber.Trim().ToLower() == obj.Identificationnumber.Trim().ToLower()), isTracking: false);
+                                      & (x.IdentificationNumber.Trim().ToLower() == obj.IdentificationNumber.Trim().ToLower()), isTracking: false);
 
                 if (objExists != null && objExists.Id != obj.Id)
                 {
                     jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = $"Identificación {obj.Identificationnumber} ya existe";
+                    jsonResponse.ErrorMessages = $"Identificación {obj.IdentificationNumber} ya existe";
                     return Json(jsonResponse);
                 }
 
@@ -357,9 +357,14 @@ public class CustomerController : Controller
     }
 
     [HttpGet]
-    public FileResult ExportExcel()
+    public IActionResult ExportExcel()
     {
         var objCustomerList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId), includeProperties: "TypeTrx,SectorTrx").ToList();
+
+        if (objCustomerList == null || objCustomerList.Count == 0)
+        {
+            return NoContent();
+        }
 
         return GenerarExcel("Clientes.xlsx", objCustomerList);
     }
@@ -407,7 +412,7 @@ public class CustomerController : Controller
                 worksheet.Cell(rowNum, 1).Value = item.TypeTrx.Code;
                 worksheet.Cell(rowNum, 2).Value = item.SectorTrx.Code;
                 worksheet.Cell(rowNum, 3).Value = item.Code;
-                worksheet.Cell(rowNum, 4).Value = item.Identificationnumber;
+                worksheet.Cell(rowNum, 4).Value = item.IdentificationNumber;
                 worksheet.Cell(rowNum, 5).Value = item.BusinessName;
                 worksheet.Cell(rowNum, 6).Value = item.CommercialName;
                 worksheet.Cell(rowNum, 7).Value = item.FirstName;
@@ -589,7 +594,7 @@ public class CustomerController : Controller
             objCustomer.TypeId = objType.Id;
             objCustomer.TypeNumeral = objType.Numeral;
             objCustomer.SectorId = objSector.Id;
-            objCustomer.Identificationnumber = numberIdent;
+            objCustomer.IdentificationNumber = numberIdent;
             objCustomer.AddressPrimary = address;
             objCustomer.CreatedBy = AC.LOCALHOSTME;
             objCustomer.CreatedDate = DateTime.UtcNow;

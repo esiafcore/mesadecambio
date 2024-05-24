@@ -35,6 +35,7 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Id Sector")]
     [ForeignKey(nameof(SectorTrx))]
     public int SectorId { get; set; } = 1;
+
     [ValidateNever]
     public virtual CustomerSector SectorTrx { get; set; } = null!;
 
@@ -50,7 +51,7 @@ public class Customer: EntityInactivated, ICloneable
     [MaxLength(20, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "# Identificación")]
-    public string Identificationnumber { get; set; } = null!;
+    public string IdentificationNumber { get; set; } = null!;
 
     [MaxLength(250, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Primer Nombre")]
@@ -70,11 +71,11 @@ public class Customer: EntityInactivated, ICloneable
 
     [MaxLength(550, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Razón Social")]
-    public string BusinessName { get; set; } = string.Empty;
+    public string BusinessName { get; set; } = null!;
 
     [MaxLength(550, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Nombre Comercial")]
-    public string CommercialName { get; set; } = string.Empty;
+    public string CommercialName { get; set; } = null!;
 
     [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
     [Display(Name = "Dirección Principal")]
@@ -100,7 +101,7 @@ public class Customer: EntityInactivated, ICloneable
             TypeId = TypeId,
             TypeNumeral = TypeNumeral,
             Code = Code,
-            Identificationnumber = Identificationnumber,
+            IdentificationNumber = IdentificationNumber,
             FirstName = FirstName,
             SecondName = SecondName,
             LastName = LastName,

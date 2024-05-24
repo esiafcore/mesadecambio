@@ -51,6 +51,14 @@ public static class SD
         LegalPerson = 2
     }
 
+
+    [Flags]
+    public enum PersonTypeCode : int
+    {
+        NAT = 1,
+        JUR = 2
+    }
+    
     [Flags]
     public enum IdentificationTypeNumber : int
     {

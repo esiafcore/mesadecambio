@@ -29,7 +29,7 @@ const fnLoadDatatable = () => {
                 , orderable: true
             },
             {
-                data: 'identificationnumber', "width": "10%"
+                data: 'identificationNumber', "width": "10%"
                 , orderable: true
             },
             {

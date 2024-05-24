@@ -1,10 +1,22 @@
-﻿//namespace Xanes.Web.Extensions;
+﻿using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Service;
+using Xanes.LoggerService;
 
-//public static class ServiceExtensions
-//{
-//    public static void ConfigureLoggerService(this IServiceCollection services) =>
-//        services.AddSingleton<ILoggerManager, LoggerManager>();
+namespace Xanes.Web.Extensions;
 
+public static class ServiceExtensions
+{
+    public static void ConfigureLoggerService(this IServiceCollection services) =>
+        services.AddSingleton<ILoggerManager, LoggerManager>();
 
-//}
+    public static void ConfigureHttpClientService(this IServiceCollection services)
+    {
+        //Authentication and Authorization
+        services.AddHttpClient<IQuotationLegacyService, QuotationLegacyService>();
+        services.AddTransient<IQuotationLegacyService, QuotationLegacyService>();
+
+        services.AddHttpClient<ICustomerLegacyService, CustomerLegacyService>();
+        services.AddTransient<ICustomerLegacyService, CustomerLegacyService>();
+    }
+}
 

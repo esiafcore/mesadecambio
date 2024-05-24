@@ -21,7 +21,7 @@ public class BaseService : IBaseService
         this.httpClient = httpClient;
     }
 
-    public async Task<T> SendAsync<T>(APIRequest apiRequest, Pagination? pagination = null)
+    public async Task<string> SendAsync(APIRequest apiRequest, Pagination? pagination = null)
     {
         StringBuilder errorsMessagesBuilder = new StringBuilder();
 
@@ -98,40 +98,34 @@ public class BaseService : IBaseService
             }
 
             var apiContent = await apiResponse.Content.ReadAsStringAsync();
+
             try
             {
-
-                APIResponse ApiResponse = JsonSerializer.Deserialize<APIResponse>(apiContent);
-                if (ApiResponse != null && (apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest
-                                            || apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound))
-                {
-                    ApiResponse.statusCode = System.Net.HttpStatusCode.BadRequest;
-                    ApiResponse.isSuccess = false;
-                    var res = JsonSerializer.Serialize(ApiResponse);
-                    var returnObj = JsonSerializer.Deserialize<T>(res);
-                    return returnObj;
-                }
+                //APIResponse ApiResponse = JsonSerializer.Deserialize<APIResponse>(apiContent);
+                //if (ApiResponse != null && (apiResponse.StatusCode == System.Net.HttpStatusCode.BadRequest || apiResponse.StatusCode == System.Net.HttpStatusCode.NotFound))
+                //{
+                //    ApiResponse.statusCode = System.Net.HttpStatusCode.BadRequest;
+                //    ApiResponse.isSuccess = false;
+                //    var res = JsonSerializer.Serialize(ApiResponse);
+                //    return res;
+                //}
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                var exceptionResponse = JsonSerializer.Deserialize<T>(apiContent);
-                return exceptionResponse;
+                return apiContent;
             }
-            var APIResponse = JsonSerializer.Deserialize<T>(apiContent);
-            return APIResponse;
 
+            return apiContent;
         }
         catch (HttpRequestException e)
         {
             var dto = new APIResponse
             {
-
                 errorMessages = new List<string> { Convert.ToString(e.Message) },
                 isSuccess = false
             };
             var res = JsonSerializer.Serialize(dto);
-            var APIResponse = JsonSerializer.Deserialize<T>(res);
-            return APIResponse;
+            return res;
         }
         catch (Exception e)
         {
@@ -141,8 +135,7 @@ public class BaseService : IBaseService
                 isSuccess = false
             };
             var res = JsonSerializer.Serialize(dto);
-            var APIResponse = JsonSerializer.Deserialize<T>(res);
-            return APIResponse;
+            return res;
         }
     }
 }
