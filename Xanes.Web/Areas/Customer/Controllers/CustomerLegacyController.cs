@@ -4,10 +4,7 @@ using System.Text.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
-using Xanes.Models;
 using Xanes.Models.Dtos;
-using Xanes.Models.Shared;
-using Xanes.Models.ViewModels;
 using Xanes.Utility;
 #pragma warning disable CS8604
 
@@ -24,7 +21,6 @@ public class CustomerLegacyController : Controller
 
     public CustomerLegacyController(ICustomerLegacyService service
         , ILoggerManager logger
-        , IHttpContextAccessor httpCtxAcc
         , IConfiguration cfg
         , IUnitOfWork uow)
     {
@@ -55,7 +51,7 @@ public class CustomerLegacyController : Controller
         if (objTypeList == null)
         {
             TempData[AC.Error] = "Tipos de personas no encontradas";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home", new { Area = "exchange" });
         }
 
         var objSectorList = _uow.CustomerSector.GetAll(filter: x =>
@@ -64,7 +60,7 @@ public class CustomerLegacyController : Controller
         if (objSectorList == null)
         {
             TempData[AC.Error] = "Sectores no encontrados";
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home", new { Area = "exchange" });
         }
 
         //Armar los clientes a exportar
@@ -98,14 +94,23 @@ public class CustomerLegacyController : Controller
                 customer.TypeTrx = objTypeList.First(x => x.Numeral == (int)SD.PersonType.NaturalPerson);
             }
 
-            customer.SectorId = objSectorList.First(x => x.Code == customerLegacy.SectorCategoryCode).Id;
-            customer.SectorTrx = objSectorList.First(x => x.Code == customerLegacy.SectorCategoryCode);
+            var sector = objSectorList.FirstOrDefault(x => x.Code == customerLegacy.SectorCategoryCode);
+
+            if(sector == null)
+            {
+                TempData[AC.Error] = $"Sector: {customerLegacy.SectorCategoryCode} no encontrado";
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
+
+            customer.SectorId = sector.Id;
+            customer.SectorTrx = sector;
             objCustomerList.Add(customer);
         }
 
         if (objCustomerList == null || objCustomerList.Count == 0)
         {
-            return NoContent();
+            TempData[AC.Error] = $"Clientes no encontrados";
+            return RedirectToAction("Index", "Home", new { Area = "exchange" });
         }
 
         return GenerarExcel("ClientesLegacy.xlsx", objCustomerList);

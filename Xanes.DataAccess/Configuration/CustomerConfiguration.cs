@@ -21,11 +21,11 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
                 , "customers_idx_2020")
             .IsUnique();
 
-        //builder.HasOne(x => x.CategoryTrx)
-        //    .WithMany()
-        //    .HasForeignKey(x => x.CategoryId)
-        //    .OnDelete(DeleteBehavior.NoAction)
-        //    .IsRequired(true);
+        builder.HasOne(x => x.IdentificationTypeTrx)
+            .WithMany()
+            .HasForeignKey(x => x.IdentificationTypeId)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired(true);
 
         builder.HasOne(x => x.TypeTrx)
             .WithMany()

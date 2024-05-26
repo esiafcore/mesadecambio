@@ -10,6 +10,9 @@ public class CustomerLegacyDto
     [JsonPropertyName("code")]
     public string Code { get; set; } = string.Empty;
 
+    [JsonPropertyName("identificationTypeCode")]
+    public string IdentificationTypeCode { get; set; } = string.Empty;
+
     [JsonPropertyName("personType")]
     public string PersonType { get; set; } = string.Empty;
 

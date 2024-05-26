@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models;
@@ -18,15 +19,20 @@ public class QuotationLegacyController : Controller
     private readonly IQuotationLegacyService _srv;
     private readonly ILoggerManager _logger;
     private readonly IConfiguration _cfg;
+    private readonly IUnitOfWork _uow;
+    private readonly int _companyId;
 
     public QuotationLegacyController(IQuotationLegacyService service
         , ILoggerManager logger
-        , IHttpContextAccessor httpCtxAcc
-        , IConfiguration cfg)
+        , IConfiguration cfg
+        , IUnitOfWork uow)
     {
         _logger = logger;
         _srv = service;
         _cfg = cfg;
+        _uow = uow;
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
+
     }
 
     [HttpGet]
@@ -47,14 +53,74 @@ public class QuotationLegacyController : Controller
     //    DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
     //    DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
     //    var objQuotationList = new List<Quotation>();
-    //    var apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 100, 1, dateTransaInitial, dateTransaFinal);
+    //    var apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal);
 
     //    var options = new JsonSerializerOptions
     //    {
     //        PropertyNameCaseInsensitive = true
     //    };
 
-    //    var objList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+    //    var objLegacyList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+
+    //    if (objLegacyList == null || objLegacyList.Count == 0)
+    //    {
+    //        return NoContent();
+    //    }
+
+    //    var objTypeList = _uow.QuotationType.GetAll(filter: x =>
+    //      x.CompanyId == _companyId).ToList();
+
+    //    if (objTypeList == null || objTypeList.Count == 0)
+    //    {
+    //        TempData[AC.Error] = "Tipos de cotizaciones no encontradas";
+    //        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+    //    }
+
+    //    var objCustomerList = _uow.Customer.GetAll(filter: x =>
+    //      x.CompanyId == _companyId).ToList();
+
+    //    if (objCustomerList == null || objCustomerList.Count == 0)
+    //    {
+    //        TempData[AC.Error] = "Clientes no encontrados no encontradas";
+    //        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+    //    }
+
+    //    var objBankAccountList = _uow.BankAccount.GetAll(filter: x =>
+    //        x.CompanyId == _companyId).ToList();
+
+    //    if (objBankAccountList == null || objBankAccountList.Count == 0)
+    //    {
+    //        TempData[AC.Error] = "Cuentas bancarias no encontradas";
+    //        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+    //    }
+
+    //    var objBusinessList = _uow.BusinessExecutive.GetAll(filter: x =>
+    //        x.CompanyId == _companyId).ToList();
+
+    //    if (objBusinessList == null || objBusinessList.Count == 0)
+    //    {
+    //        TempData[AC.Error] = "Ejecutivos no encontrados";
+    //        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+    //    }
+
+    //    var objCurrencyList = _uow.Currency.GetAll(filter: x =>
+    //        x.CompanyId == _companyId).ToList();
+
+    //    if (objCurrencyList == null || objCurrencyList.Count == 0)
+    //    {
+    //        TempData[AC.Error] = "Monedas no encontradas";
+    //        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+    //    }
+
+    //    foreach (var quotationLegacy in objLegacyList)
+    //    {
+
+    //    }
+
+
+
+
+
 
 
     //    _uow.Quotation

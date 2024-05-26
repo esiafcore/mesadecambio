@@ -10,6 +10,8 @@ using System.Net;
 using Xanes.Models.ViewModels;
 using System.Text;
 using Xanes.Models.Shared;
+using static Xanes.Utility.SD;
+using System.Text.RegularExpressions;
 
 
 namespace Xanes.Web.Areas.Customer.Controllers;
@@ -24,7 +26,7 @@ public class CustomerController : Controller
     //Usada en el Upsert
     private List<CustomerSector> sectorList;
     private IEnumerable<SelectListItem> sectorSelectList;
-    private List<PersonType> typeSelectList;
+    private List<Xanes.Models.PersonType> typeSelectList;
 
     public CustomerController(IUnitOfWork uow, IConfiguration configuration)
     {
@@ -395,16 +397,17 @@ public class CustomerController : Controller
             worksheet.Cell(4, 1).Value = "Tipo";
             worksheet.Cell(4, 2).Value = "Sector";
             worksheet.Cell(4, 3).Value = "Código";
-            worksheet.Cell(4, 4).Value = "# Ident.";
-            worksheet.Cell(4, 5).Value = "Razón Social";
-            worksheet.Cell(4, 6).Value = "Nombre Comercial";
-            worksheet.Cell(4, 7).Value = "Primer Nombre";
-            worksheet.Cell(4, 8).Value = "Segundo Nombre";
-            worksheet.Cell(4, 9).Value = "Primer Apellido";
-            worksheet.Cell(4, 10).Value = "Segundo Apellido";
-            worksheet.Cell(4, 11).Value = "Dirección";
-            worksheet.Cell(4, 12).Value = "Es Banco";
-            worksheet.Cell(4, 13).Value = "Es del Sistema";
+            worksheet.Cell(4, 4).Value = "Código Tipo Ident.";
+            worksheet.Cell(4, 5).Value = "# Ident.";
+            worksheet.Cell(4, 6).Value = "Razón Social";
+            worksheet.Cell(4, 7).Value = "Nombre Comercial";
+            worksheet.Cell(4, 8).Value = "Primer Nombre";
+            worksheet.Cell(4, 9).Value = "Segundo Nombre";
+            worksheet.Cell(4, 10).Value = "Primer Apellido";
+            worksheet.Cell(4, 11).Value = "Segundo Apellido";
+            worksheet.Cell(4, 12).Value = "Dirección";
+            worksheet.Cell(4, 13).Value = "Es Banco";
+            worksheet.Cell(4, 14).Value = "Es del Sistema";
 
             int rowNum = 5;
             foreach (var item in listEntities)
@@ -412,16 +415,17 @@ public class CustomerController : Controller
                 worksheet.Cell(rowNum, 1).Value = item.TypeTrx.Code;
                 worksheet.Cell(rowNum, 2).Value = item.SectorTrx.Code;
                 worksheet.Cell(rowNum, 3).Value = item.Code;
-                worksheet.Cell(rowNum, 4).Value = item.IdentificationNumber;
-                worksheet.Cell(rowNum, 5).Value = item.BusinessName;
-                worksheet.Cell(rowNum, 6).Value = item.CommercialName;
-                worksheet.Cell(rowNum, 7).Value = item.FirstName;
-                worksheet.Cell(rowNum, 8).Value = item.SecondName;
-                worksheet.Cell(rowNum, 9).Value = item.LastName;
-                worksheet.Cell(rowNum, 10).Value = item.SecondSurname;
-                worksheet.Cell(rowNum, 11).Value = item.AddressPrimary;
-                worksheet.Cell(rowNum, 12).Value = item.IsBank ? "S" : "N";
-                worksheet.Cell(rowNum, 13).Value = item.IsSystemRow ? "S" : "N";
+                worksheet.Cell(rowNum, 4).Value = item.IdentificationTypeCode;
+                worksheet.Cell(rowNum, 5).Value = item.IdentificationNumber;
+                worksheet.Cell(rowNum, 6).Value = item.BusinessName;
+                worksheet.Cell(rowNum, 7).Value = item.CommercialName;
+                worksheet.Cell(rowNum, 8).Value = item.FirstName;
+                worksheet.Cell(rowNum, 9).Value = item.SecondName;
+                worksheet.Cell(rowNum, 10).Value = item.LastName;
+                worksheet.Cell(rowNum, 11).Value = item.SecondSurname;
+                worksheet.Cell(rowNum, 12).Value = item.AddressPrimary;
+                worksheet.Cell(rowNum, 13).Value = item.IsBank ? "S" : "N";
+                worksheet.Cell(rowNum, 14).Value = item.IsSystemRow ? "S" : "N";
 
                 rowNum++;
             }
@@ -439,7 +443,7 @@ public class CustomerController : Controller
             worksheet.Column(11).AdjustToContents();
             worksheet.Column(12).AdjustToContents();
             worksheet.Column(13).AdjustToContents();
-
+            worksheet.Column(14).AdjustToContents();
 
             // Asignar un nombre a la página del excel
             wb.Worksheet(1).Name = "Data";
@@ -462,7 +466,6 @@ public class CustomerController : Controller
         return View(modelVm);
     }
 
-
     [HttpPost]
     public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
     {
@@ -472,6 +475,8 @@ public class CustomerController : Controller
             List<string> ErrorListMessages = new List<string>();
             var errorsMessagesBuilder = new StringBuilder();
             List<Models.Customer> objCustomerList = new();
+            List<Models.ViewModels.CustomerImportVM> objCustomerVMList = new();
+
 
             if (objImportViewModel.FileExcel is null)
             {
@@ -501,6 +506,15 @@ public class CustomerController : Controller
                 return Json(jsonResponse);
             }
 
+            var objIdentificationTypeList = _uow.IdentificationType
+              .GetAll(filter: x => x.IsActive && x.CompanyId == _companyId).ToList();
+            if (objIdentificationTypeList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Tipo de identificación no encontrado";
+                return Json(jsonResponse);
+            }
+
             var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
 
             var hoja = workbook.Worksheet(1);
@@ -511,30 +525,31 @@ public class CustomerController : Controller
             for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
             {
 
-                var objCustomer = new Models.Customer();
-                objCustomer.CompanyId = _companyId;
+                var objCustomerVM = new Models.ViewModels.CustomerImportVM();
+                objCustomerVM.DataModel = new();
+                objCustomerVM.DataModel.CompanyId = _companyId;
 
                 var fila = hoja.Row(i);
-
-                string businessName = fila.Cell(5).IsEmpty() ? null : fila.Cell(5).GetString();
+                objCustomerVM.Fila = i;
+                string? businessName = fila.Cell(6).IsEmpty() ? null : fila.Cell(5).GetString();
                 if (string.IsNullOrWhiteSpace(businessName))
                 {
                     ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. |");
                 }
 
-                string commercialName = fila.Cell(6).IsEmpty() ? null : fila.Cell(6).GetString();
+                string? commercialName = fila.Cell(7).IsEmpty() ? null : fila.Cell(6).GetString();
                 //if (string.IsNullOrWhiteSpace(commercialName))
                 //{
                 //    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
                 //}
 
-                string address = fila.Cell(11).IsEmpty() ? null : fila.Cell(11).GetString();
+                string? address = fila.Cell(12).IsEmpty() ? null : fila.Cell(11).GetString();
                 //if (string.IsNullOrWhiteSpace(address))
                 //{
                 //    ErrorListMessages.Add($"La dirección está vacia en la fila:{i}. ");
                 //}
 
-                string isBank = fila.Cell(12).IsEmpty() ? null : fila.Cell(12).GetString();
+                string? isBank = fila.Cell(13).IsEmpty() ? null : fila.Cell(12).GetString();
                 if (string.IsNullOrWhiteSpace(isBank))
                 {
                     ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. |");
@@ -543,11 +558,11 @@ public class CustomerController : Controller
                 {
                     if (isBank == "S")
                     {
-                        objCustomer.IsBank = true;
+                        objCustomerVM.DataModel.IsBank = true;
                     }
                     else if (isBank == "N")
                     {
-                        objCustomer.IsBank = false;
+                        objCustomerVM.DataModel.IsBank = false;
                     }
                     else
                     {
@@ -555,7 +570,7 @@ public class CustomerController : Controller
                     }
                 }
 
-                string isSystem = fila.Cell(13).IsEmpty() ? null : fila.Cell(13).GetString();
+                string? isSystem = fila.Cell(14).IsEmpty() ? null : fila.Cell(13).GetString();
                 if (string.IsNullOrWhiteSpace(isSystem))
                 {
                     ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. |");
@@ -564,11 +579,11 @@ public class CustomerController : Controller
                 {
                     if (isSystem == "S")
                     {
-                        objCustomer.IsSystemRow = true;
+                        objCustomerVM.DataModel.IsSystemRow = true;
                     }
                     else if (isSystem == "N")
                     {
-                        objCustomer.IsSystemRow = false;
+                        objCustomerVM.DataModel.IsSystemRow = false;
                     }
                     else
                     {
@@ -576,7 +591,7 @@ public class CustomerController : Controller
                     }
                 }
 
-                string type = fila.Cell(1).IsEmpty() ? null : fila.Cell(1).GetString();
+                string? type = fila.Cell(1).IsEmpty() ? null : fila.Cell(1).GetString();
                 if (string.IsNullOrWhiteSpace(type))
                 {
                     ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. |");
@@ -590,27 +605,27 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        objCustomer.TypeId = objType.Id;
-                        objCustomer.TypeNumeral = objType.Numeral;
+                        objCustomerVM.DataModel.TypeId = objType.Id;
+                        objCustomerVM.DataModel.TypeNumeral = objType.Numeral;
 
                         if (objType.Numeral == (int)SD.PersonType.NaturalPerson)
                         {
                             if (businessName != null)
                             {
                                 var nameSplit = businessName.Split(" ");
-                                objCustomer.FirstName = nameSplit[0];
-                                objCustomer.SecondName = nameSplit.Length > 1 && nameSplit[1] != "." ? nameSplit[1] : "";
-                                objCustomer.LastName = nameSplit.Length > 2 ? nameSplit[2] : "";
-                                objCustomer.SecondSurname = nameSplit.Length > 3 && nameSplit[3] != "." ? nameSplit[3] : "";
+                                objCustomerVM.DataModel.FirstName = nameSplit[0];
+                                objCustomerVM.DataModel.SecondName = nameSplit.Length > 1 && nameSplit[1] != "." ? nameSplit[1] : "";
+                                objCustomerVM.DataModel.LastName = nameSplit.Length > 2 ? nameSplit[2] : "";
+                                objCustomerVM.DataModel.SecondSurname = nameSplit.Length > 3 && nameSplit[3] != "." ? nameSplit[3] : "";
                                 businessName = businessName.Replace(".", "");
-                                objCustomer.BusinessName = businessName;
-                                objCustomer.CommercialName = businessName;
+                                objCustomerVM.DataModel.BusinessName = businessName;
+                                objCustomerVM.DataModel.CommercialName = businessName;
                             }
                         }
                         else
                         {
-                            objCustomer.FirstName = string.Empty;
-                            objCustomer.LastName = string.Empty;
+                            objCustomerVM.DataModel.FirstName = string.Empty;
+                            objCustomerVM.DataModel.LastName = string.Empty;
 
                             if (string.IsNullOrWhiteSpace(commercialName))
                             {
@@ -618,14 +633,14 @@ public class CustomerController : Controller
                             }
                             else
                             {
-                                if (businessName != null) objCustomer.BusinessName = businessName;
-                                objCustomer.CommercialName = commercialName;
+                                if (businessName != null) objCustomerVM.DataModel.BusinessName = businessName;
+                                objCustomerVM.DataModel.CommercialName = commercialName;
                             }
                         }
                     }
                 }
 
-                string sector = fila.Cell(2).IsEmpty() ? null : fila.Cell(2).GetString();
+                string? sector = fila.Cell(2).IsEmpty() ? null : fila.Cell(2).GetString();
                 if (string.IsNullOrWhiteSpace(sector))
                 {
                     ErrorListMessages.Add($"El sector está vacio en la fila:{i}. |");
@@ -639,12 +654,12 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        objCustomer.SectorId = objSector.Id;
+                        objCustomerVM.DataModel.SectorId = objSector.Id;
                     }
 
                 }
 
-                string code = fila.Cell(3).IsEmpty() ? null : fila.Cell(3).GetString();
+                string? code = fila.Cell(3).IsEmpty() ? null : fila.Cell(3).GetString();
                 if (string.IsNullOrWhiteSpace(code))
                 {
                     ErrorListMessages.Add($"El código está vacio en la fila:{i}. |");
@@ -658,11 +673,45 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        objCustomer.Code = code;
+                        var repeatedCode = objCustomerVMList.FirstOrDefault(x => x.DataModel.Code == code);
+
+                        if (repeatedCode != null)
+                        {
+                            ErrorListMessages.Add($"El código: {code} se repite en la fila:{i}. |");
+                        }
+                        else
+                        {
+                            objCustomerVM.DataModel.Code = code;
+                        }
+
                     }
                 }
 
-                string numberIdent = fila.Cell(4).IsEmpty() ? null : fila.Cell(4).GetString();
+                string? identificationTypeCode = fila.Cell(4).IsEmpty() ? null : fila.Cell(4).GetString();
+                if (string.IsNullOrWhiteSpace(identificationTypeCode))
+                {
+                    ErrorListMessages.Add($"El código del tipo de identificación está vacio en la fila:{i}. |");
+                }
+                else
+                {
+                    var objIdentType = objIdentificationTypeList
+                        .FirstOrDefault(x => x.Code == identificationTypeCode && x.CompanyId == _companyId);
+
+                    if (objIdentType == null)
+                    {
+                        ErrorListMessages.Add($"El código del tipo de identificación: {identificationTypeCode} no fue encontrado en la fila:{i}. |");
+
+                    }
+                    else
+                    {
+                        objCustomerVM.DataModel.IdentificationTypeId = objIdentType.Id;
+                        objCustomerVM.DataModel.IdentificationTypeCode = objIdentType.Code;
+                        objCustomerVM.DataModel.IdentificationTypeNumber = objIdentType.Numeral;
+                        objCustomerVM.DataModel.IdentificationTypeTrx = objIdentType;
+                    }
+                }
+
+                string? numberIdent = fila.Cell(5).IsEmpty() ? null : fila.Cell(4).GetString();
                 if (string.IsNullOrWhiteSpace(numberIdent))
                 {
                     ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. |");
@@ -676,16 +725,79 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        objCustomer.IdentificationNumber = numberIdent;
+                        var repeatedNumber = objCustomerVMList.FirstOrDefault(x => x.DataModel.IdentificationNumber == numberIdent);
+
+                        if (repeatedNumber != null)
+                        {
+                            ErrorListMessages.Add($"El número de identificación: {numberIdent} se repite en la fila:{i}. |");
+                        }
+                        else
+                        {
+                            objCustomerVM.DataModel.IdentificationNumber = numberIdent.ToUpper().Trim();
+                        }
                     }
                 }
 
-                objCustomer.AddressPrimary = address;
-                objCustomer.CreatedBy = AC.LOCALHOSTME;
-                objCustomer.CreatedDate = DateTime.UtcNow;
-                objCustomer.CreatedHostName = AC.LOCALHOSTPC;
-                objCustomer.CreatedIpv4 = AC.Ipv4Default;
-                objCustomerList.Add(objCustomer);
+                objCustomerVM.DataModel.AddressPrimary = address;
+                objCustomerVM.DataModel.CreatedBy = AC.LOCALHOSTME;
+                objCustomerVM.DataModel.CreatedDate = DateTime.UtcNow;
+                objCustomerVM.DataModel.CreatedHostName = AC.LOCALHOSTPC;
+                objCustomerVM.DataModel.CreatedIpv4 = AC.Ipv4Default;
+                objCustomerVMList.Add(objCustomerVM);
+            }
+
+            if (ErrorListMessages.Count > 0)
+            {
+                foreach (var error in ErrorListMessages)
+                {
+                    errorsMessagesBuilder.Append(error);
+                }
+
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
+                return Json(jsonResponse);
+            }
+
+            //Ciclo para validar el numero de identificacion
+            foreach (var customer in objCustomerVMList)
+            {
+                string regularExpressionNumber = "";
+                string formatExpressionNumber = "";
+                string substitutionExpressionNumber = "";
+                string identificationNumber = "";
+                regularExpressionNumber = customer.DataModel.IdentificationTypeTrx.RegularExpressionNumber;
+                formatExpressionNumber = customer.DataModel.IdentificationTypeTrx.FormatExpressionNumber;
+                substitutionExpressionNumber = customer.DataModel.IdentificationTypeTrx.SubstitutionExpressionNumber;
+
+                if (customer.DataModel.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+                {
+
+                    if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.CEDU)
+                    {
+                        identificationNumber = Regex.Replace(customer.DataModel.IdentificationNumber, regularExpressionNumber, formatExpressionNumber);
+                    }
+                    else if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.PASS)
+                    {
+                        identificationNumber = customer.DataModel.IdentificationNumber;
+                    }
+                }
+                else
+                {
+                    if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.RUC)
+                    {
+                        identificationNumber = customer.DataModel.IdentificationNumber;
+                    }
+                }
+
+                if (!Regex.Match(identificationNumber, regularExpressionNumber).Success)
+                {
+                    ErrorListMessages.Add($"El número de identificación: {identificationNumber} es invalido en la fila:{customer.Fila}. |");
+
+                }
+                else
+                {
+                    objCustomerList.Add(customer.DataModel);
+                }
             }
 
             if (ErrorListMessages.Count > 0)

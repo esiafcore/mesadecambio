@@ -9,16 +9,22 @@ namespace Xanes.Models;
 public class Customer: EntityInactivated, ICloneable
 {
 
-    //[Required(ErrorMessage = "El campo {0} es requerido")]
-    //[Display(Name = "Id Categoria")]
-    //[ForeignKey(nameof(CategoryTrx))]
-    //public int CategoryId { get; set; }
-    //[ValidateNever]
-    //public virtual CustomerCategory CategoryTrx { get; set; } = null!;
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Id Tipo de Identificación")]
+    [ForeignKey(nameof(IdentificationTypeTrx))]
+    public int IdentificationTypeId { get; set; }
 
-    //[Required(ErrorMessage = "El campo {0} es requerido")]
-    //[Display(Name = "Número Categoria")]
-    //public int CategoryNumeral { get; set; }
+    [ValidateNever]
+    public virtual IdentificationType IdentificationTypeTrx { get; set; } = null!;
+
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Número Tipo de Identificación")]
+    public int IdentificationTypeNumber { get; set; }
+
+    [MaxLength(10, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Código Tipo de Identificación")]
+    public string IdentificationTypeCode { get; set; } = null!;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id Tipo Persona")]
@@ -96,8 +102,9 @@ public class Customer: EntityInactivated, ICloneable
         {
             Id = Id,
             CompanyId = CompanyId,
-            //CategoryId = CategoryId,
-            //CategoryNumeral = CategoryNumeral,
+            IdentificationTypeId = IdentificationTypeId,
+            IdentificationTypeNumber = IdentificationTypeNumber,
+            IdentificationTypeCode = IdentificationTypeCode,
             TypeId = TypeId,
             TypeNumeral = TypeNumeral,
             Code = Code,

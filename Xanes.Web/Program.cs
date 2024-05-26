@@ -52,10 +52,10 @@ else
 {
     using var scope = app.Services.CreateScope();
     await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
-    if (context != null)
-    {
-        await SeedData.SeedDataDb(context);
-    }
+    //if (context != null)
+    //{
+    //    await SeedData.SeedDataDb(context);
+    //}
 }
 
 app.UseHttpsRedirection();
