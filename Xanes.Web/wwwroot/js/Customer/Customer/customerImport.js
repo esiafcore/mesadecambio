@@ -10,6 +10,7 @@
 const fnimportSubmit = async (event) => {
 
     try {
+        fntoggleLoading();
 
         event.preventDefault();
         const formObject = event.currentTarget;
@@ -71,5 +72,7 @@ const fnimportSubmit = async (event) => {
             icon: 'error',
             text: error
         });
+    } finally {
+        fntoggleLoading();
     }
 };

@@ -30,36 +30,36 @@ public class QuotationLegacyController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Export()
+    public IActionResult Export()
     {
         // Titulo de la pagina
         ViewData[AC.Title] = $"Cotizaciones Legacy - Exportar";
         TransactionReportVM modelVm = new();
         modelVm.DateTransaFinal = DateOnly.FromDateTime(DateTime.Now);
         modelVm.DateTransaInitial = DateOnly.FromDateTime(DateTime.Now);
-    
-         var apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 100, 1, new DateOnly(2024, 01, 01),
-            new DateOnly(2024, 12, 31));
-
-         var options = new JsonSerializerOptions
-         {
-             PropertyNameCaseInsensitive = true
-         };
-
-         var objList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
-
         return View(modelVm);
     }
 
+
     //[HttpGet]
-    //public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
+    //public async Task<IActionResult> ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
     //{
     //    DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
     //    DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+    //    var objQuotationList = new List<Quotation>();
+    //    var apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 100, 1, dateTransaInitial, dateTransaFinal);
 
-    //    var objQuotationList = _uow.Quotation
-    //        .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
-    //            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx,BankAccountSourceTrx,BankAccountTargetTrx").ToList();
+    //    var options = new JsonSerializerOptions
+    //    {
+    //        PropertyNameCaseInsensitive = true
+    //    };
+
+    //    var objList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+
+
+    //    _uow.Quotation
+    //       .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
+    //           , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx,BankAccountSourceTrx,BankAccountTargetTrx").ToList();
 
     //    if (objQuotationList == null || objQuotationList.Count == 0)
     //    {
@@ -219,6 +219,8 @@ public class QuotationLegacyController : Controller
     //        }
     //    }
     //}
+
+
 
 }
 

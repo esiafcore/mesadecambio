@@ -637,7 +637,62 @@ const fnLoadDatatable = () => {
         ],
         "layout": {
             topRight: {
-                buttons: ['excel', 'colvis']
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="bi bi-file-earmark-excel fs-4"></i>',
+                        titleAttr: 'Exportar a Excel',
+                        className: 'btn btn-success me-2',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Exclude the last column (buttons) from export
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="bi bi-file-earmark-pdf fs-4"></i>',
+                        titleAttr: 'Exportar a PDF',
+                        className: 'btn btn-danger me-2',
+                        exportOptions: {
+                            columns: ':not(:last-child)' // Exclude the last column (buttons) from export
+                        },
+                        customize: function (doc) {
+                            doc.pageSize = 'A3'; // Cambia el tamaño de la hoja a A3
+                            doc.pageOrientation = 'landscape'; // Orientación horizontal
+                            doc.pageMargins = [20, 20, 20, 20]; // Ajusta los márgenes
+
+                            // Cambiar color de cabecera y título
+                            doc.styles.title = {
+                                color: '#3E5060', // Gris azulado
+                                fontSize: '16',
+                                alignment: 'center'
+                            };
+
+                            // Ajustar color de cabecera
+                            doc.styles.tableHeader = {
+                                fillColor: '#3E5060',
+                                color: '#ffffff', // Blanco
+                                alignment: 'center'
+                            };
+
+                            // Ajustar anchos de columnas
+                            doc.content[1].table.widths = [
+                                '7%', '7%', '20%', '7%', '7%', '7%', '7%', '7%', '7%', '3%', '3%', '3%'
+                            ];
+                        }
+                    },
+                    {
+                        extend: 'colvis',
+                        text: '<i class="bi bi-eye-slash-fill fs-4"></i>',
+                        titleAttr: 'Ocultar columnas',
+                        className: 'btn btn-info',
+                        columnDefs: [
+                            {
+                                targets: -1, // Exclude the last column (buttons) from column visibility
+                                visible: false
+                            }
+                        ]
+                    }
+                ]
             }
         },
         "createdRow": function (row, data) {
