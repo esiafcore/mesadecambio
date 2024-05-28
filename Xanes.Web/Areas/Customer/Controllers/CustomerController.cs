@@ -408,6 +408,7 @@ public class CustomerController : Controller
             worksheet.Cell(4, 12).Value = "Dirección";
             worksheet.Cell(4, 13).Value = "Es Banco";
             worksheet.Cell(4, 14).Value = "Es del Sistema";
+            worksheet.Cell(4, 15).Value = "Id";
 
             int rowNum = 5;
             foreach (var item in listEntities)
@@ -426,6 +427,7 @@ public class CustomerController : Controller
                 worksheet.Cell(rowNum, 12).Value = item.AddressPrimary;
                 worksheet.Cell(rowNum, 13).Value = item.IsBank ? "S" : "N";
                 worksheet.Cell(rowNum, 14).Value = item.IsSystemRow ? "S" : "N";
+                worksheet.Cell(rowNum, 15).Value = item.Id;
 
                 rowNum++;
             }
@@ -531,25 +533,15 @@ public class CustomerController : Controller
 
                 var fila = hoja.Row(i);
                 objCustomerVM.Fila = i;
-                string? businessName = fila.Cell(6).IsEmpty() ? null : fila.Cell(5).GetString();
+                string? businessName = fila.Cell(6).IsEmpty() ? null : fila.Cell(6).GetString();
                 if (string.IsNullOrWhiteSpace(businessName))
                 {
                     ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. |");
                 }
 
-                string? commercialName = fila.Cell(7).IsEmpty() ? null : fila.Cell(6).GetString();
-                //if (string.IsNullOrWhiteSpace(commercialName))
-                //{
-                //    ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. ");
-                //}
-
-                string? address = fila.Cell(12).IsEmpty() ? null : fila.Cell(11).GetString();
-                //if (string.IsNullOrWhiteSpace(address))
-                //{
-                //    ErrorListMessages.Add($"La dirección está vacia en la fila:{i}. ");
-                //}
-
-                string? isBank = fila.Cell(13).IsEmpty() ? null : fila.Cell(12).GetString();
+                string? commercialName = fila.Cell(7).IsEmpty() ? null : fila.Cell(7).GetString();
+                string? address = fila.Cell(12).IsEmpty() ? null : fila.Cell(12).GetString();
+                string? isBank = fila.Cell(13).IsEmpty() ? null : fila.Cell(13).GetString();
                 if (string.IsNullOrWhiteSpace(isBank))
                 {
                     ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. |");
@@ -570,7 +562,7 @@ public class CustomerController : Controller
                     }
                 }
 
-                string? isSystem = fila.Cell(14).IsEmpty() ? null : fila.Cell(13).GetString();
+                string? isSystem = fila.Cell(14).IsEmpty() ? null : fila.Cell(14).GetString();
                 if (string.IsNullOrWhiteSpace(isSystem))
                 {
                     ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. |");
@@ -656,7 +648,6 @@ public class CustomerController : Controller
                     {
                         objCustomerVM.DataModel.SectorId = objSector.Id;
                     }
-
                 }
 
                 string? code = fila.Cell(3).IsEmpty() ? null : fila.Cell(3).GetString();
@@ -683,7 +674,6 @@ public class CustomerController : Controller
                         {
                             objCustomerVM.DataModel.Code = code;
                         }
-
                     }
                 }
 
@@ -711,14 +701,15 @@ public class CustomerController : Controller
                     }
                 }
 
-                string? numberIdent = fila.Cell(5).IsEmpty() ? null : fila.Cell(4).GetString();
+                string? numberIdent = fila.Cell(5).IsEmpty() ? null : fila.Cell(5).GetString();
                 if (string.IsNullOrWhiteSpace(numberIdent))
                 {
                     ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. |");
                 }
                 else
                 {
-                    var customerExist = await _uow.Customer.IsExists(x => x.CompanyId == _companyId && x.IdentificationNumber == numberIdent);
+                    numberIdent = numberIdent.ToUpper();
+                    var customerExist = await _uow.Customer.IsExists(x => x.CompanyId == _companyId && x.IdentificationNumber.ToUpper() == numberIdent);
                     if (customerExist)
                     {
                         ErrorListMessages.Add($"El número de identificación: {numberIdent} ya existe en la fila:{i}. |");
@@ -733,7 +724,7 @@ public class CustomerController : Controller
                         }
                         else
                         {
-                            objCustomerVM.DataModel.IdentificationNumber = numberIdent.ToUpper().Trim();
+                            objCustomerVM.DataModel.IdentificationNumber = numberIdent.Trim();
                         }
                     }
                 }
@@ -746,59 +737,55 @@ public class CustomerController : Controller
                 objCustomerVMList.Add(objCustomerVM);
             }
 
-            if (ErrorListMessages.Count > 0)
-            {
-                foreach (var error in ErrorListMessages)
-                {
-                    errorsMessagesBuilder.Append(error);
-                }
-
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"{errorsMessagesBuilder}";
-                return Json(jsonResponse);
-            }
-
-            //Ciclo para validar el numero de identificacion
+            // Ciclo para validar el número de identificación
             foreach (var customer in objCustomerVMList)
             {
                 string regularExpressionNumber = "";
                 string formatExpressionNumber = "";
                 string substitutionExpressionNumber = "";
-                string identificationNumber = "";
-                regularExpressionNumber = customer.DataModel.IdentificationTypeTrx.RegularExpressionNumber;
-                formatExpressionNumber = customer.DataModel.IdentificationTypeTrx.FormatExpressionNumber;
-                substitutionExpressionNumber = customer.DataModel.IdentificationTypeTrx.SubstitutionExpressionNumber;
+                string identificationNumber = customer.DataModel.IdentificationNumber; ;
 
-                if (customer.DataModel.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+                if (customer.DataModel.IdentificationTypeTrx != null)
                 {
+                    regularExpressionNumber = customer.DataModel.IdentificationTypeTrx.RegularExpressionNumber;
+                    formatExpressionNumber = customer.DataModel.IdentificationTypeTrx.FormatExpressionNumber;
+                    substitutionExpressionNumber = customer.DataModel.IdentificationTypeTrx.SubstitutionExpressionNumber;
 
-                    if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.CEDU)
+                    // Asegurarse de que regularExpressionNumber y identificationNumber no sean nulos
+                    if (!string.IsNullOrEmpty(regularExpressionNumber) && !string.IsNullOrEmpty(identificationNumber))
                     {
-                        identificationNumber = Regex.Replace(customer.DataModel.IdentificationNumber, regularExpressionNumber, formatExpressionNumber);
-                    }
-                    else if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.PASS)
-                    {
-                        identificationNumber = customer.DataModel.IdentificationNumber;
-                    }
-                }
-                else
-                {
-                    if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.RUC)
-                    {
-                        identificationNumber = customer.DataModel.IdentificationNumber;
-                    }
-                }
+                        if (customer.DataModel.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+                        {
+                            if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.CEDU)
+                            {
+                                identificationNumber = Regex.Replace(identificationNumber, regularExpressionNumber, formatExpressionNumber ?? "");
+                            }
+                            else if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.PASS)
+                            {
+                                identificationNumber = customer.DataModel.IdentificationNumber;
+                            }
+                        }
+                        else if (customer.DataModel.TypeNumeral == (int)SD.PersonType.LegalPerson)
+                        {
+                            if (customer.DataModel.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.RUC)
+                            {
+                                identificationNumber = customer.DataModel.IdentificationNumber;
+                            }
+                        }
 
-                if (!Regex.Match(identificationNumber, regularExpressionNumber).Success)
-                {
-                    ErrorListMessages.Add($"El número de identificación: {identificationNumber} es invalido en la fila:{customer.Fila}. |");
-
-                }
-                else
-                {
-                    objCustomerList.Add(customer.DataModel);
+                        // Validar el número de identificación solo si no es nulo
+                        if (!string.IsNullOrEmpty(identificationNumber) && !Regex.Match(identificationNumber, regularExpressionNumber).Success)
+                        {
+                            ErrorListMessages.Add($"El número de identificación: {identificationNumber} es inválido en la fila: {customer.Fila}. |");
+                        }
+                        else
+                        {
+                            objCustomerList.Add(customer.DataModel);
+                        }
+                    }
                 }
             }
+
 
             if (ErrorListMessages.Count > 0)
             {

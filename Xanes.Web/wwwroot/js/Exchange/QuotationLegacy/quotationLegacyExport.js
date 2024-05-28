@@ -29,6 +29,8 @@ const fnExportExcel = async () => {
                 text: "No se encontraron registros para exportar en el rango de fechas especificado."
             });
             return;
+        }else if (response.status == 400) {
+            window.location.href = window.location.href;
         }
 
         if (!response.ok) {

@@ -46,6 +46,8 @@ const fnimportSubmit = async (event) => {
                 divObservation.classList.remove("d-none");
 
             } else {
+                fntoggleLoading();
+
                 const result = await Swal.fire({
                     title: jsonResult.sucessMessages,
                     text: "El archivo se ha importado",
@@ -58,6 +60,8 @@ const fnimportSubmit = async (event) => {
                         confirmButton: 'bg-primary text-white border'
                     }
                 });
+
+                fntoggleLoading();
 
                 if (result.isConfirmed) {
                     if (jsonResult.urlRedirect) {

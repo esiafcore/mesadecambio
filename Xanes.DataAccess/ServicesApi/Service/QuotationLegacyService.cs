@@ -20,13 +20,13 @@ public class QuotationLegacyService : BaseService, IQuotationLegacyService
         _configuration = configuration;
     }
 
-    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate)
+    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate, string? identificationNumber = null)
     {
         return SendAsync(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?beginDate={1}&endDate={2}&pagina={3}&recordsPorPagina={4}",
-                _actionUrl, beginDate.ToString(AC.DefaultDateFormatWeb), endDate.ToString(AC.DefaultDateFormatWeb), pageNumber, pageSize),
+            Url = string.Format("{0}?beginDate={1}&endDate={2}&identificationNumber={3}&pagina={4}&recordsPorPagina={5}",
+                _actionUrl, beginDate.ToString(AC.DefaultDateFormatWeb), endDate.ToString(AC.DefaultDateFormatWeb), identificationNumber, pageNumber, pageSize),
             Token = token
         });
     }
