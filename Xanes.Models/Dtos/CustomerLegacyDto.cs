@@ -48,4 +48,7 @@ public class CustomerLegacyDto
 
     [JsonPropertyName("isSystemRow")]
     public bool IsSystemRow { get; set; }
+
+    [JsonPropertyName("totalQuotations")]
+    public int TotalQuotations { get; set; }
 }

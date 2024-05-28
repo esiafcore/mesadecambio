@@ -96,6 +96,9 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Es Registro del Sistema")]
     public bool IsSystemRow { get; set; }
 
+    [NotMapped]
+    public int? TotalQuotations { get; set; }
+
     public object Clone()
     {
         var obj = new Customer

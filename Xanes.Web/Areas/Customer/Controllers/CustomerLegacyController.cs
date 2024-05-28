@@ -90,6 +90,8 @@ public class CustomerLegacyController : Controller
             customer.Code = customerLegacy.Code;
             customer.IsBank = customerLegacy.IsBank;
             customer.IsSystemRow = customerLegacy.IsSystemRow;
+            customer.TotalQuotations = customerLegacy.TotalQuotations;
+
             if (customerLegacy.PersonType == Enum.GetName(typeof(SD.PersonTypeCode), SD.PersonTypeCode.JUR))
             {
                 customer.TypeNumeral = (int)SD.PersonType.LegalPerson;
@@ -177,7 +179,8 @@ public class CustomerLegacyController : Controller
             worksheet.Cell(4, 12).Value = "Dirección";
             worksheet.Cell(4, 13).Value = "Es Banco";
             worksheet.Cell(4, 14).Value = "Es del Sistema";
-            worksheet.Cell(4, 15).Value = "Id";
+            worksheet.Cell(4, 15).Value = "Total Cotizaciones";
+            worksheet.Cell(4, 16).Value = "Id";
 
             int rowNum = 5;
             foreach (var item in listEntities)
@@ -196,7 +199,8 @@ public class CustomerLegacyController : Controller
                 worksheet.Cell(rowNum, 12).Value = item.AddressPrimary;
                 worksheet.Cell(rowNum, 13).Value = item.IsBank ? "S" : "N";
                 worksheet.Cell(rowNum, 14).Value = item.IsSystemRow ? "S" : "N";
-                worksheet.Cell(rowNum, 15).Value = item.Id;
+                worksheet.Cell(rowNum, 15).Value = item.TotalQuotations;
+                worksheet.Cell(rowNum, 16).Value = item.Id;
 
                 rowNum++;
             }
@@ -216,6 +220,7 @@ public class CustomerLegacyController : Controller
             worksheet.Column(13).AdjustToContents();
             worksheet.Column(14).AdjustToContents();
             worksheet.Column(15).AdjustToContents();
+            worksheet.Column(16).AdjustToContents();
 
             // Asignar un nombre a la página del excel
             wb.Worksheet(1).Name = "Data";
