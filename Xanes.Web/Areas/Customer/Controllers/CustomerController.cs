@@ -533,10 +533,15 @@ public class CustomerController : Controller
 
                 var fila = hoja.Row(i);
                 objCustomerVM.Fila = i;
+
+                string uid = fila.Cell(16).IsEmpty() ? "0" : fila.Cell(16).GetString();
+
+                objCustomerVM.UId = int.Parse(uid);
+
                 string? businessName = fila.Cell(6).IsEmpty() ? null : fila.Cell(6).GetString();
                 if (string.IsNullOrWhiteSpace(businessName))
                 {
-                    ErrorListMessages.Add($"La razon social está vacia en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. La razon social está vacia. Fila:{i}. |");
                 }
 
                 string? commercialName = fila.Cell(7).IsEmpty() ? null : fila.Cell(7).GetString();
@@ -544,7 +549,7 @@ public class CustomerController : Controller
                 string? isBank = fila.Cell(13).IsEmpty() ? null : fila.Cell(13).GetString();
                 if (string.IsNullOrWhiteSpace(isBank))
                 {
-                    ErrorListMessages.Add($"Es banco está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. Es banco está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -558,14 +563,14 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        ErrorListMessages.Add($"Es banco es invalido en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. Es banco es invalido. Fila:{i}. |");
                     }
                 }
 
                 string? isSystem = fila.Cell(14).IsEmpty() ? null : fila.Cell(14).GetString();
                 if (string.IsNullOrWhiteSpace(isSystem))
                 {
-                    ErrorListMessages.Add($"Es del sistema está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. Es del sistema está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -579,21 +584,21 @@ public class CustomerController : Controller
                     }
                     else
                     {
-                        ErrorListMessages.Add($"Es del sistema es invalido en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. Es del sistema es invalido. Fila:{i}. |");
                     }
                 }
 
                 string? type = fila.Cell(1).IsEmpty() ? null : fila.Cell(1).GetString();
                 if (string.IsNullOrWhiteSpace(type))
                 {
-                    ErrorListMessages.Add($"El tipo está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. El tipo está vacio. Fila:{i}. |");
                 }
                 else
                 {
                     var objType = objTypeList.FirstOrDefault(x => x.Code == type);
                     if (objType == null)
                     {
-                        ErrorListMessages.Add($"El tipo no fue encontrado en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. El tipo no fue encontrado. Fila:{i}. |");
                     }
                     else
                     {
@@ -621,7 +626,7 @@ public class CustomerController : Controller
 
                             if (string.IsNullOrWhiteSpace(commercialName))
                             {
-                                ErrorListMessages.Add($"El nombre comercial está vacio en la fila:{i}. |");
+                                ErrorListMessages.Add($"Id:{uid}. El nombre comercial está vacio. Fila:{i}. |");
                             }
                             else
                             {
@@ -635,14 +640,14 @@ public class CustomerController : Controller
                 string? sector = fila.Cell(2).IsEmpty() ? null : fila.Cell(2).GetString();
                 if (string.IsNullOrWhiteSpace(sector))
                 {
-                    ErrorListMessages.Add($"El sector está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. El sector está vacio. Fila:{i}. |");
                 }
                 else
                 {
                     var objSector = objSectorList.FirstOrDefault(x => x.Code == sector);
                     if (objSector == null)
                     {
-                        ErrorListMessages.Add($"El sector no fue encontrado en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. El sector no fue encontrado. Fila:{i}. |");
                     }
                     else
                     {
@@ -653,14 +658,14 @@ public class CustomerController : Controller
                 string? code = fila.Cell(3).IsEmpty() ? null : fila.Cell(3).GetString();
                 if (string.IsNullOrWhiteSpace(code))
                 {
-                    ErrorListMessages.Add($"El código está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. El código está vacio. Fila:{i}. |");
                 }
                 else
                 {
                     var customerExist = await _uow.Customer.IsExists(x => x.CompanyId == _companyId && x.Code == code);
                     if (customerExist)
                     {
-                        ErrorListMessages.Add($"El código: {code} ya existe en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. El código: {code} ya existe. Fila:{i}. |");
                     }
                     else
                     {
@@ -668,7 +673,7 @@ public class CustomerController : Controller
 
                         if (repeatedCode != null)
                         {
-                            ErrorListMessages.Add($"El código: {code} se repite en la fila:{i}. |");
+                            ErrorListMessages.Add($"Id:{uid}. El código: {code} se repite. Fila:{i}. |");
                         }
                         else
                         {
@@ -680,7 +685,7 @@ public class CustomerController : Controller
                 string? identificationTypeCode = fila.Cell(4).IsEmpty() ? null : fila.Cell(4).GetString();
                 if (string.IsNullOrWhiteSpace(identificationTypeCode))
                 {
-                    ErrorListMessages.Add($"El código del tipo de identificación está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. El código del tipo de identificación está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -689,7 +694,7 @@ public class CustomerController : Controller
 
                     if (objIdentType == null)
                     {
-                        ErrorListMessages.Add($"El código del tipo de identificación: {identificationTypeCode} no fue encontrado en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. El código del tipo de identificación: {identificationTypeCode} no fue encontrado. Fila:{i}. |");
 
                     }
                     else
@@ -704,7 +709,7 @@ public class CustomerController : Controller
                 string? numberIdent = fila.Cell(5).IsEmpty() ? null : fila.Cell(5).GetString();
                 if (string.IsNullOrWhiteSpace(numberIdent))
                 {
-                    ErrorListMessages.Add($"El número de identificación está vacio en la fila:{i}. |");
+                    ErrorListMessages.Add($"Id:{uid}. El número de identificación está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -712,7 +717,7 @@ public class CustomerController : Controller
                     var customerExist = await _uow.Customer.IsExists(x => x.CompanyId == _companyId && x.IdentificationNumber.ToUpper() == numberIdent);
                     if (customerExist)
                     {
-                        ErrorListMessages.Add($"El número de identificación: {numberIdent} ya existe en la fila:{i}. |");
+                        ErrorListMessages.Add($"Id:{uid}. El número de identificación: {numberIdent} ya existe. Fila:{i}. |");
                     }
                     else
                     {
@@ -720,7 +725,7 @@ public class CustomerController : Controller
 
                         if (repeatedNumber != null)
                         {
-                            ErrorListMessages.Add($"El número de identificación: {numberIdent} se repite en la fila:{i}. |");
+                            ErrorListMessages.Add($"Id:{uid}. El número de identificación: {numberIdent} se repite. Fila:{i}. |");
                         }
                         else
                         {
@@ -776,7 +781,7 @@ public class CustomerController : Controller
                         // Validar el número de identificación solo si no es nulo
                         if (!string.IsNullOrEmpty(identificationNumber) && !Regex.Match(identificationNumber, regularExpressionNumber).Success)
                         {
-                            ErrorListMessages.Add($"El número de identificación: {identificationNumber} es inválido en la fila: {customer.Fila}. |");
+                            ErrorListMessages.Add($"Id:{customer.UId}. El número de identificación: {identificationNumber} es inválido. Fila: {customer.Fila}. |");
                         }
                         else
                         {

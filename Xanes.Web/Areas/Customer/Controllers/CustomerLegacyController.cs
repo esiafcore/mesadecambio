@@ -141,7 +141,6 @@ public class CustomerLegacyController : Controller
         return GenerarExcel("ClientesLegacy.xlsx", objCustomerList);
     }
 
-
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Customer> listEntities)
     {
         using (XLWorkbook wb = new XLWorkbook())

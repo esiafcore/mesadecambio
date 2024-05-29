@@ -15,6 +15,9 @@ public static class ServiceExtensions
         services.AddHttpClient<IQuotationLegacyService, QuotationLegacyService>();
         services.AddTransient<IQuotationLegacyService, QuotationLegacyService>();
 
+        services.AddHttpClient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
+        services.AddTransient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
+
         services.AddHttpClient<ICustomerLegacyService, CustomerLegacyService>();
         services.AddTransient<ICustomerLegacyService, CustomerLegacyService>();
     }
