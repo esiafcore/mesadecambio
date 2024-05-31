@@ -7,6 +7,12 @@ html {
     font-size: 0.875rem;
   }
 }
+/*
+table.dataTable tbody tr.selected {
+    color: white !important;
+    box-shadow: red;
+    background-color: red !important;
+}*/
 
 .select2-results__options {
     max-height: none !important;
@@ -617,4 +623,27 @@ bg-success {
     display: block;
 }
 
+table.dataTable tbody tr:hover {
+    background-color: skyblue !important;
+}
 
+
+table.dataTable tbody tr.selectedinfo td,
+table.dataTable tbody td.selectedinfo {
+    box-shadow: inset 0 0 0 9999px skyblue !important;
+}
+
+table.dataTable tbody tr.selectedsuccess td,
+table.dataTable tbody td.selectedsuccess {
+    box-shadow: inset 0 0 0 9999px lightgreen !important;
+}
+
+
+table.dataTable tbody tr:active td {
+    background-color: skyblue !important;
+}
+
+/*.selectedRow {
+    background-color: #FFC0CB !important;
+    box-shadow: inset 0 0 0 9999px #FFC0CB !important;
+}*/

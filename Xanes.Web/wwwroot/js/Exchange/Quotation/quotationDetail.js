@@ -12,7 +12,7 @@ let indexDataTableBankSourceTransfer = 0, indexDataTableBankTargetTransfer = 0, 
 let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
 
 //Variable para el color de fondo seleccionado en la tablas del detalle
-let bgRow = 'bg-success bg-opacity-75 bg-gradient';
+let bgRow = 'selectedinfo';
 document.addEventListener("DOMContentLoaded", async function () {
     currencies = document.querySelectorAll(".currenciesTransa");
     currenciesDeposit = document.querySelectorAll(".currenciesDeposit");

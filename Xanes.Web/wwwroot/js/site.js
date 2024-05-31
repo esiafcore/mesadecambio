@@ -32,9 +32,7 @@ const selectOptions = {
     items: 'row',
     style: 'os',
     blurable: true,
-    allowClear: true,
-    placeholder: 'Seleccionar..',
-    className: 'bg-info bg-opacity-75 bg-gradient'
+    className: 'selectedinfo'
 }
 
 function fntoggleLoading(textContent = "Cargando...") {
