@@ -58,7 +58,7 @@ public class QuotationLegacyController : Controller
         var objQuotationList = new List<Quotation>();
         var apiResponse = string.Empty;
 
-        apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "5211801920002J");
+        apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
         var options = new JsonSerializerOptions
         {
@@ -248,7 +248,7 @@ public class QuotationLegacyController : Controller
 
         var objQuotationDetailList = new List<QuotationDetail>();
 
-        apiResponse = await _srvDetail.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "5211801920002J");
+        apiResponse = await _srvDetail.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
         var objDetailLegacyList = JsonSerializer.Deserialize<List<QuotationDetailLegacyDto>>(apiResponse, options)!;
 

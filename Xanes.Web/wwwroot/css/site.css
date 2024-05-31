@@ -642,8 +642,3 @@ table.dataTable tbody td.selectedsuccess {
 table.dataTable tbody tr:active td {
     background-color: skyblue !important;
 }
-
-/*.selectedRow {
-    background-color: #FFC0CB !important;
-    box-shadow: inset 0 0 0 9999px #FFC0CB !important;
-}*/
