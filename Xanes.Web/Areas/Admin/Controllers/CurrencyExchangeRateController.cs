@@ -238,6 +238,10 @@ public class CurrencyExchangeRateController : Controller
             // Creando
             if (obj.Id == 0)
             {
+                obj.CreatedBy = AC.LOCALHOSTME;
+                obj.CreatedDate = DateTime.UtcNow;
+                obj.CreatedHostName = AC.LOCALHOSTPC;
+                obj.CreatedIpv4 = AC.Ipv4Default;
                 _uow.CurrencyExchangeRate.Add(obj);
                 _uow.Save();
                 TempData["success"] = "Exchange Rate created successfully";
@@ -250,7 +254,10 @@ public class CurrencyExchangeRateController : Controller
                 {
                     return NotFound();
                 }
-
+                obj.UpdatedBy = AC.LOCALHOSTME;
+                obj.UpdatedDate = DateTime.UtcNow;
+                obj.UpdatedHostName = AC.LOCALHOSTPC;
+                obj.UpdatedIpv4 = AC.Ipv4Default;
                 _uow.CurrencyExchangeRate.Update(obj);
                 _uow.Save();
                 TempData["success"] = "Exchange Rate updated successfully";

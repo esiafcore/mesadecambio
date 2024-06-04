@@ -88,24 +88,24 @@ const fnLoadDatatable = () => {
         },
         "columns": [
             {
-                data: 'dateTransa', "width": "20%"
+                data: 'dateTransa', "width": "15%"
                 , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
                 , orderable: true
             },
             {
-                data: 'currencyTrx.abbreviation', "width": "10%"
+                data: 'currencyTrx.abbreviation', "width": "15%"
                 , render: function (data, type, row) {
                     return `${data}`;
                 }
                 , orderable: false
             },
             {
-                data: 'officialRate', "width": "20%"
+                data: 'officialRate', "width": "15%"
                 , render: DataTable.render.number(null, null, decimalExchange)
                 , orderable: true
             },
             {
-                data: 'createdDate', "width": "20%"
+                data: 'createdDate', "width": "15%"
                 , render: function (data, type, row) {
                     if (!data) {
                         return '';

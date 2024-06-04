@@ -28,7 +28,6 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         if (filter != null)
         {
             query = query.Where(filter);
-
         }
         string? nextCode = query.Max(x => x.Code);
         if (String.IsNullOrEmpty(nextCode))

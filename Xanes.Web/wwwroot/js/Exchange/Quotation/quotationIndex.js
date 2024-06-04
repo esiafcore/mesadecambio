@@ -625,7 +625,6 @@ const fnLoadDatatable = () => {
                             ${btnView}
                             ${btnUpdate}
                             ${btnDelete}
-                            ${btnPrint}
                         `;
                     }
 
