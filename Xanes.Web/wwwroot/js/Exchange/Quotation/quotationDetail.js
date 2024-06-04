@@ -340,7 +340,7 @@ function formatOption(option) {
 
     if (thumbnailUrl) {
         let $option = $(
-            '<span><img src="' + thumbnailUrl + '" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" />' + option.text + '</span>'
+            '<span><img src="' + thumbnailUrl + '" class="img-thumbnail img-fluid" style="width: 80px; height: 40px; margin-right: 10px;" />' + option.text + '</span>'
         );
     } else {
         let $option = $('<span>' + option.text + '</span>');
@@ -773,7 +773,7 @@ function fnLoadDatatableBankTransferSource(index = 0) {
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
                         return `<span class="m-0 p-0"><img src="${data.logoUrl
-                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                            }" class="img-thumbnail img-fluid" style="width: 80px; height: 40px; margin-right: 10px;" /></span> `;
                     }
                     return "";
                 }
@@ -834,7 +834,7 @@ function fnLoadDatatableBankTransferTarget(index = 0) {
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
                         return `<span class="m-0 p-0"><img src="${data.logoUrl
-                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                            }" class="img-thumbnail img-fluid" style="width: 80px; height: 40px; margin-right: 10px;" /></span> `;
                     }
                     return "";
                 }
@@ -897,7 +897,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
                 "render": (data) => {
                     if (data.logoUrl != "" && data.logoUrl != null) {
                         return `<span class="m-0 p-0"><img src="${data.logoUrl
-                            }" class="img-thumbnail img-fluid" style="width: 40px; height: 40px; margin-right: 10px;" /></span> `;
+                            }" class="img-thumbnail img-fluid" style="width: 80px; height: 40px; margin-right: 10px;" /></span> `;
                     }
                     return "";
                 }

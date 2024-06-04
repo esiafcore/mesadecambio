@@ -121,6 +121,8 @@ public class QuotationController : Controller
 
         if (id == 0)
         {
+            ViewData[AC.Title] = "Crear - Cotización";
+
             objData = new Quotation
             {
                 DateTransa = DateOnly.FromDateTime(DateTime.Now),
@@ -135,6 +137,8 @@ public class QuotationController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Cotización";
+
             objData = _uow.Quotation.Get(filter: x => (x.CompanyId == _companyId && x.Id == id));
         }
 
@@ -1328,6 +1332,8 @@ public class QuotationController : Controller
 
     public IActionResult Delete(int id)
     {
+        ViewData[AC.Title] = "Eliminar - Cotización";
+
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
@@ -1359,6 +1365,8 @@ public class QuotationController : Controller
 
     public IActionResult Detail(int id)
     {
+        ViewData[AC.Title] = "Visualizar - Cotización";
+
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);

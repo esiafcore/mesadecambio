@@ -39,6 +39,8 @@ public class CustomerController : Controller
 
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Clientes";
+
         var objList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId)
         , includeProperties: "TypeTrx,SectorTrx").ToList();
         return View(objList);
@@ -46,6 +48,8 @@ public class CustomerController : Controller
 
     public IActionResult Detail(int? id)
     {
+        ViewData[AC.Title] = "Visualizar - Cliente";
+
         if (id == null || id == 0)
         {
             return NotFound();
@@ -65,10 +69,13 @@ public class CustomerController : Controller
 
     public async Task<IActionResult> Upsert(int? id)
     {
+
         Models.Customer obj;
 
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Cliente";
+
             //create
             //Setear valor por defecto
             obj = new Models.Customer()
@@ -103,6 +110,8 @@ public class CustomerController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Cliente";
+
             //update
             obj = _uow.Customer
                 .Get(filter: x => (x.Id == id), isTracking: false);

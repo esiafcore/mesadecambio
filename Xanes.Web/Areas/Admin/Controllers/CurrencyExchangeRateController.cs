@@ -33,6 +33,8 @@ public class CurrencyExchangeRateController : Controller
 
     public IActionResult Index(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
     {
+        ViewData[AC.Title] = "Tipos de Cambios";
+
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
@@ -91,6 +93,8 @@ public class CurrencyExchangeRateController : Controller
     // DETALLE
     public IActionResult Detail(int? id)
     {
+        ViewData[AC.Title] = "Visualizar - Tipo de Cambio";
+
         if (id == null || id == 0)
         {
             return NotFound();
@@ -114,6 +118,8 @@ public class CurrencyExchangeRateController : Controller
 
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Tipo de Cambio";
+
             //Obtener moneda
             var currencyCurrent = _uow.Currency
                 .Get(filter: x => (x.CompanyId == _companyId) && (x.Numeral == (short)currencyType));
@@ -133,6 +139,8 @@ public class CurrencyExchangeRateController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Tipo de Cambio";
+
             obj = _uow.CurrencyExchangeRate
                 .Get(x => (x.Id == id)
                     , includeProperties: "CurrencyTrx", isTracking: false);
@@ -290,6 +298,8 @@ public class CurrencyExchangeRateController : Controller
     // DELETE
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Tipo de Cambio";
+
         if ((id == null) || (id == 0))
         {
             return NotFound();

@@ -27,6 +27,8 @@ public class BankController : Controller
     // GET
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Bancos";
+
         var objList = _uow.Bank.GetAll(x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
@@ -35,6 +37,8 @@ public class BankController : Controller
     {
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Banco";
+
             //create
             //Setear valor por defecto
             var obj = new Bank()
@@ -47,6 +51,8 @@ public class BankController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Banco";
+
             //update
             var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
@@ -180,6 +186,8 @@ public class BankController : Controller
     [HttpDelete]
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Banco";
+
         var rowToBeDeleted = _uow.Bank.Get(filter:u => (u.Id == id)
         ,isTracking:false);
 
