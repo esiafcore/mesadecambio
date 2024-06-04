@@ -21,6 +21,8 @@ public class CustomerSectorController : Controller
 
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Sectores";
+
         var objList = _uow.CustomerSector
             .GetAll(filter: x => (x.CompanyId == _companyId)).OrderBy(x => x.Code)
             .ToList();
@@ -30,6 +32,8 @@ public class CustomerSectorController : Controller
     // Detalle
     public IActionResult Detail(int? id)
     {
+        ViewData[AC.Title] = "Visualizar - Sector";
+
         if (id == null || id == 0)
         {
             return NotFound();
@@ -51,6 +55,8 @@ public class CustomerSectorController : Controller
     {
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Sector";
+
             //create
             //Setear valor por defecto
             var obj = new CustomerSector()
@@ -85,6 +91,8 @@ public class CustomerSectorController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Sector";
+
             //update
             var obj = _uow.CustomerSector
                 .Get(filter: x => (x.Id == id), includeProperties: "ParentTrx", isTracking: false);
@@ -225,6 +233,8 @@ public class CustomerSectorController : Controller
     // DELETE
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Sector";
+
         if (id == null || id == 0)
         {
             return NotFound();

@@ -23,6 +23,8 @@ public class BusinessExecutiveController : Controller
     [HttpGet]
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Ejecutivos";
+
         return View();
     }
 
@@ -33,6 +35,8 @@ public class BusinessExecutiveController : Controller
 
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Ejecutivo";
+
             //create
             //Setear valor por defecto
             obj = new Models.BusinessExecutive()
@@ -49,6 +53,8 @@ public class BusinessExecutiveController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Ejecutivo";
+
             //update
             obj = _uow.BusinessExecutive
                 .Get(filter: x => (x.Id == id), isTracking: false);
@@ -150,6 +156,8 @@ public class BusinessExecutiveController : Controller
     [HttpGet]
     public IActionResult Detail(int id)
     {
+        ViewData[AC.Title] = "Visualizar - Ejecutivo";
+
         var obj = _uow.BusinessExecutive
             .Get(filter: x => (x.Id == id), isTracking: false);
 
@@ -169,6 +177,8 @@ public class BusinessExecutiveController : Controller
     [HttpGet]
     public IActionResult Delete(int id)
     {
+        ViewData[AC.Title] = "Eliminar - Ejecutivo";
+
         var obj = _uow.BusinessExecutive
             .Get(filter: x => (x.Id == id), isTracking: false);
 

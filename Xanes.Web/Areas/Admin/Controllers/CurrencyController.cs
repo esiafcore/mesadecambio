@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
+using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Admin.Controllers;
 [Area("Admin")]
@@ -19,6 +20,8 @@ public class CurrencyController : Controller
     }
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Monedas";
+
         var objList = _uow.Currency.GetAll(x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
     }
@@ -27,6 +30,8 @@ public class CurrencyController : Controller
     {
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Moneda";
+
             //Setear valor por defecto
             var obj = new Currency()
             {
@@ -37,6 +42,8 @@ public class CurrencyController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Moneda";
+
             var obj = _uow.Currency.Get(x => (x.Id == id), isTracking: false);
 
             if (obj == null)
@@ -122,6 +129,9 @@ public class CurrencyController : Controller
 
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Moneda";
+
+
         if (id == null || id == 0)
         {
             return NotFound();

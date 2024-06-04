@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
+using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
 [Area("Customer")]
@@ -18,6 +19,8 @@ public class CustomerCategoryController : Controller
     }
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Categorias de Clientes";
+
         var objList = _uow.CustomerCategory
             .GetAll(filter:x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
@@ -25,6 +28,8 @@ public class CustomerCategoryController : Controller
 
     public IActionResult Detail(int? id)
     {
+        ViewData[AC.Title] = "Visualizar - Categoria de Cliente";
+
         if (id == null || id == 0)
         {
             return NotFound();
@@ -45,6 +50,8 @@ public class CustomerCategoryController : Controller
     {
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Categoria de Cliente";
+
             //create
             //Setear valor por defecto
             var obj = new CustomerCategory()
@@ -56,6 +63,8 @@ public class CustomerCategoryController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Categoria de Cliente";
+
             //update
             var obj = _uow.CustomerCategory
                 .Get(filter: x => (x.Id == id), isTracking: false);
@@ -144,6 +153,8 @@ public class CustomerCategoryController : Controller
 
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Categoria de Cliente";
+
         if (id == null || id == 0)
         {
             return NotFound();

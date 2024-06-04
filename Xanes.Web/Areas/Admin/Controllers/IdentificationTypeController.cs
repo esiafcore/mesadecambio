@@ -20,6 +20,8 @@ public class IdentificationTypeController : Controller
     }
     public IActionResult Index()
     {
+        ViewData[AC.Title] = "Tipos de Idenficación";
+
         var objList = _uow.IdentificationType
             .GetAll(filter: x => (x.CompanyId == _companyId)).ToList();
         return View(objList);
@@ -27,6 +29,9 @@ public class IdentificationTypeController : Controller
 
     public IActionResult Detail(int? id)
     {
+        ViewData[AC.Title] = "Visualizar - Tipo de Idenficación";
+
+
         if (id == null || id == 0)
         {
             return NotFound();
@@ -47,6 +52,8 @@ public class IdentificationTypeController : Controller
     {
         if (id == null || id == 0)
         {
+            ViewData[AC.Title] = "Crear - Tipo de Idenficación";
+
             //create
             //Setear valor por defecto
             var obj = new IdentificationType()
@@ -62,6 +69,8 @@ public class IdentificationTypeController : Controller
         }
         else
         {
+            ViewData[AC.Title] = "Actualizar - Tipo de Idenficación";
+
             //update
             var obj = _uow.IdentificationType
                 .Get(filter: x => (x.Id == id), isTracking: false);
@@ -150,6 +159,8 @@ public class IdentificationTypeController : Controller
 
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Tipo de Idenficación";
+
         if (id == null || id == 0)
         {
             return NotFound();

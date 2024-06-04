@@ -391,6 +391,9 @@ public class CustomerController : Controller
 
     public IActionResult Delete(int? id)
     {
+        ViewData[AC.Title] = "Eliminar - Cliente";
+
+
         if (id == null || id == 0)
         {
             return NotFound();

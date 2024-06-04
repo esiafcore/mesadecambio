@@ -1099,6 +1099,8 @@ public class QuotationController : Controller
 
     public IActionResult CreateDetail(int id)
     {
+        ViewData[AC.Title] = "Dellate - Cotización";
+
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
