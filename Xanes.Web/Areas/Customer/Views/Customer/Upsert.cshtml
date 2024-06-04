@@ -21,8 +21,8 @@
             <input hidden asp-for="DataModel.IdentificationTypeNumber" name="IdentificationTypeNumber" id="identificationTypeNumber" />
 
             <div class="row">
-                <div class="row col-12">
-                    <div class="col-2 col-md-1 mb-1">Tipo</div>
+                <div class="row col-12 col-md-6">
+                    <div class="col-2 mb-1">Tipo</div>
                     <div class="col-4 ms-3 w-auto border border-primary border-opacity-25 mb-1">
                         @foreach (var personType in Model.TypeList)
                         {
@@ -36,9 +36,9 @@
                             </div>
                         }
                     </div>
-                    <div class="d-block col-4 d-md-none">
-                    </div>
-                    <div class="col-4 col-lg-2 col-md-3 text-md-center" id="labelType" hidden>Tipo Identificación</div>
+                </div>
+                <div class="row col-12 col-md-6">
+                    <div class="col-4 col-md-6 col-lg-4 text-md-center" id="labelType" hidden>Tipo Identificación</div>
                     <div class="col-4 ms-3 w-auto border border-primary border-opacity-25 naturalPerson" hidden>
                         @foreach (var identification in Model.IdentificationTypeList.Where(x => x.IsLegal == false))
                         {
