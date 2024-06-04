@@ -12,12 +12,12 @@
                    asp-route-currencyType="@((short)Model.CurrencySelected)" data-bs-placement="top" data-bs-title="Nuevo T/Cambio">
                     <i class="bi bi-plus-circle"></i> Nuevo
                 </a>
-                <a onclick="fnExportExcel()" class="btn btn-warning border"
+                <a onclick="fnExportExcel()" class="btn btn-outline-warning border text-white"
                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
                     <i class="bi bi-arrow-up-square"></i> Exportar
                 </a>
                 <a asp-controller="CurrencyExchangeRate" asp-action="Import"
-                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-outline-success border text-white">
                     <i class="bi bi-box-arrow-in-down"></i> Importar
                 </a>
             </div>
