@@ -43,15 +43,18 @@ public class ConfigCxcRepository : Repository<ConfigCxc>, IConfigCxcRepository
                 : itemRecord.SequentialNumberDraftCustomer;
             nextSequential++;
 
-            if (typeSequential == SD.TypeSequential.Official)
+            if (mustUpdate)
             {
-                itemRecord.SequentialNumberCustomer = nextSequential;
+                if (typeSequential == SD.TypeSequential.Official)
+                {
+                    itemRecord.SequentialNumberCustomer = nextSequential;
+                }
+                else
+                {
+                    itemRecord.SequentialNumberDraftCustomer = nextSequential;
+                }
+                Update(itemRecord);
             }
-            else
-            {
-                itemRecord.SequentialNumberDraftCustomer = nextSequential;
-            }
-            Update(itemRecord);
         }
 
         return await Task.FromResult(nextSequential);
