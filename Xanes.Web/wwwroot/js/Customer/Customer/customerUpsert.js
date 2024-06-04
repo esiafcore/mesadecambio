@@ -1,6 +1,13 @@
 ﻿let typeNumeral, inputTypeNumeral, typeNumerals;
 let personName = "";
+
+let labelType, divNaturalPerson, divLegalPerson;
 document.addEventListener("DOMContentLoaded", () => {
+
+    labelType = document.querySelector("#labelType");
+    divNaturalPerson = document.querySelector(".naturalPerson");
+    divLegalPerson = document.querySelector(".legalPerson");
+
 
     let inputId = document.getElementById("DataModel_Id");
     //$("#DataModel_CategoryId").select2(select2Options);
@@ -21,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     inputSecondName.addEventListener("change", naturalNames_onChange);
     inputLastName.addEventListener("change", naturalNames_onChange);
     inputSecondSurname.addEventListener("change", naturalNames_onChange);
-    inputCommercialName.addEventListener("change",() => {
+    inputCommercialName.addEventListener("change", () => {
         inputFirstName.value = inputCommercialName.value;
         inputLastName.value = inputCommercialName.value;
     });
@@ -31,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    personType_onClick(personLegalRad);
 
     inputTypeNumeral = document.querySelector("#typeNumeral");
     typeNumerals = document.querySelectorAll(".typeNumerals");
@@ -46,6 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     inputTypeNumeral.value = typeNumeral;
+    personType_onClick(inputTypeNumeral);
 
     // Evento enviar form para upsert
     const formUpsert = document.getElementById("formUpsert");
@@ -106,23 +113,50 @@ const fnCreateFormSubmit = async (event) => {
     }
 }
 
+const identificationType_onClick = async (objElem) => {
+    let identificationTypeCode = document.querySelector("#identificationTypeCode");
+    let identificationTypeNumber = document.querySelector("#identificationTypeNumber");
 
-function personType_onClick(objElem) {
+
+    let url = `/Customer/Customer/GetIdentificationType?id=${objElem.value}`;
+    const response = await fetch(url, {
+        method: "POST"
+    });
+
+    const jsonResponse = await response.json();
+
+    if (jsonResponse.isSuccess) {
+
+        identificationTypeCode.value = jsonResponse.data.code;
+        identificationTypeNumber.value = jsonResponse.data.numeral;
+    }
+}
+
+
+const personType_onClick = async (objElem) => {
+
     let currentValue = objElem.value;
-
     if (currentValue == PersonType.Natural) {
-
         personNaturalDiv.forEach((item) => {
             item.style.display = styleShow;
         });
         personLegalDiv.style.display = styleHide;
+        labelType.hidden = false;
+        divNaturalPerson.hidden = false;
+        divLegalPerson.hidden = true;
+
     }
     else if (currentValue == PersonType.Legal) {
+        labelType.hidden = false;
+        divNaturalPerson.hidden = true;
+        divLegalPerson.hidden = false;
+
         personLegalDiv.style.display = styleShow;
         personNaturalDiv.forEach((item) => {
             item.style.display = styleHide;
         });
     }
+
 }
 
 
@@ -130,13 +164,13 @@ function naturalNames_onChange(e) {
     //Hay dato y tipo de persona es natural
     if (e.target.value && personNaturalRad.checked) {
         //Concatenar los 4 campos
-        
+
         if (inputFirstName.value) {
             personName = inputFirstName.value.trim();
         }
 
         if (inputSecondName.value) {
-            personName = `${personName.trim()} ${inputSecondName.value.trim() }`;
+            personName = `${personName.trim()} ${inputSecondName.value.trim()}`;
         }
 
         if (inputLastName.value) {

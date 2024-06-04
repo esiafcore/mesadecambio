@@ -121,10 +121,14 @@ public class CustomerController : Controller
             if (legalPerson != null) { obj.TypeId = legalPerson.Id; }
         }
 
+        var objIdentificationType = _uow.IdentificationType
+            .GetAll(filter: x => (x.CompanyId == _companyId && x.IsActive)).ToList();
+
+
         var dataVM = new Models.ViewModels.CustomerCreateVM()
         {
             DataModel = obj,
-            //CategoryList = categorySelectList,
+            IdentificationTypeList = objIdentificationType,
             TypeList = typeSelectList,
             SectorList = sectorList
         };
@@ -155,6 +159,8 @@ public class CustomerController : Controller
         //Datos son validos
         if (ModelState.IsValid)
         {
+            obj.IdentificationNumber = obj.IdentificationNumber.ToUpper();
+
             if (obj.CompanyId != _companyId)
             {
                 jsonResponse.IsSuccess = false;
@@ -196,6 +202,59 @@ public class CustomerController : Controller
             }
 
             obj.TypeId = objType.Id;
+
+
+            var objIdentificationType = _uow.IdentificationType.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Id == obj.IdentificationTypeId);
+
+            if (objIdentificationType == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Tipo de persona no encontrada";
+                return Json(jsonResponse);
+            }
+
+            obj.IdentificationTypeCode = objIdentificationType.Code;
+            obj.IdentificationTypeNumber = objIdentificationType.Numeral;
+
+            string identificationNumber = obj.IdentificationNumber;
+            string regularExpressionNumber = objIdentificationType.RegularExpressionNumber;
+            string formatExpressionNumber = objIdentificationType.FormatExpressionNumber;
+            string substitutionExpressionNumber = objIdentificationType.SubstitutionExpressionNumber;
+
+            // Asegurarse de que regularExpressionNumber y identificationNumber no sean nulos
+            if (!string.IsNullOrEmpty(regularExpressionNumber) && !string.IsNullOrEmpty(identificationNumber))
+            {
+                if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+                {
+                    if (obj.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.CEDU)
+                    {
+                        identificationNumber = Regex.Replace(identificationNumber, regularExpressionNumber,
+                            formatExpressionNumber ?? "");
+                    }
+                    else if (obj.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.PASS)
+                    {
+                        identificationNumber = obj.IdentificationNumber;
+                    }
+                }
+                else if (obj.TypeNumeral == (int)SD.PersonType.LegalPerson)
+                {
+                    if (obj.IdentificationTypeNumber == (int)SD.IdentificationTypeNumber.RUC)
+                    {
+                        identificationNumber = obj.IdentificationNumber;
+                    }
+                }
+
+                // Validar el número de identificación solo si no es nulo
+                if (!string.IsNullOrEmpty(identificationNumber) &&
+                    !Regex.Match(identificationNumber, regularExpressionNumber).Success)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = $"El número de identificación: {identificationNumber} es inválido";
+                    return Json(jsonResponse);
+                }
+
+            }
 
             //Creando
             if (obj.Id == 0)
@@ -289,7 +348,7 @@ public class CustomerController : Controller
                 .ToList();
             foreach (var item in listErrorMessages)
             {
-                errorsMessagesBuilder.Append(item);
+                errorsMessagesBuilder.Append(item + Environment.NewLine);
             }
             jsonResponse.IsSuccess = false;
             jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
@@ -748,7 +807,7 @@ public class CustomerController : Controller
                 string regularExpressionNumber = "";
                 string formatExpressionNumber = "";
                 string substitutionExpressionNumber = "";
-                string identificationNumber = customer.DataModel.IdentificationNumber; ;
+                string identificationNumber = customer.DataModel.IdentificationNumber;
 
                 if (customer.DataModel.IdentificationTypeTrx != null)
                 {
@@ -843,6 +902,25 @@ public class CustomerController : Controller
 
         jsonResponse.IsSuccess = true;
         jsonResponse.Data = objList;
+        return Json(jsonResponse);
+    }
+
+    [HttpPost]
+    public JsonResult GetIdentificationType(int id = 0)
+    {
+        JsonResultResponse? jsonResponse = new();
+
+        var objIdentificationType = _uow.IdentificationType
+            .Get(filter: x => x.IsActive && x.CompanyId == _companyId && x.Id == id);
+        if (objIdentificationType == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"Tipo de identificación no encontrado";
+            return Json(jsonResponse);
+        }
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objIdentificationType;
         return Json(jsonResponse);
     }
 }

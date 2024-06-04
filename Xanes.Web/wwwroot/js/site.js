@@ -132,6 +132,16 @@ const PersonType = {
     Legal: 2
 }
 
+
+const IdentificationType = {
+    RUC: 1,
+    CEDU: 2,
+    DIMEX: 4,
+    NITE: 8,
+    DIDI: 16,
+    PASS: 32
+}
+
 const QuotationDetailType = {
     Deposit: 1,
     Transfer: 2,
