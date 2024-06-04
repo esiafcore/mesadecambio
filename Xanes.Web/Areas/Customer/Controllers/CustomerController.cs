@@ -87,11 +87,14 @@ public class CustomerController : Controller
 
             if (_cfgCxc.IsAutomaticallyCustomerCode)
             {
+                //Si el cliente está en estado TRUE, no se salvará el consecutivo temporal
+                bool hasSequentialUpdate = !obj.IsActive;
+
                 var nextCode = await _uow
                     .ConfigCxc
                     .NextSequentialNumber(filter: x => (x.CompanyId == _companyId)
                         , typeSequential: SD.TypeSequential.Draft
-                        , mustUpdate: true);
+                        , mustUpdate: hasSequentialUpdate);
 
                 obj.Code = nextCode.ToString()
                     .PadLeft(AC.RepeatCharTimes, AC.CharDefaultEmpty);
