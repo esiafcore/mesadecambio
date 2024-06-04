@@ -68,83 +68,96 @@ public class BankController : Controller
     [HttpPost]
     public async Task<IActionResult> Upsert(Bank obj, IFormFile? filelogo)
     {
-        //Datos son validos
-        if (ModelState.IsValid)
+        try
         {
-            //Trabajar con Logo del Banco
-            string wwwRootPath = _webHostEnvironment.WebRootPath;
-            if (filelogo != null)
+            //Datos son validos
+            if (ModelState.IsValid)
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(filelogo.FileName);
-                string imagePath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
-
-                if (!string.IsNullOrEmpty(obj.LogoUrl))
+                //Trabajar con Logo del Banco
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (filelogo != null)
                 {
-                    //delete the old image
-                    var oldImagePath =
-                        Path.Combine(wwwRootPath, obj.LogoUrl.TrimStart('\\'));
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(filelogo.FileName);
+                    string imagePath = Path.Combine(wwwRootPath, AC.ImagesBankFolder);
 
-                    if (System.IO.File.Exists(oldImagePath))
+                    if (!string.IsNullOrEmpty(obj.LogoUrl))
                     {
-                        System.IO.File.Delete(oldImagePath);
+                        //delete the old image
+                        var oldImagePath =
+                            Path.Combine(wwwRootPath, obj.LogoUrl.TrimStart('\\'));
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
                     }
+
+                    await using var fileStream = new FileStream(Path.Combine(imagePath, fileName)
+                        , FileMode.Create);
+                    await filelogo.CopyToAsync(fileStream);
+                    obj.LogoUrl = $"\\{AC.ImagesBankFolder}{fileName}";
                 }
 
-                await using var fileStream = new FileStream(Path.Combine(imagePath, fileName)
-                    , FileMode.Create);
-                await filelogo.CopyToAsync(fileStream);
-                obj.LogoUrl = $"\\{AC.ImagesBankFolder}{fileName}";
-            }
 
-
-            if (obj.CompanyId != _companyId)
-            {
-                ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
-            }
-
-            if (obj.Name.Trim().ToLower() == ".")
-            {
-                ModelState.AddModelError("name", "Nombre no puede ser .");
-            }
-
-            if (obj.Code.Trim().ToLower() == ".")
-            {
-                ModelState.AddModelError("code", "Código no puede ser .");
-            }
-
-            if (!ModelState.IsValid) return View(obj);
-
-            //Creando
-            if (obj.Id == 0)
-            {
-                _uow.Bank.Add(obj);
-                _uow.Save();
-                TempData["success"] = "Bank created successfully";
-                return RedirectToAction("Index", "Bank");
-            }
-            else
-            {
-                //Validar que codigo no está repetido
-                var objExists = _uow.Bank
-                    .Get(filter: x => (x.CompanyId == _companyId)
-                                      & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()),
-                                      isTracking: false);
-
-                if ((objExists != null) && (objExists.Id != obj.Id))
+                if (obj.CompanyId != _companyId)
                 {
-                    ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+                    ModelState.AddModelError("", $"Id de la compañía no puede ser distinto de {_companyId}");
                 }
-                //Datos son validos
-                if (ModelState.IsValid)
+
+                if (obj.Name.Trim().ToLower() == ".")
                 {
-                    _uow.Bank.Update(obj);
+                    ModelState.AddModelError("name", "Nombre no puede ser .");
+                }
+
+                if (obj.Code.Trim().ToLower() == ".")
+                {
+                    ModelState.AddModelError("code", "Código no puede ser .");
+                }
+
+                if (!ModelState.IsValid) return View(obj);
+
+                //Creando
+                if (obj.Id == 0)
+                {
+                    _uow.Bank.Add(obj);
                     _uow.Save();
-                    TempData["success"] = "Bank updated successfully";
+                    TempData["success"] = "Bank created successfully";
                     return RedirectToAction("Index", "Bank");
                 }
-                return View(obj);
+                else
+                {
+                    //Validar que codigo no está repetido
+                    var objExists = _uow.Bank
+                        .Get(filter: x => (x.CompanyId == _companyId)
+                                          & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()),
+                                          isTracking: false);
+
+                    if ((objExists != null) && (objExists.Id != obj.Id))
+                    {
+                        ModelState.AddModelError("", $"Código {obj.Code} ya existe");
+                    }
+                    //Datos son validos
+                    if (ModelState.IsValid)
+                    {
+                        _uow.Bank.Update(obj);
+                        _uow.Save();
+                        TempData["success"] = "Bank updated successfully";
+                        return RedirectToAction("Index", "Bank");
+                    }
+                    return View(obj);
+                }
             }
+            return View(obj);
         }
+        catch (UnauthorizedAccessException e)
+        {
+            ModelState.AddModelError("", e.Message.ToString());
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message.ToString());
+        }
+
         return View(obj);
     }
 
