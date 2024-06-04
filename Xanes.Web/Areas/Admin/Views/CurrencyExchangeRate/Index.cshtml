@@ -1,12 +1,17 @@
 ﻿@model CurrencyExchangeRateIndexVM
 
-<div class="card shadow border-0 mt-1">
+<div class="card shadow border-0 mt-1 col-9">
     <div class="card-header bg-secondary bg-gradient ms-0 py-1">
         <div class="row align-items-center">
             <div class="col-7 text-center">
                 <h3 class="text-white py-1">Tipos de Cambio</h3>
             </div>
             <div class="col-5 text-end">
+                <a class="btn btn-info border" asp-controller="CurrencyExchangeRate" asp-action="Upsert"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" id="btn-upsertexchange"
+                   asp-route-currencyType="@((short)Model.CurrencySelected)" data-bs-placement="top" data-bs-title="Nuevo T/Cambio">
+                    <i class="bi bi-plus-circle"></i> Nuevo
+                </a>
                 <a onclick="fnExportExcel()" class="btn btn-warning border"
                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
                     <i class="bi bi-arrow-up-square"></i> Exportar
@@ -14,11 +19,6 @@
                 <a asp-controller="CurrencyExchangeRate" asp-action="Import"
                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-success border">
                     <i class="bi bi-box-arrow-in-down"></i> Importar
-                </a>
-                <a class="btn btn-info border" asp-controller="CurrencyExchangeRate" asp-action="Upsert"
-                   data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading()" id="btn-upsertexchange"
-                   asp-route-currencyType="@((short)Model.CurrencySelected)" data-bs-placement="top" data-bs-title="Nuevo T/Cambio">
-                    <i class="bi bi-plus-circle"></i> Nuevo
                 </a>
             </div>
         </div>
