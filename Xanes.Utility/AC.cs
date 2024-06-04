@@ -21,6 +21,8 @@ public static class AC
     public static string DefaultDateFormatWeb = "yyyy-MM-dd";
     public static string DefaultDateFormatView = "dd/MM/yyyy";
     public const string ImagesBankFolder = @"images\banks\";
+    public const string ImagesCompanyFolder = @"images\companies\";
+
     public const string ImagesBankSufix = "banks";
     public const string ContentTypeExcel = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public const string ContentTypeZip = "application/zip";

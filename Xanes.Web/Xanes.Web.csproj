@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\images\banks\02551a1f-910f-4090-81fe-7a9138bf831c.svg" />
+    <Content Remove="wwwroot\images\banks\1b35d28d-1367-4325-93c0-1ed5fe5d86b5.svg" />
+    <Content Remove="wwwroot\images\banks\2e353f98-cf92-4172-8fa8-730bd26013df.svg" />
+    <Content Remove="wwwroot\images\banks\4a9822a3-4805-46a6-b660-88f7306b0656.png" />
+    <Content Remove="wwwroot\images\banks\fb0ba6f7-f05b-4dab-ae99-02067595a45b.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Areas\Exchange\Reports\DepositList.mrt" />
     <None Remove="Areas\Exchange\Reports\OperationList.mrt" />
     <None Remove="Areas\Exchange\Reports\Quotation.mrt" />
@@ -38,10 +46,14 @@
     <Folder Include="Areas\Customer\Data\" />
     <Folder Include="Areas\Customer\Models\" />
     <Folder Include="Controllers\" />
+    <Folder Include="wwwroot\images\banks\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="wwwroot\CompanyImages\Dummy.json">
+    <Content Update="wwwroot\images\companies\Dummy.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\images\companies\Factoring-logo-500px.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\languages\es_MX.js">
