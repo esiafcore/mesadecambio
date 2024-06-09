@@ -1,43 +1,44 @@
 ﻿@model CurrencyExchangeRateVM
 
-<div class="card shadow border-0 mt-1 col-12 col-lg-8">
-    <div class="card-header bg-secondary bg-gradient ms-0 py-1">
-        <div class="row">
-            <div class="col-12 col-md-6 pb-1">
-                <h2 class="text-white text-center text-md-start py-1">@(Model.DataModel.Id != 0 ? "Actualizar" : "Crear") - Tipo de Cambio</h2>
-            </div>
-            <div class="row col mt-1 d-flex justify-content-end">
-                <div class="col-6 col-md-5 col-xl-4">
-                    @if (Model.DataModel.Id != 0)
-                    {
-                        <button type="submit" class="btn btn-primary form-control"
-                                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Actualizar">
-                            <i class="bi bi-disc"></i> Actualizar
-                        </button>
-                    }
-                    else
-                    {
-                        <button type="submit" class="btn btn-primary form-control"
-                                data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Crear">
-                            <i class="bi bi-disc"></i> Crear
-                        </button>
-                    }
+<form method="post" class="row">
+
+    <div class="card shadow border-0 mt-1 col-12 col-lg-8">
+        <div class="card-header bg-secondary bg-gradient ms-0 py-1">
+            <div class="row">
+                <div class="col-12 col-md-6 pb-1">
+                    <h2 class="text-white text-center text-md-start py-1">@(Model.DataModel.Id != 0 ? "Actualizar" : "Crear") - Tipo de Cambio</h2>
                 </div>
-                <div class="col-6 col-md-5 col-xl-4">
-                    <a asp-controller="CurrencyExchangeRate" asp-action="Index"
-                       asp-route-currencyType="@((short)Model.DataModel.CurrencyType)" 
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Regresar"
-                       class="btn btn-secondary border form-control">
-                        <i class="bi bi-arrow-return-left"></i> Regresar
-                    </a>
+                <div class="row col mt-1 d-flex justify-content-end">
+                    <div class="col-6 col-md-5 col-xl-4">
+                        @if (Model.DataModel.Id != 0)
+                        {
+                            <button type="submit" class="btn btn-primary form-control"
+                                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Actualizar">
+                                <i class="bi bi-disc"></i> Actualizar
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-primary form-control"
+                                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Crear">
+                                <i class="bi bi-disc"></i> Crear
+                            </button>
+                        }
+                    </div>
+                    <div class="col-6 col-md-5 col-xl-4">
+                        <a asp-controller="CurrencyExchangeRate" asp-action="Index"
+                           asp-route-currencyType="@((short)Model.DataModel.CurrencyType)"
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Regresar"
+                           class="btn btn-secondary border form-control">
+                            <i class="bi bi-arrow-return-left"></i> Regresar
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="card-body px-3 py-1">
-        <div class="container pt-0">
-            <form method="post" class="row">
+        <div class="card-body px-3 py-1">
+            <div class="container pt-0">
                 <input hidden asp-for="DataModel.Id" />
                 <input hidden asp-for="DataModel.CompanyId" />
                 <input hidden asp-for="DataModel.CurrencyType" />
@@ -54,7 +55,7 @@
 
                     <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
                         <input type="text" readonly="readonly" class="form-control border-0 shadow"
-                            value="@Model.DataModel.CurrencyTrx.Abbreviation" />
+                               value="@Model.DataModel.CurrencyTrx.Abbreviation" />
                         <label class="ms-2">Moneda</label>
                     </div>
                 </div>
@@ -79,8 +80,8 @@
                         <span asp-validation-for="DataModel.SellRate" class="text-danger"></span>
                     </div>
                 </div>
-            </form>
 
+            </div>
         </div>
     </div>
-</div>
+</form>

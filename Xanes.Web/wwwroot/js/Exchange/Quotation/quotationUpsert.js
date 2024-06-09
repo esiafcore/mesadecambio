@@ -16,7 +16,13 @@ let btnSaveNext = document.querySelector("#btnSaveNext");
 let redirectHome = false, redirectDetail = true, showMessages = true;
 let isClosed = false, isReClosed = false, isClosedElement;
 
+let dataTable;
+let typeNumeral;
+let exchangeRateChar;
+
 document.addEventListener("DOMContentLoaded", async () => {
+
+    exchangeRateChar = document.querySelector("#exchangeRateChar");
     inputDateTransa = document.querySelector("#dateTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
     inputExchangeRateBuyTransa = document.querySelector("#exchangeRateBuyTransa");
@@ -36,7 +42,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementsBuy = document.querySelectorAll(".typeBuy");
     elementsTransfer = document.querySelectorAll(".typeTransfer");
     elementsSell = document.querySelectorAll(".typeSell");
-    elementsHiddenBuySell = document.querySelectorAll(".typeBuySellhidden");
+    //elementsHiddenBuySell = document.querySelectorAll(".typeBuySellhidden");
     divExchangeRateVariation = document.querySelector("#divExchangeRateVariation");
     inputExchangeRateVariation = document.querySelector("#exchangeRateVariation");
     divCurrencyDeposit = document.querySelector("#divCurrencyDeposit");
@@ -52,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     //Accedemos al contenedor principal y modificamos la clase
     containerMain = document.querySelector("#containerMain");
-    containerMain.className = "container-fluid col-md-12 col-xxl-10 col-11 m-1";
+    containerMain.className = "container-fluid m-1";
     selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
     btnSave = document.querySelector("#btnSaveReturn");
     btnNext = document.querySelector("#btnNext");
@@ -186,6 +192,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
+    typeNumeral = inputTypeNumeral.value;
+
     //Funcion para ocultar los elementos en dependencia del tipo de cotizacion
     fnLoadInputsByType(inputTypeNumeral.value);
 
@@ -239,8 +247,7 @@ const fnCreateFormSubmit = async (event) => {
         const formObject = event.currentTarget;
 
         const url =
-            `${formObject.action}?redirectHome=${redirectHome}&redirectDetail=${redirectDetail}&showMessages=${
-                showMessages}`;
+            `${formObject.action}?redirectHome=${redirectHome}&redirectDetail=${redirectDetail}&showMessages=${showMessages}`;
         const formData = new FormData(formObject);
 
         const response = await fetch(url,
@@ -419,7 +426,7 @@ const fnGetBankAccounts = async () => {
 
 const fnChangeCustomers = async (onlyCompanies) => {
     let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
-
+    let divExchangeRateHistory = document.querySelector("#divExchangeRateHistory");
     try {
 
         const response = await fetch(url, {
@@ -430,6 +437,12 @@ const fnChangeCustomers = async (onlyCompanies) => {
 
         if (jsonResponse.isSuccess) {
             selectCustomer.innerHTML = "";
+            let optionDisabled = document.createElement("option");
+            optionDisabled.value = 0;
+            optionDisabled.text = ACJS.PlaceHolderSelect;
+            optionDisabled.disabled = true;
+            optionDisabled.selected = true;
+            selectCustomer.appendChild(optionDisabled);
 
             jsonResponse.data.forEach((item) => {
                 let option = document.createElement("option");
@@ -442,16 +455,34 @@ const fnChangeCustomers = async (onlyCompanies) => {
             var options = selectCustomer.getElementsByTagName('option');
             if (options.length > 0) {
                 // Selecciona el primer elemento
-                selectCustomer.value = options[0].value;
+
+                if (onlyCompanies) {
+                    selectCustomer.value = options[0].value;
+                    divExchangeRateHistory.hidden = true;
+
+                } else {
+                    $(selectCustomer).on('select2:select', async function (e) {
+                        divExchangeRateHistory.hidden = false;
+                        fnLoadDatatable(e.params.data.id);
+                    });
+                }
             }
+
             $(selectCustomer).select2('focus');
 
+
         } else {
-            alert(jsonResponse.errorMessages);
+            Swal.fire({
+                icon: 'error',
+                text: jsonResponse.errorMessages
+            });
         }
 
     } catch (error) {
-        alert(error);
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
     }
 };
 
@@ -482,12 +513,13 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = false);
         elementsSell.forEach((item) => item.hidden = true);
         divExchangeRateVariation.hidden = false;
-        elementsHiddenBuySell.forEach((item) => {
-            item.className = "";
-            item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
-        });
+        //elementsHiddenBuySell.forEach((item) => {
+        //    item.className = "";
+        //    item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
+        //});
         elementsTransfer.forEach((item) => item.hidden = true);
         fnChangeCustomers(false);
+
     } else if (type == QuotationType.Sell) {
         divCurrencyTransa.hidden = false;
         divAmountExchange.hidden = false;
@@ -497,12 +529,13 @@ const fnLoadInputsByType = (type) => {
         divCurrencyDeposit.hidden = false;
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = false);
-        elementsHiddenBuySell.forEach((item) => {
-            item.className = "";
-            item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
-        });
+        //elementsHiddenBuySell.forEach((item) => {
+        //    item.className = "";
+        //    item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
+        //});
         elementsTransfer.forEach((item) => item.hidden = true);
         fnChangeCustomers(false);
+
     } else {
         divAmountExchange.hidden = true;
         divCurrencyTransa.hidden = true;
@@ -510,10 +543,10 @@ const fnLoadInputsByType = (type) => {
         divCurrencyTransfer.hidden = true;
         divExchangeRateVariation.hidden = true;
         divCurrencyDeposit.hidden = true;
-        elementsHiddenBuySell.forEach((item) => {
-            item.className = "";
-            item.classList.add("row", "col-xl-4", "d-none", "typeBuySell");
-        });
+        //elementsHiddenBuySell.forEach((item) => {
+        //    item.className = "";
+        //    item.classList.add("row", "col-xl-4", "d-none", "typeBuySell");
+        //});
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
@@ -672,6 +705,94 @@ const fnTCByDate = async () => {
             formatterAmount(decimalExchange).format(fnparseFloat(inputExchangeRateOfficialTransa.value));
 
     } catch (error) {
-        alert(error);
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
     }
 };
+
+const fnCalculateAverageExchangeRate = async (customerId) => {
+    let average = document.querySelector("#average");
+    let weightedAverage = document.querySelector("#weightedAverage");
+
+    let url = `/exchange/quotation/GetAverageExchangeRate?customerId=${customerId}&type=${typeNumeral}&currency=${currencyType}`;
+
+    try {
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonResponse = await response.json();
+
+        if (jsonResponse.isSuccess) {
+            average.innerHTML = formatterAmount(decimalExchange).format(jsonResponse.data.average);
+            weightedAverage.innerHTML = formatterAmount(decimalExchange).format(jsonResponse.data.weightedAverage);
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+    }
+};
+
+const fnLoadDatatable = (customerId) => {
+    if (dataTable) dataTable.destroy();
+    dataTable = new DataTable("#tblData", {
+        "dataSrc": 'data',
+        "ajax": {
+            "url": `/exchange/quotation/getallbycustomer?customerId=${customerId}&type=${typeNumeral}&currency=${currencyType}`,
+            "dataSrc": function (data) {
+                if (data.isSuccess) {
+                    return data.data;
+                } else {
+                    return [];
+                }
+            },
+            "complete": async function () {
+                await fnCalculateAverageExchangeRate(customerId)
+                fnEnableTooltip();
+            }
+        },
+        "columns": [
+            {
+                data: 'dateTransa', "width": "30%"
+                , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
+                , orderable: true
+            },
+            {
+                data: 'amountTransaction', "width": "35%"
+                , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: true
+            },
+            {
+                data: null, "width": "35%"
+                , render: (data) => {
+                    let exchangeRate = 0;
+                    if (typeNumeral == QuotationType.Buy) {
+                        exchangeRate = formatterAmount(decimalExchange).format(data.exchangeRateBuyTransa);
+                        exchangeRateChar.value = "C"
+                    } else if (typeNumeral == QuotationType.Sell) {
+                        exchangeRateChar.value = "V"
+                        exchangeRate = formatterAmount(decimalExchange).format(data.exchangeRateSellTransa);
+                    }
+                    return exchangeRate;
+                }, orderable: true
+            }
+        ],
+        "searching": false,
+        "select": selectOptions,
+        "paging": false,
+        "language": {
+            info: "",
+            infoEmpty: "",
+            zeroRecords: "",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: ""
+        }
+    });
+}

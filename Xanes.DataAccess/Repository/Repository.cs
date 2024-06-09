@@ -1,7 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Xanes.DataAccess.Data;
+using Xanes.DataAccess.Helpers;
 using Xanes.DataAccess.Repository.IRepository;
+using Xanes.Utility;
 
 namespace Xanes.DataAccess.Repository;
 
@@ -38,6 +40,59 @@ public class Repository<T> : IRepository<T> where T : class
     public void Add(T entity)
     {
         dbSet.Add(entity);
+    }
+
+    public async Task<PagedList<T>> GetAllAsync(
+        Expression<Func<T, bool>>? filter,
+        List<Expression<Func<T, object>>>? orderExpressions = null,
+        SD.OrderDirection orderDirection = SD.OrderDirection.Desc,
+        string? includeProperties = null,
+        int pageSize = 15, int pageNumber = 1)
+    {
+        IQueryable<T> query = dbSet;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
+            foreach (var includeProp in includeProperties
+                         .Split(new char[] { AC.SeparationCharProperties }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProp);
+            }
+        }
+
+        //Para varios campos
+        if (orderExpressions != null && orderExpressions.Any())
+        {
+            IOrderedQueryable<T>? orderedQuery = null;
+
+            foreach (var order in orderExpressions)
+            {
+                switch (orderDirection)
+                {
+                    case SD.OrderDirection.Asc:
+                        orderedQuery = orderedQuery == null
+                            ? query.OrderBy(order)
+                            : orderedQuery.ThenBy(order);
+                        break;
+                    case SD.OrderDirection.Desc:
+                        orderedQuery = orderedQuery == null
+                            ? query.OrderByDescending(order)
+                            : orderedQuery.ThenByDescending(order);
+                        break;
+                }
+            }
+
+            query = orderedQuery ?? query;
+        }
+
+        pageSize = Math.Min(pageSize, 50);
+
+        return await PagedList<T>.ToPagedList(query, pageNumber, pageSize);
     }
 
     public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)

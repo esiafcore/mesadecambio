@@ -400,7 +400,6 @@ const fnSetSearchValue = (value) => {
     dataTable.search(value).draw();
 }
 
-
 const fnLoadDatatable = () => {
 
     let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));

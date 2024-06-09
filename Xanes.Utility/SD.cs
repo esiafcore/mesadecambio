@@ -10,6 +10,11 @@ public static class SD
         Foreign = 2,
         Additional = 4
     }
+    public enum OrderDirection
+    {
+        Asc,
+        Desc,
+    }
 
     [Flags]
     public enum CurrencyTypeCode : int

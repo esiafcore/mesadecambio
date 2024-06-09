@@ -15,6 +15,8 @@ using static Xanes.Utility.SD;
 using static Stimulsoft.Report.Help.StiHelpProvider;
 using PersonType = Xanes.Models.PersonType;
 using QuotationType = Xanes.Models.QuotationType;
+using Xanes.DataAccess.Helpers;
+using System.Linq.Expressions;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -1411,22 +1413,31 @@ public class QuotationController : Controller
     public JsonResult ProcessingDate(string processingDate)
     {
         JsonResultResponse? jsonResponse = new();
-
-        if (processingDate != null)
+        try
         {
-            DateOnly dateTransa = DateOnly.Parse(processingDate);
+            if (processingDate != null)
+            {
+                DateOnly dateTransa = DateOnly.Parse(processingDate);
 
-            HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+                HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+            }
+            else
+            {
+                HttpContext.Session.Remove(AC.ProcessingDate);
+            }
+
+            jsonResponse.IsSuccess = true;
+            TempData[AC.Success] = $"Fecha de Procesamiento guardada correctamente";
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+            return Json(jsonResponse);
+
         }
-        else
+        catch (Exception ex)
         {
-            HttpContext.Session.Remove(AC.ProcessingDate);
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
         }
-
-        jsonResponse.IsSuccess = true;
-        TempData[AC.Success] = $"Fecha de Procesamiento guardada correctamente";
-        jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
-        return Json(jsonResponse);
     }
 
     #region API_CALL
@@ -1459,6 +1470,34 @@ public class QuotationController : Controller
         return Json(jsonResponse);
     }
 
+    public async Task<JsonResult> GetAllByCustomer(int customerId, SD.QuotationType type, SD.CurrencyType currency)
+    {
+        JsonResultResponse? jsonResponse = new();
+
+        var objPages = await _uow.Quotation
+            .GetAllAsync(x => (x.CompanyId == _companyId &&
+            x.CustomerId == customerId &&
+            x.CurrencyTransaType == currency &&
+            x.TypeNumeral == type)
+              , orderExpressions: new List<Expression<Func<Quotation, object>>>() { i => i.DateTransa }
+              , orderDirection: OrderDirection.Desc
+            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx"
+            , pageNumber: 1, pageSize: 5);
+
+        if (objPages == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = "Error al cargar los datos";
+            return Json(jsonResponse);
+        }
+
+        var objList = objPages.ToList();
+
+        jsonResponse.IsSuccess = true;
+        jsonResponse.Data = objList;
+        return Json(jsonResponse);
+    }
+
     public JsonResult GetAllByParent(int parentId = 0, QuotationDetailType type = QuotationDetailType.Deposit)
     {
         JsonResultResponse? jsonResponse = new();
@@ -1478,6 +1517,68 @@ public class QuotationController : Controller
         jsonResponse.IsSuccess = true;
         jsonResponse.Data = objList;
         return Json(jsonResponse);
+    }
+
+    public async Task<JsonResult> GetAverageExchangeRate(int customerId, SD.QuotationType type, SD.CurrencyType currency)
+    {
+        JsonResultResponse? jsonResponse = new();
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
+        DateOnly dateFilter = DateOnly.Parse(processingDateString);
+        DateOnly dateInitial = new(dateFilter.Year, dateFilter.Month - 1, 1);
+        DateOnly dateFinal = new(dateFilter.Year, dateFilter.Month - 1, dateFilter.ToDateTimeConvert().GetLastDayMonth().Day);
+
+        try
+        {
+            var objPages = await _uow.Quotation
+            .GetAllAsync(x => (x.CompanyId == _companyId &&
+            x.CustomerId == customerId &&
+            x.CurrencyTransaType == currency &&
+            x.TypeNumeral == type &&
+            x.DateTransa >= dateInitial &&
+            x.DateTransa <= dateFinal)
+            , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx"
+            , pageNumber: 1, pageSize: 0);
+
+            if (objPages == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Error al cargar los datos";
+                return Json(jsonResponse);
+            }
+
+            decimal average = 0;
+            decimal weightedAverage = 0;
+
+            foreach (var item in objPages.ToList())
+            {
+                average += type == SD.QuotationType.Buy ? item.ExchangeRateBuyTransa : item.ExchangeRateSellTransa;
+                weightedAverage += type == SD.QuotationType.Buy ?
+                    (item.ExchangeRateBuyTransa * item.AmountTransaction) :
+                    (item.ExchangeRateSellTransa * item.AmountTransaction);
+            }
+
+            if (objPages.Count() != 0)
+            {
+                average = (average / objPages.Count());
+                weightedAverage = (weightedAverage / objPages.Sum(x => x.AmountTransaction));
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = new
+            {
+                average,
+                weightedAverage
+            };
+
+            return Json(jsonResponse);
+
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
     }
 
     [HttpPost, ActionName("Delete")]

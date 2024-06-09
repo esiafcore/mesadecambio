@@ -320,31 +320,41 @@ public class CurrencyExchangeRateController : Controller
     public JsonResult GetCurrencyExchangeRate(string date)
     {
         JsonResultResponse? jsonResponse = new();
-        DateOnly dateTransa = DateOnly.Parse(date);
+        try
+        {
+            DateOnly dateTransa = DateOnly.Parse(date);
 
-        var objList = _uow.CurrencyExchangeRate.GetAll
-            (x => (x.CompanyId == _companyId) && (x.DateTransa == dateTransa)
-                , includeProperties: "CurrencyTrx").ToList();
+            var objList = _uow.CurrencyExchangeRate.GetAll
+                (x => (x.CompanyId == _companyId) && (x.DateTransa == dateTransa)
+                    , includeProperties: "CurrencyTrx").ToList();
 
-        if (objList is null || objList.Count == 0)
+            if (objList is null || objList.Count == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                return Json(jsonResponse);
+            }
+
+            var currencyForeign = objList
+                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign));
+            var currencyAdditional = objList
+                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Additional));
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = new
+            {
+                CurrencyForeign = currencyForeign,
+                CurrencyAdditional = currencyAdditional
+            };
+
+            return Json(jsonResponse);
+
+        }
+        catch (Exception ex)
         {
             jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
             return Json(jsonResponse);
         }
-
-        var currencyForeign = objList
-            .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign));
-        var currencyAdditional = objList
-            .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Additional));
-
-        jsonResponse.IsSuccess = true;
-        jsonResponse.Data = new
-        {
-            CurrencyForeign = currencyForeign,
-            CurrencyAdditional = currencyAdditional
-        };
-
-        return Json(jsonResponse);
     }
 
     [HttpPost, ActionName("Delete")]

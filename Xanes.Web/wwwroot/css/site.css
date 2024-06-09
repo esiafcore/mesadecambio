@@ -19,6 +19,10 @@ table.dataTable tbody tr.selected {
     height: auto !important;
 }
 
+.label-radio {
+    font-size: 10px;
+}
+
 .loading {
     display: none;
     justify-content: center;

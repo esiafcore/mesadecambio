@@ -58,12 +58,6 @@ const fnShowModalMessages = (data, titulo = "") => {
     });
 };
 
-const customMessagesSelect = {
-    noResults: function () {
-        return "No se encontraron resultados.";
-    }
-};
-
 const SystemInformationReportType = {
     // Transacciones
     Operation: 1,
@@ -71,14 +65,30 @@ const SystemInformationReportType = {
     Transfer: 4
 };
 
+const customMessagesSelect = {
+    noResults: function () {
+        return "No se encontraron resultados.";
+    }
+};
+
+const ACJS = {
+    GuidEmpty: '00000000-0000-0000-0000-000000000000',
+    BadRequest: "Error en la solicitud",
+    CharDefaultEmpty: 0,
+    PlaceHolderSelect: "-- Seleccionar --",
+    DefaultDateMinValue: "1900-01-01",
+    DefaultDateMaxValue: "9999-12-31",
+    DefaultDateFormatWeb: "yyyy-MM-dd",
+}
 
 const select2Options = {
     theme: "bootstrap-5",
+    language: customMessagesSelect,
     allowClear: true,
     selectionCssClass: "select2--small",
     dropdownCssClass: "select2--small",
-    placeholder: $(this).data('placeholder'),
-    width: '100%',
+    placeholder: ACJS.PlaceHolderSelect,
+    width: '100%'
 }
 
 //Constantes para STYLES / CSS
