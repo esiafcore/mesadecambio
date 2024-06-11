@@ -520,7 +520,7 @@ public class CurrencyExchangeRateController : Controller
                 var currency = fila.Cell(1).GetString();
                 if (string.IsNullOrWhiteSpace(currency))
                 {
-                    ErrorListMessages.Add($"La moneda está vacia - En la fila:{i}. |");
+                    ErrorListMessages.Add($"La moneda está vacia. Fila:{i}. |");
                 }
                 else
                 {
@@ -535,7 +535,7 @@ public class CurrencyExchangeRateController : Controller
                     }
                     else
                     {
-                        ErrorListMessages.Add($"La moneda  es invalida - En la fila:{i}. |");
+                        ErrorListMessages.Add($"La moneda  es invalida. Fila:{i}. |");
                     }
                 }
 
@@ -543,7 +543,7 @@ public class CurrencyExchangeRateController : Controller
                 var date = fila.Cell(2).GetString();
                 if (string.IsNullOrWhiteSpace(date))
                 {
-                    ErrorListMessages.Add($"La fecha está vacia - En la fila:{i}. |");
+                    ErrorListMessages.Add($"La fecha está vacia. Fila:{i}. |");
                 }
                 else
                 {
@@ -554,7 +554,7 @@ public class CurrencyExchangeRateController : Controller
                 var exchangeOfficial = fila.Cell(3).GetString();
                 if (string.IsNullOrWhiteSpace(exchangeOfficial))
                 {
-                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la fila:{i}. |");
+                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -562,14 +562,14 @@ public class CurrencyExchangeRateController : Controller
                     if (obj.OfficialRate < 0)
                     {
                         ErrorListMessages.Add(
-                            $"El tipo de cambio oficial no puede ser menor  a cero - En la fila:{i}. |");
+                            $"El tipo de cambio oficial no puede ser menor  a cero. Fila:{i}. |");
                     }
                 }
 
                 var exchangeBuy = fila.Cell(4).GetString();
                 if (string.IsNullOrWhiteSpace(exchangeBuy))
                 {
-                    ErrorListMessages.Add($"El tipo de cambio compra está vacio - En la fila:{i}. |");
+                    ErrorListMessages.Add($"El tipo de cambio compra está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -577,14 +577,14 @@ public class CurrencyExchangeRateController : Controller
                     if (obj.BuyRate < 0)
                     {
                         ErrorListMessages.Add(
-                            $"El tipo de cambio compra no puede ser menor a cero - En la fila:{i}. |");
+                            $"El tipo de cambio compra no puede ser menor a cero. Fila:{i}. |");
                     }
                 }
 
                 var exchangeSell = fila.Cell(5).GetString();
                 if (string.IsNullOrWhiteSpace(exchangeSell))
                 {
-                    ErrorListMessages.Add($"El tipo de cambio venta está vacio - En la fila:{i}. |");
+                    ErrorListMessages.Add($"El tipo de cambio venta está vacio. Fila:{i}. |");
                 }
                 else
                 {
@@ -592,7 +592,7 @@ public class CurrencyExchangeRateController : Controller
                     if (obj.SellRate < 0)
                     {
                         ErrorListMessages.Add(
-                            $"El tipo de cambio venta no puede ser menor a cero - En la fila:{i}. |");
+                            $"El tipo de cambio venta no puede ser menor a cero. Fila:{i}. |");
                     }
                 }
 
@@ -606,7 +606,7 @@ public class CurrencyExchangeRateController : Controller
                 {
                     ErrorListMessages.Add(
                         $"El tipo de cambio para {objCurrencyList
-                            .First(x => x.Id == obj.CurrencyId).Abbreviation} _ {obj.DateTransa} ya existe - En la fila:{i}. |");
+                            .First(x => x.Id == obj.CurrencyId).Abbreviation} _ {obj.DateTransa} ya existe. Fila:{i}. |");
                 }
 
                 objList.Add(obj);

@@ -190,6 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         item.addEventListener("change", () => {
             divExchangeRateHistory.hidden = true;
             inputTypeNumeral.value = parseInt(item.value);
+            typeNumeral = inputTypeNumeral.value;
             fnLoadInputsByType(item.value);
         });
     });
@@ -769,23 +770,23 @@ const fnLoadDatatable = (customerId) => {
                 , orderable: true
             },
             {
-                data: 'amountTransaction', "width": "35%"
-                , render: DataTable.render.number(null, null, decimalTransa)
-                , orderable: false
-            },
-            {
                 data: null, "width": "35%"
                 , render: (data) => {
                     let exchangeRate = 0;
                     if (typeNumeral == QuotationType.Buy) {
                         exchangeRate = formatterAmount(decimalExchange).format(data.exchangeRateBuyTransa);
-                        exchangeRateChar.value = "C"
+                        exchangeRateChar.innerHTML = "C"
                     } else if (typeNumeral == QuotationType.Sell) {
-                        exchangeRateChar.value = "V"
+                        exchangeRateChar.innerHTML = "V"
                         exchangeRate = formatterAmount(decimalExchange).format(data.exchangeRateSellTransa);
                     }
                     return exchangeRate;
                 }, orderable: false
+            },
+            {
+                data: 'amountTransaction', "width": "35%"
+                , render: DataTable.render.number(null, null, decimalTransa)
+                , orderable: false
             }
         ],
         "searching": false,

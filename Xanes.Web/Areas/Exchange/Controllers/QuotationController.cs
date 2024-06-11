@@ -1478,7 +1478,8 @@ public class QuotationController : Controller
             .GetAllAsync(x => (x.CompanyId == _companyId &&
             x.CustomerId == customerId &&
             x.CurrencyTransaType == currency &&
-            x.TypeNumeral == type)
+            x.TypeNumeral == type &&
+            x.IsClosed)
               , orderExpressions: new List<Expression<Func<Quotation, object>>>() { i => i.DateTransa }
               , orderDirection: OrderDirection.Desc
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx"
@@ -1535,7 +1536,8 @@ public class QuotationController : Controller
             x.CurrencyTransaType == currency &&
             x.TypeNumeral == type &&
             x.DateTransa >= dateInitial &&
-            x.DateTransa <= dateFinal)
+            x.DateTransa <= dateFinal && 
+            x.IsClosed)
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx"
             , pageNumber: 1, pageSize: 0);
 
