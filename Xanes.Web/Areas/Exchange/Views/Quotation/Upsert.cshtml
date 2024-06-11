@@ -49,7 +49,7 @@
 
             <div class="card-body">
                 <div class="row rounded p-2">
-                    <div class="row col-sm-8">
+                    <div class="row col-lg-8">
                         <input hidden asp-for="DataModel.Id" name="Id" />
                         <input hidden asp-for="DataModel.IsLoan" name="IsLoan" />
                         <input hidden asp-for="DataModel.IsPosted" name="IsPosted" />
@@ -243,38 +243,6 @@
                                     <span asp-validation-for="DataModel.AmountCommission" class="text-danger"></span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
-                                <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Orig.</div>
-                                <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
-                                    <select asp-for="DataModel.BankAccountSourceId" name="BankAccountSourceId" size="12"
-                                            class="form-select border p-1 shadow" id="selectBankAccountSource">
-                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
-                                        @foreach (var bank in Model.BankAccountSourceList)
-                                        {
-                                            <option value="@bank.Value">@bank.Text</option>
-                                        }
-                                    </select>
-                                    <span asp-validation-for="DataModel.BankAccountSourceId" class="text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="row col-lg-6 col-12 ps-2 mb-1 typeTransfer" hidden>
-                                <div class="col-4 col-sm-5 col-md-2 col-lg-4 col-xl-3 me-lg-0 me-md-3 ps-3">Cta/Ban Dest.</div>
-                                <div class="col-8 col-sm-7 col-md-8 col-lg-8 col-xl-9 ms-lg-0 ms-md-3 ps-xl-0 ms-xl-0">
-                                    <select asp-for="DataModel.BankAccountTargetId" size="12"
-                                            class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
-                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
-                                        @foreach (var bank in Model.BankAccountTargetList)
-                                        {
-                                            <option value="@bank.Value">@bank.Text</option>
-                                        }
-                                    </select>
-                                    <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="row col-lg-6 col-12 mb-1">
                                 <div class="col-sm-5 col-4">Ejecutivo</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
@@ -290,8 +258,38 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="row col-xl-6 col-12 ps-2 mb-1 typeTransfer" hidden>
+                                <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Orig.</div>
+                                <div class="col-8 col-sm-7 col-lg-8 col-xl-7 ms-lg-3 ms-xl-0">
+                                    <select asp-for="DataModel.BankAccountSourceId" name="BankAccountSourceId" size="12"
+                                            class="form-select border p-1 shadow" id="selectBankAccountSource">
+                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
+                                        @foreach (var bank in Model.BankAccountSourceList)
+                                        {
+                                            <option value="@bank.Value">@bank.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DataModel.BankAccountSourceId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="row col-xl-6 col-12 ps-2 mb-1 typeTransfer" hidden>
+                                <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Dest.</div>
+                                <div class="col-8 col-sm-7 col-lg-8 col-xl-7 ms-lg-3 ms-xl-0">
+                                    <select asp-for="DataModel.BankAccountTargetId" size="12"
+                                            class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
+                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
+                                        @foreach (var bank in Model.BankAccountTargetList)
+                                        {
+                                            <option value="@bank.Value">@bank.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card row col-sm-4 border border-primary border-opacity-25 shadow" id="divExchangeRateHistory" hidden>
+                    <div class="card row m-1 m-lg-0 col-lg-4 border border-primary border-opacity-25 shadow" id="divExchangeRateHistory" hidden>
                         <div class="card-header">
                             <h3 class="text-dark bg-secondary-subtle bg-gradient text-center align-middle py-1">Histórico de T/C</h3>
                         </div>

@@ -19,9 +19,10 @@ let isClosed = false, isReClosed = false, isClosedElement;
 let dataTable;
 let typeNumeral;
 let exchangeRateChar;
+let divExchangeRateHistory;
 
 document.addEventListener("DOMContentLoaded", async () => {
-
+    divExchangeRateHistory = document.querySelector("#divExchangeRateHistory");
     exchangeRateChar = document.querySelector("#exchangeRateChar");
     inputDateTransa = document.querySelector("#dateTransa");
     inputAmountTransa = document.querySelector("#amountTransa");
@@ -187,6 +188,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     typeNumerals.forEach((item) => {
         if (item.checked) inputTypeNumeral.value = parseInt(item.value);
         item.addEventListener("change", () => {
+            divExchangeRateHistory.hidden = true;
             inputTypeNumeral.value = parseInt(item.value);
             fnLoadInputsByType(item.value);
         });
@@ -426,7 +428,6 @@ const fnGetBankAccounts = async () => {
 
 const fnChangeCustomers = async (onlyCompanies) => {
     let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
-    let divExchangeRateHistory = document.querySelector("#divExchangeRateHistory");
     try {
 
         const response = await fetch(url, {
@@ -467,6 +468,10 @@ const fnChangeCustomers = async (onlyCompanies) => {
                     });
                 }
             }
+
+            $(selectCustomer).on('select2:unselect', function (e) {
+                divExchangeRateHistory.hidden = true;
+            });
 
             $(selectCustomer).select2('focus');
 
@@ -766,7 +771,7 @@ const fnLoadDatatable = (customerId) => {
             {
                 data: 'amountTransaction', "width": "35%"
                 , render: DataTable.render.number(null, null, decimalTransa)
-                , orderable: true
+                , orderable: false
             },
             {
                 data: null, "width": "35%"
@@ -780,7 +785,7 @@ const fnLoadDatatable = (customerId) => {
                         exchangeRate = formatterAmount(decimalExchange).format(data.exchangeRateSellTransa);
                     }
                     return exchangeRate;
-                }, orderable: true
+                }, orderable: false
             }
         ],
         "searching": false,

@@ -118,13 +118,16 @@ const fnAdjustmentFilterDataTable = () => {
     let wrapper = document.querySelector("#tblData_wrapper");
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
     let rowCen = document.createElement("div");
+    let rowBtn = wrapper.querySelector(".col-md");
+
     rowCen.className = "row col-xl-8 col-lg-7";
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
     rowIzq.classList.remove('col-md-auto', 'me-auto');
-    rowIzq.classList.add('row', 'col-lg-2', "col-xl-2", "col-sm-4");
+    rowIzq.classList.add('row', 'col-6', 'col-lg-2', "col-xl-2", "col-sm-4");
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-lg-2', "col-xl-2", "col-sm-4");
-
+    rowDer.classList.add('row', 'col-6', 'col-lg-3', "col-xl-2", "col-md-5");
+    rowBtn.classList.remove('col-md')
+    rowBtn.classList.add('col-6')
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
     filterDate.className = 'dt-filtro-fecha';
@@ -145,8 +148,8 @@ const fnAdjustmentFilterDataTable = () => {
     }
 
     filterDate.innerHTML =
-        `  <div class="row">
-                <div class="row col-5 m-0 col-md-5 col-xl-5 col-xxl-3 mb-1">
+        `  <div class="row gap-0 gap-lg-4">
+                <div class="row col-6 m-0 col-md-5 col-xl-5 col-xxl-3 mb-1">
                     <div class="col-5 col-sm-6 col-xxl-6 pe-0">
                         Fecha inicial:
                     </div>
@@ -154,7 +157,7 @@ const fnAdjustmentFilterDataTable = () => {
                         <input type="date" id="dateInitial" value="${initialValue}">
                     </div>
                 </div>
-                <div class="row col-5 m-0 col-md-6 col-xl-5 col-xxl-3 mb-1">
+                <div class="row col-6 m-0 col-md-6 col-xl-5 col-xxl-3 mb-1">
                     <div class="col-5 col-xl-6">
                         Fecha final:
                     </div>
@@ -162,7 +165,7 @@ const fnAdjustmentFilterDataTable = () => {
                         <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
                     </div>
                 </div>
-                 <div class="row col-5 m-0 col-md-5 col-xl-5 col-xxl-2 mb-1">
+                 <div class="row col-6 m-0 col-md-5 col-xl-5 col-xxl-2 mb-1">
                      <div class="col-8">
                          Anulados
                      </div>
