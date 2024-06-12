@@ -12,6 +12,8 @@ const fnEnableTooltip = () => {
     });
 };
 
+const LocalTimeDefault = "T00:00:00";
+
 const defaultDecimalTransa = 2;
 const defaultDecimalExchange = 4;
 const localLanguage = "es-NI";
@@ -71,6 +73,23 @@ const customMessagesSelect = {
     }
 };
 
+
+// Validar que la fecha sea correcta
+const fnValidateDatePicker = (dateChangeValue) => {
+
+    try {
+        const parsedDate = $.datepicker.parseDate(FormatDateView, dateChangeValue);
+        if (parsedDate instanceof Date) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
+
+};
+
 const ACJS = {
     GuidEmpty: '00000000-0000-0000-0000-000000000000',
     BadRequest: "Error en la solicitud",
@@ -79,6 +98,7 @@ const ACJS = {
     DefaultDateMinValue: "1900-01-01",
     DefaultDateMaxValue: "9999-12-31",
     DefaultDateFormatWeb: "yyyy-MM-dd",
+    DateInvalid: "La fecha ingresada no es válida."
 }
 
 const select2Options = {

@@ -18,6 +18,7 @@ public static class AC
     public const string XlsFormatRateExchange = "#,##0.0000";
     public static char SeparationCharProperties = ',';
 
+    public static string DefaultDateCurrent = "DateCurrent";
     public const string XlsFormatNumeric = "#,##0.00";
     public static char SeparationCharCode = '|';
     public static string Title = "Title";

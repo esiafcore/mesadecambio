@@ -1,18 +1,18 @@
 ﻿@model ProcessingDateVM
 @{
-    ViewData["Title"] = "Fecha de Procesamiento";
+    ViewData[AC.Title] = "Fecha de Procesamiento";
 }
 
 
 <div class="container col-sm-7 col-md-6 p-2 pt-1 border border-2 m-0">
-    <h2 class="text-primary">@ViewData["Title"]</h2>
+    <h2 class="text-primary">@ViewData[AC.Title]</h2>
     <hr />
     <div class="row col-sm-12">
         <div class="col-sm-2">
             Fecha
         </div>
         <div class="col-sm-6 pb-3">
-            <input asp-for="ProcessingDate" type="date" class="form-control border border-primary border-opacity-25"
+            <input asp-for="ProcessingDate" type="text" class="form-control border border-primary border-opacity-25"
                    id="processingDate" />
         </div>
     </div>
@@ -20,11 +20,13 @@
         <!-- Buttons -->
         <div class="col-sm-6">
             <a asp-area="Exchange" asp-controller="Quotation" asp-action="Index"
-               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Cancelar" class="btn-danger btn btn-sm form-control"> <i class="bi bi-x-circle"></i> Cancelar </a>
+               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Cancelar"
+               class="btn-danger btn btn-sm form-control"> <i class="bi bi-x-circle"></i> Cancelar </a>
         </div>
         <div class="col-sm-6">
             <button id="btnUpdateDate" class="btn btn-sm btn-success form-control"
-                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Guardar" onfocus="false">
+                    data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
+                    data-bs-title="Guardar" onfocus="false">
                 <i class="bi bi-disc"></i> Guardar
             </button>
         </div>
@@ -34,5 +36,8 @@
 
 
 @section Scripts {
+    <script>
+        const currentDateDefault = @Html.Raw(@ViewData[AC.DefaultDateCurrent]);
+    </script>
     <script src="~/js/Exchange/Quotation/procesingDate.js"></script>
 }

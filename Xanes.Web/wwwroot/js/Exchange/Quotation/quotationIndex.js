@@ -120,14 +120,23 @@ const fnAdjustmentFilterDataTable = () => {
     let rowCen = document.createElement("div");
     let rowBtn = wrapper.querySelector(".col-md");
 
-    rowCen.className = "row col-xl-8 col-lg-7";
+    rowCen.className = "row col-xl-8 col-lg-9";
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
     rowIzq.classList.remove('col-md-auto', 'me-auto');
-    rowIzq.classList.add('row', 'col-6', 'col-lg-2', "col-xl-2", "col-sm-4");
+    //Clases para el elemento de numero de registros por pagina
+    rowIzq.classList.add('row', 'col-12', 'col-lg-2', 'text-center', 'mb-2');
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-6', 'col-lg-3', "col-xl-2", "col-md-5");
+    //Clases para el elemento de busqueda
+    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', "col-xl-2", "col-md-5");
+
+    let searchDiv = rowDer.querySelector(".dt-search")
+    searchDiv.classList.add('text-start');
+
+
     rowBtn.classList.remove('col-md')
-    rowBtn.classList.add('col-6')
+    //Clases para los botones
+    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'text-md-end', 'text-xl-start')
+
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
     filterDate.className = 'dt-filtro-fecha';
@@ -148,38 +157,36 @@ const fnAdjustmentFilterDataTable = () => {
     }
 
     filterDate.innerHTML =
-        `  <div class="row gap-0 gap-lg-4">
-                <div class="row col-6 m-0 col-md-5 col-xl-5 col-xxl-3 mb-1">
-                    <div class="col-5 col-sm-6 col-xxl-6 pe-0">
+        `  <div class="row gap-0 gap-xxl-4">
+                <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                    <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
                         Fecha inicial:
                     </div>
                     <div class="col-7 col-sm-6 col-lg-6">
                         <input type="date" id="dateInitial" value="${initialValue}">
                     </div>
                 </div>
-                <div class="row col-6 m-0 col-md-6 col-xl-5 col-xxl-3 mb-1">
-                    <div class="col-5 col-xl-6">
+                <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                    <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
                         Fecha final:
                     </div>
-                    <div class="col-7 col-lg-6">
+                    <div class="col-7 col-sm-6 col-lg-6">
                         <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
                     </div>
                 </div>
-                 <div class="row col-6 m-0 col-md-5 col-xl-5 col-xxl-2 mb-1">
-                     <div class="col-8">
+                 <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                     <div class="col-5 pe-0">
                          Anulados
                      </div>
-                     <div class="col-1">
+                     <div class="col-1 ps-0">
                          <input type="checkbox" id="includeVoid" ${includeVoidValue}>
                      </div>
-                 </div>
-                <div class="row col-4 col-sm-3 col-xl-2 mb-1">
-                    <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
-                    data-bs-placement="top" data-bs-title="Filtrar"
-                    class="btn btn-sm btn-secondary boder-outline col-10 col-xl-12" id="btnFilter">
-                        <i class="bi bi-funnel-fill"></i>  Filtrar
+                       <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                        data-bs-placement="top" data-bs-title="Filtrar"
+                        class="btn btn-sm btn-secondary boder-outline col-5 ms-3 p-0" id="btnFilter">
+                            <i class="bi bi-funnel-fill"></i>  Filtrar
                     </button>
-                </div>
+                 </div>
             </div>`;
 
     rowCen.appendChild(filterDate);

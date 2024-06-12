@@ -1406,20 +1406,19 @@ public class QuotationController : Controller
         string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
         DateOnly processingDate = DateOnly.Parse(processingDateString);
         model.ProcessingDate = processingDate;
+        ViewData[AC.DefaultDateCurrent] = JsonSerializer.Serialize(model.ProcessingDate.ToString(AC.DefaultDateFormatWeb));
         return View(model);
     }
 
     [HttpPost]
-    public JsonResult ProcessingDate(string processingDate)
+    public JsonResult ProcessingDate(DateOnly? processingDate)
     {
         JsonResultResponse? jsonResponse = new();
         try
         {
             if (processingDate != null)
             {
-                DateOnly dateTransa = DateOnly.Parse(processingDate);
-
-                HttpContext.Session.SetString(AC.ProcessingDate, dateTransa.ToString());
+                HttpContext.Session.SetString(AC.ProcessingDate, processingDate.Value.ToString());
             }
             else
             {
