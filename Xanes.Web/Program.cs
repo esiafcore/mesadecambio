@@ -1,18 +1,14 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
+using Xanes.Utility;
 using Xanes.Web.CustomMiddleware;
 using Xanes.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
-////Remover Server Header
-//builder.WebHost.UseKestrel(x =>
-//{
-//    x.AddServerHeader = false;
-//});
 
 // Add services to the container.
 builder.Services.ConfigureLoggerService();
@@ -20,9 +16,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.ConfigureHttpClientService();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var userId = builder.Configuration[AC.SecretUserId];
+var userPwd = builder.Configuration[AC.SecretUserPwd];
+
+connectionString = new SqlConnectionStringBuilder(connectionString)
+{
+    UserID = userId,
+    Password = userPwd
+}.ConnectionString;
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-        ,x => x.MigrationsAssembly("Xanes.DataAccess"));
+    options.UseSqlServer(connectionString
+        , x => x.MigrationsAssembly("Xanes.DataAccess"));
     //options.UseLowerCaseNamingConvention();
 });
 
