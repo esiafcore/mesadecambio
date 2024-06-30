@@ -116,6 +116,12 @@ const fnAdjustmentDates = () => {
 
 const fnAdjustmentFilterDataTable = () => {
     let wrapper = document.querySelector("#tblData_wrapper");
+    let existingFilterDiv = wrapper.querySelector('.dt-filtro-fecha');
+
+    if (existingFilterDiv) {
+        // El filtro ya existe, no es necesario volver a crearlo.
+        return;
+    }
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
     let rowCen = document.createElement("div");
     let rowBtn = wrapper.querySelector(".col-md");
