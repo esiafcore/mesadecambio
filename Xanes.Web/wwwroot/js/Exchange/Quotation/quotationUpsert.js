@@ -6,6 +6,7 @@ let inputsFormatTransa, inputsFormatExchange;
 let containerMain, selectCustomer, selectBankAccountTarget, selectBankAccountSource;
 let elementsHiddenBuySell, divExchangeRateVariation, inputExchangeRateVariation, inputCommission;
 let selectBusinessExecutive;
+let typeCurrent;
 
 //Variables para los contenedores de los botones
 let btnSave, btnNext, btnClosed, btnReClosed;
@@ -204,6 +205,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const formCreate = document.getElementById("formUpsert");
     formCreate.addEventListener("submit", fnCreateFormSubmit);
     fnEnableTooltip();
+
+    await fnGetCustomer();
 });
 
 const fnSaveReturn = () => {
@@ -427,6 +430,103 @@ const fnGetBankAccounts = async () => {
     });
 };
 
+const fnGetCustomer = async () => {
+    try {
+        let onlyCompanies;
+
+        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
+            onlyCompanies = false;
+        } else {
+            onlyCompanies = true;
+        }
+
+
+        if (selectCustomer) {
+            $(selectCustomer).select2(select2Options);
+
+            $(selectCustomer).on('select2:open', async function (e) {
+
+                let searchField = document.querySelector(".select2-search__field");
+                searchField.focus();
+                searchField.addEventListener('keyup', async function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        // Capturar el valor del campo de búsqueda
+                        let searchTerm = searchField.value.replace(/-/g, "").trim();
+                        if (searchTerm === "") return;
+
+                        let url = `/Exchange/Quotation/GetCustomerByContain?search=${searchTerm}&onlyCompanies=${onlyCompanies}`;
+
+                        const response = await fetch(url, {
+                            method: "POST"
+                        });
+
+                        const jsonData = await response.json();
+
+                        fntoggleLoading();
+
+                        if (jsonData.isSuccess) {
+                            selectCustomer.innerHTML = "";
+                            // Agregar options
+                            let option = document.createElement("option");
+                            option.value = "";
+                            option.text = ACJS.PlaceHolderSelect;
+                            option.disabled = true;
+                            option.selected = true;
+
+                            selectCustomer.insertBefore(option, selectCustomer.firstChild);
+
+                            jsonData.data.forEach((item) => {
+                                let option = document.createElement("option");
+                                option.value = item.value;
+                                option.text = item.text;
+                                selectCustomer.appendChild(option);
+                            });
+
+                            $(selectCustomer).select2(select2Options);
+
+                            // Abrir Select2 nuevamente
+                            $(selectCustomer).select2('open');
+                            searchField.focus();
+                            document.querySelector(".select2-search__field").value = searchTerm;
+                        }
+
+                        fntoggleLoading();
+
+                        var options = selectCustomer.getElementsByTagName('option');
+                        if (options.length > 0) {
+                            // Selecciona el primer elemento
+
+                            if (onlyCompanies) {
+                                selectCustomer.value = options[0].value;
+                                divExchangeRateHistory.hidden = true;
+
+                            } else {
+                                $(selectCustomer).on('select2:select', async function (e) {
+                                    divExchangeRateHistory.hidden = false;
+                                    fnLoadDatatable(e.params.data.id);
+                                });
+                            }
+                        }
+
+                        $(selectCustomer).on('select2:unselect', function (e) {
+                            divExchangeRateHistory.hidden = true;
+                        });
+
+                        $(selectCustomer).select2('focus');
+
+                    }
+                });
+            });
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+    }
+};
+
 const fnChangeCustomers = async (onlyCompanies) => {
     let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
     try {
@@ -524,7 +624,7 @@ const fnLoadInputsByType = (type) => {
         //    item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
         //});
         elementsTransfer.forEach((item) => item.hidden = true);
-        fnChangeCustomers(false);
+        //fnChangeCustomers(false);
 
     } else if (type == QuotationType.Sell) {
         divCurrencyTransa.hidden = false;
@@ -540,7 +640,7 @@ const fnLoadInputsByType = (type) => {
         //    item.classList.add("row", "col-xl-4", "d-none", "d-xl-block", "typeBuySell");
         //});
         elementsTransfer.forEach((item) => item.hidden = true);
-        fnChangeCustomers(false);
+        //fnChangeCustomers(false);
 
     } else {
         divAmountExchange.hidden = true;
@@ -556,7 +656,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
-        fnChangeCustomers(true);
+        //fnChangeCustomers(true);
     }
     fnLoadOptionSelectBusiness(type);
     fnCalculateRevenueCost();

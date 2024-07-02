@@ -69,6 +69,7 @@ public class QuotationController : Controller
         string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
         QuotationCreateVM model = new();
         Quotation objData = new();
+        List<Models.Customer>? listCustomer = new();
 
         if (processingDateString != null)
         {
@@ -133,7 +134,8 @@ public class QuotationController : Controller
                 CurrencyTransferType = SD.CurrencyType.Base,
                 CurrencyDepositType = SD.CurrencyType.Base,
                 CompanyId = _companyId,
-                BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes)
+                BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes),
+                CustomerId = 0
             };
 
         }
@@ -142,6 +144,12 @@ public class QuotationController : Controller
             ViewData[AC.Title] = "Actualizar - Cotización";
 
             objData = _uow.Quotation.Get(filter: x => (x.CompanyId == _companyId && x.Id == id));
+
+            if (objData == null)
+            {
+                TempData[AC.Error] = $"Cotización no encontrada";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         model.CurrencyTransaList = objCurrencyList
@@ -155,419 +163,427 @@ public class QuotationController : Controller
         model.BankAccountTargetList = new List<SelectListItem>();
         model.DataModel = objData;
 
+        if (model.DataModel.CustomerId != 0)
+        {
+            var objCustomer =
+                 _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.DataModel.CustomerId));
+            listCustomer.Add(objCustomer);
+            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+        }
+
         return View(model);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public IActionResult Create(Models.ViewModels.QuotationCreateVM objViewModel)
-    {
-        var objBankAccountTarget = new BankAccount();
-        var objBankAccountSource = new BankAccount();
-        var objCurrency = new Currency();
-        var objCurrencyList = new List<Currency>();
-        var objTypeList = new List<QuotationType>();
-        var objCustomerList = new List<Models.Customer>();
-        objViewModel.DataModel.BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes);
+    //[HttpPost]
+    //[ValidateAntiForgeryToken]
+    //public IActionResult Create(Models.ViewModels.QuotationCreateVM objViewModel)
+    //{
+    //    var objBankAccountTarget = new BankAccount();
+    //    var objBankAccountSource = new BankAccount();
+    //    var objCurrency = new Currency();
+    //    var objCurrencyList = new List<Currency>();
+    //    var objTypeList = new List<QuotationType>();
+    //    var objCustomerList = new List<Models.Customer>();
+    //    objViewModel.DataModel.BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes);
 
-        Models.Quotation obj = objViewModel.DataModel;
-        //Datos son validos
-        if (ModelState.IsValid)
-        {
-            if (obj.CompanyId != _companyId)
-            {
-                ModelState.AddModelError("CompanyId", $"Id de la compañía no puede ser distinto de {_companyId}");
-            }
+    //    Models.Quotation obj = objViewModel.DataModel;
+    //    //Datos son validos
+    //    if (ModelState.IsValid)
+    //    {
+    //        if (obj.CompanyId != _companyId)
+    //        {
+    //            ModelState.AddModelError("CompanyId", $"Id de la compañía no puede ser distinto de {_companyId}");
+    //        }
 
-            if (obj.AmountTransaction == 0)
-            {
-                ModelState.AddModelError("AmountTransaction", "El monto no puede ser cero.");
-            }
+    //        if (obj.AmountTransaction == 0)
+    //        {
+    //            ModelState.AddModelError("AmountTransaction", "El monto no puede ser cero.");
+    //        }
 
-            //Verificamos si existe el tipo
-            var objQuotationType = _uow.QuotationType.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
+    //        //Verificamos si existe el tipo
+    //        var objQuotationType = _uow.QuotationType.Get(filter: x =>
+    //            x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
 
-            if (objQuotationType == null)
-            {
-                ModelState.AddModelError("TypeNumeral", $"Tipo de transacción no encontrado");
-            }
-            else
-            {
-                obj.TypeId = objQuotationType.Id;
+    //        if (objQuotationType == null)
+    //        {
+    //            ModelState.AddModelError("TypeNumeral", $"Tipo de transacción no encontrado");
+    //        }
+    //        else
+    //        {
+    //            obj.TypeId = objQuotationType.Id;
 
-                if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
-                {
-                    if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
-                    {
-                        obj.CurrencyDepositType = obj.CurrencyTransferType;
+    //            if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
+    //            {
+    //                if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
+    //                {
+    //                    obj.CurrencyDepositType = obj.CurrencyTransferType;
 
-                        if (obj.ExchangeRateBuyTransa == 0)
-                        {
-                            ModelState.AddModelError("ExchangeRateBuyTransa", "El tipo de cambio de compra no puede ser cero.");
-                        }
-                    }
-                    else
-                    {
-                        obj.CurrencyTransferType = obj.CurrencyDepositType;
+    //                    if (obj.ExchangeRateBuyTransa == 0)
+    //                    {
+    //                        ModelState.AddModelError("ExchangeRateBuyTransa", "El tipo de cambio de compra no puede ser cero.");
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    obj.CurrencyTransferType = obj.CurrencyDepositType;
 
-                        if (obj.ExchangeRateSellTransa == 0)
-                        {
-                            ModelState.AddModelError("ExchangeRateSellTransa", "El tipo de cambio de venta no puede ser cero.");
-                        }
-                    }
+    //                    if (obj.ExchangeRateSellTransa == 0)
+    //                    {
+    //                        ModelState.AddModelError("ExchangeRateSellTransa", "El tipo de cambio de venta no puede ser cero.");
+    //                    }
+    //                }
 
-                    //Verificamos si existe la moneda de la Transaccion
-                    objCurrency = _uow.Currency.Get(filter: x =>
-                       x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
+    //                //Verificamos si existe la moneda de la Transaccion
+    //                objCurrency = _uow.Currency.Get(filter: x =>
+    //                   x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransaType);
 
-                    if (objCurrency == null)
-                    {
-                        ModelState.AddModelError("CurrencyTransaType", $"Moneda de la transacción no encontrada");
-                    }
-                    else
-                    {
-                        obj.CurrencyTransaId = objCurrency.Id;
-                    }
+    //                if (objCurrency == null)
+    //                {
+    //                    ModelState.AddModelError("CurrencyTransaType", $"Moneda de la transacción no encontrada");
+    //                }
+    //                else
+    //                {
+    //                    obj.CurrencyTransaId = objCurrency.Id;
+    //                }
 
-                    //Verificamos si existe la moneda de deposito
-                    objCurrency = _uow.Currency.Get(filter: x =>
-                        x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
+    //                //Verificamos si existe la moneda de deposito
+    //                objCurrency = _uow.Currency.Get(filter: x =>
+    //                    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyDepositType);
 
-                    if (objCurrency == null)
-                    {
-                        ModelState.AddModelError("CurrencyDepositType", $"Moneda de deposito no encontrada");
-                    }
-                    else
-                    {
-                        obj.CurrencyDepositId = objCurrency.Id;
-                    }
+    //                if (objCurrency == null)
+    //                {
+    //                    ModelState.AddModelError("CurrencyDepositType", $"Moneda de deposito no encontrada");
+    //                }
+    //                else
+    //                {
+    //                    obj.CurrencyDepositId = objCurrency.Id;
+    //                }
 
-                    //Verificamos si existe la moneda de transferencia
-                    objCurrency = _uow.Currency.Get(filter: x =>
-                        x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransferType);
+    //                //Verificamos si existe la moneda de transferencia
+    //                objCurrency = _uow.Currency.Get(filter: x =>
+    //                    x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.CurrencyTransferType);
 
-                    if (objCurrency == null)
-                    {
-                        ModelState.AddModelError("CurrencyTransferType", $"Moneda de transferencia no encontrada");
-                    }
-                    else
-                    {
-                        obj.CurrencyTransferId = objCurrency.Id;
-                    }
-                }
-                else
-                {
-                    //Verificamos si existe la cuenta bancaria de origen
-                    objBankAccountSource = _uow.BankAccount.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.BankAccountSourceId, includeProperties: "ParentTrx");
-                    if (objBankAccountSource == null)
-                    {
-                        ModelState.AddModelError("BankAccountSourceId", $"Cuenta bancaria origen invalida");
-                    }
+    //                if (objCurrency == null)
+    //                {
+    //                    ModelState.AddModelError("CurrencyTransferType", $"Moneda de transferencia no encontrada");
+    //                }
+    //                else
+    //                {
+    //                    obj.CurrencyTransferId = objCurrency.Id;
+    //                }
+    //            }
+    //            else
+    //            {
+    //                //Verificamos si existe la cuenta bancaria de origen
+    //                objBankAccountSource = _uow.BankAccount.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.BankAccountSourceId, includeProperties: "ParentTrx");
+    //                if (objBankAccountSource == null)
+    //                {
+    //                    ModelState.AddModelError("BankAccountSourceId", $"Cuenta bancaria origen invalida");
+    //                }
 
-                    //Verificamos si existe la cuenta bancaria de destino
-                    objBankAccountTarget = _uow.BankAccount.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.BankAccountTargetId, includeProperties: "ParentTrx");
-                    if (objBankAccountTarget == null)
-                    {
-                        ModelState.AddModelError("BankAccountTargetId", $"Cuenta bancaria destino invalida");
-                    }
-                }
-            }
+    //                //Verificamos si existe la cuenta bancaria de destino
+    //                objBankAccountTarget = _uow.BankAccount.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.BankAccountTargetId, includeProperties: "ParentTrx");
+    //                if (objBankAccountTarget == null)
+    //                {
+    //                    ModelState.AddModelError("BankAccountTargetId", $"Cuenta bancaria destino invalida");
+    //                }
+    //            }
+    //        }
 
-            //Verificamos si existe la moneda de la Transaccion
-            var objBusiness = _uow.BusinessExecutive.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
+    //        //Verificamos si existe la moneda de la Transaccion
+    //        var objBusiness = _uow.BusinessExecutive.Get(filter: x =>
+    //            x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
 
-            if (objBusiness == null)
-            {
-                ModelState.AddModelError("BusinessExecutiveId", $"Ejecutivo no encontrado");
-            }
-            else
-            {
-                obj.BusinessExecutiveCode = objBusiness.Code;
-            }
+    //        if (objBusiness == null)
+    //        {
+    //            ModelState.AddModelError("BusinessExecutiveId", $"Ejecutivo no encontrado");
+    //        }
+    //        else
+    //        {
+    //            obj.BusinessExecutiveCode = objBusiness.Code;
+    //        }
 
-            //Verificamos si existe el cliente
-            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
-            if (objCustomer == null)
-            {
-                ModelState.AddModelError("CustomerId", $"Cliente no encontrado");
-            }
+    //        //Verificamos si existe el cliente
+    //        var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+    //        if (objCustomer == null)
+    //        {
+    //            ModelState.AddModelError("CustomerId", $"Cliente no encontrado");
+    //        }
 
-            if (!ModelState.IsValid)
-            {
-                ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-                ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+    //        if (!ModelState.IsValid)
+    //        {
+    //            ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
+    //            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
 
-                objCurrencyList = _uow.Currency
-                   .GetAll(x => (x.CompanyId == _companyId))
-                   .ToList();
+    //            objCurrencyList = _uow.Currency
+    //               .GetAll(x => (x.CompanyId == _companyId))
+    //               .ToList();
 
-                if (objCurrencyList == null)
-                {
-                    return NotFound();
-                }
+    //            if (objCurrencyList == null)
+    //            {
+    //                return NotFound();
+    //            }
 
-                objTypeList = _uow.QuotationType
-                   .GetAll(x => (x.CompanyId == _companyId))
-                   .ToList();
+    //            objTypeList = _uow.QuotationType
+    //               .GetAll(x => (x.CompanyId == _companyId))
+    //               .ToList();
 
-                if (objTypeList == null)
-                {
-                    return NotFound();
-                }
+    //            if (objTypeList == null)
+    //            {
+    //                return NotFound();
+    //            }
 
-                objCustomerList = _uow.Customer
-                   .GetAll(x => (x.CompanyId == _companyId))
-                   .ToList();
+    //            objCustomerList = _uow.Customer
+    //               .GetAll(x => (x.CompanyId == _companyId))
+    //               .ToList();
 
-                if (objCustomerList == null)
-                {
-                    return NotFound();
-                }
+    //            if (objCustomerList == null)
+    //            {
+    //                return NotFound();
+    //            }
 
-                var objBankAccountList = _uow.BankAccount
-                    .GetAll(x => (x.CompanyId == _companyId))
-                    .ToList();
+    //            var objBankAccountList = _uow.BankAccount
+    //                .GetAll(x => (x.CompanyId == _companyId))
+    //                .ToList();
 
-                if (objBankAccountList == null)
-                {
-                    return NotFound();
-                }
+    //            if (objBankAccountList == null)
+    //            {
+    //                return NotFound();
+    //            }
 
-                objViewModel.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
-                objViewModel.BankAccountTargetList = new List<SelectListItem>();
-                objViewModel.CurrencyTransaList = objCurrencyList
-                    .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
-                    .ToList();
-                objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
-                objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
-                objViewModel.QuotationTypeList = objTypeList;
-                objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
-                return View(objViewModel);
-            }
+    //            objViewModel.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+    //            objViewModel.BankAccountTargetList = new List<SelectListItem>();
+    //            objViewModel.CurrencyTransaList = objCurrencyList
+    //                .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+    //                .ToList();
+    //            objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+    //            objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
+    //            objViewModel.QuotationTypeList = objTypeList;
+    //            objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+    //            return View(objViewModel);
+    //        }
 
-            //Obtenemos el secuencial en borrador
-            var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
-                SD.TypeSequential.Draft, true);
+    //        //Obtenemos el secuencial en borrador
+    //        var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
+    //            SD.TypeSequential.Draft, true);
 
-            obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
-            obj.InternalSerial = AC.InternalSerialDraft;
-            //COMPRA
-            if (obj.TypeNumeral == SD.QuotationType.Buy)
-            {
-                //TC COMPRA MENOR AL TC OFICIAL
-                if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
-                {
-                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
-                    obj.AmountCost = 0;
-                }
-                //TC COMPRA MAYOR AL TC OFICIAL
-                else
-                {
-                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
-                    obj.AmountRevenue = 0;
-                }
+    //        obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
+    //        obj.InternalSerial = AC.InternalSerialDraft;
+    //        //COMPRA
+    //        if (obj.TypeNumeral == SD.QuotationType.Buy)
+    //        {
+    //            //TC COMPRA MENOR AL TC OFICIAL
+    //            if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
+    //            {
+    //                obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
+    //                obj.AmountCost = 0;
+    //            }
+    //            //TC COMPRA MAYOR AL TC OFICIAL
+    //            else
+    //            {
+    //                obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
+    //                obj.AmountRevenue = 0;
+    //            }
 
-                //Compra de dolares 
-                if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
-                {
-                    //Factoring paga en Cordobas
-                    if (obj.CurrencyTransferType == SD.CurrencyType.Base)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
-                    }
-                }
-                //Compra de Euros
-                else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
-                {
-                    //Factoring paga en Cordobas
-                    if (obj.CurrencyTransferType == SD.CurrencyType.Base)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
+    //            //Compra de dolares 
+    //            if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
+    //            {
+    //                //Factoring paga en Cordobas
+    //                if (obj.CurrencyTransferType == SD.CurrencyType.Base)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+    //                    obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
+    //                }
+    //            }
+    //            //Compra de Euros
+    //            else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
+    //            {
+    //                //Factoring paga en Cordobas
+    //                if (obj.CurrencyTransferType == SD.CurrencyType.Base)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+    //                    obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
 
-                    }
-                    //Factoring paga en Dolares
-                    else if (obj.CurrencyTransferType == SD.CurrencyType.Foreign)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = (obj.ExchangeRateBuyTransa * obj.ExchangeRateOfficialTransa);
-                    }
-                }
-            }
-            //VENTA
-            else if (obj.TypeNumeral == SD.QuotationType.Sell)
-            {
-                //TC VENTA MENOR AL TC OFICIAL
-                if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
-                {
-                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
-                    obj.AmountRevenue = 0;
-                }
-                //TC VENTA MAYOR AL TC OFICIAL
-                else
-                {
-                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
-                    obj.AmountCost = 0;
-                }
+    //                }
+    //                //Factoring paga en Dolares
+    //                else if (obj.CurrencyTransferType == SD.CurrencyType.Foreign)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+    //                    obj.ExchangeRateBuyReal = (obj.ExchangeRateBuyTransa * obj.ExchangeRateOfficialTransa);
+    //                }
+    //            }
+    //        }
+    //        //VENTA
+    //        else if (obj.TypeNumeral == SD.QuotationType.Sell)
+    //        {
+    //            //TC VENTA MENOR AL TC OFICIAL
+    //            if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
+    //            {
+    //                obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
+    //                obj.AmountRevenue = 0;
+    //            }
+    //            //TC VENTA MAYOR AL TC OFICIAL
+    //            else
+    //            {
+    //                obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
+    //                obj.AmountCost = 0;
+    //            }
 
-                //Venta de dolares 
-                if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
-                {
-                    //Cliente paga en Cordobas
-                    if (obj.CurrencyDepositType == SD.CurrencyType.Base)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
-                    }
-                }
-                //Venta de Euros
-                else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
-                {
-                    //Cliente paga en Cordobas
-                    if (obj.CurrencyDepositType == SD.CurrencyType.Base)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
+    //            //Venta de dolares 
+    //            if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
+    //            {
+    //                //Cliente paga en Cordobas
+    //                if (obj.CurrencyDepositType == SD.CurrencyType.Base)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+    //                    obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
+    //                }
+    //            }
+    //            //Venta de Euros
+    //            else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
+    //            {
+    //                //Cliente paga en Cordobas
+    //                if (obj.CurrencyDepositType == SD.CurrencyType.Base)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+    //                    obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
 
-                    }
-                    //Cliente paga en Dolares
-                    else if (obj.CurrencyDepositType == SD.CurrencyType.Foreign)
-                    {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
-                    }
-                }
-            }
-            else
-            {
-                if (objBankAccountSource != null)
-                {
-                    obj.CurrencyTransaType = objBankAccountSource.CurrencyType;
-                    obj.CurrencyDepositType = objBankAccountSource.CurrencyType;
-                    obj.CurrencyTransferType = objBankAccountSource.CurrencyType;
-                    obj.CurrencyTransaId = objBankAccountSource.CurrencyId;
-                    obj.CurrencyDepositId = objBankAccountSource.CurrencyId;
-                    obj.CurrencyTransferId = objBankAccountSource.CurrencyId;
-                }
-            }
+    //                }
+    //                //Cliente paga en Dolares
+    //                else if (obj.CurrencyDepositType == SD.CurrencyType.Foreign)
+    //                {
+    //                    obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+    //                    obj.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            if (objBankAccountSource != null)
+    //            {
+    //                obj.CurrencyTransaType = objBankAccountSource.CurrencyType;
+    //                obj.CurrencyDepositType = objBankAccountSource.CurrencyType;
+    //                obj.CurrencyTransferType = objBankAccountSource.CurrencyType;
+    //                obj.CurrencyTransaId = objBankAccountSource.CurrencyId;
+    //                obj.CurrencyDepositId = objBankAccountSource.CurrencyId;
+    //                obj.CurrencyTransferId = objBankAccountSource.CurrencyId;
+    //            }
+    //        }
 
 
-            //Seteamos campos de auditoria
-            obj.CreatedBy = AC.LOCALHOSTME;
-            obj.CreatedDate = DateTime.UtcNow;
-            obj.CreatedHostName = AC.LOCALHOSTPC;
-            obj.CreatedIpv4 = AC.Ipv4Default;
-            obj.IsPosted = false;
-            obj.IsClosed = false;
-            obj.IsLoan = false;
-            obj.IsPayment = false;
-            _uow.Quotation.Add(obj);
-            _uow.Save();
-            TempData["success"] = "Cotización creada exitosamente";
+    //        //Seteamos campos de auditoria
+    //        obj.CreatedBy = AC.LOCALHOSTME;
+    //        obj.CreatedDate = DateTime.UtcNow;
+    //        obj.CreatedHostName = AC.LOCALHOSTPC;
+    //        obj.CreatedIpv4 = AC.Ipv4Default;
+    //        obj.IsPosted = false;
+    //        obj.IsClosed = false;
+    //        obj.IsLoan = false;
+    //        obj.IsPayment = false;
+    //        _uow.Quotation.Add(obj);
+    //        _uow.Save();
+    //        TempData["success"] = "Cotización creada exitosamente";
 
-            if (obj.TypeNumeral == SD.QuotationType.Transfer)
-            {
-                if (obj.BankAccountTargetTrx != null)
-                {
-                    var objDetailBankAccountSource = new QuotationDetail()
-                    {
-                        ParentId = obj.Id,
-                        CompanyId = obj.CompanyId,
-                        QuotationDetailType = QuotationDetailType.CreditTransfer,
-                        LineNumber = 1,
-                        CurrencyDetailId = obj.CurrencyTransaId,
-                        BankSourceId = obj.BankAccountTargetTrx.ParentId,
-                        BankTargetId = obj.BankAccountTargetTrx.ParentId,
-                        AmountDetail = obj.AmountTransaction,
-                        CreatedBy = AC.LOCALHOSTME,
-                        CreatedDate = DateTime.UtcNow,
-                        CreatedHostName = AC.LOCALHOSTPC,
-                        CreatedIpv4 = AC.Ipv4Default
-                    };
+    //        if (obj.TypeNumeral == SD.QuotationType.Transfer)
+    //        {
+    //            if (obj.BankAccountTargetTrx != null)
+    //            {
+    //                var objDetailBankAccountSource = new QuotationDetail()
+    //                {
+    //                    ParentId = obj.Id,
+    //                    CompanyId = obj.CompanyId,
+    //                    QuotationDetailType = QuotationDetailType.CreditTransfer,
+    //                    LineNumber = 1,
+    //                    CurrencyDetailId = obj.CurrencyTransaId,
+    //                    BankSourceId = obj.BankAccountTargetTrx.ParentId,
+    //                    BankTargetId = obj.BankAccountTargetTrx.ParentId,
+    //                    AmountDetail = obj.AmountTransaction,
+    //                    CreatedBy = AC.LOCALHOSTME,
+    //                    CreatedDate = DateTime.UtcNow,
+    //                    CreatedHostName = AC.LOCALHOSTPC,
+    //                    CreatedIpv4 = AC.Ipv4Default
+    //                };
 
-                    _uow.QuotationDetail.Add(objDetailBankAccountSource);
-                }
+    //                _uow.QuotationDetail.Add(objDetailBankAccountSource);
+    //            }
 
-                if (obj.BankAccountSourceTrx != null)
-                {
-                    var objDetailBankAccountTarget = new QuotationDetail()
-                    {
-                        ParentId = obj.Id,
-                        CompanyId = obj.CompanyId,
-                        QuotationDetailType = QuotationDetailType.DebitTransfer,
-                        LineNumber = 1,
-                        CurrencyDetailId = obj.CurrencyTransaId,
-                        BankTargetId = obj.BankAccountSourceTrx.ParentId,
-                        BankSourceId = obj.BankAccountSourceTrx.ParentId,
-                        AmountDetail = obj.AmountTransaction,
-                        CreatedBy = AC.LOCALHOSTME,
-                        CreatedDate = DateTime.UtcNow,
-                        CreatedHostName = AC.LOCALHOSTPC,
-                        CreatedIpv4 = AC.Ipv4Default
-                    };
-                    _uow.QuotationDetail.Add(objDetailBankAccountTarget);
-                }
-                _uow.Save();
-            }
+    //            if (obj.BankAccountSourceTrx != null)
+    //            {
+    //                var objDetailBankAccountTarget = new QuotationDetail()
+    //                {
+    //                    ParentId = obj.Id,
+    //                    CompanyId = obj.CompanyId,
+    //                    QuotationDetailType = QuotationDetailType.DebitTransfer,
+    //                    LineNumber = 1,
+    //                    CurrencyDetailId = obj.CurrencyTransaId,
+    //                    BankTargetId = obj.BankAccountSourceTrx.ParentId,
+    //                    BankSourceId = obj.BankAccountSourceTrx.ParentId,
+    //                    AmountDetail = obj.AmountTransaction,
+    //                    CreatedBy = AC.LOCALHOSTME,
+    //                    CreatedDate = DateTime.UtcNow,
+    //                    CreatedHostName = AC.LOCALHOSTPC,
+    //                    CreatedIpv4 = AC.Ipv4Default
+    //                };
+    //                _uow.QuotationDetail.Add(objDetailBankAccountTarget);
+    //            }
+    //            _uow.Save();
+    //        }
 
-            return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
-        }
-        else
-        {
-            StringBuilder errorsMessagesBuilder = new();
+    //        return RedirectToAction("CreateDetail", "Quotation", new { id = obj.Id });
+    //    }
+    //    else
+    //    {
+    //        StringBuilder errorsMessagesBuilder = new();
 
-            List<string> listErrorMessages = ModelState.Values
-                .SelectMany(v => v.Errors)
-                .Select(x => x.ErrorMessage)
-                .ToList();
-            foreach (var item in listErrorMessages)
-            {
-                errorsMessagesBuilder.Append(item);
-            }
+    //        List<string> listErrorMessages = ModelState.Values
+    //            .SelectMany(v => v.Errors)
+    //            .Select(x => x.ErrorMessage)
+    //            .ToList();
+    //        foreach (var item in listErrorMessages)
+    //        {
+    //            errorsMessagesBuilder.Append(item);
+    //        }
 
-            ModelState.AddModelError("", errorsMessagesBuilder.ToString());
-        }
+    //        ModelState.AddModelError("", errorsMessagesBuilder.ToString());
+    //    }
 
-        objCurrencyList = _uow.Currency
-           .GetAll(x => (x.CompanyId == _companyId))
-           .ToList();
+    //    objCurrencyList = _uow.Currency
+    //       .GetAll(x => (x.CompanyId == _companyId))
+    //       .ToList();
 
-        if (objCurrencyList == null)
-        {
-            return NotFound();
-        }
+    //    if (objCurrencyList == null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        objTypeList = _uow.QuotationType
-           .GetAll(x => (x.CompanyId == _companyId))
-           .ToList();
+    //    objTypeList = _uow.QuotationType
+    //       .GetAll(x => (x.CompanyId == _companyId))
+    //       .ToList();
 
-        if (objTypeList == null)
-        {
-            return NotFound();
-        }
+    //    if (objTypeList == null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        objCustomerList = _uow.Customer
-            .GetAll(x => (x.CompanyId == _companyId))
-            .ToList();
+    //    objCustomerList = _uow.Customer
+    //        .GetAll(x => (x.CompanyId == _companyId))
+    //        .ToList();
 
-        if (objCustomerList == null)
-        {
-            return NotFound();
-        }
+    //    if (objCustomerList == null)
+    //    {
+    //        return NotFound();
+    //    }
 
-        objViewModel.CurrencyTransaList = objCurrencyList
-            .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
-            .ToList();
-        objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
-        objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
-        objViewModel.QuotationTypeList = objTypeList;
-        objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+    //    objViewModel.CurrencyTransaList = objCurrencyList
+    //        .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+    //        .ToList();
+    //    objViewModel.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
+    //    objViewModel.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
+    //    objViewModel.QuotationTypeList = objTypeList;
+    //    objViewModel.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
-        return View(objViewModel);
-    }
+    //    return View(objViewModel);
+    //}
 
     [HttpPost]
     public JsonResult Upsert([FromForm] Quotation obj, bool redirectHome = false, bool redirectDetail = false, bool showMessages = false)
@@ -1522,20 +1538,32 @@ public class QuotationController : Controller
     public async Task<JsonResult> GetAverageExchangeRate(int customerId, SD.QuotationType type, SD.CurrencyType currency)
     {
         JsonResultResponse? jsonResponse = new();
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
-        DateOnly dateFilter = DateOnly.Parse(processingDateString);
-        DateOnly dateInitial = new(dateFilter.Year, dateFilter.Month - 1, 1);
-        DateOnly dateFinal = new(dateFilter.Year, dateFilter.Month - 1, dateFilter.ToDateTimeConvert().GetLastDayMonth().Day);
 
         try
         {
+
+            string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
+            DateOnly dateFilter = DateOnly.Parse(processingDateString);
+
+            // Obtener la fecha un mes antes
+            DateOnly dateOneMonthBefore = DateOnly.FromDateTime(dateFilter.ToDateTime(TimeOnly.MinValue).AddMonths(-1));
+
+            // Obtener la fecha del primer día del mes anterior
+            DateOnly dateInitial = new DateOnly(dateOneMonthBefore.Year, dateOneMonthBefore.Month, 1);
+
+            // Obtener la fecha del último día del mes anterior
+            DateTime lastDay = new DateTime(dateOneMonthBefore.Year, dateOneMonthBefore.Month, DateTime.DaysInMonth(dateOneMonthBefore.Year, dateOneMonthBefore.Month));
+           
+            DateOnly dateFinal = new DateOnly(lastDay.Year, lastDay.Month, lastDay.Day);
+
+
             var objPages = await _uow.Quotation
             .GetAllAsync(x => (x.CompanyId == _companyId &&
             x.CustomerId == customerId &&
             x.CurrencyTransaType == currency &&
             x.TypeNumeral == type &&
             x.DateTransa >= dateInitial &&
-            x.DateTransa <= dateFinal && 
+            x.DateTransa <= dateFinal &&
             x.IsClosed)
             , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx"
             , pageNumber: 1, pageSize: 0);
@@ -1890,6 +1918,52 @@ public class QuotationController : Controller
         {
             var objCustomerList = _uow.Customer
                 .GetAll(filter: x => x.CompanyId == _companyId && x.IsSystemRow == onlyCompanies).ToList();
+            if (objCustomerList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cliente invalido";
+                return Json(jsonResponse);
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+
+    [HttpPost]
+    public JsonResult GetCustomerByContain(string search, bool onlyCompanies = false)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        var objCustomerList = new List<Models.Customer>();
+        try
+        {
+            if (search == ".")
+            {
+                objCustomerList = _uow.Customer
+                    .GetAll(filter: x => x.CompanyId == _companyId &&
+                                         x.IsSystemRow == onlyCompanies).ToList();
+            }
+            else
+            {
+                objCustomerList = _uow.Customer
+                    .GetAll(filter: x => x.CompanyId == _companyId &&
+                                         x.IsSystemRow == onlyCompanies &&
+                                         (x.CommercialName.Contains(search) ||
+                                          x.IdentificationNumber.Contains(search) ||
+                                          x.Code.Contains(search) ||
+                                          x.AddressPrimary.Contains(search))).ToList();
+            }
+
+
             if (objCustomerList == null)
             {
                 jsonResponse.IsSuccess = false;
