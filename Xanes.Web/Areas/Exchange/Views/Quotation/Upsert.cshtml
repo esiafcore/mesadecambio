@@ -106,7 +106,7 @@
                         </div>
                         <div class="row">
                             <div class="row col-12 ps-2 mb-1" id="divCustomer">
-                                <div class="col-4 col-sm-5 col-lg-2 me-lg-2 me-xl-3 ps-3">Cliente</div>
+                                <div class="col-4 col-sm-5 col-lg-2 me-lg-3 me-xl-3 ps-3">Cliente</div>
                                 <div class="col-8 col-sm-7 col-lg-8 ms-lg-3 ps-xl-3 ps-xxl-4">
                                     <select asp-for="DataModel.CustomerId" asp-items="@Model.CustomerList" name="CustomerId"
                                             class="form-select border p-1 shadow w-100" style="width:100%" id="selectCustomer">
@@ -248,7 +248,6 @@
                                 <div class="col-xl-6 col-sm-7 col-8">
                                     <select asp-for="DataModel.BusinessExecutiveId"
                                             class="form-select border p-1 shadow" name="BusinessExecutiveId" id="selectBusinessExecutive">
-                                        @* <option disabled selected>--Select Ejecutivo--</option> *@
                                         @foreach (var executive in Model.BusinessExecutiveList)
                                         {
                                             <option value="@executive.Id" data-loan="@executive.IsLoan" data-payment="@executive.IsPayment">@executive.Code</option>
@@ -261,10 +260,9 @@
                         <div class="row">
                             <div class="row col-xl-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Orig.</div>
-                                <div class="col-8 col-sm-7 col-lg-8 col-xl-7 ms-lg-3 ms-xl-0">
+                                <div class="col-8 col-sm-7 col-lg-8 col-xl-12 ms-lg-3 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountSourceId" name="BankAccountSourceId" size="12"
                                             class="form-select border p-1 shadow" id="selectBankAccountSource">
-                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
                                         @foreach (var bank in Model.BankAccountSourceList)
                                         {
                                             <option value="@bank.Value">@bank.Text</option>
@@ -275,10 +273,9 @@
                             </div>
                             <div class="row col-xl-6 col-12 ps-2 mb-1 typeTransfer" hidden>
                                 <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Dest.</div>
-                                <div class="col-8 col-sm-7 col-lg-8 col-xl-7 ms-lg-3 ms-xl-0">
+                                <div class="col-8 col-sm-7 col-lg-8 col-xl-12 ms-lg-3 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountTargetId" size="12"
                                             class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
-                                        @* <option disabled selected>--Select Cuenta Bancaria--</option> *@
                                         @foreach (var bank in Model.BankAccountTargetList)
                                         {
                                             <option value="@bank.Value">@bank.Text</option>

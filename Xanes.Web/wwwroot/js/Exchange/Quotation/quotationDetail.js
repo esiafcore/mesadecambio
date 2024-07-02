@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         fnCalculateRevenueCost();
     }));
 
-    fnLoadInputsByType(typeNumeral);
+    await fnLoadInputsByType(typeNumeral);
     fnCalculateRevenueCost();
     await fnGetCustomer();
 
@@ -309,17 +309,8 @@ const fnChangeCustomers = async (onlyCompanies) => {
 
 const fnGetCustomer = async () => {
     try {
-        let onlyCompanies;
-
-        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
-            onlyCompanies = false;
-        } else {
-            onlyCompanies = true;
-        }
-
-
         if (selectCustomer) {
-            $(selectCustomer).select2(select2Options);
+            fnInitializeSelectCustomer();
 
             $(selectCustomer).on('select2:open', async function (e) {
 
@@ -330,7 +321,13 @@ const fnGetCustomer = async () => {
                         // Capturar el valor del campo de búsqueda
                         let searchTerm = searchField.value.replace(/-/g, "").trim();
                         if (searchTerm === "") return;
+                        let onlyCompanies;
 
+                        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
+                            onlyCompanies = false;
+                        } else {
+                            onlyCompanies = true;
+                        }
                         let url = `/Exchange/Quotation/GetCustomerByContain?search=${searchTerm}&onlyCompanies=${onlyCompanies}`;
 
                         const response = await fetch(url, {
@@ -359,7 +356,7 @@ const fnGetCustomer = async () => {
                                 selectCustomer.appendChild(option);
                             });
 
-                            $(selectCustomer).select2(select2Options);
+                            fnInitializeSelectCustomer();
 
                             // Abrir Select2 nuevamente
                             $(selectCustomer).select2('open');
@@ -391,7 +388,7 @@ const fnGetCustomer = async () => {
 };
 
 
-const fnLoadInputsByType = (type) => {
+const fnLoadInputsByType = async (type) => {
     if (type == QuotationType.Buy) {
         divCurrencyTransa.hidden = false;
         divAmountExchange.hidden = false;
@@ -402,7 +399,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = false);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = true);
-        //fnChangeCustomers(false);
+        await fnGetCustomer();
         fnCalculateRevenueCost();
 
     } else if (type == QuotationType.Sell) {
@@ -415,7 +412,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = false);
         elementsTransfer.forEach((item) => item.hidden = true);
-        //fnChangeCustomers(false);
+        await fnGetCustomer();
         fnCalculateRevenueCost();
 
     } else {
@@ -428,7 +425,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
-        //fnChangeCustomers(true);
+        await fnGetCustomer();
     }
 };
 function formatOption(option) {

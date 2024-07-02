@@ -1955,7 +1955,7 @@ public class QuotationController : Controller
         var objCustomerList = new List<Models.Customer>();
         try
         {
-            if (search == ".")
+            if (search == "." || search == null || search == string.Empty)
             {
                 objCustomerList = _uow.Customer
                     .GetAll(filter: x => x.CompanyId == _companyId &&

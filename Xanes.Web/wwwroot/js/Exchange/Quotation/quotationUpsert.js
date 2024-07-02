@@ -193,6 +193,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             inputTypeNumeral.value = parseInt(item.value);
             typeNumeral = inputTypeNumeral.value;
             fnLoadInputsByType(item.value);
+            selectCustomer.innerHTML = "";
         });
     });
 
@@ -434,13 +435,7 @@ const fnGetCustomer = async () => {
     try {
         let onlyCompanies;
 
-        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
-            onlyCompanies = false;
-        } else {
-            onlyCompanies = true;
-        }
-
-
+       
         if (selectCustomer) {
             $(selectCustomer).select2(select2Options);
 
@@ -453,6 +448,12 @@ const fnGetCustomer = async () => {
                         // Capturar el valor del campo de búsqueda
                         let searchTerm = searchField.value.replace(/-/g, "").trim();
                         if (searchTerm === "") return;
+
+                        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
+                            onlyCompanies = false;
+                        } else {
+                            onlyCompanies = true;
+                        }
 
                         let url = `/Exchange/Quotation/GetCustomerByContain?search=${searchTerm}&onlyCompanies=${onlyCompanies}`;
 
@@ -499,7 +500,8 @@ const fnGetCustomer = async () => {
                             if (onlyCompanies) {
                                 selectCustomer.value = options[0].value;
                                 divExchangeRateHistory.hidden = true;
-
+                                // Quitar el evento select2:select
+                                $(selectCustomer).off('select2:select');
                             } else {
                                 $(selectCustomer).on('select2:select', async function (e) {
                                     divExchangeRateHistory.hidden = false;
