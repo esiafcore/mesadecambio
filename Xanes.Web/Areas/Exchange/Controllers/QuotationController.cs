@@ -1118,7 +1118,7 @@ public class QuotationController : Controller
     public IActionResult CreateDetail(int id)
     {
         ViewData[AC.Title] = "Dellate - Cotización";
-
+        List<Models.Customer>? listCustomer = new();
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
@@ -1188,6 +1188,15 @@ public class QuotationController : Controller
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.DataModel = new();
         model.DataModel.CompanyId = _companyId;
+
+        if (model.ModelCreateVM.DataModel.CustomerId != 0)
+        {
+            var objCustomer =
+                _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.ModelCreateVM.DataModel.CustomerId));
+            listCustomer.Add(objCustomer);
+            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+        }
+
         return View(model);
     }
 

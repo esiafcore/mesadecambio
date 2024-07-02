@@ -73,8 +73,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    //Aplicar select2
-    $("#selectCustomer").select2(select2Options);
+    fnInitializeSelectCustomer();
 
     //Setear enfoque en el search input
     $(document).on('select2:open', function (e) {
@@ -93,6 +92,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     fnLoadInputsByType(typeNumeral);
     fnCalculateRevenueCost();
+    await fnGetCustomer();
+
 
     $(selectBankAccountSource).select2(select2Options);
     $(selectBankAccountTarget).select2(select2Options);
@@ -118,6 +119,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     formUpdateHeader.addEventListener("submit", fnCreateDetailFormSubmit);
     fnEnableTooltip();
 });
+
+const fnInitializeSelectCustomer = () => {
+    if (selectCustomer) {
+        $(selectCustomer).select2({
+            language: customMessagesSelect,
+            allowClear: true,
+            placeholder: ACJS.PlaceHolderSelect,
+            theme: "bootstrap-5",
+            selectionCssClass: "select2--small",
+            dropdownCssClass: "select2--small",
+            dropdownParent: $('#modalUpdateHeader'),
+            width: '100%'
+        });
+    }
+};
 
 const fnCreateDetailFormSubmit = async (event) => {
 
@@ -291,6 +307,90 @@ const fnChangeCustomers = async (onlyCompanies) => {
     }
 };
 
+const fnGetCustomer = async () => {
+    try {
+        let onlyCompanies;
+
+        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
+            onlyCompanies = false;
+        } else {
+            onlyCompanies = true;
+        }
+
+
+        if (selectCustomer) {
+            $(selectCustomer).select2(select2Options);
+
+            $(selectCustomer).on('select2:open', async function (e) {
+
+                let searchField = document.querySelector(".select2-search__field");
+                searchField.focus();
+                searchField.addEventListener('keyup', async function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        // Capturar el valor del campo de búsqueda
+                        let searchTerm = searchField.value.replace(/-/g, "").trim();
+                        if (searchTerm === "") return;
+
+                        let url = `/Exchange/Quotation/GetCustomerByContain?search=${searchTerm}&onlyCompanies=${onlyCompanies}`;
+
+                        const response = await fetch(url, {
+                            method: "POST"
+                        });
+
+                        const jsonData = await response.json();
+
+                        fntoggleLoading();
+
+                        if (jsonData.isSuccess) {
+                            selectCustomer.innerHTML = "";
+                            // Agregar options
+                            let option = document.createElement("option");
+                            option.value = "";
+                            option.text = ACJS.PlaceHolderSelect;
+                            option.disabled = true;
+                            option.selected = true;
+
+                            selectCustomer.insertBefore(option, selectCustomer.firstChild);
+
+                            jsonData.data.forEach((item) => {
+                                let option = document.createElement("option");
+                                option.value = item.value;
+                                option.text = item.text;
+                                selectCustomer.appendChild(option);
+                            });
+
+                            $(selectCustomer).select2(select2Options);
+
+                            // Abrir Select2 nuevamente
+                            $(selectCustomer).select2('open');
+                            searchField.focus();
+                            document.querySelector(".select2-search__field").value = searchTerm;
+                        }
+
+                        fntoggleLoading();
+
+                        let options = selectCustomer.getElementsByTagName('option');
+                        if (options.length > 0) {
+                            // Selecciona el primer elemento
+                            selectCustomer.value = options[0].value;
+                        }
+                       
+                        $(selectCustomer).select2('focus');
+
+                    }
+                });
+            });
+        }
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+    }
+};
+
+
 const fnLoadInputsByType = (type) => {
     if (type == QuotationType.Buy) {
         divCurrencyTransa.hidden = false;
@@ -302,7 +402,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = false);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = true);
-        fnChangeCustomers(false);
+        //fnChangeCustomers(false);
         fnCalculateRevenueCost();
 
     } else if (type == QuotationType.Sell) {
@@ -315,7 +415,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = false);
         elementsTransfer.forEach((item) => item.hidden = true);
-        fnChangeCustomers(false);
+        //fnChangeCustomers(false);
         fnCalculateRevenueCost();
 
     } else {
@@ -328,7 +428,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
-        fnChangeCustomers(true);
+        //fnChangeCustomers(true);
     }
 };
 function formatOption(option) {
@@ -612,7 +712,7 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
         dataTableBankSourceDeposit.rows().every(function (index, element) {
             let rowData = this.data();
             if (rowData.id === bankSource) {
-                rowDataToSelect = index; 
+                rowDataToSelect = index;
                 return false;
             }
         });
@@ -620,7 +720,7 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
         // Verifica si se encontró la fila
         if (rowDataToSelect !== null) {
             // Selecciona la fila en la tabla
-           await fnSelectTableSourceDeposit(rowDataToSelect);
+            await fnSelectTableSourceDeposit(rowDataToSelect);
         }
 
         amountDeposit.value = formatterAmount().format(amount);
@@ -636,7 +736,7 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
             let rowData = this.data();
             if (rowData.id === bankSource) {
                 rowDataToSelectSource = index; // Asigna el índice de la fila 
-                return false; 
+                return false;
             }
         });
 
@@ -651,7 +751,7 @@ const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailTy
             let rowData = this.data();
             if (rowData.id === bankTarget) {
                 rowDataToSelectTarget = index;
-                return false; 
+                return false;
             }
         });
 
@@ -871,7 +971,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
         "dataSrc": 'data',
         "ajax": {
             "url": `/admin/bank/GetAll`,
-            "dataSrc": function(data) {
+            "dataSrc": function (data) {
                 if (data.isSuccess) {
                     return data.data;
                 } else {
@@ -883,7 +983,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
                     return [];
                 }
             },
-            "complete": async function() {
+            "complete": async function () {
                 await fnSelectTableSourceDeposit(index);
             }
         },
