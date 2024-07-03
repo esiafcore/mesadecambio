@@ -441,7 +441,7 @@ const fnGetCustomer = async () => {
             fnInitializeSelectCustomer();
 
             $(selectCustomer).on('select2:open', async function (e) {
-                $('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
+                //$('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
 
 
                 let searchField = document.querySelector(".select2-search__field");
@@ -490,7 +490,7 @@ const fnGetCustomer = async () => {
 
                             // Abrir Select2 nuevamente
                             $(selectCustomer).select2('open');
-                            $('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
+                            //$('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
                             searchField.focus();
                             document.querySelector(".select2-search__field").value = searchTerm;
                         }
