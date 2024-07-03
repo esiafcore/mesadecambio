@@ -208,6 +208,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     fnEnableTooltip();
 
     await fnGetCustomer();
+
 });
 
 const fnSaveReturn = () => {
@@ -435,11 +436,13 @@ const fnGetCustomer = async () => {
     try {
         let onlyCompanies;
 
-       
+
         if (selectCustomer) {
-            $(selectCustomer).select2(select2Options);
+            fnInitializeSelectCustomer();
 
             $(selectCustomer).on('select2:open', async function (e) {
+                $('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
+
 
                 let searchField = document.querySelector(".select2-search__field");
                 searchField.focus();
@@ -483,10 +486,11 @@ const fnGetCustomer = async () => {
                                 selectCustomer.appendChild(option);
                             });
 
-                            $(selectCustomer).select2(select2Options);
+                            fnInitializeSelectCustomer();
 
                             // Abrir Select2 nuevamente
                             $(selectCustomer).select2('open');
+                            $('.select2-results__options').css('max-height', '150px').css('overflow-y', 'auto');
                             searchField.focus();
                             document.querySelector(".select2-search__field").value = searchTerm;
                         }
@@ -529,6 +533,20 @@ const fnGetCustomer = async () => {
     }
 };
 
+const fnInitializeSelectCustomer = () => {
+    if (selectCustomer) {
+        $(selectCustomer).select2({
+            language: customMessagesSelect,
+            allowClear: true,
+            placeholder: ACJS.PlaceHolderSelect,
+            theme: "bootstrap-5",
+            selectionCssClass: "select2--small",
+            dropdownCssClass: "select2--small",
+            width: '100%'
+        });
+    }
+};
+
 const fnChangeCustomers = async (onlyCompanies) => {
     let url = `/Exchange/Quotation/GetCustomers?onlyCompanies=${onlyCompanies}`;
     try {
@@ -555,7 +573,7 @@ const fnChangeCustomers = async (onlyCompanies) => {
                 selectCustomer.appendChild(option);
             });
 
-            $(selectCustomer).select2(select2Options);
+            fnInitializeSelectCustomer();
             var options = selectCustomer.getElementsByTagName('option');
             if (options.length > 0) {
                 // Selecciona el primer elemento
