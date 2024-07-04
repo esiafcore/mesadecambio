@@ -22,12 +22,14 @@ public class QuotationLegacyController : Controller
     private readonly IConfiguration _cfg;
     private readonly IUnitOfWork _uow;
     private readonly int _companyId;
+    private string _sessionToken;
 
     public QuotationLegacyController(IQuotationLegacyService service
         , ILoggerManager logger
         , IConfiguration cfg
         , IUnitOfWork uow
-        , IQuotationDetailLegacyService srvDetail)
+        , IQuotationDetailLegacyService srvDetail
+        , IHttpContextAccessor httpCtxAcc)
     {
         _logger = logger;
         _srv = service;
@@ -35,6 +37,7 @@ public class QuotationLegacyController : Controller
         _uow = uow;
         _srvDetail = srvDetail;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
+        _sessionToken = httpCtxAcc.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
 
     }
 
@@ -58,7 +61,7 @@ public class QuotationLegacyController : Controller
         var objQuotationList = new List<Quotation>();
         var apiResponse = string.Empty;
 
-        apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "");
+        apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
         var options = new JsonSerializerOptions
         {
@@ -248,7 +251,7 @@ public class QuotationLegacyController : Controller
 
         var objQuotationDetailList = new List<QuotationDetail>();
 
-        apiResponse = await _srvDetail.GetAllLegacyAsync(string.Empty, 0, 1, dateTransaInitial, dateTransaFinal, "");
+        apiResponse = await _srvDetail.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
         var objDetailLegacyList = JsonSerializer.Deserialize<List<QuotationDetailLegacyDto>>(apiResponse, options)!;
 

@@ -18,24 +18,26 @@ public class CustomerLegacyController : Controller
     private readonly IConfiguration _cfg;
     private readonly int _companyId;
     private readonly IUnitOfWork _uow;
+    private string _sessionToken;
 
     public CustomerLegacyController(ICustomerLegacyService service
         , ILoggerManager logger
         , IConfiguration cfg
-        , IUnitOfWork uow)
+        , IUnitOfWork uow
+        , IHttpContextAccessor httpCtxAcc)
     {
         _logger = logger;
         _srv = service;
         _cfg = cfg;
         _uow = uow;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
-
+        _sessionToken = httpCtxAcc.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
     }
 
     [HttpGet]
     public async Task<IActionResult> Export()
     {
-        var apiResponse = await _srv.GetAllLegacyAsync(string.Empty, 0, 1);
+        var apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1);
 
         var options = new JsonSerializerOptions
         {
