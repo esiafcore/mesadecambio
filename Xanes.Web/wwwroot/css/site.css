@@ -8,6 +8,11 @@ html {
   }
 }
 
+.select2-dropdown .select2-results__options {
+    max-height: 18.75rem !important; /* 300px / 16px = 18.75rem */
+    overflow-y: auto !important;
+}
+
 /*
 table.dataTable tbody tr.selected {
     color: white !important;
