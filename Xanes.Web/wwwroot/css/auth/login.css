@@ -1,0 +1,16 @@
+﻿body {
+    background-image: radial-gradient(circle, rgba(255,255,255,0) 0%, rgba(0,0,0,1) 85%), url("/Images/background/Fondos-de-inversion.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: cover;
+    color: white;
+}
+
+p {
+    font-size: 1.3rem;
+}
+
+.txt-sw {
+    text-shadow: 3px 3px 5px rgba(0, 0, 0, 1);
+}

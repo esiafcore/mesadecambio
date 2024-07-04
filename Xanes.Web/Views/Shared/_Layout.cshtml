@@ -1,9 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor Accessor;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Xanes.Web</title>
+    <title>@ViewData[AC.Title] - Xanes.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/Xanes.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
@@ -39,62 +42,68 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Exchange" asp-controller="Quotation" asp-action="ProcessingDate">Fecha de Procesamiento</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Customer" asp-controller="Customer" asp-action="Index">Clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="CurrencyExchangeRate" asp-action="Index">T/C</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Exchange" asp-controller="SystemInformation" asp-action="Index">Informes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Customer" asp-controller="CustomerSector" asp-action="Index">Sectores</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                Admin
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li class="nav-item">
-                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bancos</a>
-                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Currency" asp-action="Index">Monedas</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" asp-area="Admin" asp-controller="QuotationType" asp-action="Index">Tipo Transación</a>
-                                    <a class="dropdown-item" asp-area="Customer" asp-controller="CustomerCategory" asp-action="Index">Categorias Clientes</a>
-                                    <a class="dropdown-item" asp-area="Admin" asp-controller="IdentificationType" asp-action="Index">Tipos Identificaciones</a>
-                                    <a class="dropdown-item" asp-area="Exchange" asp-controller="BusinessExecutive" asp-action="Index">Ejecutivos</a>
-                                    <a class="dropdown-item" asp-area="Customer" asp-controller="CustomerLegacy" asp-action="Export">Exportar Clientes Legacy</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link text-primary ms-2">
-                                        Migrar Cotizaciones &raquo;
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-submenu">
-                                        <li>
-                                            <a class="dropdown-item" asp-area="Exchange" asp-controller="Quotation" asp-action="Import">Importar Cotizaciones</a>
-                                            <a class="dropdown-item" asp-area="Exchange" asp-controller="Quotation" asp-action="Export">Exportar Cotizaciones</a>
-                                            <a class="dropdown-item" asp-area="Exchange" asp-controller="QuotationLegacy" asp-action="Export">Exportar Cotizaciones Legacy</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
-                        @*   <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
-                        <div class="dropdown-menu">
+                        
+                        @if (Accessor.HttpContext.Session.GetString(SD.SessionToken) != null &&
+                             Accessor.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Exchange" asp-controller="Quotation" asp-action="ProcessingDate">Fecha de Procesamiento</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Customer" asp-controller="Customer" asp-action="Index">Clientes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Admin" asp-controller="CurrencyExchangeRate" asp-action="Index">T/C</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Exchange" asp-controller="SystemInformation" asp-action="Index">Informes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Customer" asp-controller="CustomerSector" asp-action="Index">Sectores</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Admin
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="nav-item">
+                                        <a class="dropdown-item" asp-area="Admin" asp-controller="Bank" asp-action="Index">Bancos</a>
+                                        <a class="dropdown-item" asp-area="Admin" asp-controller="Currency" asp-action="Index">Monedas</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" asp-area="Admin" asp-controller="QuotationType" asp-action="Index">Tipo Transación</a>
+                                        <a class="dropdown-item" asp-area="Customer" asp-controller="CustomerCategory" asp-action="Index">Categorias Clientes</a>
+                                        <a class="dropdown-item" asp-area="Admin" asp-controller="IdentificationType" asp-action="Index">Tipos Identificaciones</a>
+                                        <a class="dropdown-item" asp-area="Exchange" asp-controller="BusinessExecutive" asp-action="Index">Ejecutivos</a>
+                                        <a class="dropdown-item" asp-area="Customer" asp-controller="CustomerLegacy" asp-action="Export">Exportar Clientes Legacy</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-primary ms-2">
+                                            Migrar Cotizaciones &raquo;
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-submenu">
+                                            <li>
+                                                <a class="dropdown-item" asp-area="Exchange" asp-controller="Quotation" asp-action="Import">Importar Cotizaciones</a>
+                                                <a class="dropdown-item" asp-area="Exchange" asp-controller="Quotation" asp-action="Export">Exportar Cotizaciones</a>
+                                                <a class="dropdown-item" asp-area="Exchange" asp-controller="QuotationLegacy" asp-action="Export">Exportar Cotizaciones Legacy</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
 
-                        <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Migrar Cotizaciones</a>
-                        <div class="dropdown-menu">
-
-                        </div>
-                        </div>
-                        </div>
-                        </li> *@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" asp-area="Auth" asp-controller="Auth" asp-action="Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" asp-area="Auth" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" asp-area="Auth" asp-controller="Auth" asp-action="Register">Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

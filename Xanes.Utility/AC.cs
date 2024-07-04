@@ -31,7 +31,11 @@ public static class AC
     public const string ContentTypeExcel = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public const string ContentTypeZip = "application/zip";
     public const string PaginationHeaderName = "x-pagination";
-
+    public static string ServicesUrlApiPath = "ServicesUrl:UrlApi";
+    public static string ClaimTypeRole = "role";
+    public static string ClaimTypeUser = "unique_name";
+    public static string UsernameLogged = "UsernameLogged";
+    public static string UserEmailSession = "UserEmail";
     public const string LOCALHOSTPC = "LOCALHOSTPC";
     public const string LOCALHOSTME = "LOCALHOSTME";
     public const string Ipv4Default = "127.0.0.1";

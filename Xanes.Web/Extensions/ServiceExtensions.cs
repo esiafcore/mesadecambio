@@ -20,6 +20,9 @@ public static class ServiceExtensions
 
         services.AddHttpClient<ICustomerLegacyService, CustomerLegacyService>();
         services.AddTransient<ICustomerLegacyService, CustomerLegacyService>();
+
+        services.AddHttpClient<IAuthService, AuthService>();
+        services.AddTransient<IAuthService, AuthService>();
     }
 }
 

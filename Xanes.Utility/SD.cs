@@ -3,6 +3,9 @@ namespace Xanes.Utility;
 
 public static class SD
 {
+    public static string SessionToken = "JWTToken";
+    public const string AccessToken = "access_token";
+
     [Flags]
     public enum CurrencyType : int
     {

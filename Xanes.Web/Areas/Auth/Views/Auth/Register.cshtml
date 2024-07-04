@@ -1,0 +1,34 @@
+﻿@model Xanes.Models.Dtos.CredencialesUsuarioDto
+@{
+    <link rel="stylesheet" type="text/css" href="~/css/auth/login.css">
+}
+
+<form method="post">
+    <div class="container-fluid m-0">
+        <div class="row justify-content-center m-5">
+            <div class="col-12 col-xl-5 col-xxl-4 col-md-8 col-lg-6">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="card border-info border border-primary border-opacity-25">
+                    @* <img src="~/Images/ERP.jpeg" class="card-img-top" alt="Logo"> *@
+                    <div class="card-header text-center border-info border-2">
+                        <h2 class="text-info">Mesa de Cambio - XanesN8</h2>
+                        <hr class="p-0 m-0 mb-0 border-2 border-primary" />
+                        <h2 class="m-0">Register</h2>
+                    </div>
+                    <div class="card-body">
+                        <input asp-for="Email" type="text" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Email..." required />
+                        <input asp-for="Password" type="password" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Password..." required />
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="form-control col-sm-6 btn btn-info" value="Submit"><i class="bi bi-person-check"></i> Registrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script defer src="~/js/Auth/Auth/login.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}

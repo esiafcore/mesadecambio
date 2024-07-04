@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -33,6 +34,20 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => {
 });
 
 builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
+
+//Configurar la Autenticación
+builder.Services.AddDistributedMemoryCache();
+//Configurar la Autenticación
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.LoginPath = "/Auth/Auth/Login";
+        options.AccessDeniedPath = "/Auth/Auth/AccessDenied";
+        options.SlidingExpiration = true;
+        //options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
 
 builder.Services.AddSession(options =>
 {
@@ -71,12 +86,12 @@ app.UseAuthorization();
 app.UseSession();
 
 
-//app.MapControllerRoute(
+//app.MapControllerRoute(1
 //    name: "default",
 //    pattern: "{controller=Home}/{action=Privacy}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area=Exchange}/{controller=Quotation}/{action=Index}/{id?}");
+    pattern: "{area=Exchange}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
