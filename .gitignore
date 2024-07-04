@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /Xanes.Web/wwwroot/images/bank
 /Xanes.Web/appsettings.Development.json
+/Xanes.Web/License/license.key
