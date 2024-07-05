@@ -92,6 +92,6 @@ app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{area=Exchange}/{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Auth}/{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();

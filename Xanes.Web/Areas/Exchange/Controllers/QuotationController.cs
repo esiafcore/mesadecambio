@@ -2715,6 +2715,27 @@ public class QuotationController : Controller
                                         }
                                     }
 
+                                    var journalEntryId = worksheet.Cell(i, 8).GetString().Trim();
+                                    var bankTransactionId = worksheet.Cell(i, 9).GetString().Trim();
+                                    var journalEntryTransferFeeId = worksheet.Cell(i, 10).GetString().Trim();
+                                    var bankTransactionTransferFeeId = worksheet.Cell(i, 11).GetString().Trim();
+
+                                    detail.JournalEntryId = (journalEntryId != string.Empty && journalEntryId != null)
+                                        ? Guid.Parse(journalEntryId)
+                                        : null;
+
+                                    detail.BankTransactionId = (bankTransactionId != string.Empty && bankTransactionId != null)
+                                        ? Guid.Parse(bankTransactionId)
+                                        : null;
+
+                                    detail.JournalEntryTransferFeeId = (journalEntryTransferFeeId != string.Empty && journalEntryTransferFeeId != null)
+                                        ? Guid.Parse(journalEntryTransferFeeId)
+                                        : null;
+
+                                    detail.BankTransactionTransferFeeId = (bankTransactionTransferFeeId != string.Empty && bankTransactionTransferFeeId != null)
+                                        ? Guid.Parse(bankTransactionTransferFeeId)
+                                        : null;
+
                                     objQuotationDetailList.Add(detail);
                                 }
 
