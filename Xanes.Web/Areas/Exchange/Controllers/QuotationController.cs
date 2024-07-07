@@ -26,6 +26,8 @@ public class QuotationController : Controller
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
+    private readonly int _decimalExchangeFull;
+
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -36,6 +38,7 @@ public class QuotationController : Controller
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
         _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
+        _decimalExchangeFull = _configuration.GetValue<int>("ApplicationSettings:DecimalExchangeFull");
         _hostEnvironment = hostEnvironment;
         _parametersReport = new();
         var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
@@ -1944,7 +1947,6 @@ public class QuotationController : Controller
         }
     }
 
-
     [HttpPost]
     public JsonResult GetCustomerByContain(string search, bool onlyCompanies = false)
     {
@@ -2049,7 +2051,6 @@ public class QuotationController : Controller
 
         return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
     }
-
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
     {
         using (XLWorkbook wb = new XLWorkbook())
@@ -2997,16 +2998,13 @@ public class QuotationController : Controller
 
     #endregion
 
-
     #region REPORT
-
     public IActionResult PrintReport()
     {
         // Titulo pestaña del reporte
         ViewData["Title"] = $"Rpt - Nota de Crédito";
         return View("~/Views/Shared/IndexReport.cshtml");
     }
-
     public IActionResult GetReport()
     {
         try
@@ -3034,7 +3032,6 @@ public class QuotationController : Controller
             return Content($"Error al cargar el informe: {ex.Message}");
         }
     }
-
     public IActionResult ViewerEvent()
     {
         return StiNetCoreViewer.ViewerEventResult(this);
