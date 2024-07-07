@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.Models.Shared;
-using Xanes.Utility;
 
 namespace Xanes.DataAccess.ServicesApi.Service;
 

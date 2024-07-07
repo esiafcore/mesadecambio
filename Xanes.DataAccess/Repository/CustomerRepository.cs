@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Expressions;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;

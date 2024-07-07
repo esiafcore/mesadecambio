@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Stimulsoft.Svg.ExCSS;
 using System.Text;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models.Shared;

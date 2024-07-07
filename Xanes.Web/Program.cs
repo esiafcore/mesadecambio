@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;

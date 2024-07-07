@@ -6,7 +6,6 @@ using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models;
 using Xanes.Models.Dtos;
-using Xanes.Models.Shared;
 using Xanes.Models.ViewModels;
 using Xanes.Utility;
 #pragma warning disable CS8604

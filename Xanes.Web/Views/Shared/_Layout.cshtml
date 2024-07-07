@@ -44,9 +44,9 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        
+
                         @if (Accessor.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                             Accessor.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+                        Accessor.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="Exchange" asp-controller="Quotation" asp-action="ProcessingDate">Fecha de Procesamiento</a>
@@ -167,7 +167,7 @@
     <script asp-subresource-integrity type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script asp-subresource-integrity type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
-     integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     @*<script src="https://cdn.tiny.cloud/1/akzmg9znat7ux50bkk4656x23p70geihliu1ftghmrft7opi/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>*@
     <script>

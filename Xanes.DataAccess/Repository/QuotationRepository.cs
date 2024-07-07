@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Expressions;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
-using Xanes.Utility;
 
 namespace Xanes.DataAccess.Repository;
 

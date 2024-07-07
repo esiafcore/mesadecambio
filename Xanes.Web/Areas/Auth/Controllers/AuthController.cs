@@ -9,7 +9,6 @@ using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos;
 using Xanes.Utility;
-using Xanes.Models.Shared;
 
 namespace Xanes.Web.Areas.Auth.Controllers;
 [Area("Auth")]
@@ -58,23 +57,24 @@ public class AuthController : Controller
             var model = JsonSerializer.Deserialize<RespuestaAutenticacionDto>(apiResponse, options)!;
             if (model != null)
             {
-                //var handler = new JwtSecurityTokenHandler();
-                //var jwtToken = handler.ReadJwtToken(model.Token);
+                var handler = new JwtSecurityTokenHandler();
+                var jwtToken = handler.ReadJwtToken(model.Token);
 
-                //var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-                //if (jwtToken != null)
-                //{
-                //    var rolesClaims = jwtToken.Claims.Where(u => u.Type == AC.ClaimTypeRole).ToList();
-                //    if (rolesClaims.Count > 0)
-                //    {
-                //        identity.AddClaims(rolesClaims
-                //            .Select(x => new Claim(ClaimTypes.Role, x.Value)));
-                //    }
-                //    //identity.AddClaim(new Claim(ClaimTypes.Role, jwtToken.Claims.FirstOrDefault(u => u.Type == "role").Value));
-                //    identity.AddClaim(new Claim(ClaimTypes.Name, jwtToken.Claims.FirstOrDefault(u => u.Type == AC.ClaimTypeUser).Value));
-                //    var principal = new ClaimsPrincipal(identity);
-                //    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                //}
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                if (jwtToken != null)
+                {
+                    //Leer Roles
+                    var rolesClaims = jwtToken.Claims.Where(u => u.Type == "role").ToList();
+                    if (rolesClaims.Count > 0)
+                    {
+                        identity.AddClaims(rolesClaims
+                            .Select(x => new Claim(ClaimTypes.Role, x.Value)));
+                    }
+                    //Leer usuario
+                    identity.AddClaim(new Claim(ClaimTypes.Email, jwtToken.Claims.FirstOrDefault(u => u.Type == "email")?.Value));
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                }
 
                 //Grabar el TOKEN en la sessión
                 HttpContext.Session.SetString(SD.SessionToken, model.Token);
@@ -144,7 +144,7 @@ public class AuthController : Controller
         HttpContext.Session.SetString(SD.SessionToken, "");
         //HttpContext.Session.SetString(AC.UsernameLogged, "");
 
-        return RedirectToAction("Index", "Home", new { Area = "exchange" });
+        return RedirectToAction("Login", "Auth", new { Area = "auth" });
     }
 }
 

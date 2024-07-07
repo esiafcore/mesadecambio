@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using System.Text.Json;
 using Xanes.Models;
@@ -12,15 +11,14 @@ using ClosedXML.Excel;
 using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
-using static Stimulsoft.Report.Help.StiHelpProvider;
-using PersonType = Xanes.Models.PersonType;
-using QuotationType = Xanes.Models.QuotationType;
-using Xanes.DataAccess.Helpers;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
 [Area("Exchange")]
+[Authorize()]
+
 public class QuotationController : Controller
 {
     private readonly IUnitOfWork _uow;

@@ -2,9 +2,12 @@
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 using Xanes.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
 [Area("Customer")]
+[Authorize()]
+
 public class CustomerCategoryController : Controller
 {
     private readonly IUnitOfWork _uow;
