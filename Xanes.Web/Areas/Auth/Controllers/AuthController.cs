@@ -9,7 +9,6 @@ using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos;
 using Xanes.Utility;
-using Xanes.Models.Shared;
 
 namespace Xanes.Web.Areas.Auth.Controllers;
 [Area("Auth")]

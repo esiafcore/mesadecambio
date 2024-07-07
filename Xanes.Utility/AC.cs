@@ -1,6 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-namespace Xanes.Utility;
+﻿namespace Xanes.Utility;
 
 public static class AC
 {

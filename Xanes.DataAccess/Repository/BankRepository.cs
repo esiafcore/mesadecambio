@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Xanes.DataAccess.Data;
+﻿using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 

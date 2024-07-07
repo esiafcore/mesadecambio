@@ -1,7 +1,4 @@
-﻿using static Stimulsoft.Report.Help.StiHelpProvider;
-using static Stimulsoft.Report.StiOptions.Export.Pdf;
-
-namespace Xanes.Web.CustomMiddleware;
+﻿namespace Xanes.Web.CustomMiddleware;
 
 public class ContentSecurityPolicyMiddleware
 {

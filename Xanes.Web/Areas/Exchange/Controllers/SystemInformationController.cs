@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using System.Text;
@@ -10,9 +9,6 @@ using Xanes.Utility;
 using Xanes.Models.ViewModels;
 using Xanes.Models;
 using Xanes.Models.Shared;
-using Microsoft.DotNet.MSIdentity.Shared;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Microsoft.AspNetCore.Http;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 

@@ -4,13 +4,9 @@ using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 using Xanes.Utility;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Azure;
-using System.Net;
 using Xanes.Models.ViewModels;
 using System.Text;
 using Xanes.Models.Shared;
-using static Xanes.Utility.SD;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 

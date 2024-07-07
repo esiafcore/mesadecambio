@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 using Xanes.Models.Shared;
