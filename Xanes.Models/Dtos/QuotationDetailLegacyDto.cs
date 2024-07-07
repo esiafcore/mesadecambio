@@ -33,4 +33,10 @@ public class QuotationDetailLegacyDto
 
     [JsonPropertyName("transactionRelateUId")]
     public Guid? TransactionRelateUId { get; set; }
+
+    [JsonPropertyName("journalEntryTransferFeeId")]
+    public Guid? JournalEntryTransferFeeId { get; set; }
+
+    [JsonPropertyName("bankTransactionTransferFeeId")]
+    public Guid? BankTransactionTransferFeeId { get; set; }
 }
