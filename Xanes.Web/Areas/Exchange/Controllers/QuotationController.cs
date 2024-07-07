@@ -17,10 +17,13 @@ using PersonType = Xanes.Models.PersonType;
 using QuotationType = Xanes.Models.QuotationType;
 using Xanes.DataAccess.Helpers;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
 [Area("Exchange")]
+[Authorize()]
+
 public class QuotationController : Controller
 {
     private readonly IUnitOfWork _uow;

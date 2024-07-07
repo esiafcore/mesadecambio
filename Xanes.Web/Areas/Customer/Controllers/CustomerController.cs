@@ -12,10 +12,13 @@ using System.Text;
 using Xanes.Models.Shared;
 using static Xanes.Utility.SD;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Xanes.Web.Areas.Customer.Controllers;
 [Area("Customer")]
+[Authorize()]
+
 public class CustomerController : Controller
 {
     private readonly IUnitOfWork _uow;
