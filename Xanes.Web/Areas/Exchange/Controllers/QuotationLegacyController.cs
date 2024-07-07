@@ -266,6 +266,10 @@ public class QuotationLegacyController : Controller
             detail.QuotationDetailType = (SD.QuotationDetailType)detailLegacy.TypeDetail;
             detail.CurrencyDetailId = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaId;
             detail.CurrencyDetailTrx = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaTrx;
+            detail.BankTransactionId = detailLegacy.TransactionRelateUId;
+            detail.JournalEntryId = detailLegacy.JournalEntryUId;
+            detail.JournalEntryTransferFeeId = detailLegacy.JournalEntryTransferFeeId;
+            detail.BankTransactionTransferFeeId = detailLegacy.BankTransactionTransferFeeId;
 
             if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transfer)
             {
