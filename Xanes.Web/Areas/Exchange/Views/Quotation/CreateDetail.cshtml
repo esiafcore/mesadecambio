@@ -126,6 +126,7 @@
                     <div class="row col-xl-4 col-md-6 col-12 mb-1 d-none d-xl-block">
                     </div>
                 }
+
                 <div class="row col-xl-4 col-md-6 col-12 mb-1">
                     <div class="col-sm-5 col-lg-4 col-4">
                         <h5 class="text-white fs-6">Monto</h5>
@@ -134,6 +135,7 @@
                         <input class="form-control text-end border p-1 shadow decimalTransa" id="amountHeader" value="@Model.ModelCreateVM.DataModel.AmountTransaction" readonly />
                     </div>
                 </div>
+
                 @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
                 {
                     <div class="row col-xl-4 col-md-6 col-12 mb-1">
@@ -205,6 +207,10 @@
                             </a>
                         }
                         <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelDeposit"></h5>
+                        <a type="button" class="btn btn-danger btn-sm fs-2" hidden
+                           data-bs-toggle="tooltip" data-bs-title="Ajustar" id="btnAdjustmentDeposit">
+                            <i class="bi bi-hammer"></i>
+                        </a>
                     </div>
                 </div>
                 <table id="tblDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
@@ -242,6 +248,10 @@
                             </a>
                         }
                         <h5 class="m-0 ms-2 col-10 align-content-center" id="tableRowLabelTransfer"></h5>
+                        <a type="button" class="btn btn-danger btn-sm fs-2" hidden
+                           data-bs-toggle="tooltip" data-bs-title="Ajustar" id="btnAdjustmentTransfer">
+                            <i class="bi bi-hammer"></i>
+                        </a>
                     </div>
                 </div>
                 <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
@@ -261,13 +271,19 @@
                     </tfoot>
                 </table>
             </div>
-            <div class="modal fade" id="modalCreateDeposit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade" id="modalCreateDeposit" 
+                 data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" 
+                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_CreateDetailDeposit" />
             </div>
-            <div class="modal fade modal-lg" id="modalCreateTransfer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade modal-lg" id="modalCreateTransfer" 
+                 data-bs-backdrop="static" data-bs-keyboard="false" 
+                 tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_CreateDetailTransfer" />
             </div>
-            <div class="modal fade modal-xl" id="modalUpdateHeader" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal fade modal-xl" id="modalUpdateHeader" 
+                 data-bs-backdrop="static" data-bs-keyboard="false" 
+                 tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <partial name="_UpdateHeader" model="Model.ModelCreateVM" />
             </div>
         </div>
@@ -277,6 +293,9 @@
     <script>
         let decimalTransa = @Html.Raw(@ViewBag.DecimalTransa);
         let decimalExchange = @Html.Raw(@ViewBag.DecimalExchange);
+        // let decimalExchangeFull = @Html.Raw(@ViewBag.DecimalExchangeFull);
+        let variationMaxDeposit = @Html.Raw(@ViewBag.VariationMaxDeposit);
+
     </script>
     <partial name="_ValidationScriptsPartial" />
     <script defer src="~/js/Exchange/Quotation/quotationDetail.js"></script>
