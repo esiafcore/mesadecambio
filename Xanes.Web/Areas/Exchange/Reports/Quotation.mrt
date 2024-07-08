@@ -69,7 +69,7 @@
             <ImgLogo Ref="6" type="Image" isKey="true">
               <AspectRatio>True</AspectRatio>
               <Brush>Transparent</Brush>
-              <ClientRectangle>0,0,36,23</ClientRectangle>
+              <ClientRectangle>0,0,36,22</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <IconColor>68, 114, 196</IconColor>
@@ -365,10 +365,10 @@
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>5/8/2024 9:40:20 AM</ReportChanged>
+  <ReportChanged>7/7/2024 10:09:27 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\Users\Administrador\source\repos\XanesN8\Xanes\Xanes.Web\Areas\Exchange\Reports\Quotation.mrt</ReportFile>
-  <ReportGuid>7944ae956d9448e9ad7a1dd47cf37bdd</ReportGuid>
+  <ReportGuid>721491f189a2444f978aa366c05eaae1</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2024.2.3.0</ReportVersion>

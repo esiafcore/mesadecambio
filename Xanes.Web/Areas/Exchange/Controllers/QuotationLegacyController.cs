@@ -46,8 +46,8 @@ public class QuotationLegacyController : Controller
         // Titulo de la pagina
         ViewData[AC.Title] = $"Cotizaciones Legacy - Exportar";
         TransactionReportVM modelVm = new();
-        modelVm.DateTransaFinal = DateOnly.FromDateTime(DateTime.Now);
         modelVm.DateTransaInitial = DateOnly.FromDateTime(DateTime.Now);
+        modelVm.DateTransaFinal = modelVm.DateTransaInitial;
         return View(modelVm);
     }
 
