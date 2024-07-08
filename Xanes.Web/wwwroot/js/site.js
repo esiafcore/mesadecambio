@@ -124,6 +124,7 @@ const ButtonsText = {
     Create: "Crear",
     Link: "Relacionar",
     Add: "Agregar",
+    Adjustment: "Ajustar",
     CreateVersion: "Crear Nueva Versión",
     Update: "Actualizar",
     Save: "Guardar",

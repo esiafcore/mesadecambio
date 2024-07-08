@@ -92,17 +92,14 @@ public class Quotation : Entity, ICloneable
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Oficial Transa")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateOfficialTransa { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Compra Transa")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateBuyTransa { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Venta Transa")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateSellTransa { get; set; } = 0M;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
@@ -111,17 +108,14 @@ public class Quotation : Entity, ICloneable
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Oficial Real")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateOfficialReal { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Compra Real")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateBuyReal { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "TC Venta Real")]
-    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal ExchangeRateSellReal { get; set; } = 0M;
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
@@ -178,6 +172,10 @@ public class Quotation : Entity, ICloneable
     [Required]
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
+
+    [Required]
+    [Display(Name = "Está ajustado")]
+    public bool IsAdjustment { get; set; } = false;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id BusinessExecutive")]

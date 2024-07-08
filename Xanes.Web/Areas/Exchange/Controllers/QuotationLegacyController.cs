@@ -205,7 +205,7 @@ public class QuotationLegacyController : Controller
                 if (objBankAccountSource == null)
                 {
                     TempData[AC.Error] = $"La cuenta bancaria origen: {quotationLegacy.BankAccountSourceId} no fue encontrada";
-                    return RedirectToAction("Index", "Home", new { Area = "exchange" });
+                    return BadRequest();
                 }
 
                 quotation.BankAccountSourceId = objBankAccountSource.Id;
@@ -217,7 +217,7 @@ public class QuotationLegacyController : Controller
                 if (objBankAccountTarget == null)
                 {
                     TempData[AC.Error] = $"La cuenta bancaria destino: {quotationLegacy.BankAccountTargetId} no fue encontrada";
-                    return RedirectToAction("Index", "Home", new { Area = "exchange" });
+                    return BadRequest();
                 }
 
                 quotation.BankAccountTargetId = objBankAccountTarget.Id;

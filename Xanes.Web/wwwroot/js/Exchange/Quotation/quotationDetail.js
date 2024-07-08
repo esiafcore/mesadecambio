@@ -10,10 +10,15 @@ let selectCustomer, divCurrencyTransa, divAmountExchange, divCommission, divCurr
 let dataTableBankSourceDeposit, dataTableBankSourceTransfer, dataTableBankTargetTransfer;
 let indexDataTableBankSourceTransfer = 0, indexDataTableBankTargetTransfer = 0, indexDataTableBankSourceDeposit = 0, divExchangeRateVariation, inputExchangeRateVariation, btnQuotationClosed;
 let isPendingDeposit = true, isPendingTransfer = true, pendingTransfer, pendingDeposit;
+let totalDeposit, totalTransfer;
+let btnAdjustmentTransfer, btnAdjustmentDeposit;
+
 
 //Variable para el color de fondo seleccionado en la tablas del detalle
 let bgRow = 'selectedinfo';
 document.addEventListener("DOMContentLoaded", async function () {
+    btnAdjustmentTransfer = document.querySelector("#btnAdjustmentTransfer");
+    btnAdjustmentDeposit = document.querySelector("#btnAdjustmentDeposit");
     currencies = document.querySelectorAll(".currenciesTransa");
     currenciesDeposit = document.querySelectorAll(".currenciesDeposit");
     currenciesTransfer = document.querySelectorAll(".currenciesTransfer");
@@ -118,6 +123,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     const formUpdateHeader = document.getElementById("formUpdateHeader");
     formUpdateHeader.addEventListener("submit", fnCreateDetailFormSubmit);
     fnEnableTooltip();
+
+
+    btnAdjustmentDeposit.addEventListener("click", fnAdjustmentExchange);
+    btnAdjustmentTransfer.addEventListener("click", fnAdjustmentExchange);
+
 });
 
 const fnInitializeSelectCustomer = () => {
@@ -299,11 +309,17 @@ const fnChangeCustomers = async (onlyCompanies) => {
             }
 
         } else {
-            alert(jsonResponse.errorMessages);
+            Swal.fire({
+                icon: 'error',
+                text: jsonResponse.errorMessages
+            });
         }
 
     } catch (error) {
-        alert(error);
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
     }
 };
 
@@ -311,7 +327,6 @@ const fnGetCustomer = async () => {
     try {
         if (selectCustomer) {
             fnInitializeSelectCustomer();
-
             $(selectCustomer).on('select2:open', async function (e) {
 
                 let searchField = document.querySelector(".select2-search__field");
@@ -371,7 +386,7 @@ const fnGetCustomer = async () => {
                             // Selecciona el primer elemento
                             selectCustomer.value = options[0].value;
                         }
-                       
+
                         $(selectCustomer).select2('focus');
 
                     }
@@ -386,7 +401,6 @@ const fnGetCustomer = async () => {
         });
     }
 };
-
 
 const fnLoadInputsByType = async (type) => {
     if (type == QuotationType.Buy) {
@@ -1051,6 +1065,9 @@ function fnLoadDatatableDeposit() {
             "complete": function () {
                 fnEnableTooltip();
                 fnVerificateIsPending();
+                if (typeNumeral == QuotationType.Sell) {
+                    fnVerificateAjustment(pendingDeposit);
+                }
             }
         },
         "columns": [
@@ -1171,6 +1188,7 @@ function fnLoadDatatableDeposit() {
                 }`;
 
             pendingDeposit = pending;
+            totalDeposit = total;
 
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
@@ -1206,6 +1224,9 @@ function fnLoadDatatableTransfer() {
             "complete": function () {
                 fnEnableTooltip();
                 fnVerificateIsPending();
+                if (typeNumeral == QuotationType.Buy) {
+                    fnVerificateAjustment(pendingTransfer);
+                }
             }
         },
         "columns": [
@@ -1334,6 +1355,7 @@ function fnLoadDatatableTransfer() {
                 `${label}: ${formatterAmount().format(fnparseFloat(transfer))}  -  Pendiente: ${formatterAmount().format(pending)
                 }`;
             pendingTransfer = pending;
+            totalTransfer = total;
             $(footerCell).html(`${formatterAmount().format(total)}`);
         }
     });
@@ -1343,3 +1365,76 @@ function fnLoadDatatableTransfer() {
         dataTableTransfer.column(4).visible(false);
     }
 }
+
+const fnVerificateAjustment = (pendiente) => {
+
+    if (Math.abs(pendiente) <= variationMaxDeposit) {
+        if (typeNumeral == QuotationType.Sell && pendiente != 0) {
+            btnAdjustmentDeposit.hidden = false;
+        } else {
+            btnAdjustmentDeposit.hidden = true;
+        }
+        if (typeNumeral == QuotationType.Buy && pendiente != 0) {
+            btnAdjustmentTransfer.hidden = false;
+        } else {
+            btnAdjustmentTransfer.hidden = true;
+        }
+    }
+};
+
+
+const fnAdjustmentExchange = async () => {
+
+    let result = await Swal.fire({
+        title: `&#191;Está seguro de ajustar la cotización?`,
+        html: `Se recalcularán los datos nuevamente`,
+        icon: "warning",
+        showCancelButton: true,
+        reverseButtons: true,
+        focusConfirm: false,
+        confirmButtonText: ButtonsText.Adjustment,
+        cancelButtonText: ButtonsText.Cancel,
+        customClass: {
+            confirmButton: "btn btn-info px-3 mx-2",
+            cancelButton: "btn btn-danger px-3 mx-2"
+        },
+        buttonsStyling: false
+    });
+
+    if (!result.isConfirmed) {
+        return;
+    }
+
+
+
+    let url = `/Exchange/Quotation/AdjustmentExchange?parentId=${parentId}`;
+    try {
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            if (jsonResponse.urlRedirect) {
+                window.location.href = jsonResponse.urlRedirect;
+            }
+        }
+    }
+    catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
+    }
+
+
+
+};
+

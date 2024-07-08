@@ -26,6 +26,10 @@ public class QuotationController : Controller
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
+    private readonly int _decimalExchangeFull;
+    private readonly decimal _variationMaxDeposit;
+
+
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
 
@@ -36,6 +40,8 @@ public class QuotationController : Controller
         _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
         _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
+        _decimalExchangeFull = _configuration.GetValue<int>("ApplicationSettings:DecimalExchangeFull");
+        _variationMaxDeposit = _configuration.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
         _hostEnvironment = hostEnvironment;
         _parametersReport = new();
         var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
@@ -114,7 +120,7 @@ public class QuotationController : Controller
             .GetAll(x => (x.CompanyId == _companyId))
             .ToList();
 
-        if (objBusinessExecutiveList == null)
+        if (objBusinessExecutiveList == null || objBusinessExecutiveList.Count == 0)
         {
             TempData[AC.Error] = $"Ejecutivo no encontrado";
             return RedirectToAction(nameof(Index));
@@ -1119,14 +1125,24 @@ public class QuotationController : Controller
         List<Models.Customer>? listCustomer = new();
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
-
+        ViewBag.VariationMaxDeposit = JsonSerializer.Serialize(_variationMaxDeposit);
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
         }
+
+        if (objHeader.IsAdjustment)
+        {
+            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchangeFull);
+        }
+        else
+        {
+            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        }
+
+
 
         if (objHeader.IsClosed && !objHeader.IsPosted)
         {
@@ -1560,7 +1576,7 @@ public class QuotationController : Controller
 
             // Obtener la fecha del último día del mes anterior
             DateTime lastDay = new DateTime(dateOneMonthBefore.Year, dateOneMonthBefore.Month, DateTime.DaysInMonth(dateOneMonthBefore.Year, dateOneMonthBefore.Month));
-           
+
             DateOnly dateFinal = new DateOnly(lastDay.Year, lastDay.Month, lastDay.Day);
 
 
@@ -1616,6 +1632,140 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
     }
+
+    [HttpPost]
+    public async Task<JsonResult> AdjustmentExchange(int parentId)
+    {
+        JsonResultResponse? jsonResponse = new()
+        {
+            IsSuccess = true
+        };
+
+        try
+        {
+            decimal exchange = 0M;
+            var objQuotation = _uow.Quotation
+                .Get(filter: x => (x.CompanyId == _companyId && x.Id == parentId));
+
+            if (objQuotation is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            if (objQuotation.TypeNumeral == SD.QuotationType.Buy)
+            {
+                objQuotation.ExchangeRateBuyTransa = (objQuotation.TotalTransfer / objQuotation.AmountTransaction);
+
+                //TC COMPRA MENOR AL TC OFICIAL
+                if (objQuotation.ExchangeRateBuyTransa < objQuotation.ExchangeRateOfficialTransa)
+                {
+                    objQuotation.AmountRevenue = (objQuotation.ExchangeRateOfficialTransa - objQuotation.ExchangeRateBuyTransa) * objQuotation.AmountTransaction;
+                    objQuotation.AmountCost = 0;
+                }
+                //TC COMPRA MAYOR AL TC OFICIAL
+                else
+                {
+                    objQuotation.AmountCost = (objQuotation.ExchangeRateBuyTransa - objQuotation.ExchangeRateOfficialTransa) * objQuotation.AmountTransaction;
+                    objQuotation.AmountRevenue = 0;
+                }
+
+                //Compra de dolares 
+                if (objQuotation.CurrencyTransaType == SD.CurrencyType.Foreign)
+                {
+                    //Factoring paga en Cordobas
+                    if (objQuotation.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
+                        objQuotation.ExchangeRateBuyReal = objQuotation.ExchangeRateBuyTransa;
+                    }
+                }
+                //Compra de Euros
+                else if (objQuotation.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    //Factoring paga en Cordobas
+                    if (objQuotation.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
+                        objQuotation.ExchangeRateBuyReal = objQuotation.ExchangeRateBuyTransa;
+
+                    }
+                    //Factoring paga en Dolares
+                    else if (objQuotation.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
+                        objQuotation.ExchangeRateBuyReal = (objQuotation.ExchangeRateBuyTransa * objQuotation.ExchangeRateOfficialTransa);
+                    }
+                }
+            }
+            else if (objQuotation.TypeNumeral == SD.QuotationType.Sell)
+            {
+                objQuotation.ExchangeRateSellTransa = (objQuotation.TotalDeposit / objQuotation.AmountTransaction);
+
+                //TC VENTA MENOR AL TC OFICIAL
+                if (objQuotation.ExchangeRateSellTransa < objQuotation.ExchangeRateOfficialTransa)
+                {
+                    objQuotation.AmountCost = (objQuotation.ExchangeRateOfficialTransa - objQuotation.ExchangeRateSellTransa) * objQuotation.AmountTransaction;
+                    objQuotation.AmountRevenue = 0;
+                }
+                //TC VENTA MAYOR AL TC OFICIAL
+                else
+                {
+                    objQuotation.AmountRevenue = (objQuotation.ExchangeRateSellTransa - objQuotation.ExchangeRateOfficialTransa) * objQuotation.AmountTransaction;
+                    objQuotation.AmountCost = 0;
+                }
+
+                //Venta de dolares 
+                if (objQuotation.CurrencyTransaType == SD.CurrencyType.Foreign)
+                {
+                    //Cliente paga en Cordobas
+                    if (objQuotation.CurrencyDepositType == SD.CurrencyType.Base)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
+                        objQuotation.ExchangeRateSellReal = objQuotation.ExchangeRateSellTransa;
+                    }
+                }
+                //Venta de Euros
+                else if (objQuotation.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    //Cliente paga en Cordobas
+                    if (objQuotation.CurrencyDepositType == SD.CurrencyType.Base)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
+                        objQuotation.ExchangeRateSellReal = objQuotation.ExchangeRateSellTransa;
+
+                    }
+                    //Cliente paga en Dolares
+                    else if (objQuotation.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    {
+                        objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
+                        objQuotation.ExchangeRateSellReal = (objQuotation.ExchangeRateSellTransa * objQuotation.ExchangeRateOfficialTransa);
+                    }
+                }
+            }
+
+            //Seteamos campos de auditoria
+            objQuotation.UpdatedBy = AC.LOCALHOSTME;
+            objQuotation.UpdatedDate = DateTime.UtcNow;
+            objQuotation.UpdatedHostName = AC.LOCALHOSTPC;
+            objQuotation.UpdatedIpv4 = AC.Ipv4Default;
+            objQuotation.IsAdjustment = true;
+            _uow.Quotation.Update(objQuotation);
+            _uow.Save();
+            jsonResponse.UrlRedirect = Url.Action(action: "CreateDetail", controller: "Quotation", new { id = objQuotation.Id });
+
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
 
     [HttpPost, ActionName("Delete")]
     public async Task<JsonResult> DeletePost(int id)
@@ -1944,7 +2094,6 @@ public class QuotationController : Controller
         }
     }
 
-
     [HttpPost]
     public JsonResult GetCustomerByContain(string search, bool onlyCompanies = false)
     {
@@ -2049,7 +2198,6 @@ public class QuotationController : Controller
 
         return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
     }
-
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
     {
         using (XLWorkbook wb = new XLWorkbook())
@@ -2997,16 +3145,13 @@ public class QuotationController : Controller
 
     #endregion
 
-
     #region REPORT
-
     public IActionResult PrintReport()
     {
         // Titulo pestaña del reporte
         ViewData["Title"] = $"Rpt - Nota de Crédito";
         return View("~/Views/Shared/IndexReport.cshtml");
     }
-
     public IActionResult GetReport()
     {
         try
@@ -3034,7 +3179,6 @@ public class QuotationController : Controller
             return Content($"Error al cargar el informe: {ex.Message}");
         }
     }
-
     public IActionResult ViewerEvent()
     {
         return StiNetCoreViewer.ViewerEventResult(this);
