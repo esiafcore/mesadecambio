@@ -35,8 +35,8 @@ public class SystemInformationController : Controller
         _hostEnvironment = hostEnvironment;
 
         _parametersReport = new();
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
-        // Verificar si el archivo existe
+
+        var path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
         FileInfo file = new FileInfo(path);
         if (file.Exists)
         {
