@@ -1126,6 +1126,8 @@ public class QuotationController : Controller
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.VariationMaxDeposit = JsonSerializer.Serialize(_variationMaxDeposit);
+        ViewBag.DecimalExchangeFull = JsonSerializer.Serialize(_decimalExchangeFull);
+
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)

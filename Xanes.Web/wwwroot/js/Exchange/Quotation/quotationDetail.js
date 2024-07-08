@@ -1382,12 +1382,12 @@ const fnVerificateAjustment = (pendiente) => {
     }
 };
 
-
 const fnAdjustmentExchange = async () => {
-
+    let total = typeNumeral == QuotationType.Buy ? fnparseFloat(totalTransfer) : fnparseFloat(totalDeposit);
+    let TCNew = total / fnparseFloat(amountHeader);
     let result = await Swal.fire({
-        title: `&#191;Está seguro de ajustar la cotización?`,
-        html: `Se recalcularán los datos nuevamente`,
+        title: `&#191;Está seguro de ajustar la transacción?`,
+        html: `T/C Actual: ${formatterAmount(decimalExchange).format(TCHeader.value)} - Nuevo T/C: ${formatterAmount(decimalExchangeFull).format(TCNew)}`,
         icon: "warning",
         showCancelButton: true,
         reverseButtons: true,
