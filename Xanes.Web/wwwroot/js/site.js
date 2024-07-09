@@ -12,6 +12,17 @@ const fnEnableTooltip = () => {
     });
 };
 
+
+//const fnDestroyTooltips = () => {
+//    let buttons = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+//    buttons.forEach(function (button) {
+//        let tooltipInstance = bootstrap.Tooltip.getInstance(button);
+//        if (tooltipInstance) {
+//            tooltipInstance.dispose();
+//        }
+//    });
+//};
+
 const LocalTimeDefault = "T00:00:00";
 
 const defaultDecimalTransa = 2;

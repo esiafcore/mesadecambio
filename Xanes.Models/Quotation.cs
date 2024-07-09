@@ -190,20 +190,37 @@ public class Quotation : Entity, ICloneable
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     [Display(Name = "Cerrado El")]
-    public DateTime ClosedDate { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
+    public DateTime? ClosedDate { get; set; } = null;
 
     [Display(Name = "Cerrado Por")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string ClosedBy { get; set; } = string.Empty;
+    public string? ClosedBy { get; set; } = null;
 
     [Display(Name = "IPv4 Cerrado")]
     [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string ClosedIpv4 { get; set; } = string.Empty;
+    public string? ClosedIpv4 { get; set; } = null;
 
     [Display(Name = "HostName Cerrado")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string ClosedHostName { get; set; } = string.Empty;
-    
+    public string? ClosedHostName { get; set; } = null;
+
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [Display(Name = "ReCerrado El")]
+    public DateTime? ReClosedDate { get; set; } = null;
+
+    [Display(Name = "ReCerrado Por")]
+    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string? ReClosedBy { get; set; } = null;
+
+    [Display(Name = "IPv4 ReCerrado")]
+    [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string? ReClosedIpv4 { get; set; } = null;
+
+    [Display(Name = "HostName ReCerrado")]
+    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    public string? ReClosedHostName { get; set; } = null;
+
     public object Clone()
     {
         throw new NotImplementedException();

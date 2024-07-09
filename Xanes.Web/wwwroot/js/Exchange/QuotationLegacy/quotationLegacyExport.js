@@ -29,14 +29,10 @@ const fnExportExcel = async () => {
                 text: "No se encontraron registros para exportar en el rango de fechas especificado."
             });
             return;
-        }else if (response.status == 400) {
+        } else if (response.status == 400) {
             window.location.href = window.location.href;
+            return;
         }
-
-        if (!response.ok) {
-            throw new Error('Error en la respuesta del servidor');
-        }
-
 
         // Convertir la respuesta a un blob
         const blob = await response.blob();

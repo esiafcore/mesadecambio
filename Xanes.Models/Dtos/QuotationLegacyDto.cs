@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Xanes.Models.Dtos;
 
@@ -72,4 +73,36 @@ public class QuotationLegacyDto
 
     [JsonPropertyName("isVoid")]
     public bool IsVoid { get; set; }
+
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [JsonPropertyName("createdOn")]
+    public DateTime CreatedOn { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
+
+    [JsonPropertyName("createdBy")]
+    public string CreatedBy { get; set; } = string.Empty;
+
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [JsonPropertyName("updatedOn")]
+    public DateTime? UpdatedOn { get; set; } = null;
+
+    [JsonPropertyName("updatedBy")]
+    public string? UpdatedBy { get; set; } = null;
+
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [JsonPropertyName("closedOn")]
+    public DateTime? ClosedOn { get; set; } = null;
+
+    [JsonPropertyName("closedBy")]
+    public string? ClosedBy { get; set; } = null;
+
+    [DataType(DataType.DateTime)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [JsonPropertyName("reClosedOn")]
+    public DateTime? ReClosedOn { get; set; } = null;
+
+    [JsonPropertyName("reClosedBy")]
+    public string? ReClosedBy { get; set; } = null;
 }

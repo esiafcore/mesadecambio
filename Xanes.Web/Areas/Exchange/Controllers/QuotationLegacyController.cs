@@ -1,5 +1,6 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.MSIdentity.Shared;
 using System.Text.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
@@ -55,260 +56,280 @@ public class QuotationLegacyController : Controller
     [HttpGet]
     public async Task<IActionResult> ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
     {
-        DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
-        DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
-        var objQuotationList = new List<Quotation>();
-        var apiResponse = string.Empty;
-
-        apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
-
-        var options = new JsonSerializerOptions
+        try
         {
-            PropertyNameCaseInsensitive = true
-        };
+            DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
+            DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+            var objQuotationList = new List<Quotation>();
+            var apiResponse = string.Empty;
 
-        var objLegacyList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+            apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
-        if (objLegacyList == null || objLegacyList.Count == 0)
-        {
-            return NoContent();
-        }
-
-        var objTypeList = _uow.QuotationType.GetAll(filter: x =>
-          x.CompanyId == _companyId).ToList();
-
-        if (objTypeList == null || objTypeList.Count == 0)
-        {
-            TempData[AC.Error] = "Tipos de cotizaciones no encontradas";
-            return BadRequest();
-        }
-
-        var objCustomerList = _uow.Customer.GetAll(filter: x =>
-          x.CompanyId == _companyId).ToList();
-
-        if (objCustomerList == null || objCustomerList.Count == 0)
-        {
-            TempData[AC.Error] = "Clientes no encontrados";
-            return BadRequest();
-        }
-
-        var objBankAccountList = _uow.BankAccount.GetAll(filter: x =>
-            x.CompanyId == _companyId).ToList();
-
-        if (objBankAccountList == null || objBankAccountList.Count == 0)
-        {
-            TempData[AC.Error] = "Cuentas bancarias no encontradas";
-            return BadRequest();
-        }
-
-        var objBusinessList = _uow.BusinessExecutive.GetAll(filter: x =>
-            x.CompanyId == _companyId).ToList();
-
-        if (objBusinessList == null || objBusinessList.Count == 0)
-        {
-            TempData[AC.Error] = "Ejecutivos no encontrados";
-            return BadRequest();
-        }
-
-        var objCurrencyList = _uow.Currency.GetAll(filter: x =>
-            x.CompanyId == _companyId).ToList();
-
-        if (objCurrencyList == null || objCurrencyList.Count == 0)
-        {
-            TempData[AC.Error] = "Monedas no encontradas";
-            return BadRequest();
-        }
-
-        var objBankList = _uow.Bank.GetAll(filter: x =>
-            x.CompanyId == _companyId).ToList();
-
-        if (objBankList == null || objBankList.Count == 0)
-        {
-            TempData[AC.Error] = "Bancos no encontrados";
-            return BadRequest();
-        }
-
-        foreach (var quotationLegacy in objLegacyList)
-        {
-            var quotation = new Quotation();
-            quotation.CompanyId = _companyId;
-            quotation.Id = quotationLegacy.Id;
-            var objType = objTypeList.FirstOrDefault(x => x.Code == quotationLegacy.TypeCode);
-            if (objType == null)
+            var options = new JsonSerializerOptions
             {
-                TempData[AC.Error] = $"Tipo de cotización: {quotationLegacy.TypeCode} no fue encontrado";
+                PropertyNameCaseInsensitive = true
+            };
+
+            var objLegacyList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+
+            if (objLegacyList == null || objLegacyList.Count == 0)
+            {
+                return NoContent();
+            }
+
+            var objTypeList = _uow.QuotationType.GetAll(filter: x =>
+              x.CompanyId == _companyId).ToList();
+
+            if (objTypeList == null || objTypeList.Count == 0)
+            {
+                TempData[AC.Error] = "Tipos de cotizaciones no encontradas";
                 return BadRequest();
             }
 
-            quotation.TypeId = objType.Id;
-            quotation.TypeNumeral = (SD.QuotationType)objType.Numeral;
-            quotation.TypeTrx = objType;
-            quotation.Numeral = quotationLegacy.NumeralTrx;
-            var date = quotationLegacy.DateTrx.Split("T")[0];
-            quotation.DateTransa = DateOnly.Parse(date);
+            var objCustomerList = _uow.Customer.GetAll(filter: x =>
+              x.CompanyId == _companyId).ToList();
 
-            var objCustomer = objCustomerList.FirstOrDefault(x => x.Code == quotationLegacy.CustomerCode);
-            if (objCustomer == null)
+            if (objCustomerList == null || objCustomerList.Count == 0)
             {
-                TempData[AC.Error] = $"El cliente con el código: {quotationLegacy.CustomerCode} no fue encontrado";
+                TempData[AC.Error] = "Clientes no encontrados";
                 return BadRequest();
             }
 
-            quotation.CustomerId = objCustomer.Id;
-            quotation.CustomerTrx = objCustomer;
+            var objBankAccountList = _uow.BankAccount.GetAll(filter: x =>
+                x.CompanyId == _companyId).ToList();
 
-            var objCurrencyTransa = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyTransaction);
-            if (objCurrencyTransa == null)
+            if (objBankAccountList == null || objBankAccountList.Count == 0)
             {
-                TempData[AC.Error] = $"La moneda de la transacción: {quotationLegacy.CurrencyTransaction} no fue encontrado";
+                TempData[AC.Error] = "Cuentas bancarias no encontradas";
                 return BadRequest();
             }
 
-            quotation.CurrencyTransaId = objCurrencyTransa.Id;
-            quotation.CurrencyTransaType = (SD.CurrencyType)objCurrencyTransa.Numeral;
-            quotation.CurrencyTransaTrx = objCurrencyTransa;
+            var objBusinessList = _uow.BusinessExecutive.GetAll(filter: x =>
+                x.CompanyId == _companyId).ToList();
 
-            var objCurrencyDeposit = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyDeposit);
-            if (objCurrencyDeposit == null)
+            if (objBusinessList == null || objBusinessList.Count == 0)
             {
-                TempData[AC.Error] = $"La moneda del deposito: {quotationLegacy.CurrencyDeposit} no fue encontrado";
+                TempData[AC.Error] = "Ejecutivos no encontrados";
                 return BadRequest();
             }
 
-            quotation.CurrencyDepositId = objCurrencyDeposit.Id;
-            quotation.CurrencyDepositType = (SD.CurrencyType)objCurrencyDeposit.Numeral;
-            quotation.CurrencyDepositTrx = objCurrencyDeposit;
+            var objCurrencyList = _uow.Currency.GetAll(filter: x =>
+                x.CompanyId == _companyId).ToList();
 
-            var objCurrencyTransfer = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyTransfer);
-            if (objCurrencyTransfer == null)
+            if (objCurrencyList == null || objCurrencyList.Count == 0)
             {
-                TempData[AC.Error] = $"La moneda de la transferencia: {quotationLegacy.CurrencyTransfer} no fue encontrado";
+                TempData[AC.Error] = "Monedas no encontradas";
                 return BadRequest();
             }
 
-            quotation.CurrencyTransferId = objCurrencyTransfer.Id;
-            quotation.CurrencyTransferType = (SD.CurrencyType)objCurrencyTransfer.Numeral;
-            quotation.CurrencyTransferTrx = objCurrencyTransfer;
-            quotation.ExchangeRateOfficialTransa = quotationLegacy.ExchangeRateOfficial;
-            quotation.ExchangeRateBuyTransa = quotationLegacy.ExchangeRateBuy;
-            quotation.ExchangeRateSellTransa = quotationLegacy.ExchangeRateSell;
-            quotation.AmountTransaction = quotationLegacy.AmountTrx;
-            quotation.AmountExchange = quotationLegacy.AmountExchange;
-            quotation.AmountCost = quotationLegacy.AmountCost;
-            quotation.AmountRevenue = quotationLegacy.AmountRevenue;
+            var objBankList = _uow.Bank.GetAll(filter: x =>
+                x.CompanyId == _companyId).ToList();
 
-            if (quotation.TypeNumeral == SD.QuotationType.Transfer)
+            if (objBankList == null || objBankList.Count == 0)
             {
-                var objBankAccountSource =
-                    objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountSourceId);
+                TempData[AC.Error] = "Bancos no encontrados";
+                return BadRequest();
+            }
 
-                if (objBankAccountSource == null)
+            foreach (var quotationLegacy in objLegacyList)
+            {
+                var quotation = new Quotation();
+                quotation.CompanyId = _companyId;
+                quotation.Id = quotationLegacy.Id;
+                var objType = objTypeList.FirstOrDefault(x => x.Code == quotationLegacy.TypeCode);
+                if (objType == null)
                 {
-                    TempData[AC.Error] = $"La cuenta bancaria origen: {quotationLegacy.BankAccountSourceId} no fue encontrada";
+                    TempData[AC.Error] = $"Tipo de cotización: {quotationLegacy.TypeCode} no fue encontrado";
                     return BadRequest();
                 }
 
-                quotation.BankAccountSourceId = objBankAccountSource.Id;
-                quotation.BankAccountSourceTrx = objBankAccountSource;
+                quotation.TypeId = objType.Id;
+                quotation.TypeNumeral = (SD.QuotationType)objType.Numeral;
+                quotation.TypeTrx = objType;
+                quotation.Numeral = quotationLegacy.NumeralTrx;
+                var date = quotationLegacy.DateTrx.Split("T")[0];
+                quotation.DateTransa = DateOnly.Parse(date);
 
-                var objBankAccountTarget =
-                    objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountTargetId);
-
-                if (objBankAccountTarget == null)
+                var objCustomer = objCustomerList.FirstOrDefault(x => x.Code == quotationLegacy.CustomerCode);
+                if (objCustomer == null)
                 {
-                    TempData[AC.Error] = $"La cuenta bancaria destino: {quotationLegacy.BankAccountTargetId} no fue encontrada";
+                    TempData[AC.Error] = $"El cliente con el código: {quotationLegacy.CustomerCode} no fue encontrado";
                     return BadRequest();
                 }
 
-                quotation.BankAccountTargetId = objBankAccountTarget.Id;
-                quotation.BankAccountTargetTrx = objBankAccountTarget;
+                quotation.CustomerId = objCustomer.Id;
+                quotation.CustomerTrx = objCustomer;
 
-            }
-
-            var objBusiness = objBusinessList.FirstOrDefault(x => x.Code == quotationLegacy.BusinessExecutiveCode);
-            if (objBusiness == null)
-            {
-                TempData[AC.Error] = $"El ejecutivo: {quotationLegacy.BusinessExecutiveCode} no fue encontrado";
-                return BadRequest();
-            }
-
-            quotation.BusinessExecutiveId = objBusiness.Id;
-            quotation.BusinessExecutiveCode = objBusiness.Code;
-            quotation.BusinessExecutiveTrx = objBusiness;
-
-            quotation.IsVoid = quotationLegacy.IsVoid;
-            quotation.IsClosed = quotationLegacy.IsClosed;
-            quotation.IsPosted = quotationLegacy.IsJournalPost;
-
-            objQuotationList.Add(quotation);
-        }
-
-        if (objQuotationList.Count == 0)
-        {
-            return NoContent();
-        }
-
-        var objQuotationDetailList = new List<QuotationDetail>();
-
-        apiResponse = await _srvDetail.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
-
-        var objDetailLegacyList = JsonSerializer.Deserialize<List<QuotationDetailLegacyDto>>(apiResponse, options)!;
-
-        foreach (var detailLegacy in objDetailLegacyList)
-        {
-            var detail = new QuotationDetail();
-            detail.CompanyId = _companyId;
-            detail.Id = detailLegacy.Id;
-            detail.ParentId = detailLegacy.ParentId;
-            detail.AmountDetail = detailLegacy.AmountDetail;
-            detail.LineNumber = detailLegacy.DetailNumeral;
-            detail.QuotationDetailType = (SD.QuotationDetailType)detailLegacy.TypeDetail;
-            detail.CurrencyDetailId = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaId;
-            detail.CurrencyDetailTrx = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaTrx;
-            detail.BankTransactionId = detailLegacy.TransactionRelateUId;
-            detail.JournalEntryId = detailLegacy.JournalEntryUId;
-            detail.JournalEntryTransferFeeId = detailLegacy.JournalEntryTransferFeeId;
-            detail.BankTransactionTransferFeeId = detailLegacy.BankTransactionTransferFeeId;
-
-            if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transfer)
-            {
-                if (detail.QuotationDetailType == SD.QuotationDetailType.CreditTransfer)
+                var objCurrencyTransa = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyTransaction);
+                if (objCurrencyTransa == null)
                 {
-                    detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                    detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                    detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                    detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                    TempData[AC.Error] = $"La moneda de la transacción: {quotationLegacy.CurrencyTransaction} no fue encontrado";
+                    return BadRequest();
+                }
+
+                quotation.CurrencyTransaId = objCurrencyTransa.Id;
+                quotation.CurrencyTransaType = (SD.CurrencyType)objCurrencyTransa.Numeral;
+                quotation.CurrencyTransaTrx = objCurrencyTransa;
+
+                var objCurrencyDeposit = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyDeposit);
+                if (objCurrencyDeposit == null)
+                {
+                    TempData[AC.Error] = $"La moneda del deposito: {quotationLegacy.CurrencyDeposit} no fue encontrado";
+                    return BadRequest();
+                }
+
+                quotation.CurrencyDepositId = objCurrencyDeposit.Id;
+                quotation.CurrencyDepositType = (SD.CurrencyType)objCurrencyDeposit.Numeral;
+                quotation.CurrencyDepositTrx = objCurrencyDeposit;
+
+                var objCurrencyTransfer = objCurrencyList.FirstOrDefault(x => x.Numeral == quotationLegacy.CurrencyTransfer);
+                if (objCurrencyTransfer == null)
+                {
+                    TempData[AC.Error] = $"La moneda de la transferencia: {quotationLegacy.CurrencyTransfer} no fue encontrado";
+                    return BadRequest();
+                }
+
+                quotation.CurrencyTransferId = objCurrencyTransfer.Id;
+                quotation.CurrencyTransferType = (SD.CurrencyType)objCurrencyTransfer.Numeral;
+                quotation.CurrencyTransferTrx = objCurrencyTransfer;
+                quotation.ExchangeRateOfficialTransa = quotationLegacy.ExchangeRateOfficial;
+                quotation.ExchangeRateBuyTransa = quotationLegacy.ExchangeRateBuy;
+                quotation.ExchangeRateSellTransa = quotationLegacy.ExchangeRateSell;
+                quotation.AmountTransaction = quotationLegacy.AmountTrx;
+                quotation.AmountExchange = quotationLegacy.AmountExchange;
+                quotation.AmountCost = quotationLegacy.AmountCost;
+                quotation.AmountRevenue = quotationLegacy.AmountRevenue;
+
+                if (quotation.TypeNumeral == SD.QuotationType.Transfer)
+                {
+                    var objBankAccountSource =
+                        objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountSourceId);
+
+                    if (objBankAccountSource == null)
+                    {
+                        TempData[AC.Error] = $"La cuenta bancaria origen: {quotationLegacy.BankAccountSourceId} no fue encontrada";
+                        return BadRequest();
+                    }
+
+                    quotation.BankAccountSourceId = objBankAccountSource.Id;
+                    quotation.BankAccountSourceTrx = objBankAccountSource;
+
+                    var objBankAccountTarget =
+                        objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountTargetId);
+
+                    if (objBankAccountTarget == null)
+                    {
+                        TempData[AC.Error] = $"La cuenta bancaria destino: {quotationLegacy.BankAccountTargetId} no fue encontrada";
+                        return BadRequest();
+                    }
+
+                    quotation.BankAccountTargetId = objBankAccountTarget.Id;
+                    quotation.BankAccountTargetTrx = objBankAccountTarget;
+
+                }
+
+                var objBusiness = objBusinessList.FirstOrDefault(x => x.Code == quotationLegacy.BusinessExecutiveCode);
+                if (objBusiness == null)
+                {
+                    TempData[AC.Error] = $"El ejecutivo: {quotationLegacy.BusinessExecutiveCode} no fue encontrado";
+                    return BadRequest();
+                }
+
+                quotation.BusinessExecutiveId = objBusiness.Id;
+                quotation.BusinessExecutiveCode = objBusiness.Code;
+                quotation.BusinessExecutiveTrx = objBusiness;
+
+                quotation.IsVoid = quotationLegacy.IsVoid;
+                quotation.IsClosed = quotationLegacy.IsClosed;
+                quotation.IsPosted = quotationLegacy.IsJournalPost;
+
+                quotation.CreatedBy = quotationLegacy.CreatedBy;
+                quotation.CreatedDate = quotationLegacy.CreatedOn;
+
+                quotation.UpdatedBy = quotationLegacy.UpdatedBy;
+                quotation.UpdatedDate = quotationLegacy.UpdatedOn;
+
+                quotation.ClosedBy = quotationLegacy.ClosedBy;
+                quotation.ClosedDate = quotationLegacy.ClosedOn;
+
+                quotation.ReClosedBy = quotationLegacy.ReClosedBy;
+                quotation.ReClosedDate = quotationLegacy.ReClosedOn;
+
+                objQuotationList.Add(quotation);
+            }
+
+            if (objQuotationList.Count == 0)
+            {
+                return NoContent();
+            }
+
+            var objQuotationDetailList = new List<QuotationDetail>();
+
+            apiResponse = await _srvDetail.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+
+            var objDetailLegacyList = JsonSerializer.Deserialize<List<QuotationDetailLegacyDto>>(apiResponse, options)!;
+
+            foreach (var detailLegacy in objDetailLegacyList)
+            {
+                var detail = new QuotationDetail();
+                detail.CompanyId = _companyId;
+                detail.Id = detailLegacy.Id;
+                detail.ParentId = detailLegacy.ParentId;
+                detail.AmountDetail = detailLegacy.AmountDetail;
+                detail.LineNumber = detailLegacy.DetailNumeral;
+                detail.QuotationDetailType = (SD.QuotationDetailType)detailLegacy.TypeDetail;
+                detail.CurrencyDetailId = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaId;
+                detail.CurrencyDetailTrx = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaTrx;
+                detail.BankTransactionId = detailLegacy.TransactionRelateUId;
+                detail.JournalEntryId = detailLegacy.JournalEntryUId;
+                detail.JournalEntryTransferFeeId = detailLegacy.JournalEntryTransferFeeId;
+                detail.BankTransactionTransferFeeId = detailLegacy.BankTransactionTransferFeeId;
+
+                if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transfer)
+                {
+                    if (detail.QuotationDetailType == SD.QuotationDetailType.CreditTransfer)
+                    {
+                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
+                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
+                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                    }
+                    else
+                    {
+                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
+                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
+                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
+                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
+                    }
                 }
                 else
                 {
-                    detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                    detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
-                    detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                    detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
+                    if (detail.QuotationDetailType == SD.QuotationDetailType.Deposit)
+                    {
+                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
+                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
+                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                    }
+                    else
+                    {
+                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
+                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
+                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
+                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                    }
                 }
-            }
-            else
-            {
-                if (detail.QuotationDetailType == SD.QuotationDetailType.Deposit)
-                {
-                    detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                    detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                    detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                    detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                }
-                else
-                {
-                    detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                    detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
-                    detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                    detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                }
+
+                objQuotationDetailList.Add(detail);
             }
 
-            objQuotationDetailList.Add(detail);
+            return GenerarExcel("Cotizaciones.xlsx", objQuotationList, objQuotationDetailList);
         }
-
-        return GenerarExcel("Cotizaciones.xlsx", objQuotationList, objQuotationDetailList);
+        catch (Exception ex)
+        {
+            TempData[AC.Success] = ex.Message.ToString();
+            return BadRequest();
+        }
     }
 
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities, List<Models.QuotationDetail> listEntityDetails)
@@ -353,6 +374,10 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(3, 10).Value = "T/C Compra";
                 worksheet.Cell(3, 11).Value = "T/C Venta";
                 worksheet.Cell(3, 12).Value = "Preservar Numeración";
+                worksheet.Cell(3, 13).Value = "Creado Por";
+                worksheet.Cell(3, 14).Value = "Creado El";
+                worksheet.Cell(3, 15).Value = "Actualizado Por";
+                worksheet.Cell(3, 16).Value = "Actualizado El";
 
                 worksheet.Cell(4, 1).Value = header.TypeTrx.Code;
                 worksheet.Cell(4, 2).Value = header.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty);
@@ -370,6 +395,12 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(4, 11).Value = header.ExchangeRateSellTransa;
                 worksheet.Cell(4, 11).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
                 worksheet.Cell(4, 12).Value = "S";
+                worksheet.Cell(4, 13).Value = header.CreatedBy;
+                worksheet.Cell(4, 13).SetValue(header.CreatedDate);
+                worksheet.Cell(4, 13).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(4, 15).Value = header.UpdatedBy;
+                worksheet.Cell(4, 16).SetValue(header.UpdatedDate);
+                worksheet.Cell(4, 16).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
 
                 worksheet.Cell(5, 1).Value = "Monto";
                 worksheet.Cell(5, 2).Value = "Monto M/C";
@@ -382,6 +413,10 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(5, 9).Value = "Cerrado";
                 worksheet.Cell(5, 10).Value = "Contabilizado";
                 worksheet.Cell(5, 11).Value = "Anulado";
+                worksheet.Cell(5, 12).Value = "Cerrado Por";
+                worksheet.Cell(5, 13).Value = "Cerrado El";
+                worksheet.Cell(5, 14).Value = "ReCerrado Por";
+                worksheet.Cell(5, 15).Value = "ReCerrado El";
 
 
                 worksheet.Cell(6, 1).Value = header.AmountTransaction;
@@ -400,6 +435,12 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(6, 9).Value = header.IsClosed ? "S" : "N";
                 worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
                 worksheet.Cell(6, 11).Value = header.IsVoid ? "S" : "N";
+                worksheet.Cell(6, 12).Value = header.ClosedBy;
+                worksheet.Cell(6, 13).SetValue(header.ClosedDate);
+                worksheet.Cell(6, 13).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(6, 14).Value = header.ReClosedBy;
+                worksheet.Cell(6, 15).SetValue(header.ReClosedDate);
+                worksheet.Cell(6, 15).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
 
                 worksheet.Cell(7, 1).Value = "#";
                 worksheet.Cell(7, 2).Value = "Banco Origen";
@@ -449,6 +490,11 @@ public class QuotationLegacyController : Controller
                 worksheet.Column(10).AdjustToContents();
                 worksheet.Column(11).AdjustToContents();
                 worksheet.Column(12).AdjustToContents();
+                worksheet.Column(13).AdjustToContents();
+                worksheet.Column(14).AdjustToContents();
+                worksheet.Column(15).AdjustToContents();
+                worksheet.Column(16).AdjustToContents();
+
             }
 
             using (MemoryStream stream = new MemoryStream())

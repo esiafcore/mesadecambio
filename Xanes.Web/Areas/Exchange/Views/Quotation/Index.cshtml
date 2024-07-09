@@ -1,7 +1,7 @@
 ﻿@model TransactionReportVM
 
 <div class="card shadow border-0 mt-1">
-    <form method="post" id="formPrint" asp-area="Exchange" asp-controller="SystemInformation" asp-action="PrintTransaOperationList" target="_blank" onsubmit="fnsendFormValidate(event)">
+    <form method="post" id="formPrint" asp-area="Exchange" asp-controller="SystemInformation" asp-action="PrintTransaOperationList" target="_blank">
         <input asp-for="ReportType" value="@((short)SD.ReportTransaType.Operation)" name="ReportType" hidden />
         <input asp-for="DateTransaInitial" name="DateTransaInitial" type="date" id="dateInitialReport" hidden />
         <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />

@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
 const fnPrintFormSubmit = async (event) => {
 
     try {
+        fntoggleLoading();
+
         let resultResponse = {
             isSuccess: true
         };
@@ -39,7 +41,6 @@ const fnPrintFormSubmit = async (event) => {
 
         const url = `${formObject.action}`;
         const formData = new FormData(formObject);
-        //const plainFormData = Object.fromEntries(formData.entries());
         const plainFormData = Object.fromEntries([...formData.entries()].filter(([key, _]) => !key.startsWith("__")));
         plainFormData.ReportType = parseInt(plainFormData.ReportType);
 
@@ -49,6 +50,7 @@ const fnPrintFormSubmit = async (event) => {
         if (resultResponse.isSuccess) {
             formObject.submit();
         }
+        fntoggleLoading();
 
     } catch (error) {
         Swal.fire({
@@ -63,7 +65,7 @@ const fnvalidateOperation = async (plainFormData) => {
     const resultResponse = {
         isSuccess: true
     };
-
+    fntoggleLoading();
     // Validar que existan registros disponibles
     const url = `${window.location.origin}/Exchange/SystemInformation/VerificationDataForOperation`;
     const formDataJsonString = JSON.stringify(plainFormData);
@@ -77,6 +79,8 @@ const fnvalidateOperation = async (plainFormData) => {
     };
 
     const response = await fetch(url, fetchOptions);
+
+    fntoggleLoading();
 
     if (!response.ok) {
         const errorMessage = await response.text();
@@ -93,7 +97,6 @@ const fnvalidateOperation = async (plainFormData) => {
             return resultResponse;
         }
     }
-
     return resultResponse;
 };
 
@@ -260,19 +263,20 @@ const fnVoid = async (id) => {
             }
         }
 
+        fntoggleLoading();
+
     } catch (e) {
         Swal.fire({
             icon: 'error',
             title: "Error en la conexión",
             text: e
         });
-    } finally {
-        fntoggleLoading();
     }
 };
 
 const fnPrintReport = async (id) => {
     try {
+        fntoggleLoading();
         const url = `/exchange/quotation/ValidateDataToPrint?id=${id}`;
 
         const response = await fetch(url, {
@@ -280,6 +284,7 @@ const fnPrintReport = async (id) => {
         });
 
         const jsonResponse = await response.json();
+
         if (!jsonResponse.isSuccess) {
             Swal.fire({
                 icon: 'error',
@@ -291,7 +296,7 @@ const fnPrintReport = async (id) => {
                 window.open(`${jsonResponse.data.urlRedirectTo}`, "_blank");
             }
         }
-
+        fntoggleLoading();
     } catch (e) {
         Swal.fire({
             icon: 'error',
@@ -325,6 +330,8 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
             return;
         }
 
+        fntoggleLoading();
+
         fetchOptions = {
             method: "DELETE"
         };
@@ -338,6 +345,8 @@ const fnDeleteRow = async (url, dateTransa, transaFullName) => {
         } else {
             toastr.success(jsonResponse.errorMessages);
         }
+
+        fntoggleLoading();
     }
     catch (e) {
         Swal.fire({
@@ -417,6 +426,12 @@ const fnSetSearchValue = (value) => {
 }
 
 const fnLoadDatatable = () => {
+
+    let tooltipInstance = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
+    if (tooltipInstance) {
+        tooltipInstance.hide();
+        tooltipInstance.dispose();
+    }
 
     let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));
 

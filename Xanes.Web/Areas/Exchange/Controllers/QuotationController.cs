@@ -1768,7 +1768,6 @@ public class QuotationController : Controller
         }
     }
 
-
     [HttpPost, ActionName("Delete")]
     public async Task<JsonResult> DeletePost(int id)
     {
