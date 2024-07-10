@@ -601,27 +601,27 @@ const fnLoadDatatable = () => {
                         urlReClosed = urlUpdate;
                     }
 
-                    let btnUpdate = `<a href="${urlUpdate}" class="btn btn-primary py-1 px-3 my-0 mx-1"
+                    let btnUpdate = `<a href="${urlUpdate}" class="btn btn-primary py-1 px-3 my-0 mx-1" onclick="fnredirectBtnIndex(event)"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Editar">
                                          <i class="bi bi-pencil-square fs-5"></i>
                                      </a>`;
 
-                    let btnReClosed = `<a href="${urlReClosed}" class="btn btn-warning py-1 px-3 my-0 mx-1"
+                    let btnReClosed = `<a href="${urlReClosed}" class="btn btn-warning py-1 px-3 my-0 mx-1" onclick="fnredirectBtnIndex(event)"
                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
                                          <i class="bi bi-check2-square fs-5"></i>
                                      </a>`;
 
-                    let btnVoid = `<a onclick="fnVoid(${row.id})" class="btn btn-outline-info py-1 px-3 my-0 mx-1"
+                    let btnVoid = `<a onclick="fnVoid(${row.id})" class="btn btn-outline-info py-1 px-3 my-0 mx-1" 
                                         data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Anular">
                                          <i class="bi bi-x-square-fill fs-5"></i>
                                      </a>`;
 
-                    let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1"
+                    let btnView = `<a href="/exchange/quotation/Detail?id=${row.id}" class="btn btn-success py-1 px-3 my-0 mx-1" onclick="fnredirectBtnIndex(event)"
                                      data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Ver">
                                      <i class="bi bi-eye fs-5"></i>
                                    </a>`;
 
-                    let btnDelete = `<a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" 
+                    let btnDelete = `<a href="/exchange/quotation/Delete?id=${row.id}" class="btn btn-danger py-1 px-3 my-0 mx-1" onclick="fnredirectBtnIndex(event)"
                                          data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Eliminar">
                                           <i class="bi bi-trash-fill fs-5"></i>
                                      </a> `;
@@ -653,12 +653,6 @@ const fnLoadDatatable = () => {
                             ${btnVoid}
                         `;
                     }
-                    //else if (row.isClosed && !row.isPosted && row.isVoid) {
-                    //    buttons += `
-                    //        ${btnView}
-                    //        ${btnPrint}
-                    //    `;
-                    //}
                     else {
                         buttons += `
                             ${btnView}

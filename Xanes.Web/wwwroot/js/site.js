@@ -55,6 +55,12 @@ function fntoggleLoading(textContent = "Cargando...") {
     loading.classList.toggle("loading-show");
 }
 
+const fnredirectBtnIndex = async (event) => {
+    if (!event.ctrlKey) {
+        fntoggleLoading();
+    }
+}
+
 const fnShowModalMessages = (data, titulo = "") => {
     let icono = "error";
 
