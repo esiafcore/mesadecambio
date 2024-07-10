@@ -157,5 +157,5 @@ const fnLoadDatatable = () => {
 
 const fnupdateLinkParameter = (selectedRadio) => {
     const radioValue = parseInt(selectedRadio.value);
-    window.location.href = `${window.location.origin}/Admin/CurrencyExchangeRate?currencyType=${radioValue}`;
+    window.location.href = `${window.location.origin}/Admin/CurrencyExchangeRate/Index?currencyType=${radioValue}`;
 };

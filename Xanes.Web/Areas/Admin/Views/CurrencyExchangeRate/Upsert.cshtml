@@ -63,7 +63,7 @@
                 <!-- ROW 2 -->
                 <div class="row">
                     <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
-                        <input asp-for="DataModel.OfficialRate" type="number" class="form-control border-0 shadow text-end" step="any" />
+                        <input asp-for="DataModel.OfficialRate" id="officialRate" type="number" class="form-control border-0 shadow text-end" step="any" />
                         <label asp-for="DataModel.OfficialRate" class="ms-2"></label>
                         <span asp-validation-for="DataModel.OfficialRate" class="text-danger"></span>
                     </div>
@@ -85,3 +85,6 @@
         </div>
     </div>
 </form>
+@section Scripts {
+    <script src="~/js/Admin/CurrencyExchangeRate/currencyExchangeRateUpsert.js"></script>
+}
