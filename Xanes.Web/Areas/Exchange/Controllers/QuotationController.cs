@@ -2783,6 +2783,42 @@ public class QuotationController : Controller
                                     }
                                 }
 
+                                header.CreatedBy = worksheet.Cell(4, 13).GetString().Trim();
+
+                                var createdDate = worksheet.Cell(4, 14).GetString().Trim();
+
+                                if (!string.IsNullOrEmpty(createdDate))
+                                {
+                                    header.CreatedDate = DateTime.Parse(createdDate);
+                                }
+
+                                header.UpdatedBy = worksheet.Cell(4, 15).GetString().Trim();
+
+                                var updatedDate = worksheet.Cell(4, 16).GetString().Trim();
+
+                                if (!string.IsNullOrEmpty(updatedDate))
+                                {
+                                    header.UpdatedDate = DateTime.Parse(updatedDate);
+                                }
+
+                                header.ClosedBy = worksheet.Cell(6, 13).GetString().Trim();
+
+                                var closedDate = worksheet.Cell(6, 14).GetString().Trim();
+
+                                if (!string.IsNullOrEmpty(closedDate))
+                                {
+                                    header.ClosedDate = DateTime.Parse(closedDate);
+                                }
+
+                                header.ReClosedBy = worksheet.Cell(6, 15).GetString().Trim();
+
+                                var reClosedDate = worksheet.Cell(6, 16).GetString().Trim();
+
+                                if (!string.IsNullOrEmpty(reClosedDate))
+                                {
+                                    header.ReClosedDate = DateTime.Parse(reClosedDate);
+                                }
+
                                 objQuotationList.Add(header);
 
                                 var firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
@@ -3047,9 +3083,9 @@ public class QuotationController : Controller
                 header.IsLoan = objBusiness.IsLoan;
                 header.IsPayment = objBusiness.IsPayment;
 
-                //Seteamos campos de auditoria
-                header.CreatedBy = AC.LOCALHOSTME;
-                header.CreatedDate = DateTime.UtcNow;
+                ////Seteamos campos de auditoria
+                //header.CreatedBy = AC.LOCALHOSTME;
+                //header.CreatedDate = DateTime.UtcNow;
                 header.CreatedHostName = AC.LOCALHOSTPC;
                 header.CreatedIpv4 = AC.Ipv4Default;
 
@@ -3090,8 +3126,8 @@ public class QuotationController : Controller
                     }
 
                     header.InternalSerial = AC.InternalSerialOfficial;
-                    header.ClosedBy = AC.LOCALHOSTME;
-                    header.ClosedDate = DateTime.UtcNow;
+                    //header.ClosedBy = AC.LOCALHOSTME;
+                    //header.ClosedDate = DateTime.UtcNow;
                     header.ClosedHostName = AC.LOCALHOSTPC;
                     header.ClosedIpv4 = AC.Ipv4Default;
                 }

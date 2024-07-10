@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.DotNet.MSIdentity.Shared;
 using System.Text.Json;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
@@ -38,7 +39,6 @@ public class QuotationLegacyController : Controller
         _srvDetail = srvDetail;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
         _sessionToken = httpCtxAcc.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
-
     }
 
     [HttpGet]
@@ -96,7 +96,7 @@ public class QuotationLegacyController : Controller
             }
 
             var objBankAccountList = _uow.BankAccount.GetAll(filter: x =>
-                x.CompanyId == _companyId).ToList();
+                x.CompanyId == _companyId, includeProperties: "ParentTrx").ToList();
 
             if (objBankAccountList == null || objBankAccountList.Count == 0)
             {
@@ -203,11 +203,14 @@ public class QuotationLegacyController : Controller
                 if (quotation.TypeNumeral == SD.QuotationType.Transfer)
                 {
                     var objBankAccountSource =
-                        objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountSourceId);
+                        objBankAccountList
+                            .FirstOrDefault(x => 
+                                x.Code == quotationLegacy.BankAccountSourceCode &&
+                                x.ParentTrx.Code == quotationLegacy.BankSourceCode);
 
                     if (objBankAccountSource == null)
                     {
-                        TempData[AC.Error] = $"La cuenta bancaria origen: {quotationLegacy.BankAccountSourceId} no fue encontrada";
+                        TempData[AC.Error] = $"La cuenta bancaria origen: {quotationLegacy.BankAccountSourceCode} para el banco: {quotationLegacy.BankSourceCode} no fue encontrada";
                         return BadRequest();
                     }
 
@@ -215,11 +218,14 @@ public class QuotationLegacyController : Controller
                     quotation.BankAccountSourceTrx = objBankAccountSource;
 
                     var objBankAccountTarget =
-                        objBankAccountList.FirstOrDefault(x => x.Id == quotationLegacy.BankAccountTargetId);
+                        objBankAccountList
+                            .FirstOrDefault(x => 
+                                x.Code == quotationLegacy.BankAccountTargetCode &&
+                                x.ParentTrx.Code == quotationLegacy.BankTargetCode);
 
                     if (objBankAccountTarget == null)
                     {
-                        TempData[AC.Error] = $"La cuenta bancaria destino: {quotationLegacy.BankAccountTargetId} no fue encontrada";
+                        TempData[AC.Error] = $"La cuenta bancaria destino: {quotationLegacy.BankAccountTargetCode} para el banco: {quotationLegacy.BankTargetCode} no fue encontrada";
                         return BadRequest();
                     }
 
@@ -278,45 +284,98 @@ public class QuotationLegacyController : Controller
                 detail.AmountDetail = detailLegacy.AmountDetail;
                 detail.LineNumber = detailLegacy.DetailNumeral;
                 detail.QuotationDetailType = (SD.QuotationDetailType)detailLegacy.TypeDetail;
-                detail.CurrencyDetailId = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaId;
-                detail.CurrencyDetailTrx = objQuotationList.First(x => x.Id == detailLegacy.ParentId).CurrencyTransaTrx;
+
+                var objParent = objQuotationList.FirstOrDefault(x => x.Id == detailLegacy.ParentId);
+
+                if (objParent == null)
+                {
+                    TempData[AC.Error] = $"El padre: {detailLegacy.ParentId} no fue encontrado";
+                    return BadRequest();
+                }
+
+                detail.CurrencyDetailId = objParent.CurrencyTransaId;
+                detail.CurrencyDetailTrx = objParent.CurrencyTransaTrx;
                 detail.BankTransactionId = detailLegacy.TransactionRelateUId;
                 detail.JournalEntryId = detailLegacy.JournalEntryUId;
                 detail.JournalEntryTransferFeeId = detailLegacy.JournalEntryTransferFeeId;
                 detail.BankTransactionTransferFeeId = detailLegacy.BankTransactionTransferFeeId;
 
+                string bankSourceCode = detailLegacy.BankSourceCode.Split('-')[0];
+                string bankTargetCode = detailLegacy.BankTargetCode.Split('-')[0];
+
                 if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transfer)
                 {
                     if (detail.QuotationDetailType == SD.QuotationDetailType.CreditTransfer)
                     {
-                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                        var obj = objBankList.FirstOrDefault(x => x.Code == bankTargetCode);
+
+                        if (obj == null)
+                        {
+                            TempData[AC.Error] = $"El banco destino: {detailLegacy.BankTargetCode} no fue encontrado";
+                            return BadRequest();
+                        }
+
+                        detail.BankSourceId = obj.Id;
+                        detail.BankSourceTrx = obj;
+                        detail.BankTargetId = obj.Id;
+                        detail.BankTargetTrx = obj;
                     }
                     else
                     {
-                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
-                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
+                        var obj = objBankList.FirstOrDefault(x => x.Code == bankSourceCode);
+
+                        if (obj == null)
+                        {
+                            TempData[AC.Error] = $"El banco origen: {detailLegacy.BankSourceCode} no fue encontrado";
+                            return BadRequest();
+                        }
+
+                        detail.BankSourceId = obj.Id;
+                        detail.BankSourceTrx = obj;
+                        detail.BankTargetId = obj.Id;
+                        detail.BankTargetTrx = obj;
                     }
                 }
                 else
                 {
                     if (detail.QuotationDetailType == SD.QuotationDetailType.Deposit)
                     {
-                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
-                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                        var obj = objBankList.FirstOrDefault(x => x.Code == bankTargetCode);
+
+                        if (obj == null)
+                        {
+                            TempData[AC.Error] = $"El banco destino: {detailLegacy.BankTargetCode} no fue encontrado";
+                            return BadRequest();
+                        }
+
+                        detail.BankSourceId = obj.Id;
+                        detail.BankSourceTrx = obj;
+                        detail.BankTargetId = obj.Id;
+                        detail.BankTargetTrx = obj;
                     }
                     else
                     {
-                        detail.BankSourceId = objBankList.First(x => x.Code == detailLegacy.BankSourceCode).Id;
-                        detail.BankSourceTrx = objBankList.First(x => x.Code == detailLegacy.BankSourceCode);
-                        detail.BankTargetId = objBankList.First(x => x.Code == detailLegacy.BankTargetCode).Id;
-                        detail.BankTargetTrx = objBankList.First(x => x.Code == detailLegacy.BankTargetCode);
+                        var obj = objBankList.FirstOrDefault(x => x.Code == bankSourceCode);
+
+                        if (obj == null)
+                        {
+                            TempData[AC.Error] = $"El banco origen: {detailLegacy.BankSourceCode} no fue encontrado";
+                            return BadRequest();
+                        }
+
+                        detail.BankSourceId = obj.Id;
+                        detail.BankSourceTrx = obj;
+
+                         obj = objBankList.FirstOrDefault(x => x.Code == bankTargetCode);
+
+                        if (obj == null)
+                        {
+                            TempData[AC.Error] = $"El banco destino: {detailLegacy.BankTargetCode} no fue encontrado";
+                            return BadRequest();
+                        }
+
+                        detail.BankTargetId = obj.Id;
+                        detail.BankTargetTrx = obj;
                     }
                 }
 
@@ -327,7 +386,7 @@ public class QuotationLegacyController : Controller
         }
         catch (Exception ex)
         {
-            TempData[AC.Success] = ex.Message.ToString();
+            TempData[AC.Error] = ex.Message.ToString();
             return BadRequest();
         }
     }
@@ -350,8 +409,7 @@ public class QuotationLegacyController : Controller
                 worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-
-
+                
                 var headerRow = worksheet.Row(3);
                 headerRow.Style.Font.Bold = true;
                 headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
@@ -413,11 +471,10 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(5, 9).Value = "Cerrado";
                 worksheet.Cell(5, 10).Value = "Contabilizado";
                 worksheet.Cell(5, 11).Value = "Anulado";
-                worksheet.Cell(5, 12).Value = "Cerrado Por";
-                worksheet.Cell(5, 13).Value = "Cerrado El";
-                worksheet.Cell(5, 14).Value = "ReCerrado Por";
-                worksheet.Cell(5, 15).Value = "ReCerrado El";
-
+                worksheet.Cell(5, 13).Value = "Cerrado Por";
+                worksheet.Cell(5, 14).Value = "Cerrado El";
+                worksheet.Cell(5, 15).Value = "ReCerrado Por";
+                worksheet.Cell(5, 16).Value = "ReCerrado El";
 
                 worksheet.Cell(6, 1).Value = header.AmountTransaction;
                 worksheet.Cell(6, 1).Style.NumberFormat.Format = AC.XlsFormatNumeric;
@@ -435,12 +492,12 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(6, 9).Value = header.IsClosed ? "S" : "N";
                 worksheet.Cell(6, 10).Value = header.IsPosted ? "S" : "N";
                 worksheet.Cell(6, 11).Value = header.IsVoid ? "S" : "N";
-                worksheet.Cell(6, 12).Value = header.ClosedBy;
-                worksheet.Cell(6, 13).SetValue(header.ClosedDate);
-                worksheet.Cell(6, 13).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
-                worksheet.Cell(6, 14).Value = header.ReClosedBy;
-                worksheet.Cell(6, 15).SetValue(header.ReClosedDate);
-                worksheet.Cell(6, 15).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(6, 13).Value = header.ClosedBy;
+                worksheet.Cell(6, 14).SetValue(header.ClosedDate);
+                worksheet.Cell(6, 14).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(6, 15).Value = header.ReClosedBy;
+                worksheet.Cell(6, 16).SetValue(header.ReClosedDate);
+                worksheet.Cell(6, 16).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
 
                 worksheet.Cell(7, 1).Value = "#";
                 worksheet.Cell(7, 2).Value = "Banco Origen";
@@ -494,7 +551,6 @@ public class QuotationLegacyController : Controller
                 worksheet.Column(14).AdjustToContents();
                 worksheet.Column(15).AdjustToContents();
                 worksheet.Column(16).AdjustToContents();
-
             }
 
             using (MemoryStream stream = new MemoryStream())
@@ -506,8 +562,5 @@ public class QuotationLegacyController : Controller
             }
         }
     }
-
-
-
 }
 

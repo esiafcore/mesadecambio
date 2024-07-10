@@ -20,6 +20,9 @@ public class QuotationLegacyDto
     [JsonPropertyName("customerCode")]
     public string CustomerCode { get; set; } = string.Empty;
 
+    [JsonPropertyName("customerIdentificationNumber")]
+    public string CustomerIdentificationNumber { get; set; } = string.Empty;
+
     [JsonPropertyName("businessName")]
     public string BusinessName { get; set; } = string.Empty;
 
@@ -57,10 +60,22 @@ public class QuotationLegacyDto
     public decimal AmountTransferFee { get; set; } = 0M;
 
     [JsonPropertyName("bankAccountSourceId")]
-    public int BankAccountSourceId { get; set; } = 0;
+    public int? BankAccountSourceId { get; set; } = null;
+
+    [JsonPropertyName("bankAccountSourceCode")]
+    public string? BankAccountSourceCode { get; set; } = null;
+
+    [JsonPropertyName("bankSourceCode")]
+    public string? BankSourceCode { get; set; } = null;
 
     [JsonPropertyName("bankAccountTargetId")]
-    public int BankAccountTargetId { get; set; } = 0;
+    public int? BankAccountTargetId { get; set; } = null;
+
+    [JsonPropertyName("bankAccountTargetCode")]
+    public string? BankAccountTargetCode { get; set; } = null;
+
+    [JsonPropertyName("bankTargetCode")]
+    public string? BankTargetCode { get; set; } = null;
 
     [JsonPropertyName("businessExecutiveCode")]
     public string BusinessExecutiveCode { get; set; } = string.Empty;

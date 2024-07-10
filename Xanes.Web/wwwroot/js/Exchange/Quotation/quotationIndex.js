@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
 const fnPrintFormSubmit = async (event) => {
 
     try {
-        fntoggleLoading();
 
         let resultResponse = {
             isSuccess: true
@@ -50,7 +49,6 @@ const fnPrintFormSubmit = async (event) => {
         if (resultResponse.isSuccess) {
             formObject.submit();
         }
-        fntoggleLoading();
 
     } catch (error) {
         Swal.fire({
@@ -58,6 +56,8 @@ const fnPrintFormSubmit = async (event) => {
             text: error
         });
 
+    } finally {
+        fntoggleLoading();
     }
 }
 
@@ -65,39 +65,48 @@ const fnvalidateOperation = async (plainFormData) => {
     const resultResponse = {
         isSuccess: true
     };
-    fntoggleLoading();
-    // Validar que existan registros disponibles
-    const url = `${window.location.origin}/Exchange/SystemInformation/VerificationDataForOperation`;
-    const formDataJsonString = JSON.stringify(plainFormData);
-    let fetchOptions = {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: formDataJsonString
-    };
 
-    const response = await fetch(url, fetchOptions);
+    try {
 
-    fntoggleLoading();
+        // Validar que existan registros disponibles
+        const url = `${window.location.origin}/Exchange/SystemInformation/VerificationDataForOperation`;
+        const formDataJsonString = JSON.stringify(plainFormData);
+        let fetchOptions = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: formDataJsonString
+        };
 
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: errorMessage
-        });
-    } else {
-        let jsonResponse = await response.json();
-        if (!jsonResponse.isSuccess) {
-            fnShowModalMessages(jsonResponse);
-            resultResponse.isSuccess = false;
-            return resultResponse;
+        const response = await fetch(url, fetchOptions);
+
+
+        if (!response.ok) {
+            const errorMessage = await response.text();
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: errorMessage
+            });
+        } else {
+            let jsonResponse = await response.json();
+            if (!jsonResponse.isSuccess) {
+                fnShowModalMessages(jsonResponse);
+                resultResponse.isSuccess = false;
+                return resultResponse;
+            }
         }
+
+        return resultResponse;
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+
     }
-    return resultResponse;
 };
 
 // Función para ajustar las fechas según los criterios
