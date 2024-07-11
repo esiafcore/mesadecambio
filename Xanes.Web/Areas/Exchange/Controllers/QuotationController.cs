@@ -117,7 +117,8 @@ public class QuotationController : Controller
         }
 
         var objBusinessExecutiveList = _uow.BusinessExecutive
-            .GetAll(x => (x.CompanyId == _companyId))
+            .GetAll(x => (x.CompanyId == _companyId)
+            && (x.IsActive))
             .ToList();
 
         if (objBusinessExecutiveList == null || objBusinessExecutiveList.Count == 0)
@@ -1506,7 +1507,9 @@ public class QuotationController : Controller
         }
 
         jsonResponse.IsSuccess = true;
-        jsonResponse.Data = objList;
+        jsonResponse.Data = objList.OrderByDescending(x => x.CreatedDate)
+            .ThenBy(x => x.TypeNumeral)
+            .ThenByDescending(x => x.Numeral);
         return Json(jsonResponse);
     }
 
