@@ -8,14 +8,16 @@
 
         <div class="row col mt-1 d-flex justify-content-end g-1">
             <div class="col-6 col-sm-4 col-lg-3 col-xl-6">
-                <a asp-controller="Home" asp-action="Index" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Regresar"
+                <a asp-controller="Home" asp-action="Index" data-bs-toggle="tooltip"
+                   data-bs-trigger="hover" data-bs-title="Regresar"
                    class="btn-primary btn btn-sm form-control">
                     <i class="bi bi-arrow-return-left"></i> Regresar
                 </a>
             </div>
 
             <div class="col-6 col-sm-4 col-lg-3 col-xl-6">
-                <a onclick="fnExportExcel()" class="btn btn-success btn-sm form-control" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel">
+                <a onclick="fnExportExcel()" class="btn btn-success btn-sm form-control"
+                   data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel">
                     <i class="bi bi-arrow-up-square"></i> Export
                 </a>
             </div>
@@ -28,13 +30,17 @@
             Fecha Inicial
         </div>
         <div class="col-5 col-xl-4 mb-1">
-            <input asp-for="DateTransaInitial" type="date" id="dateInitial" class="form-control border p-1" />
+            <input asp-for="DateTransaInitial"
+                   type="date" id="dateInitial"
+                   class="form-control border p-1" />
         </div>
         <div class="col-4 col-xl-2 mb-1">
             Fecha Final
         </div>
         <div class="col-5 col-xl-4 mb-1">
-            <input asp-for="DateTransaFinal" type="date" id="dateFinal" class="form-control border p-1" />
+            <input asp-for="DateTransaFinal"
+                   type="date" id="dateFinal"
+                   class="form-control border p-1" />
         </div>
     </div>
 

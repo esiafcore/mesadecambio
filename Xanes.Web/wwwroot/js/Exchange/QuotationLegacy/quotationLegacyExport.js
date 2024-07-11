@@ -13,7 +13,7 @@ const fnExportExcel = async () => {
         dateInitial = inputDateInitial.value;
         dateFinal = inputDateFinal.value;
 
-        fntoggleLoading();
+        fntoggleLoading("Generando...");
 
         let url =
             `/exchange/quotationlegacy/exportexcel?dateInitial=${dateInitial}&dateFinal=${dateFinal}`;
