@@ -496,7 +496,9 @@ public class SystemInformationController : Controller
             // Obtener la cotización
             var transactionList = _uow.Quotation.GetAll(filter: x => x.CompanyId == _companyId && x.DateTransa >= reportData.DateTransaInitial &&
                                                                      x.DateTransa <= reportData.DateTransaFinal,
-                includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx").ToList();
+                includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
+                .OrderByDescending(x => x.Id)
+                .ToList();
 
             if (transactionList is null)
             {

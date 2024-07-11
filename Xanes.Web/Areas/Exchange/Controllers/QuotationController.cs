@@ -1507,9 +1507,7 @@ public class QuotationController : Controller
         }
 
         jsonResponse.IsSuccess = true;
-        jsonResponse.Data = objList.OrderByDescending(x => x.CreatedDate)
-            .ThenBy(x => x.TypeNumeral)
-            .ThenByDescending(x => x.Numeral);
+        jsonResponse.Data = objList.OrderByDescending(x => x.Id);
         return Json(jsonResponse);
     }
 

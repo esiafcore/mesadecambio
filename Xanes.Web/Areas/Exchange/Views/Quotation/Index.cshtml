@@ -7,10 +7,7 @@
         <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />
         <div class="card-header ms-0 py-1">
             <div class="row align-items-center">
-                <div class="col-7 text-center">
-                    <h3 class="text-black py-1">Transacciones</h3>
-                </div>
-                <div class="col-5 text-end">
+                <div class="col-4 text-start">
                     <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
                        data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fnredirectBtnIndex(event)" data-bs-placement="top" data-bs-title="Nuevo Cotización">
                         <i class="bi bi-plus-circle"></i> Nuevo
@@ -20,15 +17,13 @@
                             data-bs-placement="top" data-bs-title="Imprimir Operaciones">
                         <i class="bi bi-printer-fill"></i> Imprimir
                     </button>
-              @*       <a onclick="fnExportExcel()" class="btn btn-outline-warning bg-gradient border"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Exportar a Excel">
-                        <i class="bi bi-arrow-up-square"></i> Exportar
-                    </a>
-                    <a asp-controller="Quotation" asp-action="Import"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-title="Importar Excel" class="btn btn-outline-success bg-gradient border">
-                        <i class="bi bi-box-arrow-in-down"></i> Importar
-                    </a> *@
                 </div>
+                <div class="col-4 text-center">
+                    <h3 class="text-black py-1">Transacciones</h3>
+                </div>
+                <div class="col-4">
+                </div>
+
             </div>
         </div>
     </form>
