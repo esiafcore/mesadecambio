@@ -134,26 +134,31 @@ const fnAdjustmentFilterDataTable = () => {
         // El filtro ya existe, no es necesario volver a crearlo.
         return;
     }
+
+
+    // Elementos originales
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
-    let rowCen = document.createElement("div");
     let rowBtn = wrapper.querySelector(".col-md");
-
-    rowCen.className = "row col-xl-8 col-lg-9";
     let rowDer = wrapper.querySelector(".col-md-auto.ms-auto");
-    rowIzq.classList.remove('col-md-auto', 'me-auto');
-    //Clases para el elemento de numero de registros por pagina
-    rowIzq.classList.add('row', 'col-12', 'col-lg-2', 'text-center', 'mb-2');
-    rowDer.classList.remove('col-md-auto', 'ms-auto');
-    //Clases para el elemento de busqueda
-    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', "col-xl-2", "col-md-5");
 
-    let searchDiv = rowDer.querySelector(".dt-search")
+    // Crear nuevo contenedor central para el filtro
+    let rowCen = document.createElement("div");
+    rowCen.className = "row col-xl-8 col-lg-9";
+
+    // Ajustar clases para ocultar el elemento izquierdo
+    rowIzq.classList.remove('col-md-auto', 'me-auto');
+    rowIzq.classList.add('d-none');
+
+    // Ajustar clases para el elemento de búsqueda
+    rowDer.classList.remove('col-md-auto', 'ms-auto');
+    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', 'col-xl-3', 'col-md-5');
+
+    let searchDiv = rowDer.querySelector(".dt-search");
     searchDiv.classList.add('text-start');
 
-
-    rowBtn.classList.remove('col-md')
-    //Clases para los botones
-    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'text-md-end', 'text-xl-start')
+    // Ajustar clases para los botones
+    rowBtn.classList.remove('col-md');
+    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'text-md-end', 'text-xl-start');
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
@@ -163,11 +168,7 @@ const fnAdjustmentFilterDataTable = () => {
     if (dateInitial != undefined && dateFinal != undefined && includeVoid != undefined) {
         initialValue = dateInitial;
         finalValue = dateFinal;
-        if (includeVoid) {
-            includeVoidValue = "checked";
-        } else {
-            includeVoidValue = "";
-        }
+        includeVoidValue = includeVoid ? "checked" : "";
     } else {
         initialValue = processingDate;
         finalValue = processingDate;
@@ -175,46 +176,49 @@ const fnAdjustmentFilterDataTable = () => {
     }
 
     filterDate.innerHTML =
-        `  <div class="row gap-0 gap-xxl-4">
-                <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
-                    <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
-                        Fecha inicial:
-                    </div>
-                    <div class="col-7 col-sm-6 col-lg-6">
-                        <input type="date" id="dateInitial" value="${initialValue}">
-                    </div>
+        `<div class="row gap-0 gap-xxl-4">
+            <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
+                    Fecha inicial:
                 </div>
-                <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
-                    <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
-                        Fecha final:
-                    </div>
-                    <div class="col-7 col-sm-6 col-lg-6">
-                        <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
-                    </div>
+                <div class="col-7 col-sm-6 col-lg-6">
+                    <input type="date" id="dateInitial" value="${initialValue}">
                 </div>
-                 <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
-                     <div class="col-5 pe-0">
-                         Anulados
-                     </div>
-                     <div class="col-1 ps-0">
-                         <input type="checkbox" id="includeVoid" ${includeVoidValue}>
-                     </div>
-                       <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
-                        data-bs-placement="top" data-bs-title="Filtrar"
-                        class="btn btn-sm btn-secondary boder-outline col-5 ms-3 p-0" id="btnFilter">
-                            <i class="bi bi-funnel-fill"></i>  Filtrar
-                    </button>
-                 </div>
-            </div>`;
+            </div>
+            <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                <div class="col-5 col-sm-6 col-xl-5 col-xxl-6 pe-0">
+                    Fecha final:
+                </div>
+                <div class="col-7 col-sm-6 col-lg-6">
+                    <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
+                </div>
+            </div>
+            <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
+                <div class="col-5 pe-0">
+                    Anulados
+                </div>
+                <div class="col-1 ps-0">
+                    <input type="checkbox" id="includeVoid" ${includeVoidValue}>
+                </div>
+                <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                    data-bs-placement="top" data-bs-title="Filtrar"
+                    class="btn btn-sm btn-secondary boder-outline col-5 ms-3 p-0" id="btnFilter">
+                    <i class="bi bi-funnel-fill"></i> Filtrar
+                </button>
+            </div>
+        </div>`;
 
     rowCen.appendChild(filterDate);
+
+    // Insertar el nuevo contenedor central antes del elemento de búsqueda
     let container = rowIzq.parentElement;
     container.insertBefore(rowCen, rowDer);
 
     inputDateInitial = document.querySelector("#dateInitial");
     inputDateFinal = document.querySelector("#dateFinal");
     inputIncludeVoid = document.querySelector("#includeVoid");
-    //Ajustamos las fechas
+
+    // Ajustamos las fechas
     fnAdjustmentDates();
 
     inputDateInitial.addEventListener("change", () => {
@@ -733,6 +737,34 @@ const fnLoadDatatable = () => {
             }
         },
         "searching": true,
-        "select": selectOptions
+        "select": selectOptions,
+        "lengthMenu": [15],
+        //"paging": false,
+        "autoWidth": false,
+        "language": {
+            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+            infoFiltered: "(Filtrado de _MAX_ total de entradas)",
+            infoEmpty: "No hay datos para mostrar",
+            lengthMenu: "",
+            zeroRecords: "No se encontraron coincidencias",
+            processing: "Procesando...",
+            loadingRecords: "Cargando...",
+            emptyTable: "No hay datos disponibles en la tabla",
+            search: "Buscar",
+            select: {
+                cells: {
+                    "1": "1 celda seleccionada",
+                    "_": "%d celdas seleccionadas"
+                },
+                columns: {
+                    "1": "1 columna seleccionada",
+                    "_": "%d columnas seleccionadas"
+                },
+                rows: {
+                    "1": "1 fila seleccionada",
+                    "_": "%d filas seleccionadas"
+                }
+            }
+        }
     });
 }

@@ -64,6 +64,7 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
 
                 foreach (var detail in details)
                 {
+                    detail.Id = 0;
                     detail.ParentId = entity.Id;
                 }
                 await _db.Set<QuotationDetail>().AddRangeAsync(details);
