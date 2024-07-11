@@ -10,7 +10,7 @@
 const fnimportSubmit = async (event) => {
 
     try {
-        fntoggleLoading();
+        fntoggleLoading("Importando...");
 
         event.preventDefault();
         const formObject = event.currentTarget;

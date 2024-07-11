@@ -454,8 +454,8 @@ public class QuotationLegacyController : Controller
                 worksheet.Cell(4, 11).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
                 worksheet.Cell(4, 12).Value = "S";
                 worksheet.Cell(4, 13).Value = header.CreatedBy;
-                worksheet.Cell(4, 13).SetValue(header.CreatedDate);
-                worksheet.Cell(4, 13).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+                worksheet.Cell(4, 14).SetValue(header.CreatedDate);
+                worksheet.Cell(4, 14).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
                 worksheet.Cell(4, 15).Value = header.UpdatedBy;
                 worksheet.Cell(4, 16).SetValue(header.UpdatedDate);
                 worksheet.Cell(4, 16).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
