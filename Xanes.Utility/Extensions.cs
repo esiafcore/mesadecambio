@@ -14,4 +14,12 @@ public static class Extensions
         DateTime dateReturn = new DateTime(yearDate, monthDate, lastdayDate);
         return dateReturn;
     }
+
+    public static Decimal RoundTo(this Decimal d, Int32 decimals)
+    {
+        return decimal
+            .TryParse(d.ToString($"N{decimals}")
+                , out decimal anvalueReturn) ? anvalueReturn : d;
+    }
+
 }

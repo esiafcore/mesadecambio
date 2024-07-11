@@ -3295,7 +3295,7 @@ public class QuotationController : Controller
             foreach (var detail in detailDistinct)
             {
                 bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
             }
 
             // Remover la coma adicional al final, si es necesario
@@ -3309,6 +3309,9 @@ public class QuotationController : Controller
             decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa
                 : transaction.ExchangeRateSellTransa;
 
+            var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString() 
+                : tcExchange.RoundTo(_decimalExchangeFull).ToString();
+
             // Crear objeto para pasar datos de cabecera al reporte
             var dataHead = new QuotationReportVM()
             {
@@ -3316,8 +3319,8 @@ public class QuotationController : Controller
                 BankTargetFullName = bankTargets,
                 IsClosed = transaction.IsClosed,
                 CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
-                AmountTransaction = transaction.AmountTransaction,
-                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchange}",
+                AmountTransaction = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.AmountExchange : transaction.AmountTransaction,
+                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchangeString}",
                 NumberReferen = numberReferenTarget,
                 DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
             };
