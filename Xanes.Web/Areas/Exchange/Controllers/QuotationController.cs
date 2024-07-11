@@ -117,7 +117,8 @@ public class QuotationController : Controller
         }
 
         var objBusinessExecutiveList = _uow.BusinessExecutive
-            .GetAll(x => (x.CompanyId == _companyId))
+            .GetAll(x => (x.CompanyId == _companyId)
+            && (x.IsActive))
             .ToList();
 
         if (objBusinessExecutiveList == null || objBusinessExecutiveList.Count == 0)
@@ -172,7 +173,7 @@ public class QuotationController : Controller
             var objCustomer =
                  _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.DataModel.CustomerId));
             listCustomer.Add(objCustomer);
-            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
         }
 
         return View(model);
@@ -1200,7 +1201,7 @@ public class QuotationController : Controller
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.DataModel = new();
         model.DataModel.CompanyId = _companyId;
@@ -1210,7 +1211,7 @@ public class QuotationController : Controller
             var objCustomer =
                 _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.ModelCreateVM.DataModel.CustomerId));
             listCustomer.Add(objCustomer);
-            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
         }
 
         return View(model);
@@ -1401,7 +1402,7 @@ public class QuotationController : Controller
 
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
@@ -1434,7 +1435,7 @@ public class QuotationController : Controller
 
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
@@ -1506,7 +1507,7 @@ public class QuotationController : Controller
         }
 
         jsonResponse.IsSuccess = true;
-        jsonResponse.Data = objList;
+        jsonResponse.Data = objList.OrderByDescending(x => x.Id);
         return Json(jsonResponse);
     }
 
@@ -2084,7 +2085,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
             return Json(jsonResponse);
         }
         catch (Exception ex)
@@ -2114,7 +2115,7 @@ public class QuotationController : Controller
                 objCustomerList = _uow.Customer
                     .GetAll(filter: x => x.CompanyId == _companyId &&
                                          x.IsSystemRow == onlyCompanies &&
-                                         (x.CommercialName.Contains(search) ||
+                                         (x.BusinessName.Contains(search) ||
                                           x.IdentificationNumber.Contains(search) ||
                                           x.Code.Contains(search) ||
                                           x.AddressPrimary.Contains(search))).ToList();
@@ -2129,7 +2130,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
             return Json(jsonResponse);
         }
         catch (Exception ex)
@@ -3293,7 +3294,7 @@ public class QuotationController : Controller
             foreach (var detail in detailDistinct)
             {
                 bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
+                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
             }
 
             // Remover la coma adicional al final, si es necesario
@@ -3307,15 +3308,18 @@ public class QuotationController : Controller
             decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa
                 : transaction.ExchangeRateSellTransa;
 
+            var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString() 
+                : tcExchange.RoundTo(_decimalExchangeFull).ToString();
+
             // Crear objeto para pasar datos de cabecera al reporte
             var dataHead = new QuotationReportVM()
             {
-                CustomerFullName = transaction.CustomerTrx.CommercialName,
+                CustomerFullName = transaction.CustomerTrx.BusinessName,
                 BankTargetFullName = bankTargets,
                 IsClosed = transaction.IsClosed,
                 CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
-                AmountTransaction = transaction.AmountTransaction,
-                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchange}",
+                AmountTransaction = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.AmountExchange : transaction.AmountTransaction,
+                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchangeString}",
                 NumberReferen = numberReferenTarget,
                 DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
             };

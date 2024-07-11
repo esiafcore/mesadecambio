@@ -522,7 +522,7 @@ const fnLoadDatatable = () => {
                 , render: function (data, type, row) {
                     return `${row.typeTrx.code}-${row.numeral.toString().padStart(paddingLength, paddingChar)}`;
                 }
-                , orderable: false
+                , orderable: true
             },
             {
                 data: 'customerTrx.businessName', "width": "30%"
