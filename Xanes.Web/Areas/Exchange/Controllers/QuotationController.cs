@@ -173,7 +173,7 @@ public class QuotationController : Controller
             var objCustomer =
                  _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.DataModel.CustomerId));
             listCustomer.Add(objCustomer);
-            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
         }
 
         return View(model);
@@ -1201,7 +1201,7 @@ public class QuotationController : Controller
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.DataModel = new();
         model.DataModel.CompanyId = _companyId;
@@ -1211,7 +1211,7 @@ public class QuotationController : Controller
             var objCustomer =
                 _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.ModelCreateVM.DataModel.CustomerId));
             listCustomer.Add(objCustomer);
-            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
         }
 
         return View(model);
@@ -1402,7 +1402,7 @@ public class QuotationController : Controller
 
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
@@ -1435,7 +1435,7 @@ public class QuotationController : Controller
 
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
-        model.CustomerFullName = $"{objHeader.CustomerTrx.CommercialName}";
+        model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
@@ -2085,7 +2085,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
             return Json(jsonResponse);
         }
         catch (Exception ex)
@@ -2115,7 +2115,7 @@ public class QuotationController : Controller
                 objCustomerList = _uow.Customer
                     .GetAll(filter: x => x.CompanyId == _companyId &&
                                          x.IsSystemRow == onlyCompanies &&
-                                         (x.CommercialName.Contains(search) ||
+                                         (x.BusinessName.Contains(search) ||
                                           x.IdentificationNumber.Contains(search) ||
                                           x.Code.Contains(search) ||
                                           x.AddressPrimary.Contains(search))).ToList();
@@ -2130,7 +2130,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
             return Json(jsonResponse);
         }
         catch (Exception ex)
@@ -3315,7 +3315,7 @@ public class QuotationController : Controller
             // Crear objeto para pasar datos de cabecera al reporte
             var dataHead = new QuotationReportVM()
             {
-                CustomerFullName = transaction.CustomerTrx.CommercialName,
+                CustomerFullName = transaction.CustomerTrx.BusinessName,
                 BankTargetFullName = bankTargets,
                 IsClosed = transaction.IsClosed,
                 CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
