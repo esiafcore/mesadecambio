@@ -3164,8 +3164,7 @@ public class QuotationController : Controller
                     }
                 }
             }
-
-
+            
             await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
 
             jsonResponse.SuccessMessages = "Importación exitosamente";
