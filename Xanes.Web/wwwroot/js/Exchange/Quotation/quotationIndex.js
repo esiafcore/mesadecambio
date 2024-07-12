@@ -135,7 +135,6 @@ const fnAdjustmentFilterDataTable = () => {
         return;
     }
 
-
     // Elementos originales
     let rowIzq = wrapper.querySelector(".col-md-auto.me-auto");
     let rowBtn = wrapper.querySelector(".col-md");
@@ -151,19 +150,37 @@ const fnAdjustmentFilterDataTable = () => {
 
     // Ajustar clases para el elemento de búsqueda
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', 'col-xl-3', 'col-md-5');
+    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', 'col-xl-2', 'col-md-5');
 
     let searchDiv = rowDer.querySelector(".dt-search");
-    searchDiv.classList.add('text-start');
+    searchDiv.classList.add('text-start', 'row');
+
+    // Crear divs para el label y el input de búsqueda
+    let labelDiv = document.createElement('div');
+    labelDiv.classList.add('col-4');
+
+    let inputDiv = document.createElement('div');
+    inputDiv.classList.add('col-8');
+
+    // Modificar el input de búsqueda y su label
+    let searchLabel = rowDer.querySelector("label");
+    searchLabel.parentElement.replaceChild(labelDiv, searchLabel);
+    labelDiv.appendChild(searchLabel);
+
+    let searchInput = rowDer.querySelector("input");
+    searchInput.classList.add('w-100', 'form-control');
+    searchInput.parentElement.replaceChild(inputDiv, searchInput);
+    inputDiv.appendChild(searchInput);
+
 
     // Ajustar clases para los botones
     rowBtn.classList.remove('col-md');
-    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'text-md-end', 'text-xl-start');
+    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'col-xl-2', 'text-end');
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
     filterDate.className = 'dt-filtro-fecha';
-
+    filterDate.classList.add('dt-filtro-fecha', 'col-xl-8');
     let initialValue, finalValue, includeVoidValue;
     if (dateInitial != undefined && dateFinal != undefined && includeVoid != undefined) {
         initialValue = dateInitial;
@@ -208,11 +225,28 @@ const fnAdjustmentFilterDataTable = () => {
             </div>
         </div>`;
 
-    rowCen.appendChild(filterDate);
+    // Crear un contenedor para la búsqueda y el filtro
+    let searchAndFilterDiv = document.createElement('div');
+    searchAndFilterDiv.className = "row col-12";
 
-    // Insertar el nuevo contenedor central antes del elemento de búsqueda
-    let container = rowIzq.parentElement;
-    container.insertBefore(rowCen, rowDer);
+    // Mover el input de búsqueda al contenedor combinado
+    searchAndFilterDiv.appendChild(rowDer);
+
+    // Agregar el filtro de fecha al contenedor combinado
+    searchAndFilterDiv.appendChild(filterDate);
+
+    // Agregar los botones al contenedor combinado
+    searchAndFilterDiv.appendChild(rowBtn);
+
+    //// Insertar el contenedor combinado antes del contenedor de botones
+    //let container = rowIzq.parentElement;
+    //container.insertBefore(searchAndFilterDiv, rowBtn);
+
+
+    // Insertar el contenedor combinado antes del contenedor de botones
+    let container = wrapper.querySelector('.row'); // Obtener el contenedor principal
+    container.insertBefore(searchAndFilterDiv, container.firstChild); // Insertar al principio del contenedor principal
+
 
     inputDateInitial = document.querySelector("#dateInitial");
     inputDateFinal = document.querySelector("#dateFinal");
@@ -230,6 +264,7 @@ const fnAdjustmentFilterDataTable = () => {
 
     fnEnableTooltip();
 };
+
 
 const fnVoid = async (id) => {
 
@@ -738,8 +773,7 @@ const fnLoadDatatable = () => {
         },
         "searching": true,
         "select": selectOptions,
-        "lengthMenu": [15],
-        //"paging": false,
+        "lengthMenu": [10],
         "autoWidth": false,
         "language": {
             info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
