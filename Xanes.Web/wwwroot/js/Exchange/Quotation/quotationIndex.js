@@ -561,7 +561,7 @@ const fnLoadDatatable = () => {
             },
             {
                 data: 'customerTrx.businessName', "width": "30%"
-                , render: DataTable.render.ellipsis(28, false)
+                , render: DataTable.render.ellipsis(34, false)
                 , orderable: true
             },
             {

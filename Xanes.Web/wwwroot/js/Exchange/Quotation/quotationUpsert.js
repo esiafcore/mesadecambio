@@ -69,6 +69,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     isClosedElement = document.querySelector("#isClosedElement").value;
     $(selectBusinessExecutive).select2(select2Options);
 
+    //Establecer ejecutivo por defecto
+    $(selectBusinessExecutive).val(executiveIdByDefault).trigger('change');
     var selectedOptionActive = $(selectBusinessExecutive).find(':selected');
 
     if (selectedOptionActive[0].dataset.loan === "True" || selectedOptionActive[0].dataset.payment === "True") {

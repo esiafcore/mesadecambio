@@ -126,6 +126,8 @@ public class QuotationController : Controller
             TempData[AC.Error] = $"Ejecutivo no encontrado";
             return RedirectToAction(nameof(Index));
         }
+        //Ejecutivo por defecto
+        ViewBag.BusinessExecutiveIdByDefault = JsonSerializer.Serialize(objBusinessExecutiveList.FirstOrDefault(x => x.IsDefault)!.Id);
 
         if (id == 0)
         {
