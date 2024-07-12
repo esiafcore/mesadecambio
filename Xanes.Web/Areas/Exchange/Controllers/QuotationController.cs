@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
-using System.Text.Json;
 using Xanes.Models;
 using Xanes.Models.Shared;
 using Xanes.Models.ViewModels;
@@ -13,6 +12,7 @@ using Stimulsoft.Report.Mvc;
 using static Xanes.Utility.SD;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -57,10 +57,10 @@ public class QuotationController : Controller
     {
         string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
         DateOnly dateFilter = DateOnly.Parse(processingDateString);
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
-        ViewBag.ProcessingDate = JsonSerializer.Serialize(dateFilter.ToString(AC.DefaultDateFormatWeb));
-        ViewBag.IsNewEntry = JsonSerializer.Serialize(true);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
+        ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
+        ViewBag.IsNewEntry = JsonConvert.SerializeObject(true);
         TransactionReportVM modelVM = new();
         ViewData[AC.Title] = "Listado de Transacciones";
         return View(modelVM);
@@ -68,8 +68,8 @@ public class QuotationController : Controller
 
     public IActionResult Upsert(int id = 0)
     {
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
         QuotationCreateVM model = new();
         Quotation objData = new();
@@ -127,7 +127,7 @@ public class QuotationController : Controller
             return RedirectToAction(nameof(Index));
         }
         //Ejecutivo por defecto
-        ViewBag.BusinessExecutiveIdByDefault = JsonSerializer.Serialize(objBusinessExecutiveList.FirstOrDefault(x => x.IsDefault)!.Id);
+        ViewBag.BusinessExecutiveIdByDefault = JsonConvert.SerializeObject(objBusinessExecutiveList.FirstOrDefault(x => x.IsDefault)!.Id);
 
         if (id == 0)
         {
@@ -319,8 +319,8 @@ public class QuotationController : Controller
 
     //        if (!ModelState.IsValid)
     //        {
-    //            ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-    //            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+    //            ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+    //            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
     //            objCurrencyList = _uow.Currency
     //               .GetAll(x => (x.CompanyId == _companyId))
@@ -1127,9 +1127,9 @@ public class QuotationController : Controller
         ViewData[AC.Title] = "Dellate - Cotización";
         List<Models.Customer>? listCustomer = new();
         QuotationDetailVM model = new();
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.VariationMaxDeposit = JsonSerializer.Serialize(_variationMaxDeposit);
-        ViewBag.DecimalExchangeFull = JsonSerializer.Serialize(_decimalExchangeFull);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.VariationMaxDeposit = JsonConvert.SerializeObject(_variationMaxDeposit);
+        ViewBag.DecimalExchangeFull = JsonConvert.SerializeObject(_decimalExchangeFull);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
@@ -1140,11 +1140,11 @@ public class QuotationController : Controller
 
         if (objHeader.IsAdjustment)
         {
-            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchangeFull);
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchangeFull);
         }
         else
         {
-            ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         }
 
 
@@ -1383,8 +1383,8 @@ public class QuotationController : Controller
         ViewData[AC.Title] = "Eliminar - Cotización";
 
         QuotationDetailVM model = new();
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
@@ -1416,8 +1416,8 @@ public class QuotationController : Controller
         ViewData[AC.Title] = "Visualizar - Cotización";
 
         QuotationDetailVM model = new();
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
@@ -1450,7 +1450,7 @@ public class QuotationController : Controller
         string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
         DateOnly processingDate = DateOnly.Parse(processingDateString);
         model.ProcessingDate = processingDate;
-        ViewData[AC.DefaultDateCurrent] = JsonSerializer.Serialize(model.ProcessingDate.ToString(AC.DefaultDateFormatWeb));
+        ViewData[AC.DefaultDateCurrent] = JsonConvert.SerializeObject(model.ProcessingDate.ToString(AC.DefaultDateFormatWeb));
         return View(model);
     }
 
@@ -3208,7 +3208,7 @@ public class QuotationController : Controller
 
             // Cargar objetos ya deserialiozados
             if (datRepJson != null)
-                report.RegBusinessObject(AC.DatRep, JsonSerializer.Deserialize<QuotationReportVM>(datRepJson));
+                report.RegBusinessObject(AC.DatRep, JsonConvert.DeserializeObject<QuotationReportVM>(datRepJson));
 
             return StiNetCoreViewer.GetReportResult(this, report);
         }
@@ -3343,7 +3343,7 @@ public class QuotationController : Controller
             // Reporte 
             HttpContext.Session.SetString(AC.ObjectReportData, reportResult.SaveToJsonString());
             // Objeros de negocio
-            HttpContext.Session.SetString(AC.DatRep, JsonSerializer.Serialize(dataHead));
+            HttpContext.Session.SetString(AC.DatRep, JsonConvert.SerializeObject(dataHead));
 
             jsonResponse.IsSuccess = true;
             jsonResponse.Data = new

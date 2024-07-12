@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text.Json;
+using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
@@ -49,12 +49,8 @@ public class AuthController : Controller
         {
             var apiResponse = await _srv.LoginAsync(obj);
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
 
-            var model = JsonSerializer.Deserialize<RespuestaAutenticacionDto>(apiResponse, options)!;
+            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(apiResponse)!;
             if (model != null)
             {
                 var handler = new JwtSecurityTokenHandler();
@@ -107,12 +103,7 @@ public class AuthController : Controller
         {
             var apiResponse = await _srv.RegisterAsync(obj);
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            var model = JsonSerializer.Deserialize<RespuestaAutenticacionDto>(apiResponse, options)!;
+            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(apiResponse)!;
 
             if (model != null)
             {

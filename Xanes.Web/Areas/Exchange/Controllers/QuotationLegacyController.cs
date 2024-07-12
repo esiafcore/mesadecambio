@@ -1,8 +1,6 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.MSIdentity.Shared;
-using System.Text.Json;
-using DocumentFormat.OpenXml.Office2010.Excel;
+using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
@@ -65,12 +63,7 @@ public class QuotationLegacyController : Controller
 
             apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            var objLegacyList = JsonSerializer.Deserialize<List<QuotationLegacyDto>>(apiResponse, options)!;
+            var objLegacyList = JsonConvert.DeserializeObject<List<QuotationLegacyDto>>(apiResponse)!;
 
             if (objLegacyList == null || objLegacyList.Count == 0)
             {
@@ -273,7 +266,7 @@ public class QuotationLegacyController : Controller
 
             apiResponse = await _srvDetail.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
-            var objDetailLegacyList = JsonSerializer.Deserialize<List<QuotationDetailLegacyDto>>(apiResponse, options)!;
+            var objDetailLegacyList = JsonConvert.DeserializeObject<List<QuotationDetailLegacyDto>>(apiResponse)!;
 
             foreach (var detailLegacy in objDetailLegacyList)
             {

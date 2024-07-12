@@ -2,7 +2,7 @@
 using Stimulsoft.Report;
 using Stimulsoft.Report.Mvc;
 using System.Text;
-using System.Text.Json;
+using Newtonsoft.Json;
 using static Xanes.Utility.SD;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Utility;
@@ -83,7 +83,7 @@ public class SystemInformationController : Controller
     {
         // Guardar datos en el contexto
         // Serializar el objeto FiltersReportDto a JSON
-        var reportDtoJson = JsonSerializer.Serialize(reportDataVm);
+        var reportDtoJson = JsonConvert.SerializeObject(reportDataVm);
         HttpContext.Session.SetString(AC.FilterReportData, reportDtoJson);
         HttpContext.Session.SetInt32(AC.ReportDataType, (short)reportTypeParam);
 
@@ -121,7 +121,7 @@ public class SystemInformationController : Controller
                 return Content($"{AC.ReportDataErrorLoad}");
             }
 
-            var reportDataVmTrans = JsonSerializer.Deserialize<TransactionReportVM>(reportDataVmJson);
+            var reportDataVmTrans = JsonConvert.DeserializeObject<TransactionReportVM>(reportDataVmJson);
 
             switch (reportType)
             {
@@ -207,7 +207,7 @@ public class SystemInformationController : Controller
         {
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
-        var reportDataList = JsonSerializer.Deserialize<List<TransaODTVM>>(reportDataListJson);
+        var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
@@ -275,7 +275,7 @@ public class SystemInformationController : Controller
         {
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
-        var reportDataList = JsonSerializer.Deserialize<List<TransaODTVM>>(reportDataListJson);
+        var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
@@ -334,7 +334,7 @@ public class SystemInformationController : Controller
         {
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
-        var reportDataList = JsonSerializer.Deserialize<List<TransaODTVM>>(reportDataListJson);
+        var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
 
@@ -560,7 +560,7 @@ public class SystemInformationController : Controller
             }
 
             // Guardar los datos en el contexto
-            var reportListData = JsonSerializer.Serialize(transaListVM);
+            var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
             HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
             HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
@@ -654,7 +654,7 @@ public class SystemInformationController : Controller
             }
 
             // Guardar los datos en el contexto
-            var reportListData = JsonSerializer.Serialize(transaListVM);
+            var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
             HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
             HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
@@ -751,7 +751,7 @@ public class SystemInformationController : Controller
             }
 
             // Guardar los datos en el contexto
-            var reportListData = JsonSerializer.Serialize(transaListVM);
+            var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
             HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
             HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());

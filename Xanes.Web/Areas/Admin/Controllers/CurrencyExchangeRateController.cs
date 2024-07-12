@@ -5,9 +5,9 @@ using Xanes.Models.ViewModels;
 using Xanes.Models;
 using Xanes.Utility;
 using Xanes.Models.Shared;
-using System.Text.Json;
 using System.Text;
 using ClosedXML.Excel;
+using Newtonsoft.Json;
 
 
 namespace Xanes.Web.Areas.Admin.Controllers;
@@ -32,8 +32,8 @@ public class CurrencyExchangeRateController : Controller
     {
         ViewData[AC.Title] = "Tipos de Cambios";
 
-        ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
-        ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
+        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var currencyList = _uow.Currency
             .GetAll(filter: x => (x.CompanyId == _companyId)

@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text;
+using Newtonsoft.Json;
 using Xanes.Models.Shared;
 using Xanes.Utility;
-using System.Text.Json;
 
 
 namespace Xanes.DataAccess.ServicesApi;
@@ -72,7 +72,7 @@ public class BaseService : IBaseService
             {
                 if (apiRequest.Data != null)
                 {
-                    message.Content = new StringContent(JsonSerializer.Serialize(apiRequest.Data),
+                    message.Content = new StringContent(JsonConvert.SerializeObject(apiRequest.Data),
                         Encoding.UTF8, "application/json");
                 }
             }
@@ -90,7 +90,7 @@ public class BaseService : IBaseService
             apiResponse = await client.SendAsync(message);
             if (pagination != null)
             {
-                var paginationHeader = JsonSerializer.Deserialize<Pagination>(apiResponse.Headers.GetValues(AC.PaginationHeaderName).First());
+                var paginationHeader = JsonConvert.DeserializeObject<Pagination>(apiResponse.Headers.GetValues(AC.PaginationHeaderName).First());
                 pagination.pageNumber = paginationHeader.pageNumber;
                 pagination.totalPages = paginationHeader.totalPages;
                 pagination.totalCount = paginationHeader.totalCount;
@@ -106,7 +106,7 @@ public class BaseService : IBaseService
                 //{
                 //    ApiResponse.statusCode = System.Net.HttpStatusCode.BadRequest;
                 //    ApiResponse.isSuccess = false;
-                //    var res = JsonSerializer.Serialize(ApiResponse);
+                //    var res = JsonConvert.SerializeObject(ApiResponse);
                 //    return res;
                 //}
             }
@@ -124,7 +124,7 @@ public class BaseService : IBaseService
                 errorMessages = new List<string> { Convert.ToString(e.Message) },
                 isSuccess = false
             };
-            var res = JsonSerializer.Serialize(dto);
+            var res = JsonConvert.SerializeObject(dto);
             return res;
         }
         catch (Exception e)
@@ -134,7 +134,7 @@ public class BaseService : IBaseService
                 errorMessages = new List<string> { Convert.ToString(e.Message) },
                 isSuccess = false
             };
-            var res = JsonSerializer.Serialize(dto);
+            var res = JsonConvert.SerializeObject(dto);
             return res;
         }
     }

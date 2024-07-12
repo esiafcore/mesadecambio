@@ -1,7 +1,7 @@
 ﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
@@ -42,12 +42,8 @@ public class CustomerLegacyController : Controller
     {
         var apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1);
 
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
 
-        var objList = JsonSerializer.Deserialize<List<CustomerLegacyDto>>(apiResponse, options)!;
+        var objList = JsonConvert.DeserializeObject<List<CustomerLegacyDto>>(apiResponse)!;
         var objCustomerList = new List<Models.Customer>();
 
         var objTypeList = _uow.PersonType.GetAll(filter: x =>
