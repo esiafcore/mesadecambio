@@ -394,13 +394,24 @@ public class CurrencyExchangeRateController : Controller
 
         if (objList == null || objList.Count == 0)
         {
-            return NoContent();
+            TempData[AC.Error] = $"Tipos de cambio no encontrados";
+            return RedirectToAction(nameof(Index));
         }
 
-        return GenerarExcel("TiposDeCambio.xlsx", objList);
+        var objCurrencyList = _uow.Currency
+            .GetAll(filter: x => (x.CompanyId == _companyId))
+            .ToList();
+
+        if (objCurrencyList == null || objCurrencyList.Count == 0)
+        {
+            TempData[AC.Error] = $"Monedas no encontrada";
+            return RedirectToAction(nameof(Index));
+        }
+
+        return GenerarExcel("TiposDeCambio.xlsx", objList, objCurrencyList);
     }
 
-    private FileResult GenerarExcel(string nombreArchivo, List<Models.CurrencyExchangeRate> listEntities)
+    private FileResult GenerarExcel(string nombreArchivo, List<Models.CurrencyExchangeRate> listEntities, List<Models.Currency> listCurrencies)
     {
         using (XLWorkbook wb = new XLWorkbook())
         {
@@ -433,7 +444,7 @@ public class CurrencyExchangeRateController : Controller
             int rowNum = 5;
             foreach (var item in listEntities)
             {
-                worksheet.Cell(rowNum, 1).Value = (short)item.CurrencyType;
+                worksheet.Cell(rowNum, 1).Value = item.CurrencyTrx.CodeIso;
                 worksheet.Cell(rowNum, 2).SetValue(item.DateTransa.ToDateTimeConvert());
                 worksheet.Cell(rowNum, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
                 worksheet.Cell(rowNum, 3).Value = item.OfficialRate;
@@ -521,18 +532,16 @@ public class CurrencyExchangeRateController : Controller
                 }
                 else
                 {
-                    int currencyType = int.Parse(currency);
+                    var objCurrency = objCurrencyList.FirstOrDefault(x => x.CodeIso == currency);
 
-                    if (Enum.IsDefined(typeof(SD.CurrencyType), currencyType))
+                    if (objCurrency is not null)
                     {
-                        obj.CurrencyId = objCurrencyList
-                            .First(x => x.Numeral == currencyType).Id;
-
-                        obj.CurrencyType = (SD.CurrencyType)currencyType;
+                        obj.CurrencyId = objCurrency.Id;
+                        obj.CurrencyType = (SD.CurrencyType)objCurrency.Numeral;
                     }
                     else
                     {
-                        ErrorListMessages.Add($"La moneda  es invalida. Fila:{i}. |");
+                        ErrorListMessages.Add($"La moneda: {currency} es invalida. Fila:{i}. |");
                     }
                 }
 
