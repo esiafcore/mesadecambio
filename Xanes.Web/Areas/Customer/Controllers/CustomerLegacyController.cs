@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Xanes.DataAccess.Repository.IRepository;
@@ -11,6 +12,8 @@ using Xanes.Utility;
 namespace Xanes.Web.Areas.Customer.Controllers;
 
 [Area("Customer")]
+[Authorize()]
+
 public class CustomerLegacyController : Controller
 {
     private readonly ICustomerLegacyService _srv;
