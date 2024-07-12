@@ -44,8 +44,8 @@ public class QuotationController : Controller
         _variationMaxDeposit = _configuration.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
         _hostEnvironment = hostEnvironment;
         _parametersReport = new();
-        var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
-        // Verificar si el archivo existe
+
+        var path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
         FileInfo file = new FileInfo(path);
         if (file.Exists)
         {
@@ -65,12 +65,12 @@ public class QuotationController : Controller
 
         if (changeProcessingDateString is not null)
         {
-            ViewBag.ChangeProcessingDate = JsonSerializer.Serialize(true);
+            ViewBag.ChangeProcessingDate = JsonConvert.SerializeObject(true);
             HttpContext.Session.Remove(AC.ChangeProcessingDate);
         }
         else
         {
-            ViewBag.ChangeProcessingDate = JsonSerializer.Serialize(false);
+            ViewBag.ChangeProcessingDate = JsonConvert.SerializeObject(false);
         }
 
         DateOnly dateFilter = DateOnly.Parse(processingDateString);
