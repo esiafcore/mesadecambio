@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
 using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
 [Area("Customer")]
+[Authorize()]
+
 public class CustomerSectorController : Controller
 {
     private readonly IUnitOfWork _uow;
