@@ -13,11 +13,12 @@
                     <div class="card-header text-center border-info border-2">
                         <h2 class="text-info">Mesa de Cambio - XanesN8</h2>
                         <hr class="p-0 m-0 mb-0 border-2 border-primary" />
-                        <h2 class="m-0">Register</h2>
+                        <h2 class="m-0">Nuevo Usuario</h2>
                     </div>
                     <div class="card-body">
                         <input asp-for="Email" type="text" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Email..." required />
-                        <input asp-for="Password" type="password" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Password..." required />
+                        <input asp-for="Password" type="password" id="password" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Password..." required />
+                        <input asp-for="Password" type="password" id="confirmPassword" class="form-control p-1 border border-primary border-opacity-25 mb-3" placeholder="Confirmar..." required />
                         <div class="d-grid gap-2 mb-3">
                             <button type="submit" class="form-control col-sm-6 btn btn-info" value="Submit"><i class="bi bi-person-check"></i> Registrar</button>
                         </div>
@@ -29,6 +30,6 @@
 </form>
 
 @section Scripts {
-    <script src="~/js/Auth/Auth/login.js"></script>
+    <script src="~/js/Auth/Auth/register.js"></script>
     <partial name="_ValidationScriptsPartial" />
 }

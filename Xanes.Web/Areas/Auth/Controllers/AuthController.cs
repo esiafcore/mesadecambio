@@ -114,13 +114,15 @@ public class AuthController : Controller
 
             var model = JsonSerializer.Deserialize<RespuestaAutenticacionDto>(apiResponse, options)!;
 
-            if (model == null)
+            if (model != null)
             {
+                TempData[AC.Success] = "Usuario creado exitosamente";
                 return RedirectToAction("Login");
             }
             else
             {
-                return View();
+                TempData[AC.Error] = "Error al crear el usuario";
+                return RedirectToAction("Register");
             }
         }
         catch (Exception e)

@@ -4,6 +4,8 @@ let dateFinalReport = document.querySelector("#dateFinalReport");
 let dateInitialReport = document.querySelector("#dateInitialReport");
 let inputIncludeVoid, includeVoid;
 let searchValue;
+let btnFilter;
+let clean = false;
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
@@ -27,6 +29,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+const fnCleanFilter = () => {
+    btnFilter = document.querySelector("#btnFilter");
+
+    initialValue = processingDate;
+    finalValue = processingDate;
+    includeVoidValue = "";
+    clean = true;
+    btnFilter.click();
+}
+
 
 const fnPrintFormSubmit = async (event) => {
 
@@ -150,20 +163,21 @@ const fnAdjustmentFilterDataTable = () => {
 
     // Ajustar clases para el elemento de búsqueda
     rowDer.classList.remove('col-md-auto', 'ms-auto');
-    rowDer.classList.add('row', 'col-sm-8', 'col-6', 'col-lg-4', 'col-xl-2', 'col-md-5');
+    rowDer.classList.add('row', 'col-sm-8', 'col-12', 'col-lg-8', 'col-xl-2', 'mb-1', 'pe-xl-0');
 
     let searchDiv = rowDer.querySelector(".dt-search");
     searchDiv.classList.add('text-start', 'row');
 
     // Crear divs para el label y el input de búsqueda
     let labelDiv = document.createElement('div');
-    labelDiv.classList.add('col-4');
+    labelDiv.classList.add('col-4', 'col-sm-5', 'col-md-4');
 
     let inputDiv = document.createElement('div');
-    inputDiv.classList.add('col-8');
+    inputDiv.classList.add('col-xl-8', 'col-6', 'col-lg-5', 'ps-0', 'ps-md-2');
 
     // Modificar el input de búsqueda y su label
     let searchLabel = rowDer.querySelector("label");
+    searchLabel.classList.add('ms-3', 'ms-xl-0')
     searchLabel.parentElement.replaceChild(labelDiv, searchLabel);
     labelDiv.appendChild(searchLabel);
 
@@ -172,15 +186,14 @@ const fnAdjustmentFilterDataTable = () => {
     searchInput.parentElement.replaceChild(inputDiv, searchInput);
     inputDiv.appendChild(searchInput);
 
-
     // Ajustar clases para los botones
     rowBtn.classList.remove('col-md');
-    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'col-xl-2', 'text-end');
+    rowBtn.classList.add('col-6', 'col-sm-4', 'col-md-6', 'col-xl-2', 'text-xl-end', 'px-xl-0');
 
     // Crear los elementos del filtro de fecha y botón de búsqueda
     let filterDate = document.createElement('div');
-    filterDate.className = 'dt-filtro-fecha';
-    filterDate.classList.add('dt-filtro-fecha', 'col-xl-8');
+    //filterDate.className = 'dt-filtro-fecha';
+    filterDate.classList.add('dt-filtro-fecha', 'col-xl-8', 'px-xl-0');
     let initialValue, finalValue, includeVoidValue;
     if (dateInitial != undefined && dateFinal != undefined && includeVoid != undefined) {
         initialValue = dateInitial;
@@ -210,16 +223,16 @@ const fnAdjustmentFilterDataTable = () => {
                     <input type="date" id="dateFinal" value="${finalValue}" min="${initialValue}">
                 </div>
             </div>
-            <div class="row col-6 m-0 col-md-5 col-xl-4 col-xxl-3 mb-1">
-                <div class="col-5 pe-0">
+            <div class="row col-12 m-0 col-xl-4 col-xxl-3 mb-1">
+                <div class="col-4 col-sm-3 col-md-2 col-xl-4 me-md-5 me-xl-0 pe-0">
                     Anulados
                 </div>
-                <div class="col-1 ps-0">
+                <div class="col-1 ps-0 ms-lg-2">
                     <input type="checkbox" id="includeVoid" ${includeVoidValue}>
                 </div>
                 <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
                     data-bs-placement="top" data-bs-title="Filtrar"
-                    class="btn btn-sm btn-secondary boder-outline col-5 ms-3 p-0" id="btnFilter">
+                    class="btn btn-sm btn-secondary boder-outline col-4 col-sm-3 col-md-2 col-xl-4 ms-3 p-0" id="btnFilter">
                     <i class="bi bi-funnel-fill"></i> Filtrar
                 </button>
             </div>
@@ -264,7 +277,6 @@ const fnAdjustmentFilterDataTable = () => {
 
     fnEnableTooltip();
 };
-
 
 const fnVoid = async (id) => {
 
@@ -475,10 +487,16 @@ const fnSetSearchValue = (value) => {
 
 const fnLoadDatatable = () => {
 
-    let tooltipInstance = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
-    if (tooltipInstance) {
-        tooltipInstance.hide();
-        tooltipInstance.dispose();
+    let tooltipInstanceFilter = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
+    if (tooltipInstanceFilter) {
+        tooltipInstanceFilter.hide();
+        tooltipInstanceFilter.dispose();
+    }
+
+    let tooltipInstanceClean = bootstrap.Tooltip.getInstance(document.getElementById('btnClean'));
+    if (tooltipInstanceClean) {
+        tooltipInstanceClean.hide();
+        tooltipInstanceClean.dispose();
     }
 
     let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));
@@ -502,7 +520,7 @@ const fnLoadDatatable = () => {
             }
         }
     } else {
-        if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
+        if ((inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) && clean == false) {
             dateInitial = inputDateInitial.value;
             dateFinal = inputDateFinal.value;
             includeVoid = inputIncludeVoid.checked;
