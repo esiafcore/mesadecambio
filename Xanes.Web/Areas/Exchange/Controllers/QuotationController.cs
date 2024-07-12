@@ -55,7 +55,24 @@ public class QuotationController : Controller
 
     public IActionResult Index()
     {
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
+        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
+        string changeProcessingDateString = HttpContext.Session.GetString(AC.ChangeProcessingDate);
+
+        if (processingDateString is null)
+        {
+            processingDateString = DateOnly.FromDateTime(DateTime.Now).ToString();
+        }
+
+        if (changeProcessingDateString is not null)
+        {
+            ViewBag.ChangeProcessingDate = JsonSerializer.Serialize(true);
+            HttpContext.Session.Remove(AC.ChangeProcessingDate);
+        }
+        else
+        {
+            ViewBag.ChangeProcessingDate = JsonSerializer.Serialize(false);
+        }
+
         DateOnly dateFilter = DateOnly.Parse(processingDateString);
         ViewBag.DecimalTransa = JsonSerializer.Serialize(_decimalTransa);
         ViewBag.DecimalExchange = JsonSerializer.Serialize(_decimalExchange);
@@ -1463,6 +1480,7 @@ public class QuotationController : Controller
             if (processingDate != null)
             {
                 HttpContext.Session.SetString(AC.ProcessingDate, processingDate.Value.ToString());
+                HttpContext.Session.SetString(AC.ChangeProcessingDate, true.ToString());
             }
             else
             {
