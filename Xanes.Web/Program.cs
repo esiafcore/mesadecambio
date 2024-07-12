@@ -36,11 +36,12 @@ builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
 
 //Configurar la Autenticación
 builder.Services.AddDistributedMemoryCache();
-//builder.Services.ConfigureApplicationCookie(options => {
-//    options.Cookie.Name = "AspNetCore.Identity.Application";
-//    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-//    options.SlidingExpiration = true;
-//});
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "AspNetCore.Session";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
 
 //Configurar la Autenticación
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

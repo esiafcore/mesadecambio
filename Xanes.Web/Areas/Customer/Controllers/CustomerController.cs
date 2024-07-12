@@ -893,6 +893,7 @@ public class CustomerController : Controller
         }
     }
 
+    [Authorize()]
     public JsonResult GetAll()
     {
         JsonResultResponse? jsonResponse = new();
