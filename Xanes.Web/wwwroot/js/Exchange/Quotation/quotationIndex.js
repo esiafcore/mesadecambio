@@ -528,6 +528,7 @@ const fnLoadDatatable = () => {
             dateInitial = processingDate;
             dateFinal = processingDate;
             includeVoid = false;
+            clean = false
         }
     }
 
