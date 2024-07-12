@@ -39,6 +39,8 @@ public static class AC
     public const string Ipv4Default = "127.0.0.1";
 
     public const string ProcessingDate = "ProcessingDate";
+    public const string ChangeProcessingDate = "ChangeProcessingDate";
+
 
     public static char CharDefaultEmpty = '0';
     public static short RepeatCharTimes = 5;

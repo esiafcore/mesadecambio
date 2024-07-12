@@ -503,11 +503,16 @@ const fnLoadDatatable = () => {
 
     if (isNewEntry) {
         isNewEntry = false;
-
         if (sessionObjFilter) {
-            dateInitial = sessionObjFilter.dateInitial;
-            dateFinal = sessionObjFilter.dateFinal;
-            includeVoid = sessionObjFilter.includeVoid;
+            if (changeProcessingDate) {
+                dateInitial = processingDate;
+                dateFinal = processingDate;
+                includeVoid = false;
+            } else {
+                dateInitial = sessionObjFilter.dateInitial;
+                dateFinal = sessionObjFilter.dateFinal;
+                includeVoid = sessionObjFilter.includeVoid;
+            }
         } else {
             if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
                 dateInitial = inputDateInitial.value;
@@ -528,7 +533,7 @@ const fnLoadDatatable = () => {
             dateInitial = processingDate;
             dateFinal = processingDate;
             includeVoid = false;
-            clean = false
+            clean = false;
         }
     }
 
