@@ -13,22 +13,26 @@ document.addEventListener("DOMContentLoaded", function () {
     //Habilitar Tooltip
     fnEnableTooltip();
 
-    //// Crear los elementos del filtro de fecha y botón de búsqueda
-    //var filtroFecha = $('<div class="dt-filtro-fecha col-8 d-flex gap-4">Fecha de inicio: <input type="date" id="fechaInicio"> Fecha fin: <input type="date" id="fechaFin"> <button id="btnBuscar">Buscar</button></div>');
-
-    //// Insertar los elementos antes de la barra de búsqueda estándar
-    //wrapper.find('.dt-length').after(filtroFecha);
-
     // Evento enviar form para crear
     const formPrint = document.getElementById("formPrint");
     formPrint.addEventListener("submit", fnPrintFormSubmit);
 
     searchValue = document.querySelector("#dt-search-0");
-    searchValue.addEventListener("change", () => {
-        sessionStorage.setItem('searchValue', searchValue.value);
-    });
+    searchValue.addEventListener('change', fnSetSessionSearchInput);
+    searchValue.addEventListener('blur', fnSetSessionSearchInput);
 
 });
+
+//const fnHandleEvent = (event) => {
+//    if (event.type === 'change' || event.type == 'blur') {
+//        fnSetSessionSearchInput();
+//    }
+//}
+
+const fnSetSessionSearchInput = () => {
+    //searchValue = document.querySelector("#dt-search-0");
+    sessionStorage.setItem('searchValue', searchValue.value);
+};
 
 const fnCleanFilter = () => {
     btnFilter = document.querySelector("#btnFilter");
@@ -36,10 +40,11 @@ const fnCleanFilter = () => {
     initialValue = processingDate;
     finalValue = processingDate;
     includeVoidValue = "";
+    searchValue.value = "";
+    fnSetSessionSearchInput();
     clean = true;
     btnFilter.click();
 }
-
 
 const fnPrintFormSubmit = async (event) => {
 
@@ -486,7 +491,6 @@ const fnSetSearchValue = (value) => {
 }
 
 const fnLoadDatatable = () => {
-
     let tooltipInstanceFilter = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
     if (tooltipInstanceFilter) {
         tooltipInstanceFilter.hide();
