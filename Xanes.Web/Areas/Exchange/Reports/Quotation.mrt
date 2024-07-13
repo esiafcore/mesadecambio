@@ -7,7 +7,7 @@
         <Alias>datrep</Alias>
         <BusinessObjects isList="true" count="0" />
         <Category />
-        <Columns isList="true" count="9">
+        <Columns isList="true" count="11">
           <value>ORIGINAL,CustomerFullName,CustomerFullName,CustomerFullName,System.String,ad5b781787284b138d9b8983ef1f0e48</value>
           <value>ORIGINAL,BankTargetFullName,BankTargetFullName,BankTargetFullName,System.String,_x0033_b34320aa05a49e994cd056ae72298a6</value>
           <value>ORIGINAL,CurrencyTransferCode,CurrencyTransferCode,CurrencyTransferCode,System.String,_x0033_e1b705a732f43579a01b7d239dbcd25</value>
@@ -17,6 +17,8 @@
           <value>ORIGINAL,DescriptionGeneral,DescriptionGeneral,DescriptionGeneral,System.String,_x0034_9937a2ef344463fa3322be7d65f13be</value>
           <value>ORIGINAL,IsClosed,IsClosed,IsClosed,System.Boolean,b4f99f502f184053a67607c848b024bf</value>
           <value>ParentQuotationId,System.Int32</value>
+          <value>ParentDateTransaFormat,System.String</value>
+          <value>ParentTransactionNumberFormat,System.String</value>
         </Columns>
         <Dictionary isRef="1" />
         <Guid>caedc6cba36042aab50756856537422f</Guid>
@@ -30,7 +32,7 @@
     <Report isRef="0" />
     <Resources isList="true" count="0" />
     <UserFunctions isList="true" count="0" />
-    <Variables isList="true" count="7">
+    <Variables isList="true" count="8">
       <value>,parDecimalTransaction,parDecimalTransaction,,System.Int32,,False,False,False,False,,c41c691bb0104842bfe3b594f0c3bcbb</value>
       <value>,parDecimalExchangeRate,parDecimalExchangeRate,,System.Int32,,False,False,False,False,,bdde54674a3b4663b855626fd2fdeed3</value>
       <value>,parFileImagePath,parFileImagePath,,System.String,,False,False,False,False,,e081bd39f22144dfa499924b56e22136</value>
@@ -38,6 +40,7 @@
       <value>,parNameReport,parNameReport,,System.String,,False,False,False,False,,_x0039_ee921370da7401db9a27154fa1f0bf4</value>
       <value>,parFilterName,parFilterName,,System.String,,False,False,False,False,,b2db9c90872243f89db8dbef94fc3b81</value>
       <value>,parIsClosed,parIsClosed,,System.String,,False,False,False,False,,a944452f6b604287acf85ae98aa0666d</value>
+      <value>,parIsGeneral,parIsGeneral,,System.Boolean,false,False,False,False,False</value>
     </Variables>
   </Dictionary>
   <EngineVersion>EngineV2</EngineVersion>
@@ -103,7 +106,10 @@
               <Name>Text2</Name>
               <Page isRef="3" />
               <Parent isRef="7" />
-              <Text>{parNameReport}</Text>
+              <Text>{ parIsGeneral ? 
+parNameReport + " " + datrep.ParentDateTransaFormat
++ "-" + datrep.ParentTransactionNumberFormat : 
+ parNameReport}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
@@ -141,11 +147,11 @@
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Name>GroupHeaderBand1</Name>
+          <NewPageBefore>True</NewPageBefore>
           <Page isRef="3" />
           <Parent isRef="3" />
         </GroupHeaderBand1>
         <Data Ref="11" type="DataBand" isKey="true">
-          <Border>None;Black;1;Solid;False;4;Black</Border>
           <Brush>Transparent</Brush>
           <BusinessObjectGuid>caedc6cba36042aab50756856537422f</BusinessObjectGuid>
           <ClientRectangle>0,34,196,58</ClientRectangle>
@@ -323,6 +329,7 @@
             <Text9 Ref="24" type="Text" isKey="true">
               <AutoWidth>True</AutoWidth>
               <Brush>Transparent</Brush>
+              <CanGrow>True</CanGrow>
               <ClientRectangle>0,0,196,16</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
@@ -359,7 +366,6 @@
       <Report isRef="0" />
       <StretchToPrintArea>True</StretchToPrintArea>
       <UnlimitedBreakable>False</UnlimitedBreakable>
-      <UnlimitedHeight>True</UnlimitedHeight>
       <Watermark Ref="25" type="Stimulsoft.Report.Components.StiWatermark" isKey="true">
         <AspectRatio>True</AspectRatio>
         <Font>Arial,72,Italic</Font>
@@ -386,10 +392,10 @@
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>7/13/2024 11:15:52 AM</ReportChanged>
+  <ReportChanged>7/13/2024 3:46:31 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
   <ReportFile>C:\GitNet8\Xanes\mesadecambio\Xanes.Web\Areas\Exchange\Reports\Quotation.mrt</ReportFile>
-  <ReportGuid>75e34056038c478d91610ba47d48f01d</ReportGuid>
+  <ReportGuid>ef7e77dc60a14f9a8cb5468baa98d018</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
   <ReportVersion>2024.3.2.0</ReportVersion>

@@ -747,36 +747,18 @@ const fnLoadDatatable = () => {
                         }
                     },
                     {
-                        extend: 'pdf',
                         text: '<i class="bi bi-file-earmark-pdf fs-4"></i>',
                         titleAttr: 'Exportar a PDF',
                         className: 'btn btn-danger me-2',
-                        exportOptions: {
-                            columns: ':not(:last-child)' // Exclude the last column (buttons) from export
+                        init: function (dt, node, config) {
+                            $(node).removeClass("btn-secondary"); // Remueve la clase 'btn-secondary'
                         },
-                        customize: function (doc) {
-                            doc.pageSize = 'A3'; // Cambia el tamaño de la hoja a A3
-                            doc.pageOrientation = 'landscape'; // Orientación horizontal
-                            doc.pageMargins = [20, 20, 20, 20]; // Ajusta los márgenes
-
-                            // Cambiar color de cabecera y título
-                            doc.styles.title = {
-                                color: '#3E5060', // Gris azulado
-                                fontSize: '16',
-                                alignment: 'center'
-                            };
-
-                            // Ajustar color de cabecera
-                            doc.styles.tableHeader = {
-                                fillColor: '#3E5060',
-                                color: '#ffffff', // Blanco
-                                alignment: 'center'
-                            };
-
-                            // Ajustar anchos de columnas
-                            doc.content[1].table.widths = [
-                                '7%', '7%', '20%', '7%', '7%', '7%', '7%', '7%', '7%', '3%', '3%', '3%'
-                            ];
+                        action: async function () {
+                            const result = await getfilteredDataFromDatatable();
+                            // si se imprime
+                            if (result.isSuccess) {
+                                await fnexportToPDF(result.data);
+                            }
                         }
                     },
                     {
@@ -830,3 +812,114 @@ const fnLoadDatatable = () => {
         }
     });
 }
+
+// Obtener los datos filtrados disponibles en el datatable
+const getfilteredDataFromDatatable = async () => {
+    const reponseIsPrint = {
+        isSuccess: true
+    };
+
+    const data = dataTable.rows({ search: "applied" }).data().toArray();
+    const countData = data.length;
+
+    if (countData <= 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: "No hay registros",
+            text: "No se encontraron registros para exportar"
+        });
+        reponseIsPrint.isSuccess = false;
+        return reponseIsPrint;
+    }
+
+    if (countData > limitBatchCreditNote) {
+        const result = await Swal.fire({
+            title: `&#191;Está seguro de imprimir las transacciones?`,
+            html: `Se van a imprimir ${countData} registros. <br>Esto supera el limite permitido de ${limitBatchCreditNote}`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: ButtonsText.Confirm,
+            cancelButtonText: ButtonsText.Cancel,
+            customClass: {
+                confirmButton: "btn btn-success px-3 mx-2",
+                cancelButton: "btn btn-primary px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
+
+        if (!result.isConfirmed) {
+            reponseIsPrint.isSuccess = false;
+            return reponseIsPrint;
+        }
+    }
+
+    // Obtener solo las propiedades 'id' de cada objeto en 'data'
+    const ids = data.map(item => item.id);
+    reponseIsPrint.isSuccess = true;
+    reponseIsPrint.data = ids;
+    return reponseIsPrint;
+};
+
+// Exportar datos del datatable a PDF
+const fnexportToPDF = async (quoatationIds) => {
+    try {
+        let isPrintSeparatedFiles = false;
+
+        // Preguntar si los quiere separados
+        const result = await Swal.fire({
+            title: `&#191;Desea imprimir las transacciones separadas?`,
+            html: `Las transacciones se van a imprimir por separados comprimidas`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: ButtonsText.Yes,
+            cancelButtonText: ButtonsText.No,
+            customClass: {
+                confirmButton: "btn btn-success px-3 mx-2",
+                cancelButton: "btn btn-primary px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
+
+        isPrintSeparatedFiles = result.isConfirmed;
+
+        fntoggleLoading();
+
+        const url = `/exchange/quotation/ExportToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify(quoatationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            const linkDownload = document.createElement('a');
+            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
+            linkDownload.download = jsonResponse.data.filename;
+            linkDownload.click();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    } finally {
+        fntoggleLoading();
+    }
+};

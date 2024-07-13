@@ -10,7 +10,7 @@
                 <div class="col-4 text-start">
                     <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
                        data-bs-toggle="tooltip" data-bs-trigger="hover"
-                       onclick="fnredirectBtnIndex(event)" data-bs-placement="top" 
+                       onclick="fnredirectBtnIndex(event)" data-bs-placement="top"
                        data-bs-title="Nuevo Cotización">
                         <i class="bi bi-plus-circle"></i> Nuevo
                     </a>
@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-4 text-end">
                     <a class="btn btn-secondary border" id="btnClean" data-bs-toggle="tooltip"
-                       data-bs-trigger="hover" onclick="fnCleanFilter()" 
+                       data-bs-trigger="hover" onclick="fnCleanFilter()"
                        data-bs-placement="top" data-bs-title="Limpiar Filtro">
                         <i class="bi bi-eraser-fill"></i> Limpiar
                     </a>
@@ -64,6 +64,7 @@
         let changeProcessingDate = @Html.Raw(@ViewBag.ChangeProcessingDate);
         let processingDate = @Html.Raw(@ViewBag.ProcessingDate);
         let decimalExchange = @Html.Raw(@ViewBag.DecimalExchange);
+        let limitBatchCreditNote = @Html.Raw(@ViewBag.LimitBatchCreditNote);
 
     </script>
     <script src="~/js/Exchange/Quotation/quotationIndex.js"></script>

@@ -156,7 +156,9 @@ const ButtonsText = {
     Inactive: "Inactivar",
     Accept: "Aceptar",
     Authorize: "Autorizar",
-    Auxiliary: "Auxiliar"
+    Auxiliary: "Auxiliar",
+    Yes: "Si",
+    No: "No",
 }
 
 const ButtonsColor = {

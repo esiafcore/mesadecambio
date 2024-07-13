@@ -13,6 +13,10 @@ using static Xanes.Utility.SD;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using static Stimulsoft.Report.Help.StiHelpProvider;
+using Stimulsoft.Report.Components;
+using System.IO.Compression;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -28,7 +32,7 @@ public class QuotationController : Controller
     private readonly int _decimalExchange;
     private readonly int _decimalExchangeFull;
     private readonly decimal _variationMaxDeposit;
-
+    private readonly int _limitBatchCreditNote;
 
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
@@ -42,6 +46,7 @@ public class QuotationController : Controller
         _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
         _decimalExchangeFull = _configuration.GetValue<int>("ApplicationSettings:DecimalExchangeFull");
         _variationMaxDeposit = _configuration.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
+        _limitBatchCreditNote = _configuration.GetValue<int>("ApplicationSettings:LimitBatchCreditNote");
         _hostEnvironment = hostEnvironment;
         _parametersReport = new();
         var path = Path.Combine(Directory.GetCurrentDirectory(), "License/license.key");
@@ -78,6 +83,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
         ViewBag.IsNewEntry = JsonConvert.SerializeObject(true);
+        ViewBag.LimitBatchCreditNote = JsonConvert.SerializeObject(_limitBatchCreditNote);
         TransactionReportVM modelVM = new();
         ViewData[AC.Title] = "Listado de Transacciones";
         return View(modelVM);
@@ -2951,6 +2957,209 @@ public class QuotationController : Controller
                 urlRedirectTo = Url.Action("PrintReport", "Quotation", new { area = "Exchange" })
             };
             return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+    }
+
+    // Exportar a PDF las cotizaciones
+    [HttpPost]
+    public JsonResult ExportToPDF([FromBody] List<int> quotationIds, bool isFileSeparated = false)
+    {
+        JsonResultResponse jsonResponse = new();
+        StiReport reportResult = new();
+        ConfigFac? configFac = null;
+        Company? company = null;
+
+        try
+        {
+            var fileName = "Quotation.mrt";
+            var filePath = $"{Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName)}";
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Reporte no encontrado";
+                return Json(jsonResponse);
+            }
+
+            if (Path.GetExtension(fileName).ToUpper() != ".MRT")
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Reporte invalido";
+                return Json(jsonResponse);
+            }
+
+            configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            if (configFac is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Configuración de facturación no encontrada";
+                return Json(jsonResponse);
+            }
+
+            company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            if (company is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Compañia no encontrada";
+                return Json(jsonResponse);
+            }
+
+            var transaDetails = _uow.QuotationDetail.GetAll(filter: x => (x.CompanyId == _companyId)
+                                                                         && quotationIds.Contains(x.ParentId)
+                                                                         && x.QuotationDetailType == QuotationDetailType.Transfer,
+                includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+            if (transaDetails is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Cotización sin hijos encontrados";
+                return Json(jsonResponse);
+            }
+
+            var dataDetails = new List<QuotationReportVM>();
+            var transaDetailsGroup = transaDetails.GroupBy(x => x.ParentId).ToList();
+            var listPdfFiles = new List<(string FileName, byte[] FileContent)>();
+
+            foreach (var itemDetailList in transaDetailsGroup)
+            {
+                var transaction = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == itemDetailList.Key, includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx");
+
+                if (transaction is null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = "Cotización no encontrada";
+                    return Json(jsonResponse);
+                }
+
+                var tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa;
+                var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString() : tcExchange.RoundTo(_decimalExchangeFull).ToString();
+
+                foreach (var itemDetail in itemDetailList)
+                {
+                    dataDetails.Add(new QuotationReportVM()
+                    {
+                        CustomerFullName = transaction.CustomerTrx.BusinessName,
+                        ParentQuotationId = transaction.Id,
+                        ParentTransactionNumber = transaction.Numeral,
+                        ParentDateTransaFormat = transaction.DateTransa.ToString(AC.DefaultDateFormatView),
+                        ParentTransactionNumberFormat = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}",
+                        BankTargetFullName = itemDetail.BankTargetTrx.Code,
+                        IsClosed = transaction.IsClosed,
+                        CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
+                        AmountTransaction = itemDetail.AmountDetail,
+                        ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchangeString}",
+                        NumberReferen = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{itemDetail.BankTargetTrx.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}",
+                        DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
+                    });
+                }
+
+                if (isFileSeparated)
+                {
+                    var tipoTransa = Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral);
+                    var numberTransa = transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty);
+                    var pdfFileName = $"NotaCredito_{tipoTransa}_{numberTransa}.pdf";
+
+                    var individualReport = new StiReport();
+                    individualReport.Load(StiNetCoreHelper.MapPath(this, filePath));
+
+                    // Decimales
+                    individualReport.Dictionary.Variables[AC.ParDecimalTransaction].ValueObject = _decimalTransa;
+                    individualReport.Dictionary.Variables[AC.ParDecimalExchangeRate].ValueObject = _decimalExchange;
+                    individualReport.Dictionary.Variables[AC.ParNameCompany].ValueObject = $"{company.Name}";
+                    individualReport.Dictionary.Variables[AC.ParNameReport].ValueObject = "Nota de Crédito";
+                    individualReport.Dictionary.Variables[AC.ParFileImagePath].ValueObject = $"{company.ImageLogoUrl}";
+                    individualReport.Dictionary.Variables[AC.ParIsGeneral].ValueObject = true;
+                    string isClosed = transaction.IsClosed ? "" : "No Cerrado";
+                    individualReport.Dictionary.Variables["parIsClosed"].ValueObject = isClosed;
+
+                    individualReport.ReportName = $"NotaCredito_{tipoTransa}_{numberTransa}";
+
+                    individualReport.RegBusinessObject(AC.DatRep, dataDetails);
+                    individualReport.Compile();
+                    individualReport.Render();
+
+                    using var stream = new MemoryStream();
+                    individualReport.ExportDocument(StiExportFormat.Pdf, stream);
+                    listPdfFiles.Add((pdfFileName, stream.ToArray()));
+
+                    // Limpiar los detalles
+                    dataDetails.Clear();
+                }
+            }
+
+            // Si es archivos separados colocar dentro de un ZIP
+            if (isFileSeparated)
+            {
+                using var memoryStream = new MemoryStream();
+                using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var (pdfFileName, pdfData) in listPdfFiles)
+                    {
+                        var fileEntry = zip.CreateEntry(pdfFileName, CompressionLevel.Optimal);
+                        using var entryStream = fileEntry.Open();
+                        using var fileStream = new MemoryStream(pdfData);
+                        fileStream.CopyTo(entryStream);
+                    }
+                }
+
+                var zipBytes = memoryStream.ToArray();
+                var exportReporteBase64 = Convert.ToBase64String(zipBytes);
+
+                jsonResponse.IsSuccess = true;
+                jsonResponse.Data = new
+                {
+                    ContentFile = exportReporteBase64,
+                    ContentType = AC.ContentTypeZip,
+                    Filename = $"NotasDeCreditos_{DateTime.UtcNow:yyyyMMdd}"
+                };
+                return Json(jsonResponse);
+            }
+            // Si es un solo PDF
+            else
+            {
+                // Cargar reporte
+                reportResult.Load(StiNetCoreHelper.MapPath(this, filePath));
+
+                // Decimales
+                reportResult.Dictionary.Variables[AC.ParDecimalTransaction].ValueObject = _decimalTransa;
+                reportResult.Dictionary.Variables[AC.ParDecimalExchangeRate].ValueObject = _decimalExchange;
+                reportResult.Dictionary.Variables[AC.ParNameCompany].ValueObject = $"{company.Name}";
+                reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = "Nota de Crédito";
+                reportResult.Dictionary.Variables[AC.ParFileImagePath].ValueObject = $"{company.ImageLogoUrl}";
+                reportResult.Dictionary.Variables[AC.ParIsGeneral].ValueObject = true;
+
+                reportResult.ReportName = "Notas de Créditos";
+
+                reportResult.RegBusinessObject(AC.DatRep, dataDetails);
+
+                reportResult.Compile();
+                reportResult.Render();
+
+                // Generar el PDF en memoria
+                byte[] pdfData;
+                using (var stream = new MemoryStream())
+                {
+                    reportResult.ExportDocument(StiExportFormat.Pdf, stream);
+                    pdfData = stream.ToArray();
+                }
+
+                // Convertir los bytes a base64
+                var exportReporteBase64 = Convert.ToBase64String(pdfData);
+
+                jsonResponse.IsSuccess = true;
+                jsonResponse.Data = new
+                {
+                    ContentFile = exportReporteBase64,
+                    ContentType = AC.ContentTypePdf,
+                    Filename = "ListadoDeCotizaciones"
+                };
+                return Json(jsonResponse);
+            }
         }
         catch (Exception ex)
         {
