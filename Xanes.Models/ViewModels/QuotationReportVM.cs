@@ -11,4 +11,6 @@ public class QuotationReportVM
     public string NumberReferen { get; set; }
     public decimal AmountTransaction { get; set; } = 0M;
     public bool IsClosed { get; set; }
+    public int ParentQuotationId { get; set; }
+    public int ParentTransactionNumber { get; set; }
 }

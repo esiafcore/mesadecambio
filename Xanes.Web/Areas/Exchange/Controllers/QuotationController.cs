@@ -2773,7 +2773,7 @@ public class QuotationController : Controller
                     }
                 }
             }
-            
+
             await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
 
             jsonResponse.SuccessMessages = "Importación exitosamente";
@@ -2815,7 +2815,7 @@ public class QuotationController : Controller
 
             // Cargar objetos ya deserialiozados
             if (datRepJson != null)
-                report.RegBusinessObject(AC.DatRep, JsonConvert.DeserializeObject<QuotationReportVM>(datRepJson));
+                report.RegBusinessObject(AC.DatRep, JsonConvert.DeserializeObject<List<QuotationReportVM>>(datRepJson));
 
             return StiNetCoreViewer.GetReportResult(this, report);
         }
@@ -2898,40 +2898,33 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var detailDistinct = transaDetails.Select(x => x.BankTargetTrx).Distinct().ToList();
-            string bankTargets = "", numberReferenTarget = "";
-            foreach (var detail in detailDistinct)
-            {
-                bankTargets += detail.Code + ", ";
-                numberReferenTarget += $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{detail.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}" + ", ";
-            }
-
-            // Remover la coma adicional al final, si es necesario
-            if (!string.IsNullOrEmpty(bankTargets) && !string.IsNullOrEmpty(numberReferenTarget))
-            {
-                bankTargets = bankTargets.Trim().TrimEnd(',');
-                numberReferenTarget = numberReferenTarget.Trim().TrimEnd(',');
-            }
-
             //Tipo de Cambio
             decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa
                 : transaction.ExchangeRateSellTransa;
 
-            var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString() 
+            var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString()
                 : tcExchange.RoundTo(_decimalExchangeFull).ToString();
 
-            // Crear objeto para pasar datos de cabecera al reporte
-            var dataHead = new QuotationReportVM()
+            // Crear listado de objetos basados en el detalle
+            var dataDetails = new List<QuotationReportVM>();
+            foreach (var itemDetail in transaDetails)
             {
-                CustomerFullName = transaction.CustomerTrx.BusinessName,
-                BankTargetFullName = bankTargets,
-                IsClosed = transaction.IsClosed,
-                CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
-                AmountTransaction = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.AmountExchange : transaction.AmountTransaction,
-                ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchangeString}",
-                NumberReferen = numberReferenTarget,
-                DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
-            };
+                dataDetails.Add(new QuotationReportVM()
+                {
+                    CustomerFullName = transaction.CustomerTrx.BusinessName,
+                    // Campos de agrupamiento
+                    ParentQuotationId = transaction.Id,
+                    ParentTransactionNumber = transaction.Numeral,
+                    // --
+                    BankTargetFullName = itemDetail.BankTargetTrx.Code,
+                    IsClosed = transaction.IsClosed,
+                    CurrencyTransferCode = transaction.CurrencyTransferTrx.Code,
+                    AmountTransaction = itemDetail.AmountDetail,
+                    ConceptGeneral = $"{Enum.GetName(typeof(SD.QuotationTypeName), (int)transaction.TypeNumeral)} de {transaction.CurrencyTransaTrx.NameSingular} TC:{tcExchangeString}",
+                    NumberReferen = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)!.ToUpper()}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}-{itemDetail.BankTargetTrx.Code}{transaction.DateTransa.Year}{transaction.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}{transaction.DateTransa.Day.ToString().PadLeft(2, AC.CharDefaultEmpty)}",
+                    DescriptionGeneral = $"Por este medio se confirma el envío por transferencia bancaria, producto de la operación de cambio afectuada el dia de hoy {transaction.DateTransa.Day} de {Enum.GetName(typeof(SD.MonthName), transaction.DateTransa.Month)} del año {transaction.DateTransa.Year}"
+                });
+            }
 
             // Cargar reporte
             reportResult.Load(StiNetCoreHelper.MapPath(this, _parametersReport[ParametersReport.FilePath]?.ToString() ?? string.Empty));
@@ -2950,7 +2943,7 @@ public class QuotationController : Controller
             // Reporte 
             HttpContext.Session.SetString(AC.ObjectReportData, reportResult.SaveToJsonString());
             // Objeros de negocio
-            HttpContext.Session.SetString(AC.DatRep, JsonConvert.SerializeObject(dataHead));
+            HttpContext.Session.SetString(AC.DatRep, JsonConvert.SerializeObject(dataDetails));
 
             jsonResponse.IsSuccess = true;
             jsonResponse.Data = new
