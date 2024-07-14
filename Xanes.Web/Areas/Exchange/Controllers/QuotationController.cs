@@ -2968,7 +2968,7 @@ public class QuotationController : Controller
 
     // Exportar a PDF las cotizaciones
     [HttpPost]
-    public JsonResult ExportToPDF([FromBody] List<int> quotationIds, bool isFileSeparated = false)
+    public JsonResult ExportCreditNoteToPDF([FromBody] List<int> quotationIds, bool isFileSeparated = false)
     {
         JsonResultResponse jsonResponse = new();
         StiReport reportResult = new();
@@ -3156,7 +3156,7 @@ public class QuotationController : Controller
                 {
                     ContentFile = exportReporteBase64,
                     ContentType = AC.ContentTypePdf,
-                    Filename = "ListadoDeCotizaciones"
+                    Filename = "NotasDeCreditosEnLote"
                 };
                 return Json(jsonResponse);
             }

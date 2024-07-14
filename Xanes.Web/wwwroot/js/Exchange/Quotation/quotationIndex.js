@@ -748,7 +748,7 @@ const fnLoadDatatable = () => {
                     },
                     {
                         text: '<i class="bi bi-file-earmark-pdf fs-4"></i>',
-                        titleAttr: 'Exportar a PDF',
+                        titleAttr: 'Exportar Nota Crédito en Lote a PDF',
                         className: 'btn btn-danger me-2',
                         init: fnremoveClassBtnExporDataTable,
                         action: async function () {
@@ -867,7 +867,7 @@ const fnexportToPDF = async (quoatationIds) => {
 
         // Preguntar si los quiere separados
         const result = await Swal.fire({
-            title: `&#191;Desea imprimir las transacciones separadas?`,
+            title: `&#191;Desea exportar las Notas de Crédito en archivos separados?`,
             html: `Las transacciones se van a imprimir por separados comprimidas`,
             icon: "warning",
             showCancelButton: true,
@@ -884,9 +884,9 @@ const fnexportToPDF = async (quoatationIds) => {
 
         isPrintSeparatedFiles = result.isConfirmed;
 
-        fntoggleLoading();
+        fntoggleLoading("Generado PDF");
 
-        const url = `/exchange/quotation/ExportToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
+        const url = `/exchange/quotation/ExportCreditNoteToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
 
         const response = await fetch(url, {
             method: "POST",
