@@ -750,9 +750,7 @@ const fnLoadDatatable = () => {
                         text: '<i class="bi bi-file-earmark-pdf fs-4"></i>',
                         titleAttr: 'Exportar a PDF',
                         className: 'btn btn-danger me-2',
-                        init: function (dt, node, config) {
-                            $(node).removeClass("btn-secondary"); // Remueve la clase 'btn-secondary'
-                        },
+                        init: fnremoveClassBtnExporDataTable,
                         action: async function () {
                             const result = await getfilteredDataFromDatatable();
                             // si se imprime

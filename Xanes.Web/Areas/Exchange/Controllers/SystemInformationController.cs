@@ -494,8 +494,11 @@ public class SystemInformationController : Controller
         try
         {
             // Obtener la cotización
-            var transactionList = _uow.Quotation.GetAll(filter: x => x.CompanyId == _companyId && x.DateTransa >= reportData.DateTransaInitial &&
-                                                                     x.DateTransa <= reportData.DateTransaFinal,
+            var transactionList = _uow.Quotation.GetAll(filter: x => (x.CompanyId == _companyId)
+                                                                     && (x.DateTransa >= reportData.DateTransaInitial)
+                                                                     && (x.DateTransa <= reportData.DateTransaFinal)
+                                                                        // No se incluyen TRA
+                                                                        && (x.TypeNumeral != SD.QuotationType.Transfer),
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
                 .OrderByDescending(x => x.Id)
                 .ToList();
