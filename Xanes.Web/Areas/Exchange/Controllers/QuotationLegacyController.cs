@@ -55,6 +55,7 @@ public class QuotationLegacyController : Controller
     [HttpGet]
     public async Task<IActionResult> ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
     {
+        List<string> listErrors = new List<string>();
         try
         {
             DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
@@ -67,7 +68,8 @@ public class QuotationLegacyController : Controller
 
             if (objLegacyList == null || objLegacyList.Count == 0)
             {
-                return NoContent();
+                TempData[AC.Error] = "Con los criterios establecidos, No hay datos a exportar";
+                return BadRequest();
             }
 
             var objTypeList = _uow.QuotationType.GetAll(filter: x =>
@@ -75,8 +77,7 @@ public class QuotationLegacyController : Controller
 
             if (objTypeList == null || objTypeList.Count == 0)
             {
-                TempData[AC.Error] = "Tipos de cotizaciones no encontradas";
-                return BadRequest();
+                listErrors.Add("Tipos de cotizaciones no encontradas");
             }
 
             var objCustomerList = _uow.Customer.GetAll(filter: x =>
@@ -84,8 +85,7 @@ public class QuotationLegacyController : Controller
 
             if (objCustomerList == null || objCustomerList.Count == 0)
             {
-                TempData[AC.Error] = "Clientes no encontrados";
-                return BadRequest();
+                listErrors.Add("Clientes no encontrados");
             }
 
             var objBankAccountList = _uow.BankAccount.GetAll(filter: x =>
@@ -93,8 +93,7 @@ public class QuotationLegacyController : Controller
 
             if (objBankAccountList == null || objBankAccountList.Count == 0)
             {
-                TempData[AC.Error] = "Cuentas bancarias no encontradas";
-                return BadRequest();
+                listErrors.Add("Cuentas bancarias no encontradas");
             }
 
             var objBusinessList = _uow.BusinessExecutive.GetAll(filter: x =>
@@ -102,8 +101,7 @@ public class QuotationLegacyController : Controller
 
             if (objBusinessList == null || objBusinessList.Count == 0)
             {
-                TempData[AC.Error] = "Ejecutivos no encontrados";
-                return BadRequest();
+                listErrors.Add("Ejecutivos no encontrados");
             }
 
             var objCurrencyList = _uow.Currency.GetAll(filter: x =>
@@ -111,8 +109,7 @@ public class QuotationLegacyController : Controller
 
             if (objCurrencyList == null || objCurrencyList.Count == 0)
             {
-                TempData[AC.Error] = "Monedas no encontradas";
-                return BadRequest();
+                listErrors.Add("Monedas no encontradas");
             }
 
             var objBankList = _uow.Bank.GetAll(filter: x =>
@@ -120,7 +117,13 @@ public class QuotationLegacyController : Controller
 
             if (objBankList == null || objBankList.Count == 0)
             {
-                TempData[AC.Error] = "Bancos no encontrados";
+                listErrors.Add("Bancos no encontrados");
+            }
+
+            //Primer checkpoint de Validación
+            if (listErrors.Count > 0)
+            {
+                TempData[AC.Error] = listErrors.ToString();
                 return BadRequest();
             }
 
