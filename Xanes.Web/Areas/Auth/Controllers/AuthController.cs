@@ -51,6 +51,12 @@ public class AuthController : Controller
         try
         {
             var apiResponse = await _srv.LoginAsync<APIResponse>(obj);
+            if (apiResponse is null)
+            {
+                TempData[AC.Error] = "No se pudo inciar sesion";
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
+
             if (!apiResponse.isSuccess)
             {
                 errorsMessagesBuilder.AppendJoin("", apiResponse.errorMessages);
