@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos;
+using Xanes.Models.Shared;
 using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Auth.Controllers;
@@ -44,13 +46,19 @@ public class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(CredencialesUsuarioDto obj)
     {
+        var errorsMessagesBuilder = new StringBuilder();
         ViewData[AC.Title] = "Login";
         try
         {
-            var apiResponse = await _srv.LoginAsync(obj);
+            var apiResponse = await _srv.LoginAsync<APIResponse>(obj);
+            if (!apiResponse.isSuccess)
+            {
+                errorsMessagesBuilder.AppendJoin("", apiResponse.errorMessages);
+                TempData[AC.Error] = $"{errorsMessagesBuilder}";
+                return RedirectToAction("Login", "Auth", new { Area = "auth" });
+            }
 
-
-            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(apiResponse)!;
+            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(Convert.ToString(apiResponse.result))!;
             if (model != null)
             {
                 var handler = new JwtSecurityTokenHandler();
@@ -101,9 +109,9 @@ public class AuthController : Controller
     {
         try
         {
-            var apiResponse = await _srv.RegisterAsync(obj);
+            var apiResponse = await _srv.RegisterAsync<APIResponse>(obj);
 
-            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(apiResponse)!;
+            var model = JsonConvert.DeserializeObject<RespuestaAutenticacionDto>(Convert.ToString(apiResponse.result))!;
 
             if (model != null)
             {

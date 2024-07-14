@@ -3,7 +3,7 @@
 namespace Xanes.DataAccess.ServicesApi.Interface;
 public interface IAuthService
 {
-    Task<string> LoginAsync(CredencialesUsuarioDto obj);
-    Task<string> RegisterAsync(CredencialesUsuarioDto obj);
+    Task<T> LoginAsync<T>(CredencialesUsuarioDto obj);
+    Task<T> RegisterAsync<T>(CredencialesUsuarioDto obj);
 }
 

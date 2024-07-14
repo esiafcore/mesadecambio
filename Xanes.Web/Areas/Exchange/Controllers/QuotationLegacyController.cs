@@ -6,6 +6,7 @@ using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models;
 using Xanes.Models.Dtos;
+using Xanes.Models.Shared;
 using Xanes.Models.ViewModels;
 using Xanes.Utility;
 #pragma warning disable CS8604
@@ -59,11 +60,10 @@ public class QuotationLegacyController : Controller
             DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
             DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
             var objQuotationList = new List<Quotation>();
-            var apiResponse = string.Empty;
 
-            apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+            var apiResponse = await _srv.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
-            var objLegacyList = JsonConvert.DeserializeObject<List<QuotationLegacyDto>>(apiResponse)!;
+            var objLegacyList = JsonConvert.DeserializeObject<List<QuotationLegacyDto>>(Convert.ToString(apiResponse.result))!;
 
             if (objLegacyList == null || objLegacyList.Count == 0)
             {
@@ -264,9 +264,9 @@ public class QuotationLegacyController : Controller
 
             var objQuotationDetailList = new List<QuotationDetail>();
 
-            apiResponse = await _srvDetail.GetAllLegacyAsync(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+            apiResponse = await _srvDetail.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
 
-            var objDetailLegacyList = JsonConvert.DeserializeObject<List<QuotationDetailLegacyDto>>(apiResponse)!;
+            var objDetailLegacyList = JsonConvert.DeserializeObject<List<QuotationDetailLegacyDto>>(Convert.ToString(apiResponse.result))!;
 
             foreach (var detailLegacy in objDetailLegacyList)
             {

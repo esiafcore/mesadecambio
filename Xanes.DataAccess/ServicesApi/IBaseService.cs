@@ -5,5 +5,5 @@ namespace Xanes.DataAccess.ServicesApi;
 public interface IBaseService
 {
     APIResponse ResponseModel { get; set; }
-    Task<string> SendAsync(APIRequest apiRequest, Pagination? pagination);
+    Task<T> SendAsync<T>(APIRequest apiRequest, Pagination? pagination);
 }

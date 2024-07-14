@@ -21,9 +21,9 @@ public class AuthService : BaseService, IAuthService
         _configuration = configuration;
     }
 
-    public Task<string> LoginAsync(CredencialesUsuarioDto obj)
+    public Task<T> LoginAsync<T>(CredencialesUsuarioDto obj)
     {
-        return SendAsync(new APIRequest()
+        return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Post,
             Data = obj,
@@ -31,9 +31,9 @@ public class AuthService : BaseService, IAuthService
         });
     }
 
-    public Task<string> RegisterAsync(CredencialesUsuarioDto obj)
+    public Task<T> RegisterAsync<T>(CredencialesUsuarioDto obj)
     {
-        return SendAsync(new APIRequest()
+        return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Post,
             Data = obj,

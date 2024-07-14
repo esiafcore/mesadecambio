@@ -20,9 +20,9 @@ public class QuotationDetailLegacyService : BaseService, IQuotationDetailLegacyS
         _configuration = configuration;
     }
 
-    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate, string? identificationNumber = null)
+    public Task<T> GetAllLegacyAsync<T>(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate, string? identificationNumber = null)
     {
-        return SendAsync(new APIRequest()
+        return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
             Url = string.Format("{0}?beginDate={1}&endDate={2}&identificationNumber={3}&pagina={4}&recordsPorPagina={5}",

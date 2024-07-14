@@ -6,6 +6,7 @@ using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos;
+using Xanes.Models.Shared;
 using Xanes.Utility;
 #pragma warning disable CS8604
 
@@ -40,10 +41,10 @@ public class CustomerLegacyController : Controller
     [HttpGet]
     public async Task<IActionResult> Export()
     {
-        var apiResponse = await _srv.GetAllLegacyAsync(_sessionToken, 0, 1);
+        var apiResponse = await _srv.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1);
 
 
-        var objList = JsonConvert.DeserializeObject<List<CustomerLegacyDto>>(apiResponse)!;
+        var objList = JsonConvert.DeserializeObject<List<CustomerLegacyDto>>(Convert.ToString(apiResponse.result))!;
         var objCustomerList = new List<Models.Customer>();
 
         var objTypeList = _uow.PersonType.GetAll(filter: x =>

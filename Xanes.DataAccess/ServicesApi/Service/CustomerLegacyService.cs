@@ -19,9 +19,9 @@ public class CustomerLegacyService : BaseService, ICustomerLegacyService
         _configuration = configuration;
     }
 
-    public Task<string> GetAllLegacyAsync(string token, int pageSize, int pageNumber)
+    public Task<T> GetAllLegacyAsync<T>(string token, int pageSize, int pageNumber)
     {
-        return SendAsync(new APIRequest()
+        return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
             Url = string.Format("{0}?pagina={1}&recordsPorPagina={2}",
