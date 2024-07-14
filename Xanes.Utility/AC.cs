@@ -28,6 +28,7 @@ public static class AC
     public const string ImagesBankSufix = "banks";
     public const string ContentTypeExcel = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public const string ContentTypeZip = "application/zip";
+    public const string ContentTypePdf = "application/pdf";
     public const string PaginationHeaderName = "x-pagination";
     public static string ServicesUrlApiPath = "ServicesUrl:UrlApi";
     public static string ClaimTypeRole = "role";
@@ -59,6 +60,7 @@ public static class AC
     public static string ParDecimalUnitCost = "parDecimalUnitCost";
     public static string ParDecimalPriceSell = "parDecimalPriceSell";
     public static string ParDecimalExchangeRate = "parDecimalExchangeRate";
+    public static string ParIsGeneral = "parIsGeneral";
     public static string DatRep = "datrep";
     public static string ReportListData = "ListaDatosReporte";
     public static string ObjectReportData = "ObjetoReporte";

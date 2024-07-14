@@ -156,7 +156,9 @@ const ButtonsText = {
     Inactive: "Inactivar",
     Accept: "Aceptar",
     Authorize: "Autorizar",
-    Auxiliary: "Auxiliar"
+    Auxiliary: "Auxiliar",
+    Yes: "Si",
+    No: "No",
 }
 
 const ButtonsColor = {
@@ -279,3 +281,7 @@ const select2Floating = () => {
         .find('label')
         .css('z-index', '1');
 }
+
+const fnremoveClassBtnExporDataTable = (dt, node, config) => {
+    $(node).removeClass("btn-secondary"); // Remueve la clase 'btn-secondary'
+};

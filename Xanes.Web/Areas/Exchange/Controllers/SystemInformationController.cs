@@ -494,8 +494,11 @@ public class SystemInformationController : Controller
         try
         {
             // Obtener la cotización
-            var transactionList = _uow.Quotation.GetAll(filter: x => x.CompanyId == _companyId && x.DateTransa >= reportData.DateTransaInitial &&
-                                                                     x.DateTransa <= reportData.DateTransaFinal,
+            var transactionList = _uow.Quotation.GetAll(filter: x => (x.CompanyId == _companyId)
+                                                                     && (x.DateTransa >= reportData.DateTransaInitial)
+                                                                     && (x.DateTransa <= reportData.DateTransaFinal)
+                                                                        // No se incluyen TRA
+                                                                        && (x.TypeNumeral != SD.QuotationType.Transfer),
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -544,11 +547,11 @@ public class SystemInformationController : Controller
                     CurrencySourceTarget = currency,
                     ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
                     ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
-                    AmountTransaction = transaction.AmountTransaction,
-                    AmountRevenue = transaction.AmountRevenue,
-                    AmountCost = transaction.AmountCost,
-                    TotalDeposit = transaction.TotalDeposit,
-                    TotalTransfer = transaction.TotalTransfer,
+                    AmountTransaction = transaction.AmountTransactionRpt,
+                    AmountRevenue = transaction.AmountRevenueRpt,
+                    AmountCost = transaction.AmountCostRpt,
+                    TotalDeposit = transaction.TotalDepositRpt,
+                    TotalTransfer = transaction.TotalTransferRpt,
                     ExecutiveCode = transaction.BusinessExecutiveCode,
                     IsClosed = transaction.IsClosed,
                     CreatedBy = transaction.CreatedBy,

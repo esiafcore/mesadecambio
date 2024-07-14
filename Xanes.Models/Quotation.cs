@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
 using Xanes.Utility;
+using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
 [Table("quotations", Schema = "fac")]
@@ -122,6 +123,21 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Monto Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountTransaction { get; set; } = 0M;
+    [NotMapped]
+    public decimal AmountTransactionRpt
+    {
+        get
+        {
+            var total = this.AmountTransaction;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Comisión TRF")]
@@ -137,21 +153,81 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Ingreso Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountRevenue { get; set; } = 0M;
+    [NotMapped]
+    public decimal AmountRevenueRpt
+    {
+        get
+        {
+            var total = this.AmountRevenue;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Costo Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;
+    [NotMapped]
+    public decimal AmountCostRpt
+    {
+        get
+        {
+            var total = this.AmountCost;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Total Depósito")]
     [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
     public decimal TotalDeposit { get; set; } = 0M;
+    [NotMapped]
+    public decimal TotalDepositRpt
+    {
+        get
+        {
+            var total = this.TotalDeposit;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Total Transferencia")]
     [DisplayFormat(DataFormatString = "{0:n8}", ApplyFormatInEditMode = true)]
     public decimal TotalTransfer { get; set; } = 0M;
+    [NotMapped]
+    public decimal TotalTransferRpt
+    {
+        get
+        {
+            var total = this.TotalTransfer;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required]
     [Display(Name = "Está Contabilizado?")]
