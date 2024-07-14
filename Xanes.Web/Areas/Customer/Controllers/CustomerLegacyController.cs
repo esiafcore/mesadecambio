@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿using System.Text;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -41,8 +42,21 @@ public class CustomerLegacyController : Controller
     [HttpGet]
     public async Task<IActionResult> Export()
     {
-        var apiResponse = await _srv.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1);
+        var errorsMessagesBuilder = new StringBuilder();
 
+        var apiResponse = await _srv.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1);
+        if (apiResponse is null)
+        {
+            TempData[AC.Error] = "No se pudo obtener la respuesta";
+            return RedirectToAction("Index", "Home", new { Area = "exchange" });
+        }
+
+        if (apiResponse is { isSuccess: false })
+        {
+            errorsMessagesBuilder.AppendJoin("", apiResponse.errorMessages);
+            TempData[AC.Error] = errorsMessagesBuilder.ToString();
+            return RedirectToAction("Index", "Home", new { Area = "exchange" });
+        }
 
         var objList = JsonConvert.DeserializeObject<List<CustomerLegacyDto>>(Convert.ToString(apiResponse.result))!;
         var objCustomerList = new List<Models.Customer>();

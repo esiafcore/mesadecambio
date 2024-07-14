@@ -1,4 +1,5 @@
-﻿using ClosedXML.Excel;
+﻿using System.Text;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
@@ -58,11 +59,25 @@ public class QuotationLegacyController : Controller
         List<string> listErrors = new List<string>();
         try
         {
+            var errorsMessagesBuilder = new StringBuilder();
             DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
             DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
             var objQuotationList = new List<Quotation>();
 
-            var apiResponse = await _srv.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+            var apiResponse = await _srv
+                .GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+            if (apiResponse is null)
+            {
+                TempData[AC.Error] = "No se pudo obtener la respuesta";
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
+
+            if (apiResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", apiResponse.errorMessages);
+                TempData[AC.Error] = errorsMessagesBuilder.ToString();
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
 
             var objLegacyList = JsonConvert.DeserializeObject<List<QuotationLegacyDto>>(Convert.ToString(apiResponse.result))!;
 
@@ -200,7 +215,7 @@ public class QuotationLegacyController : Controller
                 {
                     var objBankAccountSource =
                         objBankAccountList
-                            .FirstOrDefault(x => 
+                            .FirstOrDefault(x =>
                                 x.Code == quotationLegacy.BankAccountSourceCode &&
                                 x.ParentTrx.Code == quotationLegacy.BankSourceCode);
 
@@ -215,7 +230,7 @@ public class QuotationLegacyController : Controller
 
                     var objBankAccountTarget =
                         objBankAccountList
-                            .FirstOrDefault(x => 
+                            .FirstOrDefault(x =>
                                 x.Code == quotationLegacy.BankAccountTargetCode &&
                                 x.ParentTrx.Code == quotationLegacy.BankTargetCode);
 
@@ -268,6 +283,19 @@ public class QuotationLegacyController : Controller
             var objQuotationDetailList = new List<QuotationDetail>();
 
             apiResponse = await _srvDetail.GetAllLegacyAsync<APIResponse>(_sessionToken, 0, 1, dateTransaInitial, dateTransaFinal, "");
+
+            if (apiResponse is null)
+            {
+                TempData[AC.Error] = "No se pudo obtener la respuesta";
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
+
+            if (apiResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", apiResponse.errorMessages);
+                TempData[AC.Error] = errorsMessagesBuilder.ToString();
+                return RedirectToAction("Index", "Home", new { Area = "exchange" });
+            }
 
             var objDetailLegacyList = JsonConvert.DeserializeObject<List<QuotationDetailLegacyDto>>(Convert.ToString(apiResponse.result))!;
 
@@ -362,7 +390,7 @@ public class QuotationLegacyController : Controller
                         detail.BankSourceId = obj.Id;
                         detail.BankSourceTrx = obj;
 
-                         obj = objBankList.FirstOrDefault(x => x.Code == bankTargetCode);
+                        obj = objBankList.FirstOrDefault(x => x.Code == bankTargetCode);
 
                         if (obj == null)
                         {
@@ -405,7 +433,7 @@ public class QuotationLegacyController : Controller
                 worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-                
+
                 var headerRow = worksheet.Row(3);
                 headerRow.Style.Font.Bold = true;
                 headerRow.Style.Fill.BackgroundColor = XLColor.PastelBlue;
