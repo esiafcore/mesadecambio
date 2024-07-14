@@ -12,17 +12,6 @@ const fnEnableTooltip = () => {
     });
 };
 
-
-//const fnDestroyTooltips = () => {
-//    let buttons = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-//    buttons.forEach(function (button) {
-//        let tooltipInstance = bootstrap.Tooltip.getInstance(button);
-//        if (tooltipInstance) {
-//            tooltipInstance.dispose();
-//        }
-//    });
-//};
-
 const LocalTimeDefault = "T00:00:00";
 
 const defaultDecimalTransa = 2;
@@ -133,6 +122,11 @@ const styleHide = "none";
 const styleShow = "block";
 const styleShowInline = "inline-block";
 
+const ToggleLoadingText = {
+    Printing: "Imprimiendo...",
+    GeneratePdf: "Generado PDF..."
+
+}
 const ButtonsText = {
     Confirm: "Confirmar",
     Cancel: "Cancelar",
@@ -215,12 +209,6 @@ const fnparseFloat = (valueInput, onlyNumbersPositive = false) => {
 
     // Verifica si valueInput es una cadena antes de intentar reemplazar las comas
     if (typeof valueInput === 'string') {
-        // Utiliza una expresión regular para reemplazar todas las comas
-        //if (!onlyNumbersPositive) {
-        //    valueInput = valueInput.replace(/,/g, "");
-        //} else {
-        //    valueInput = valueInput.replace(/[,-]/g, "");
-        //}
 
         if (!onlyNumbersPositive) {
             // Eliminar comas y caracteres no numéricos
@@ -246,27 +234,6 @@ const select2Floating = () => {
         .children('span')
         .children('span')
         .css('height', ' calc(3.5rem + 2px)');
-
-    //document.querySelectorAll('.select2me').forEach((element) => {
-    //    let parentDiv = element.parentElement;
-    //    if (parentDiv.tagName.toLowerCase() === 'div') {
-    //        let spans = parentDiv.querySelectorAll('span');
-    //        spans.forEach(function (span) {
-    //            span.style.height = 'calc(3.5rem + 2px)';
-    //            span.style.marginTop = '18px';
-    //        });
-    //    }
-    //});
-
-    //document.querySelectorAll('.select2me').forEach((element) => {
-    //    let parentDiv = element.parentElement;
-    //    if (parentDiv.tagName.toLowerCase() === 'div') {
-    //        let labels = parentDiv.querySelectorAll('label');
-    //        labels.forEach(function (label) {
-    //            label.style.zIndex = '1';
-    //        });
-    //    }
-    //});
 
     $('.select2me')
         .parent('div')

@@ -341,7 +341,7 @@ const fnVoid = async (id) => {
 
 const fnPrintReport = async (id) => {
     try {
-        fntoggleLoading();
+        fntoggleLoading(ToggleLoadingText.Printing);
         const url = `/exchange/quotation/ValidateDataToPrint?id=${id}`;
 
         const response = await fetch(url, {
@@ -694,7 +694,7 @@ const fnLoadDatatable = () => {
                                      </a> `;
 
                     let btnPrint = `<a onclick="fnPrintReport('${row.id}')" class="btn btn-outline-primary py-1 px-3 my-0 mx-1" 
-                                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Imprimir">
+                                       data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Imprimir Nota de Crédito">
                                         <i class="bi bi-printer fs-5"></i>
                                     </a> `;
 
@@ -755,7 +755,7 @@ const fnLoadDatatable = () => {
                             const result = await getfilteredDataFromDatatable();
                             // si se imprime
                             if (result.isSuccess) {
-                                await fnexportToPDF(result.data);
+                                await fnexportCreditNoteToPDF(result.data);
                             }
                         }
                     },
@@ -861,7 +861,7 @@ const getfilteredDataFromDatatable = async () => {
 };
 
 // Exportar datos del datatable a PDF
-const fnexportToPDF = async (quoatationIds) => {
+const fnexportCreditNoteToPDF = async (quoatationIds) => {
     try {
         let isPrintSeparatedFiles = false;
 
@@ -884,7 +884,7 @@ const fnexportToPDF = async (quoatationIds) => {
 
         isPrintSeparatedFiles = result.isConfirmed;
 
-        fntoggleLoading("Generado PDF");
+        fntoggleLoading(ToggleLoadingText.GeneratePdf);
 
         const url = `/exchange/quotation/ExportCreditNoteToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
 

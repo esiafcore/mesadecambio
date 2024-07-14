@@ -2972,8 +2972,6 @@ public class QuotationController : Controller
     {
         JsonResultResponse jsonResponse = new();
         StiReport reportResult = new();
-        ConfigFac? configFac = null;
-        Company? company = null;
 
         try
         {
@@ -2994,7 +2992,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            var configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
             if (configFac is null)
             {
                 jsonResponse.IsSuccess = false;
@@ -3002,7 +3000,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            var company = _uow.Company.Get(filter: x => x.Id == _companyId);
             if (company is null)
             {
                 jsonResponse.IsSuccess = false;
@@ -3111,11 +3109,13 @@ public class QuotationController : Controller
                 var exportReporteBase64 = Convert.ToBase64String(zipBytes);
 
                 jsonResponse.IsSuccess = true;
+                DateTime dateReport = DateTime.Now;
+
                 jsonResponse.Data = new
                 {
                     ContentFile = exportReporteBase64,
                     ContentType = AC.ContentTypeZip,
-                    Filename = $"NotasDeCreditos_{DateTime.UtcNow:yyyyMMdd}"
+                    Filename = $"NotasDeCreditos_{dateReport:yyyyMMdd}_{dateReport:HHmmss}"
                 };
                 return Json(jsonResponse);
             }
@@ -3150,13 +3150,14 @@ public class QuotationController : Controller
 
                 // Convertir los bytes a base64
                 var exportReporteBase64 = Convert.ToBase64String(pdfData);
+                DateTime dateReport = DateTime.Now;
 
                 jsonResponse.IsSuccess = true;
                 jsonResponse.Data = new
                 {
                     ContentFile = exportReporteBase64,
                     ContentType = AC.ContentTypePdf,
-                    Filename = "NotasDeCreditosEnLote"
+                    Filename = $"NotasDeCreditosEnLote_{dateReport:yyyyMMdd}_{dateReport:HHmmss}"
                 };
                 return Json(jsonResponse);
             }
