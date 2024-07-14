@@ -2,70 +2,74 @@
 @using Stimulsoft.Report.Web
 @using Stimulsoft.System.Web.UI.WebControls;
 
+<div class="container-fluid p-0 container-viewer-report">
 @Html.StiNetCoreViewer(new StiNetCoreViewerOptions()
 {
-    Actions = {
-        GetReport = "GetReport",
-        ViewerEvent = "ViewerEvent"
+    Actions =
+    {
+    GetReport = "GetReport",
+    ViewerEvent = "ViewerEvent"
     },
     Localization = "~/Localization/es.xml",
     Theme = StiViewerTheme.Office2022BlackPurple,
     Appearance =
     {
-        InterfaceType = StiInterfaceType.Mouse,
-        ShowTooltips = true,
-        ScrollbarsMode = true,
-        BackgroundColor = System.Drawing.Color.FromArgb(0xe8, 0xe8, 0xe8),
+    InterfaceType = StiInterfaceType.Mouse,
+    ShowTooltips = true,
+    ScrollbarsMode = true,
+    BackgroundColor = System.Drawing.Color.FromArgb(0xe8, 0xe8, 0xe8),
     },
     Toolbar =
     {
-        DisplayMode = StiToolbarDisplayMode.Simple,
-        ShowFullScreenButton = false,
-        PrintDestination = StiPrintDestination.Direct,
-        ShowBookmarksButton = false,
-        ShowParametersButton = false,
-        ShowResourcesButton = false,
-        ShowSaveButton = true,
-        ShowOpenButton = false,
-        ShowPrintButton = true,
+    DisplayMode = StiToolbarDisplayMode.Simple,
+    ShowFullScreenButton = false,
+    PrintDestination = StiPrintDestination.Direct,
+    ShowBookmarksButton = false,
+    ShowParametersButton = false,
+    ShowResourcesButton = false,
+    ShowSaveButton = true,
+    ShowOpenButton = false,
+    ShowPrintButton = true,
     },
-    Exports = {
-        ShowExportToDocument = false,
-        ShowExportToPdf = true, // OK
-        ShowExportToXps = false,
-        ShowExportToPowerPoint = false,
-        ShowExportToHtml = false,
-        ShowExportToHtml5 = false,
-        ShowExportToMht = false,
-        ShowExportToText = false,
-        ShowExportToRtf = false,
-        ShowExportToWord2007 = false,
-        ShowExportToOpenDocumentWriter = false,
-        ShowExportToExcel = false,
-        ShowExportToExcelXml = false,
-        ShowExportToExcel2007 = true, // OK
-        ShowExportToOpenDocumentCalc = true, // OK
-        ShowExportToCsv = false,
-        ShowExportToDbf = false,
-        ShowExportToXml = false,
-        ShowExportToDif = false,
-        ShowExportToSylk = false,
-        ShowExportToImageBmp = false,
-        ShowExportToImageGif = false,
-        ShowExportToImageJpeg = true, // OK
-        ShowExportToImagePcx = false,
-        ShowExportToImagePng = false,
-        ShowExportToImageTiff = false,
-        ShowExportToImageMetafile = false,
-        ShowExportToImageSvg = false,
-        ShowExportToImageSvgz = false,
-        ShowExportToJson = false,
-        ShowOpenAfterExport = true,
-        ShowExportDialog = true // Mostrar C. Dialog de export
+    Exports =
+    {
+    ShowExportToDocument = false,
+    ShowExportToPdf = true, // OK
+    ShowExportToXps = false,
+    ShowExportToPowerPoint = false,
+    ShowExportToHtml = false,
+    ShowExportToHtml5 = false,
+    ShowExportToMht = false,
+    ShowExportToText = false,
+    ShowExportToRtf = false,
+    ShowExportToWord2007 = false,
+    ShowExportToOpenDocumentWriter = false,
+    ShowExportToExcel = false,
+    ShowExportToExcelXml = false,
+    ShowExportToExcel2007 = true, // OK
+    ShowExportToOpenDocumentCalc = true, // OK
+    ShowExportToCsv = false,
+    ShowExportToDbf = false,
+    ShowExportToXml = false,
+    ShowExportToDif = false,
+    ShowExportToSylk = false,
+    ShowExportToImageBmp = false,
+    ShowExportToImageGif = false,
+    ShowExportToImageJpeg = true, // OK
+    ShowExportToImagePcx = false,
+    ShowExportToImagePng = false,
+    ShowExportToImageTiff = false,
+    ShowExportToImageMetafile = false,
+    ShowExportToImageSvg = false,
+    ShowExportToImageSvgz = false,
+    ShowExportToJson = false,
+    ShowOpenAfterExport = true,
+    ShowExportDialog = true // Mostrar C. Dialog de export
     },
-    Width = Unit.Percentage(100)
+    Width = Unit.Percentage(100),
+    Height = Unit.Percentage(100)
 })
-
+</div>
 
 @section Scripts {
     <script src="~/js/Exchange/SystemInformation/indexReport.js"></script>

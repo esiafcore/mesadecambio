@@ -56,6 +56,10 @@ table.dataTable tbody tr.selected {
     display: flex;
 }
 
+.container-viewer-report {
+    height: 82vh;
+}
+
 .buttons-pdf.btn-danger {
     background-color: #dc3545 !important;
     border-color: #dc3545 !important;
