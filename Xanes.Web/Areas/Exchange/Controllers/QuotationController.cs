@@ -14,6 +14,8 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.IO.Compression;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -33,8 +35,13 @@ public class QuotationController : Controller
 
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
+    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly string? _userName;
+    private readonly System.Net.IPAddress? _ipAddress;
 
-    public QuotationController(IUnitOfWork uow, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
+    public QuotationController(IUnitOfWork uow, IConfiguration configuration
+        , IWebHostEnvironment hostEnvironment
+        , IHttpContextAccessor contextAccessor)
     {
         _uow = uow;
         _configuration = configuration;
@@ -45,6 +52,7 @@ public class QuotationController : Controller
         _variationMaxDeposit = _configuration.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
         _limitBatchCreditNote = _configuration.GetValue<int>("ApplicationSettings:LimitBatchCreditNote");
         _hostEnvironment = hostEnvironment;
+        _contextAccessor = contextAccessor;
         _parametersReport = new();
 
         var path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
@@ -53,6 +61,10 @@ public class QuotationController : Controller
         {
             Stimulsoft.Base.StiLicense.LoadFromFile(path);
         }
+
+        //_userName = _contextAccessor.HttpContext?.User.Identity?.Name;
+        _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
+        _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
     }
 
     public IActionResult Index()
@@ -450,10 +462,10 @@ public class QuotationController : Controller
                 obj.InternalSerial = AC.InternalSerialDraft;
 
                 //Seteamos campos de auditoria
-                obj.CreatedBy = AC.LOCALHOSTME;
+                obj.CreatedBy = _userName ?? AC.LOCALHOSTME;
                 obj.CreatedDate = DateTime.UtcNow;
                 obj.CreatedHostName = AC.LOCALHOSTPC;
-                obj.CreatedIpv4 = AC.Ipv4Default;
+                obj.CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 obj.IsPosted = false;
                 obj.IsClosed = false;
                 _uow.Quotation.Add(obj);
@@ -510,10 +522,10 @@ public class QuotationController : Controller
             else
             {
                 //Seteamos campos de auditoria
-                obj.UpdatedBy = AC.LOCALHOSTME;
+                obj.UpdatedBy = _userName ?? AC.LOCALHOSTME;
                 obj.UpdatedDate = DateTime.UtcNow;
                 obj.UpdatedHostName = AC.LOCALHOSTPC;
-                obj.UpdatedIpv4 = AC.Ipv4Default;
+                obj.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.Quotation.Update(obj);
                 _uow.Save();
                 if (showMessages)
@@ -526,10 +538,10 @@ public class QuotationController : Controller
                     {
                         detail.AmountDetail = obj.AmountTransaction;
                         //Seteamos campos de auditoria
-                        detail.UpdatedBy = AC.LOCALHOSTME;
+                        detail.UpdatedBy = _userName ?? AC.LOCALHOSTME;
                         detail.UpdatedDate = DateTime.UtcNow;
                         detail.UpdatedHostName = AC.LOCALHOSTPC;
-                        detail.UpdatedIpv4 = AC.Ipv4Default;
+                        detail.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                         _uow.QuotationDetail.Update(detail);
                     }
                     _uow.Save();
@@ -700,10 +712,10 @@ public class QuotationController : Controller
         objQt.ExchangeRateSellTransa = obj.ExchangeRateSellTransa;
 
         //Seteamos campos de auditoria
-        objQt.UpdatedBy = AC.LOCALHOSTME;
+        objQt.UpdatedBy = _userName ?? AC.LOCALHOSTME;
         objQt.UpdatedDate = DateTime.UtcNow;
         objQt.UpdatedHostName = AC.LOCALHOSTPC;
-        objQt.UpdatedIpv4 = AC.Ipv4Default;
+        objQt.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
         _uow.Quotation.Update(objQt);
         _uow.Save();
 
@@ -715,10 +727,10 @@ public class QuotationController : Controller
             {
                 detail.AmountDetail = objQt.AmountTransaction;
                 //Seteamos campos de auditoria
-                detail.UpdatedBy = AC.LOCALHOSTME;
+                detail.UpdatedBy = _userName ?? AC.LOCALHOSTME;
                 detail.UpdatedDate = DateTime.UtcNow;
                 detail.UpdatedHostName = AC.LOCALHOSTPC;
-                detail.UpdatedIpv4 = AC.Ipv4Default;
+                detail.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.QuotationDetail.Update(detail);
             }
             _uow.Save();
@@ -906,10 +918,10 @@ public class QuotationController : Controller
                 //Seteamos campos de auditoria
                 obj.LineNumber = await _uow.QuotationDetail.NextLineNumber(filter: x =>
                      x.CompanyId == obj.CompanyId && x.ParentId == objHeader.Id && x.QuotationDetailType == obj.QuotationDetailType);
-                obj.CreatedBy = AC.LOCALHOSTME;
+                obj.CreatedBy = _userName ?? AC.LOCALHOSTME;
                 obj.CreatedDate = DateTime.UtcNow;
                 obj.CreatedHostName = AC.LOCALHOSTPC;
-                obj.CreatedIpv4 = AC.Ipv4Default;
+                obj.CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.QuotationDetail.Add(obj);
                 _uow.Save();
                 TempData[AC.Success] = $"Cotización creada correctamente";
@@ -931,10 +943,10 @@ public class QuotationController : Controller
                 objDetail.BankSourceId = obj.BankSourceId;
                 objDetail.BankTargetId = obj.BankTargetId;
                 objDetail.QuotationDetailType = obj.QuotationDetailType;
-                objDetail.UpdatedBy = AC.LOCALHOSTME;
+                objDetail.UpdatedBy = _userName ?? AC.LOCALHOSTME;
                 objDetail.UpdatedDate = DateTime.UtcNow;
                 objDetail.UpdatedHostName = AC.LOCALHOSTPC;
-                objDetail.UpdatedIpv4 = AC.Ipv4Default;
+                objDetail.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.QuotationDetail.Update(objDetail);
                 _uow.Save();
 
@@ -959,10 +971,10 @@ public class QuotationController : Controller
             objHeader.TotalTransfer = objDetails
                 .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer || x.QuotationDetailType == QuotationDetailType.DebitTransfer)
                 .Sum(x => x.AmountDetail);
-            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
         }
