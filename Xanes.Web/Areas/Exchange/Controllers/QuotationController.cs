@@ -13,9 +13,6 @@ using static Xanes.Utility.SD;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using static Stimulsoft.Report.Help.StiHelpProvider;
-using Stimulsoft.Report.Components;
 using System.IO.Compression;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
