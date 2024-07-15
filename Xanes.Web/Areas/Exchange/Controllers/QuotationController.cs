@@ -14,7 +14,6 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.IO.Compression;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
@@ -52,7 +51,6 @@ public class QuotationController : Controller
         _variationMaxDeposit = _configuration.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
         _limitBatchCreditNote = _configuration.GetValue<int>("ApplicationSettings:LimitBatchCreditNote");
         _hostEnvironment = hostEnvironment;
-        _contextAccessor = contextAccessor;
         _parametersReport = new();
 
         var path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
@@ -61,10 +59,10 @@ public class QuotationController : Controller
         {
             Stimulsoft.Base.StiLicense.LoadFromFile(path);
         }
-
-        //_userName = _contextAccessor.HttpContext?.User.Identity?.Name;
+        _contextAccessor = contextAccessor;
         _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
         _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
+
     }
 
     public IActionResult Index()
@@ -1373,10 +1371,10 @@ public class QuotationController : Controller
             }
 
             //Seteamos campos de auditoria
-            objQuotation.UpdatedBy = AC.LOCALHOSTME;
+            objQuotation.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objQuotation.UpdatedDate = DateTime.UtcNow;
             objQuotation.UpdatedHostName = AC.LOCALHOSTPC;
-            objQuotation.UpdatedIpv4 = AC.Ipv4Default;
+            objQuotation.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             objQuotation.IsAdjustment = true;
             _uow.Quotation.Update(objQuotation);
             _uow.Save();
@@ -1474,14 +1472,14 @@ public class QuotationController : Controller
             objHeader.Numeral = nextSeq;
             objHeader.InternalSerial = AC.InternalSerialOfficial;
             //Seteamos campos de auditoria
-            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = AC.Ipv4Default;
-            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.ClosedDate = DateTime.UtcNow;
             objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ClosedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
@@ -1524,14 +1522,14 @@ public class QuotationController : Controller
             objHeader.IsPosted = true;
 
             //Seteamos campos de auditoria
-            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = AC.Ipv4Default;
-            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.ClosedDate = DateTime.UtcNow;
             objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ClosedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
@@ -1573,14 +1571,14 @@ public class QuotationController : Controller
 
             objHeader.IsVoid = true;
             //Seteamos campos de auditoria
-            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = AC.Ipv4Default;
-            objHeader.ClosedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.ClosedDate = DateTime.UtcNow;
             objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ClosedIpv4 = AC.Ipv4Default;
+            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
@@ -1649,10 +1647,10 @@ public class QuotationController : Controller
             objHeader.TotalTransfer = objDetails
                 .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer)
                 .Sum(x => x.AmountDetail);
-            objHeader.UpdatedBy = AC.LOCALHOSTME;
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = AC.Ipv4Default;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
 
@@ -2709,10 +2707,10 @@ public class QuotationController : Controller
                 header.IsPayment = objBusiness.IsPayment;
 
                 ////Seteamos campos de auditoria
-                //header.CreatedBy = AC.LOCALHOSTME;
-                //header.CreatedDate = DateTime.UtcNow;
+                header.CreatedBy = _userName ?? AC.LOCALHOSTME;
+                header.CreatedDate = DateTime.UtcNow;
                 header.CreatedHostName = AC.LOCALHOSTPC;
-                header.CreatedIpv4 = AC.Ipv4Default;
+                header.CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
 
                 if (!header.IsClosed)
                 {
@@ -2751,10 +2749,10 @@ public class QuotationController : Controller
                     }
 
                     header.InternalSerial = AC.InternalSerialOfficial;
-                    //header.ClosedBy = AC.LOCALHOSTME;
-                    //header.ClosedDate = DateTime.UtcNow;
+                    header.ClosedBy = _userName ?? AC.LOCALHOSTME;
+                    header.ClosedDate = DateTime.UtcNow;
                     header.ClosedHostName = AC.LOCALHOSTPC;
-                    header.ClosedIpv4 = AC.Ipv4Default;
+                    header.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 }
 
                 if (header.TypeNumeral != SD.QuotationType.Transfer)
