@@ -554,6 +554,7 @@ public class SystemInformationController : Controller
                     TotalTransfer = transaction.TotalTransferRpt,
                     ExecutiveCode = transaction.BusinessExecutiveCode,
                     IsClosed = transaction.IsClosed,
+                    IsVoid = transaction.IsVoid,
                     CreatedBy = transaction.CreatedBy,
                     ClosedBy = transaction.ClosedBy,
                     DateTransa = transaction.DateTransa
@@ -565,8 +566,8 @@ public class SystemInformationController : Controller
             // Guardar los datos en el contexto
             var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
-            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
-            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString(AC.DefaultDateFormatView));
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString(AC.DefaultDateFormatView));
             jsonResponse.IsSuccess = true;
             return Json(jsonResponse);
         }
@@ -659,8 +660,8 @@ public class SystemInformationController : Controller
             // Guardar los datos en el contexto
             var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
-            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString());
-            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString());
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString(AC.DefaultDateFormatView));
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString(AC.DefaultDateFormatView));
 
             jsonResponse.IsSuccess = true;
             return Json(jsonResponse);
