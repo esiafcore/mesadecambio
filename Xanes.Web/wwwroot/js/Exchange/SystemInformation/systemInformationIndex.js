@@ -2,7 +2,7 @@
 let selectReportValue;
 
 document.addEventListener("DOMContentLoaded", async () => {
-
+    
     const selectGroupReport = document.getElementById("select-group");
     selectGroupReport.addEventListener("change", async (event) => {
         const selectElement = event.target;
@@ -21,11 +21,39 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Cargar vista parcial seleccionada
             selectReportValue = parseInt(selectElement.value);
             await fnloadPartialsView(selectReportValue);
+            //fnSetProcessingDate();
         }
     });
 
     await fnloadPartialsView(SystemInformationReportType.Operation);
+    fnSetProcessingDate();
+
+
+    document.getElementById('dateInitial').addEventListener("change", () => {
+        fnAdjustmentDates();
+    });
 });
+
+const fnSetProcessingDate = () => {
+    document.getElementById('dateInitial').value = processingDate;
+    document.getElementById('dateFinal').value = processingDate;
+}
+
+// Función para ajustar las fechas según los criterios
+const fnAdjustmentDates = () => {
+    let dateInitialValue = new Date(document.getElementById('dateInitial').value);
+    let dateFinalValue = new Date(document.getElementById('dateFinal').value);
+
+    // Validar si la fecha final es menor que la fecha inicial
+    if (dateFinalValue < dateInitialValue) {
+        document.getElementById('dateFinal').value = document.getElementById('dateInitial').value;
+    }
+
+    // Establecer el mínimo de la fecha final como la fecha inicial
+    document.getElementById('dateFinal').min = document.getElementById('dateInitial').value;
+    
+}
+
 
 // Validaciones en formularios ====>
 // Evento antes de enviar formularios para agregar validaciones  

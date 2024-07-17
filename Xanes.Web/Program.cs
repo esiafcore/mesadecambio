@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Xanes.DataAccess.Data;
@@ -63,6 +64,13 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
+//// forward headers configuration for reverse proxy
+//builder.Services.Configure<ForwardedHeadersOptions>(options => {
+//    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+//    options.KnownNetworks.Clear();
+//    options.KnownProxies.Clear();
+//});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -74,6 +82,7 @@ if (!app.Environment.IsDevelopment())
     //app.Environment.IsStaging()
 
     app.UseExceptionHandler("/Home/Error");
+    //app.UseForwardedHeaders();
     app.UseHsts();
 }
 else
@@ -85,6 +94,7 @@ else
     //{
     //    await SeedData.SeedDataDb(context);
     //}
+    //app.UseForwardedHeaders();
 }
 
 app.UseHttpsRedirection();

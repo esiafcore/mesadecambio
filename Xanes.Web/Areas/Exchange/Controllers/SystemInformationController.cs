@@ -50,6 +50,11 @@ public class SystemInformationController : Controller
     [HttpGet]
     public IActionResult Index()
     {
+        string? processingDateString = HttpContext.Session.GetString(AC.ProcessingDate)
+            ?? DateOnly.FromDateTime(DateTime.Now).ToString();
+        DateOnly dateFilter = DateOnly.Parse(processingDateString);
+        ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
+
         // TITULO DE LA PAGINA
         ViewData[AC.Title] = "Sistema de Información";
 

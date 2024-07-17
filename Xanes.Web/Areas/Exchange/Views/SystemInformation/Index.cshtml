@@ -57,5 +57,8 @@
 </div>
 
 @section Scripts {
+    <script>
+        let processingDate = @Html.Raw(@ViewBag.ProcessingDate);
+    </script>
     <script src="~/js/Exchange/SystemInformation/systemInformationIndex.js"></script>
 }

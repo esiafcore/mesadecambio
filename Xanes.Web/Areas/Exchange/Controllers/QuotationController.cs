@@ -291,6 +291,7 @@ public class QuotationController : Controller
                     obj.CurrencyTransferId = objCurrency.Id;
 
                     //TC COMPRA MENOR AL TC OFICIAL
+                    obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
                     if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
                     {
                         obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
