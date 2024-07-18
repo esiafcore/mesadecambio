@@ -443,7 +443,7 @@ public class QuotationController : Controller
             obj.IsPayment = objBusinessExecutive.IsPayment;
 
             //Verificamos si existe el cliente
-            var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId);
+            var objCustomer = _uow.Customer.Get(filter: x => (x.CompanyId == obj.CompanyId) && (x.Id == obj.CustomerId));
             if (objCustomer == null)
             {
                 jsonResponse.IsSuccess = false;
@@ -467,6 +467,7 @@ public class QuotationController : Controller
                 obj.CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 obj.IsPosted = false;
                 obj.IsClosed = false;
+                obj.IsBank = objCustomer.IsBank;
                 _uow.Quotation.Add(obj);
                 _uow.Save();
                 if (showMessages)
@@ -525,6 +526,7 @@ public class QuotationController : Controller
                 obj.UpdatedDate = DateTime.UtcNow;
                 obj.UpdatedHostName = AC.LOCALHOSTPC;
                 obj.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                obj.IsBank = objCustomer.IsBank;
                 _uow.Quotation.Update(obj);
                 _uow.Save();
                 if (showMessages)

@@ -253,6 +253,11 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Está ajustado")]
     public bool IsAdjustment { get; set; } = false;
 
+    [Required]
+    [Display(Name = "Es Banco")]
+    public bool IsBank { get; set; } = false;
+
+
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Id BusinessExecutive")]
     [ForeignKey(nameof(BusinessExecutiveTrx))]
