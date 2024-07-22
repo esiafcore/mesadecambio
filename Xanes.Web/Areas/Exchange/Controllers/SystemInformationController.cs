@@ -548,7 +548,7 @@ public class SystemInformationController : Controller
                     CompanyId = transaction.CompanyId,
                     TypeNumeral = transaction.TypeNumeral,
                     NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}",
-                    CustomerFullName = transaction.CustomerTrx.CommercialName,
+                    CustomerFullName = transaction.CustomerTrx.BusinessName,
                     CurrencySourceTarget = currency,
                     ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
                     ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
@@ -628,15 +628,16 @@ public class SystemInformationController : Controller
                 decimal amountMB = 0, amountMF = 0, amountMA = 0;
                 var customer = customerList.FirstOrDefault(c => c.Id == transaction.ParentTrx.CustomerId);
 
-                switch (transaction.ParentTrx.CurrencyTransferType)
+                //switch (transaction.CurrencyDetailTrx.Numeral .ParentTrx.CurrencyTransferType)
+                switch (transaction.CurrencyDetailTrx.Numeral)
                 {
-                    case CurrencyType.Base:
+                    case (int)CurrencyType.Base:
                         amountMB = transaction.AmountDetail;
                         break;
-                    case CurrencyType.Foreign:
+                    case (int)CurrencyType.Foreign:
                         amountMF = transaction.AmountDetail;
                         break;
-                    case CurrencyType.Additional:
+                    case (int)CurrencyType.Additional:
                         amountMA = transaction.AmountDetail;
                         break;
                 }

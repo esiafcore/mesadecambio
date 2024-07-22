@@ -34,6 +34,7 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
 
         builder.Property(b => b.IsPosted).HasDefaultValue(false);
         builder.Property(b => b.IsLoan).HasDefaultValue(false);
+        builder.Property(b => b.IsBank).HasDefaultValue(false);
         builder.Property(b => b.IsPayment).HasDefaultValue(false);
         builder.Property(b => b.IsClosed).HasDefaultValue(false);
         builder.Property(b => b.IsAdjustment).HasDefaultValue(false);

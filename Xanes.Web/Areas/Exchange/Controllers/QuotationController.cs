@@ -754,7 +754,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchangeFull = JsonConvert.SerializeObject(_decimalExchangeFull);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -819,7 +819,7 @@ public class QuotationController : Controller
         model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.QuotationTypeList = objTypeList;
         model.ModelCreateVM.CurrencySourceTarget =
-            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
+            $"{objHeader.CurrencyDepositTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
         //model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
 
         //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });

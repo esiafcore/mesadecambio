@@ -425,7 +425,7 @@ Oficial</Text>
           <BusinessObjectGuid>3cf0d9c4e6904b81a595386bed5f4a06</BusinessObjectGuid>
           <ClientRectangle>0,50,344,6</ClientRectangle>
           <Components isList="true" count="13">
-            <Datadatrep_code Ref="28" type="Text" isKey="true">
+            <fldId Ref="28" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>0,0,16,6</ClientRectangle>
@@ -434,7 +434,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>8,3,0,0</Margins>
-              <Name>Datadatrep_code</Name>
+              <Name>fldId</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.Id}</Text>
@@ -442,8 +442,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_code>
-            <Datadatrep_identNumber Ref="29" type="Text" isKey="true">
+            </fldId>
+            <fldDateTransa Ref="29" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>54,0,24,6</ClientRectangle>
@@ -452,7 +452,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Datadatrep_identNumber</Name>
+              <Name>fldDateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.DateTransa}</Text>
@@ -460,8 +460,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_identNumber>
-            <Datadatrep_isActive Ref="30" type="Text" isKey="true">
+            </fldDateTransa>
+            <fldIsClosed Ref="30" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>320,0,24,6</ClientRectangle>
@@ -470,7 +470,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Datadatrep_isActive</Name>
+              <Name>fldIsClosed</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.IsClosed ? "S" : "N"}</Text>
@@ -478,8 +478,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_isActive>
-            <Datadatrep_identNumberCode Ref="31" type="Text" isKey="true">
+            </fldIsClosed>
+            <fldNumberTransa Ref="31" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>32,0,22,6</ClientRectangle>
@@ -488,7 +488,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>8,3,0,0</Margins>
-              <Name>Datadatrep_identNumberCode</Name>
+              <Name>fldNumberTransa</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.NumberTransa}</Text>
@@ -496,7 +496,7 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_identNumberCode>
+            </fldNumberTransa>
             <Datadatrep_comercialName Ref="32" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
@@ -514,7 +514,7 @@ Oficial</Text>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
             </Datadatrep_comercialName>
-            <Text16 Ref="33" type="Text" isKey="true">
+            <fldExecutiveCode Ref="33" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>304,0,16,6</ClientRectangle>
@@ -523,7 +523,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text16</Name>
+              <Name>fldExecutiveCode</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.ExecutiveCode}</Text>
@@ -531,8 +531,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text16>
-            <Text18 Ref="34" type="Text" isKey="true">
+            </fldExecutiveCode>
+            <fldAmountTransactionAdditional Ref="34" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>280,0,24,6</ClientRectangle>
@@ -541,7 +541,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text18</Name>
+              <Name>fldAmountTransactionAdditional</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransactionAdditional)}</Text>
@@ -549,8 +549,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text18>
-            <Text19 Ref="35" type="Text" isKey="true">
+            </fldAmountTransactionAdditional>
+            <fldAmountTransactionForeign Ref="35" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>256,0,24,6</ClientRectangle>
@@ -559,7 +559,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text19</Name>
+              <Name>fldAmountTransactionForeign</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransactionForeign)}</Text>
@@ -567,8 +567,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text19>
-            <Text21 Ref="36" type="Text" isKey="true">
+            </fldAmountTransactionForeign>
+            <fldBankSourceCode Ref="36" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>206,0,26,6</ClientRectangle>
@@ -577,7 +577,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text21</Name>
+              <Name>fldBankSourceCode</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.BankSourceCode}</Text>
@@ -585,8 +585,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text21>
-            <Text22 Ref="37" type="Text" isKey="true">
+            </fldBankSourceCode>
+            <fldExchangeRateOfficialTransa Ref="37" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>180,0,26,6</ClientRectangle>
@@ -595,7 +595,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text22</Name>
+              <Name>fldExchangeRateOfficialTransa</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{Format("{0:N" + parDecimalExchangeRate + "}", datrep.ExchangeRateOfficialTransa)}</Text>
@@ -603,8 +603,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text22>
-            <Text23 Ref="38" type="Text" isKey="true">
+            </fldExchangeRateOfficialTransa>
+            <fldExchangeRateTransa Ref="38" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>156,0,24,6</ClientRectangle>
@@ -613,7 +613,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text23</Name>
+              <Name>fldExchangeRateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{Format("{0:N" + parDecimalExchangeRate + "}", datrep.ExchangeRateTransa)}</Text>
@@ -621,8 +621,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text23>
-            <Text13 Ref="39" type="Text" isKey="true">
+            </fldExchangeRateTransa>
+            <fldIdDetail Ref="39" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>16,0,16,6</ClientRectangle>
@@ -631,7 +631,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>8,3,0,0</Margins>
-              <Name>Text13</Name>
+              <Name>fldIdDetail</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{datrep.IdDetail}</Text>
@@ -639,8 +639,8 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text13>
-            <Text35 Ref="40" type="Text" isKey="true">
+            </fldIdDetail>
+            <fldAmountTransactionBase Ref="40" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>232,0,24,6</ClientRectangle>
@@ -649,7 +649,7 @@ Oficial</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text35</Name>
+              <Name>fldAmountTransactionBase</Name>
               <Page isRef="3" />
               <Parent isRef="27" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransactionBase)}</Text>
@@ -657,7 +657,7 @@ Oficial</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text35>
+            </fldAmountTransactionBase>
           </Components>
           <Conditions isList="true" count="0" />
           <DataSourceName isNull="true" />
@@ -1054,13 +1054,13 @@ parAmountNetMBO)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>7/7/2024 10:08:35 PM</ReportChanged>
+  <ReportChanged>7/21/2024 9:34:16 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
-  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\Xanes\Xanes.Web\Areas\Exchange\Reports\DepositList.mrt</ReportFile>
-  <ReportGuid>fa708055741a453da61672b6e35c6fca</ReportGuid>
+  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\XanesN8.UI\Xanes.Web\Areas\Exchange\Reports\DepositList.mrt</ReportFile>
+  <ReportGuid>37f57025ca924ad4a0c16fc9aa2bd6ed</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
-  <ReportVersion>2024.2.3.0</ReportVersion>
+  <ReportVersion>2024.3.1.0</ReportVersion>
   <Script>using System;
 using System.Drawing;
 using System.Windows.Forms;
