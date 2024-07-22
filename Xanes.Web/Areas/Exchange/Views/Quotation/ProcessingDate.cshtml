@@ -12,7 +12,7 @@
             Fecha
         </div>
         <div class="col-sm-6 pb-3">
-            <input asp-for="ProcessingDate" type="text" class="form-control border border-primary border-opacity-25"
+            <input asp-for="ProcessingDate" value="@Model.ProcessingDate.ToString(AC.DefaultDateFormatView)" type="text" class="form-control border border-primary border-opacity-25"
                    id="processingDate" />
         </div>
     </div>

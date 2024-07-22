@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //});
 
     $(processingDate).datepicker({
+        dateFormat: FormatDateView,
         changeMonth: true,
         changeYear: true,
         defaultDate: new Date(currentDateDefault + LocalTimeDefault),

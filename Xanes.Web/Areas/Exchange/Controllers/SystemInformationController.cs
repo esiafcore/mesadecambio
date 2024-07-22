@@ -102,7 +102,7 @@ public class SystemInformationController : Controller
     //! RENDERIZACION DE REPORTE ===>
     #region ImplementacionReporte
 
-    public async Task<IActionResult> GetReport()
+    public IActionResult GetReport()
     {
         try
         {
@@ -131,15 +131,15 @@ public class SystemInformationController : Controller
             switch (reportType)
             {
                 case SD.ReportTransaType.Operation:
-                    report = await SetReportDataForOperation(reportDataVmTrans);
+                    report = SetReportDataForOperation(reportDataVmTrans);
                     break;
 
                 case SD.ReportTransaType.Deposit:
-                    report = await SetReportDataForDeposit(reportDataVmTrans);
+                    report = SetReportDataForDeposit(reportDataVmTrans);
                     break;
 
                 case SD.ReportTransaType.Transfer:
-                    report = await SetReportDataForTransfer(reportDataVmTrans);
+                    report = SetReportDataForTransfer(reportDataVmTrans);
                     break;
             }
 
@@ -184,7 +184,7 @@ public class SystemInformationController : Controller
 
 
     // FUNCIONES PARA CONFIGURAR LOS REPORTES A UTILIZAR =====>
-    private async Task<StiReport> SetReportDataForOperation(TransactionReportVM modelVm)
+    private StiReport SetReportDataForOperation(TransactionReportVM modelVm)
     {
         StiReport reportResult = new();
 
@@ -252,7 +252,7 @@ public class SystemInformationController : Controller
         return reportResult;
     }
 
-    private async Task<StiReport> SetReportDataForDeposit(TransactionReportVM modelVm)
+    private StiReport SetReportDataForDeposit(TransactionReportVM modelVm)
     {
         StiReport reportResult = new();
 
@@ -311,7 +311,7 @@ public class SystemInformationController : Controller
         return reportResult;
     }
 
-    private async Task<StiReport> SetReportDataForTransfer(TransactionReportVM modelVm)
+    private StiReport SetReportDataForTransfer(TransactionReportVM modelVm)
     {
         StiReport reportResult = new();
 
@@ -373,7 +373,7 @@ public class SystemInformationController : Controller
 
     // Obtener las vistas parciales para renderizarlas
     [HttpPost]
-    public async Task<IActionResult> GetPartialView(SD.ReportTransaType reportType)
+    public IActionResult GetPartialView(SD.ReportTransaType reportType)
     {
         JsonResultResponse? resultResponse;
         var partialViewName = SD.SystemInformationReportPartialViewName[(short)reportType];
@@ -381,7 +381,7 @@ public class SystemInformationController : Controller
         switch (reportType)
         {
             case SD.ReportTransaType.Operation:
-                resultResponse = await SetDataPartialViewOperation(reportType);
+                resultResponse = SetDataPartialViewOperation(reportType);
                 if (!resultResponse.IsSuccess || (resultResponse.Data == null))
                 {
                     return BadRequest(resultResponse.ErrorMessages);
@@ -391,7 +391,7 @@ public class SystemInformationController : Controller
                 return PartialView(partialViewName, transaVM);
 
             case SD.ReportTransaType.Deposit:
-                resultResponse = await SetDataPartialViewDeposit(reportType);
+                resultResponse = SetDataPartialViewDeposit(reportType);
                 if (!resultResponse.IsSuccess || (resultResponse.Data == null))
                 {
                     return BadRequest(resultResponse.ErrorMessages);
@@ -401,7 +401,7 @@ public class SystemInformationController : Controller
                 return PartialView(partialViewName, transaVM);
 
             case SD.ReportTransaType.Transfer:
-                resultResponse = await SetDataPartialViewTransfer(reportType);
+                resultResponse = SetDataPartialViewTransfer(reportType);
                 if (!resultResponse.IsSuccess || (resultResponse.Data == null))
                 {
                     return BadRequest(resultResponse.ErrorMessages);
@@ -416,7 +416,7 @@ public class SystemInformationController : Controller
 
     //Configurar modelo para cada vista parcial (si lo requiere)
     // Reporte => Listado de Operaciones
-    private async Task<JsonResultResponse> SetDataPartialViewOperation(SD.ReportTransaType typeReport)
+    private JsonResultResponse SetDataPartialViewOperation(SD.ReportTransaType typeReport)
     {
         JsonResultResponse? resultResponse = new() { IsSuccess = true };
 
@@ -441,7 +441,7 @@ public class SystemInformationController : Controller
     }
 
     // Reporte => Listado de Depositos
-    private async Task<JsonResultResponse> SetDataPartialViewDeposit(SD.ReportTransaType typeReport)
+    private JsonResultResponse SetDataPartialViewDeposit(SD.ReportTransaType typeReport)
     {
         JsonResultResponse? resultResponse = new() { IsSuccess = true };
 
@@ -466,7 +466,7 @@ public class SystemInformationController : Controller
     }
 
     // Reporte => Listado de Depositos
-    private async Task<JsonResultResponse> SetDataPartialViewTransfer(SD.ReportTransaType typeReport)
+    private JsonResultResponse SetDataPartialViewTransfer(SD.ReportTransaType typeReport)
     {
         JsonResultResponse? resultResponse = new() { IsSuccess = true };
 
@@ -489,10 +489,11 @@ public class SystemInformationController : Controller
             return resultResponse;
         }
     }
+
 
     // VALIDAR QUE EXISTAN DATOS PARA EL REPORTE Y GUARDARLOS ======>
     [HttpPost]
-    public async Task<JsonResult> VerificationDataForOperation([FromBody] TransactionReportVM reportData)
+    public JsonResult VerificationDataForOperation([FromBody] TransactionReportVM reportData)
     {
         JsonResultResponse? jsonResponse = new();
         StiReport reportResult = new();
@@ -585,7 +586,7 @@ public class SystemInformationController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> VerificationDataForDeposit([FromBody] TransactionReportVM reportData)
+    public JsonResult VerificationDataForDeposit([FromBody] TransactionReportVM reportData)
     {
         JsonResultResponse? jsonResponse = new();
         try
@@ -681,7 +682,7 @@ public class SystemInformationController : Controller
     }
 
     [HttpPost]
-    public async Task<JsonResult> VerificationDataForTransfer([FromBody] TransactionReportVM reportData)
+    public JsonResult VerificationDataForTransfer([FromBody] TransactionReportVM reportData)
     {
         JsonResultResponse? jsonResponse = new();
         try

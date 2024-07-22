@@ -20,7 +20,6 @@
     <None Remove="Areas\Exchange\Reports\OperationList.mrt" />
     <None Remove="Areas\Exchange\Reports\Quotation.mrt" />
     <None Remove="Areas\Exchange\Reports\TransferList.mrt" />
-    <None Remove="License\license.key" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,9 +98,6 @@
     </Content>
     <Content Include="Areas\Exchange\Reports\Quotation.mrt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="License\license.key">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

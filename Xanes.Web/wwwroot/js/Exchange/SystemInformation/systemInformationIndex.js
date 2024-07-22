@@ -1,6 +1,8 @@
 ﻿// Reporte seleccionadoo
 let selectReportValue;
 
+let dateInitialSave, dateFinalSave;
+
 document.addEventListener("DOMContentLoaded", async () => {
     
     const selectGroupReport = document.getElementById("select-group");
@@ -21,18 +23,37 @@ document.addEventListener("DOMContentLoaded", async () => {
             // Cargar vista parcial seleccionada
             selectReportValue = parseInt(selectElement.value);
             await fnloadPartialsView(selectReportValue);
-            //fnSetProcessingDate();
+
+            fnSetEventChange();
+
+            fnSetProcessingDate();
+
+            if (dateInitialSave) {
+                document.getElementById('dateInitial').value = dateInitialSave;
+            }
+
+            if (dateFinalSave) {
+                document.getElementById('dateFinal').value = dateFinalSave;
+            }
         }
     });
 
     await fnloadPartialsView(SystemInformationReportType.Operation);
     fnSetProcessingDate();
 
+    fnSetEventChange();
+});
 
+const fnSetEventChange = () => {
     document.getElementById('dateInitial').addEventListener("change", () => {
         fnAdjustmentDates();
+        dateInitialSave = document.getElementById('dateInitial').value;
     });
-});
+
+    document.getElementById('dateFinal').addEventListener("change", () => {
+        dateFinalSave = document.getElementById('dateFinal').value;
+    });
+};
 
 const fnSetProcessingDate = () => {
     document.getElementById('dateInitial').value = processingDate;
