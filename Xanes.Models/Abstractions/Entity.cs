@@ -14,31 +14,31 @@ public abstract class Entity
 
     [Display(Name = "Creado Por")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedBy { get; set; } = string.Empty;
+    public string CreatedBy { get; set; } = null!;
 
     [Display(Name = "IPv4 Creador")]
     [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedIpv4 { get; set; } = string.Empty;
+    public string CreatedIpv4 { get; set; } = null!;
 
     [Display(Name = "HostName Creador")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedHostName { get; set; } = string.Empty;
+    public string CreatedHostName { get; set; } = null!;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     [Display(Name = "Actualizado El")]
-    public DateTime? UpdatedDate { get; set; } = null;
+    public DateTime? UpdatedDate { get; set; }
 
     [Display(Name = "Actualizado Por")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string? UpdatedBy { get; set; } = null;
+    public string? UpdatedBy { get; set; }
 
     [Display(Name = "IPv4 Actualizador")]
     [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string? UpdatedIpv4 { get; set; } = null;
+    public string? UpdatedIpv4 { get; set; }
 
     [Display(Name = "HostName Actualizador")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string? UpdatedHostName { get; set; } = null;
+    public string? UpdatedHostName { get; set; }
 
 }
