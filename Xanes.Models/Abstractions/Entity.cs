@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Xanes.Utility;
 
 namespace Xanes.Models.Abstractions;
 
@@ -8,7 +9,7 @@ public abstract class Entity
     public int CompanyId { get; set; }
 
     [DataType(DataType.DateTime)]
-    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [DisplayFormat(DataFormatString = "{0:" + AC.DefaultDateFormatView + "}")]
     [Display(Name = "Creado El")]
     public DateTime CreatedDate { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
 
@@ -25,7 +26,7 @@ public abstract class Entity
     public string CreatedHostName { get; set; } = null!;
 
     [DataType(DataType.DateTime)]
-    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+    [DisplayFormat(DataFormatString = "{0:" + AC.DefaultDateFormatView + "}")]
     [Display(Name = "Actualizado El")]
     public DateTime? UpdatedDate { get; set; }
 
