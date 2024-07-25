@@ -15,15 +15,15 @@ public abstract class Entity
 
     [Display(Name = "Creado Por")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedBy { get; set; } = null!;
+    public string CreatedBy { get; set; } = string.Empty;
 
     [Display(Name = "IPv4 Creador")]
     [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedIpv4 { get; set; } = null!;
+    public string CreatedIpv4 { get; set; } = string.Empty;
 
     [Display(Name = "HostName Creador")]
     [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
-    public string CreatedHostName { get; set; } = null!;
+    public string CreatedHostName { get; set; } = string.Empty;
 
     [DataType(DataType.DateTime)]
     [DisplayFormat(DataFormatString = "{0:" + AC.DefaultDateFormatView + "}")]

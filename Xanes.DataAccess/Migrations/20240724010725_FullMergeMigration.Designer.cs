@@ -9,18 +9,18 @@ using Xanes.DataAccess.Data;
 
 #nullable disable
 
-namespace Xanes.DataAccess.Migrations.PgSql
+namespace Xanes.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240522175330_VerificationP0002")]
-    partial class VerificationP0002
+    [Migration("20240724010725_FullMergeMigration")]
+    partial class FullMergeMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -1301,11 +1301,25 @@ namespace Xanes.DataAccess.Migrations.PgSql
                         .HasColumnType("nvarchar(250)")
                         .HasColumnName("firstname");
 
-                    b.Property<string>("Identificationnumber")
+                    b.Property<string>("IdentificationNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("identificationnumber");
+
+                    b.Property<string>("IdentificationTypeCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasColumnName("identificationtypecode");
+
+                    b.Property<int>("IdentificationTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("identificationtypeid");
+
+                    b.Property<int>("IdentificationTypeNumber")
+                        .HasColumnType("int")
+                        .HasColumnName("identificationtypenumber");
 
                     b.Property<string>("InactivatedBy")
                         .HasMaxLength(100)
@@ -1395,6 +1409,9 @@ namespace Xanes.DataAccess.Migrations.PgSql
                     b.HasKey("Id")
                         .HasName("pk_customers");
 
+                    b.HasIndex("IdentificationTypeId")
+                        .HasDatabaseName("ix_customers_identificationtypeid");
+
                     b.HasIndex("SectorId")
                         .HasDatabaseName("ix_customers_sectorid");
 
@@ -1405,7 +1422,7 @@ namespace Xanes.DataAccess.Migrations.PgSql
                         .IsUnique()
                         .HasDatabaseName("ix_customers_companyid_internalserial_code");
 
-                    b.HasIndex(new[] { "CompanyId", "TypeId", "Identificationnumber" }, "customers_idx_2020")
+                    b.HasIndex(new[] { "CompanyId", "TypeId", "IdentificationNumber" }, "customers_idx_2020")
                         .IsUnique()
                         .HasDatabaseName("ix_customers_companyid_typeid_identificationnumber");
 
@@ -2233,23 +2250,20 @@ namespace Xanes.DataAccess.Migrations.PgSql
                         .HasColumnName("businessexecutiveid");
 
                     b.Property<string>("ClosedBy")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("closedby");
 
-                    b.Property<DateTime>("ClosedDate")
+                    b.Property<DateTime?>("ClosedDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("closeddate");
 
                     b.Property<string>("ClosedHostName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("closedhostname");
 
                     b.Property<string>("ClosedIpv4")
-                        .IsRequired()
                         .HasMaxLength(75)
                         .HasColumnType("nvarchar(75)")
                         .HasColumnName("closedipv4");
@@ -2361,6 +2375,18 @@ namespace Xanes.DataAccess.Migrations.PgSql
                         .HasDefaultValue("Z")
                         .HasColumnName("internalserial");
 
+                    b.Property<bool>("IsAdjustment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("isadjustment");
+
+                    b.Property<bool>("IsBank")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("isbank");
+
                     b.Property<bool>("IsClosed")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -2392,6 +2418,25 @@ namespace Xanes.DataAccess.Migrations.PgSql
                     b.Property<int>("Numeral")
                         .HasColumnType("int")
                         .HasColumnName("numeral");
+
+                    b.Property<string>("ReClosedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("reclosedby");
+
+                    b.Property<DateTime?>("ReClosedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("recloseddate");
+
+                    b.Property<string>("ReClosedHostName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("reclosedhostname");
+
+                    b.Property<string>("ReClosedIpv4")
+                        .HasMaxLength(75)
+                        .HasColumnType("nvarchar(75)")
+                        .HasColumnName("reclosedipv4");
 
                     b.Property<decimal>("TotalDeposit")
                         .ValueGeneratedOnAdd()
@@ -2827,6 +2872,13 @@ namespace Xanes.DataAccess.Migrations.PgSql
 
             modelBuilder.Entity("Xanes.Models.Customer", b =>
                 {
+                    b.HasOne("Xanes.Models.IdentificationType", "IdentificationTypeTrx")
+                        .WithMany()
+                        .HasForeignKey("IdentificationTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("fk_customers_identificationstypes_identificationtypeid");
+
                     b.HasOne("Xanes.Models.CustomerSector", "SectorTrx")
                         .WithMany()
                         .HasForeignKey("SectorId")
@@ -2840,6 +2892,8 @@ namespace Xanes.DataAccess.Migrations.PgSql
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("fk_customers_personstypes_typeid");
+
+                    b.Navigation("IdentificationTypeTrx");
 
                     b.Navigation("SectorTrx");
 

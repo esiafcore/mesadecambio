@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Security.Claims;
+using Xanes.LoggerService;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -35,12 +36,14 @@ public class QuotationController : Controller
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly ILoggerManager _logger;
     private readonly string? _userName;
     private readonly System.Net.IPAddress? _ipAddress;
 
     public QuotationController(IUnitOfWork uow, IConfiguration configuration
         , IWebHostEnvironment hostEnvironment
-        , IHttpContextAccessor contextAccessor)
+        , IHttpContextAccessor contextAccessor
+        , ILoggerManager logger)
     {
         _uow = uow;
         _configuration = configuration;
@@ -60,6 +63,7 @@ public class QuotationController : Controller
             Stimulsoft.Base.StiLicense.LoadFromFile(path);
         }
         _contextAccessor = contextAccessor;
+        _logger = logger;
         _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
         _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
 
@@ -2789,6 +2793,8 @@ public class QuotationController : Controller
                     }
                 }
             }
+
+            //Mandar al Log
 
             await _uow.Quotation.ImportRangeAsync(objQuotationList, objQuotationDetailList);
 
