@@ -4,8 +4,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     inputDateInitial = document.querySelector("#dateInitial");
     inputDateFinal = document.querySelector("#dateFinal");
-
+    inputDateInitial.addEventListener("change", () => {
+        fnAdjustmentDates();
+    });
 });
+
+const fnAdjustmentDates = () => {
+    let dateInitialValue = new Date(document.getElementById('dateInitial').value);
+    let dateFinalValue = new Date(document.getElementById('dateFinal').value);
+
+    // Validar si la fecha final es menor que la fecha inicial
+    if (dateFinalValue < dateInitialValue) {
+        document.getElementById('dateFinal').value = document.getElementById('dateInitial').value;
+    }
+
+    // Establecer el mínimo de la fecha final como la fecha inicial
+    document.getElementById('dateFinal').min = document.getElementById('dateInitial').value;
+}
 
 const fnExportExcel = async () => {
     try {

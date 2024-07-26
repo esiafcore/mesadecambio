@@ -71,8 +71,7 @@ const fnAdjustmentDates = () => {
     }
 
     // Establecer el mínimo de la fecha final como la fecha inicial
-    document.getElementById('dateFinal').min = document.getElementById('dateInitial').value;
-    
+    document.getElementById('dateFinal').min = document.getElementById('dateInitial').value;    
 }
 
 
