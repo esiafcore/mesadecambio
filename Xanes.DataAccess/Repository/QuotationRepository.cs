@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
-
+using Newtonsoft.Json;
 namespace Xanes.DataAccess.Repository;
 
 public class QuotationRepository : Repository<Quotation>, IQuotationRepository
@@ -51,6 +51,9 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
 
     public async Task ImportRangeAsync(List<Quotation> entityList, List<QuotationDetail> entityDetailList)
     {
+        string parentJson = string.Empty;
+        string childrenJson = string.Empty;
+
         await using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
@@ -59,6 +62,10 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
                 var details = entityDetailList.Where(x => x.ParentId == entity.Id).ToList();
 
                 entity.Id = 0;
+                parentJson = JsonConvert.SerializeObject(entity,Formatting.None, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                });
                 await dbSet.AddAsync(entity);
                 await _db.SaveChangesAsync();
 
@@ -67,6 +74,11 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
                     detail.Id = 0;
                     detail.ParentId = entity.Id;
                 }
+                childrenJson = JsonConvert.SerializeObject(details, Formatting.None, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                });
+
                 await _db.Set<QuotationDetail>().AddRangeAsync(details);
                 await _db.SaveChangesAsync();
             }
@@ -76,12 +88,12 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
         catch (DbUpdateException ex)
         {
             await transaction.RollbackAsync();
-            throw new Exception(ex.InnerException?.Message);
+            throw new Exception($"{ex.InnerException?.Message} {parentJson} {childrenJson}");
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-            throw new Exception(ex.Message);
+            throw new Exception($"{ex.Message}");
         }
     }
 
