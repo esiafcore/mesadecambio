@@ -26,6 +26,12 @@ const formatterAmount = (fractionDigits = defaultDecimalTransa) => {
 }
 //formatterAmount(2).format(10000000000.123456)
 
+const fnremoveSession = () => {
+    //Filtros en Quotation
+    sessionStorage.removeItem('objFilter');
+    sessionStorage.removeItem('searchValue');
+}
+
 const defaultFormatDate = 'dd/MM/yyyy';
 const paddingLength = 3;
 const paddingChar = '0';

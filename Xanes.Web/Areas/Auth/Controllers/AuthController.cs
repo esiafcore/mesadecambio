@@ -149,6 +149,7 @@ public class AuthController : Controller
         await HttpContext.SignOutAsync();
         //Limpiar el TOKEN de la sesión
         HttpContext.Session.SetString(SD.SessionToken, "");
+        HttpContext.Session.Remove(AC.ProcessingDate);
         //HttpContext.Session.SetString(AC.UsernameLogged, "");
 
         return RedirectToAction("Login", "Auth", new { Area = "auth" });
