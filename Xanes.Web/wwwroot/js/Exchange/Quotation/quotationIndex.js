@@ -237,10 +237,10 @@ const fnAdjustmentFilterDataTable = () => {
                 </div>
                 <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
                     data-bs-placement="top" data-bs-title="Filtrar"
-                    class="btn btn-secondary boder-outline col-2 col-md-1 col-xl-2 ms-3" id="btnFilter">
+                    class="btn btn-outline-success boder-outline col-2 col-md-1 col-xl-2 ms-3" id="btnFilter">
                     <i class="bi bi-funnel-fill"></i>
                 </button>
-                <a class="btn btn-secondary border-outline col-2 col-md-1 col-xl-2 ms-2" id="btnClean" data-bs-toggle="tooltip"
+                <a class="btn btn-outline-danger border-outline col-2 col-md-1 col-xl-2 ms-2" id="btnClean" data-bs-toggle="tooltip"
                        data-bs-trigger="hover" onclick="fnCleanFilter()"
                        data-bs-placement="top" data-bs-title="Limpiar Filtro">
                         <i class="bi bi-eraser-fill"></i>
