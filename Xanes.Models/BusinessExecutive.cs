@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml.Linq;
 using Xanes.Models.Abstractions;
 
 namespace Xanes.Models;
@@ -42,6 +43,32 @@ public class BusinessExecutive : EntityInactivated, ICloneable
 
     public object Clone()
     {
-        throw new NotImplementedException();
+        BusinessExecutive obj = new BusinessExecutive
+        {
+            Id = Id,
+            CompanyId = CompanyId,
+            Code = Code,
+            FirstName = FirstName,
+            SecondName = SecondName,
+            LastName = LastName,
+            SecondSurname = SecondSurname,
+            IsPayment = IsPayment,
+            IsLoan = IsLoan,
+            IsDefault = IsDefault,
+            IsActive = IsActive,
+            CreatedDate = CreatedDate,
+            CreatedBy = CreatedBy,
+            CreatedIpv4 = CreatedIpv4,
+            CreatedHostName = CreatedHostName,
+            UpdatedDate = UpdatedDate,
+            UpdatedBy = UpdatedBy,
+            UpdatedIpv4 = UpdatedIpv4,
+            UpdatedHostName = UpdatedHostName,
+            InactivatedDate = InactivatedDate,
+            InactivatedBy = InactivatedBy,
+            InactivatedIpv4 = InactivatedIpv4,
+            InactivatedHostName = InactivatedHostName
+        };
+        return obj;
     }
 }
