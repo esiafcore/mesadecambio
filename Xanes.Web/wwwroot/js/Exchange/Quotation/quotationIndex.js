@@ -237,9 +237,14 @@ const fnAdjustmentFilterDataTable = () => {
                 </div>
                 <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
                     data-bs-placement="top" data-bs-title="Filtrar"
-                    class="btn btn-sm btn-secondary boder-outline col-4 col-sm-3 col-md-2 col-xl-4 ms-3 p-0" id="btnFilter">
-                    <i class="bi bi-funnel-fill"></i> Filtrar
+                    class="btn btn-outline-success boder-outline col-2 col-md-1 col-xl-2 ms-3" id="btnFilter">
+                    <i class="bi bi-funnel-fill"></i>
                 </button>
+                <a class="btn btn-outline-danger border-outline col-2 col-md-1 col-xl-2 ms-2" id="btnClean" data-bs-toggle="tooltip"
+                       data-bs-trigger="hover" onclick="fnCleanFilter()"
+                       data-bs-placement="top" data-bs-title="Limpiar Filtro">
+                        <i class="bi bi-eraser-fill"></i>
+                    </a>
             </div>
         </div>`;
 
@@ -759,18 +764,18 @@ const fnLoadDatatable = () => {
                             }
                         }
                     },
-                    {
-                        extend: 'colvis',
-                        text: '<i class="bi bi-eye-slash-fill fs-4"></i>',
-                        titleAttr: 'Ocultar columnas',
-                        className: 'btn btn-info',
-                        columnDefs: [
-                            {
-                                targets: -1, // Exclude the last column (buttons) from column visibility
-                                visible: false
-                            }
-                        ]
-                    }
+                    //{
+                    //    extend: 'colvis',
+                    //    text: '<i class="bi bi-eye-slash-fill fs-4"></i>',
+                    //    titleAttr: 'Ocultar columnas',
+                    //    className: 'btn btn-info',
+                    //    columnDefs: [
+                    //        {
+                    //            targets: -1, // Exclude the last column (buttons) from column visibility
+                    //            visible: false
+                    //        }
+                    //    ]
+                    //}
                 ]
             }
         },
