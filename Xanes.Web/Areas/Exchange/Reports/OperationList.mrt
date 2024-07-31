@@ -720,7 +720,7 @@ Ori-Des</Text>
               <Name>Text21</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
-              <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransaction AND {datrep.TotalTransfer})}</Text>
+              <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransaction)}</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
@@ -1280,13 +1280,13 @@ parAmountNetRevenueSell)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>7/14/2024 5:52:29 PM</ReportChanged>
+  <ReportChanged>7/31/2024 12:33:19 PM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
-  <ReportFile>C:\GitNet8\Xanes\mesadecambio\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
-  <ReportGuid>0720071958ed4fc6b4fc3251087e1309</ReportGuid>
+  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\XanesN8.UI\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
+  <ReportGuid>d1d07fd2e8d040eca309d7c6104621cd</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
-  <ReportVersion>2024.3.2.0</ReportVersion>
+  <ReportVersion>2024.3.1.0</ReportVersion>
   <Script>using System;
 using System.Drawing;
 using System.Windows.Forms;
