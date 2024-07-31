@@ -446,6 +446,19 @@ public class QuotationController : Controller
             obj.IsLoan = objBusinessExecutive.IsLoan;
             obj.IsPayment = objBusinessExecutive.IsPayment;
 
+            if (obj.IsLoan || obj.IsPayment)
+            {
+                if (obj.TypeNumeral == SD.QuotationType.Sell)
+                {
+                    obj.TotalDeposit = obj.AmountTransaction * obj.ExchangeRateSellTransa;
+                    obj.TotalTransfer = obj.AmountTransaction;
+                }else if (obj.TypeNumeral == SD.QuotationType.Buy)
+                {
+                    obj.TotalTransfer = obj.AmountTransaction * obj.ExchangeRateBuyTransa;
+                    obj.TotalDeposit = obj.AmountTransaction;
+                }
+            }
+
             //Verificamos si existe el cliente
             var objCustomer = _uow.Customer.Get(filter: x => (x.CompanyId == obj.CompanyId) && (x.Id == obj.CustomerId));
             if (objCustomer == null)
@@ -1526,17 +1539,17 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            objHeader.IsPosted = true;
+            //objHeader.IsPosted = true;
 
             //Seteamos campos de auditoria
             objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
             objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.ClosedDate = DateTime.UtcNow;
-            objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.ReClosedDate = DateTime.UtcNow;
+            objHeader.ReClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
