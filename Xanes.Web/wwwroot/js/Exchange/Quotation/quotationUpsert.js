@@ -190,19 +190,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     //Tipos de cotizacion
     typeNumerals.forEach((item) => {
         if (item.checked) inputTypeNumeral.value = parseInt(item.value);
-        item.addEventListener("change", () => {
+        item.addEventListener("change", async () => {
             divExchangeRateHistory.hidden = true;
             inputTypeNumeral.value = parseInt(item.value);
             typeNumeral = inputTypeNumeral.value;
-            fnLoadInputsByType(item.value);
             selectCustomer.innerHTML = "";
+            await fnLoadInputsByType(item.value);
         });
     });
 
     typeNumeral = inputTypeNumeral.value;
 
     //Funcion para ocultar los elementos en dependencia del tipo de cotizacion
-    fnLoadInputsByType(inputTypeNumeral.value);
+    await fnLoadInputsByType(inputTypeNumeral.value);
 
     // Evento enviar form para crear
     const formCreate = document.getElementById("formUpsert");
@@ -436,9 +436,6 @@ const fnGetBankAccounts = async () => {
 
 const fnGetCustomer = async () => {
     try {
-        let onlyCompanies;
-
-
         if (selectCustomer) {
             fnInitializeSelectCustomer();
 
@@ -453,6 +450,7 @@ const fnGetCustomer = async () => {
                         // Capturar el valor del campo de búsqueda
                         let searchTerm = searchField.value.replace(/-/g, "").trim();
                         if (searchTerm === "") return;
+                        let onlyCompanies;
 
                         if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
                             onlyCompanies = false;
@@ -520,8 +518,7 @@ const fnGetCustomer = async () => {
                             divExchangeRateHistory.hidden = true;
                         });
 
-                        $(selectCustomer).select2('focus');
-
+                        $(selectCustomer).select2('focus');                     
                     }
                 });
             });
@@ -534,6 +531,85 @@ const fnGetCustomer = async () => {
         });
     }
 };
+
+const fnLoadCustomer = async (searchTerm) => {
+
+    try {
+        let onlyCompanies;
+
+        if (typeNumeral == QuotationType.Buy || typeNumeral == QuotationType.Sell) {
+            onlyCompanies = false;
+        } else {
+            onlyCompanies = true;
+        }
+
+        let url = `/Exchange/Quotation/GetCustomerByContain?search=${searchTerm}&onlyCompanies=${onlyCompanies}`;
+
+        const response = await fetch(url, {
+            method: "POST"
+        });
+
+        const jsonData = await response.json();
+
+        fntoggleLoading();
+
+        if (jsonData.isSuccess) {
+            selectCustomer.innerHTML = "";
+            // Agregar options
+            let option = document.createElement("option");
+            option.value = "";
+            option.text = ACJS.PlaceHolderSelect;
+            option.disabled = true;
+            option.selected = true;
+
+            selectCustomer.insertBefore(option, selectCustomer.firstChild);
+
+            jsonData.data.forEach((item) => {
+                let option = document.createElement("option");
+                option.value = item.value;
+                option.text = item.text;
+                selectCustomer.appendChild(option);
+            });
+
+            fnInitializeSelectCustomer();
+
+            // Abrir Select2 nuevamente
+            $(selectCustomer).select2('open');
+        
+            document.querySelector(".select2-search__field").value = searchTerm;
+        }
+
+        fntoggleLoading();
+
+        var options = selectCustomer.getElementsByTagName('option');
+        if (options.length > 0) {
+            // Selecciona el primer elemento
+
+            if (onlyCompanies) {
+                selectCustomer.value = options[0].value;
+                divExchangeRateHistory.hidden = true;
+                // Quitar el evento select2:select
+                $(selectCustomer).off('select2:select');
+            } else {
+                $(selectCustomer).on('select2:select', async function (e) {
+                    divExchangeRateHistory.hidden = false;
+                    fnLoadDatatable(e.params.data.id);
+                });
+            }
+        }
+
+        $(selectCustomer).on('select2:unselect', function (e) {
+            divExchangeRateHistory.hidden = true;
+        });
+
+        $(selectCustomer).select2('focus');
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            text: error
+        });
+    }
+}
 
 const fnInitializeSelectCustomer = () => {
     if (selectCustomer) {
@@ -631,7 +707,7 @@ const fnLoadOptionSelectBusiness = (type) => {
 };
 
 //Funcion para ocultar o mostrar los elementos en base al tipo
-const fnLoadInputsByType = (type) => {
+const fnLoadInputsByType = async (type) => {
     if (type == QuotationType.Buy) {
         divCurrencyTransa.hidden = false;
         divAmountExchange.hidden = false;
@@ -678,6 +754,7 @@ const fnLoadInputsByType = (type) => {
         elementsBuy.forEach((item) => item.hidden = true);
         elementsSell.forEach((item) => item.hidden = true);
         elementsTransfer.forEach((item) => item.hidden = false);
+        await fnLoadCustomer(".");
         //fnChangeCustomers(true);
     }
     fnLoadOptionSelectBusiness(type);
