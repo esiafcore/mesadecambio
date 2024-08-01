@@ -52,6 +52,31 @@
                 <div class="row rounded p-2">
                     <div class="col-lg-8">
                         <input hidden asp-for="DataModel.Id" name="Id" />
+                        <input hidden asp-for="DataModel.Numeral" name="Numeral" />
+                        <input hidden asp-for="DataModel.CreatedBy" name="CreatedBy" />
+                        <input hidden asp-for="DataModel.CreatedDate" name="CreatedDate" />
+                        <input hidden asp-for="DataModel.CreatedHostName" name="CreatedHostName" />
+                        <input hidden asp-for="DataModel.CreatedIpv4" name="CreatedIpv4" />
+                        <input hidden asp-for="DataModel.UpdatedBy" name="UpdatedBy" />
+                        <input hidden asp-for="DataModel.UpdatedDate" name="UpdatedDate" />
+                        <input hidden asp-for="DataModel.UpdatedHostName" name="UpdatedHostName" />
+                        <input hidden asp-for="DataModel.UpdatedIpv4" name="UpdatedIpv4" />
+                        <input hidden asp-for="DataModel.ClosedBy" name="ClosedBy" />
+                        <input hidden asp-for="DataModel.ClosedDate" name="ClosedDate" />
+                        <input hidden asp-for="DataModel.ClosedHostName" name="ClosedHostName" />
+                        <input hidden asp-for="DataModel.ClosedIpv4" name="ClosedIpv4" />
+                        <input hidden asp-for="DataModel.ReClosedBy" name="ReClosedBy" />
+                        <input hidden asp-for="DataModel.ReClosedDate" name="ReClosedDate" />
+                        <input hidden asp-for="DataModel.ReClosedHostName" name="ReClosedHostName" />
+                        <input hidden asp-for="DataModel.ReClosedIpv4" name="ReClosedIpv4" />
+                        <input hidden asp-for="DataModel.IsAdjustment" name="IsAdjustment" />
+                        <input hidden asp-for="DataModel.IsBank" name="IsBank" />
+                        <input hidden asp-for="DataModel.IsVoid" name="IsVoid" />
+                        <input hidden asp-for="DataModel.BusinessExecutiveCode" name="BusinessExecutiveCode" />
+                        <input hidden asp-for="DataModel.ExchangeRateBuyReal" name="ExchangeRateBuyReal" />
+                        <input hidden asp-for="DataModel.ExchangeRateSellReal" name="ExchangeRateSellReal" />
+                        <input hidden asp-for="DataModel.ExchangeRateOfficialReal" name="ExchangeRateOfficialReal" />
+
                         <input hidden asp-for="DataModel.IsLoan" name="IsLoan" />
                         <input hidden asp-for="DataModel.IsPosted" name="IsPosted" />
                         <input hidden asp-for="DataModel.IsClosed" name="IsClosed" />
@@ -72,7 +97,8 @@
                                 <div class="col-xl-6 col-sm-7 col-6 border border-primary border-opacity-25 shadow w-auto ms-2 px-1">
                                     @foreach (var quotationType in Model.QuotationTypeList)
                                     {
-                                        var isChecked = (quotationType == Model.QuotationTypeList.First());
+                                        var isChecked = (quotationType.Numeral == (int)Model.DataModel.TypeNumeral);
+
 
                                         <div class="form-check mt-1 mx-0 mb-0 form-check-inline" id="@("quotationType_divradio_" + quotationType.Numeral)">
                                             <input name="QuotationTypes"

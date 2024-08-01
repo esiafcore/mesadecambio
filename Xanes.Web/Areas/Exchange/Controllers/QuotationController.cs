@@ -160,11 +160,12 @@ public class QuotationController : Controller
             TempData[AC.Error] = $"Ejecutivo no encontrado";
             return RedirectToAction(nameof(Index));
         }
-        //Ejecutivo por defecto
-        ViewBag.BusinessExecutiveIdByDefault = JsonConvert.SerializeObject(objBusinessExecutiveList.FirstOrDefault(x => x.IsDefault)!.Id);
 
         if (id == 0)
         {
+            //Ejecutivo por defecto
+            ViewBag.BusinessExecutiveIdByDefault = JsonConvert.SerializeObject(objBusinessExecutiveList.FirstOrDefault(x => x.IsDefault)!.Id);
+
             ViewData[AC.Title] = "Crear - Cotización";
 
             objData = new Quotation
@@ -176,7 +177,11 @@ public class QuotationController : Controller
                 CurrencyDepositType = SD.CurrencyType.Base,
                 CompanyId = _companyId,
                 BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes),
-                CustomerId = 0
+                CustomerId = 0,
+                CreatedBy = _userName ?? AC.LOCALHOSTME,
+                CreatedDate = DateTime.UtcNow,
+                CreatedHostName = AC.LOCALHOSTPC,
+                CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default
             };
 
         }
@@ -191,6 +196,8 @@ public class QuotationController : Controller
                 TempData[AC.Error] = $"Cotización no encontrada";
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.BusinessExecutiveIdByDefault = JsonConvert.SerializeObject(objData.BusinessExecutiveId);
         }
 
         model.CurrencyTransaList = objCurrencyList
@@ -505,10 +512,10 @@ public class QuotationController : Controller
                             BankSourceId = obj.BankAccountTargetTrx.ParentId,
                             BankTargetId = obj.BankAccountTargetTrx.ParentId,
                             AmountDetail = obj.AmountTransaction,
-                            CreatedBy = AC.LOCALHOSTME,
+                            CreatedBy = _userName ?? AC.LOCALHOSTME,
                             CreatedDate = DateTime.UtcNow,
                             CreatedHostName = AC.LOCALHOSTPC,
-                            CreatedIpv4 = AC.Ipv4Default
+                            CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default
                         };
 
                         _uow.QuotationDetail.Add(objDetailBankAccountSource);
@@ -526,10 +533,10 @@ public class QuotationController : Controller
                             BankTargetId = obj.BankAccountSourceTrx.ParentId,
                             BankSourceId = obj.BankAccountSourceTrx.ParentId,
                             AmountDetail = obj.AmountTransaction,
-                            CreatedBy = AC.LOCALHOSTME,
+                            CreatedBy = _userName ?? AC.LOCALHOSTME,
                             CreatedDate = DateTime.UtcNow,
                             CreatedHostName = AC.LOCALHOSTPC,
-                            CreatedIpv4 = AC.Ipv4Default
+                            CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default
                         };
                         _uow.QuotationDetail.Add(objDetailBankAccountTarget);
                     }
@@ -1610,10 +1617,10 @@ public class QuotationController : Controller
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
             objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.ClosedDate = DateTime.UtcNow;
-            objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            //objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
+            //objHeader.ClosedDate = DateTime.UtcNow;
+            //objHeader.ClosedHostName = AC.LOCALHOSTPC;
+            //objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;
