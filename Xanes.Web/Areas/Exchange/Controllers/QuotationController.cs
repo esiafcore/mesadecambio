@@ -452,7 +452,8 @@ public class QuotationController : Controller
                 {
                     obj.TotalDeposit = obj.AmountTransaction * obj.ExchangeRateSellTransa;
                     obj.TotalTransfer = obj.AmountTransaction;
-                }else if (obj.TypeNumeral == SD.QuotationType.Buy)
+                }
+                else if (obj.TypeNumeral == SD.QuotationType.Buy)
                 {
                     obj.TotalTransfer = obj.AmountTransaction * obj.ExchangeRateBuyTransa;
                     obj.TotalDeposit = obj.AmountTransaction;
@@ -1075,6 +1076,20 @@ public class QuotationController : Controller
         }
 
         model.BankList = objBankList;
+
+        //if (objHeader.CreatedDate == null)
+        //{
+        //    objHeader.CreatedDate = string.Empty;
+        //}
+        //if (objHeader.ClosedDate == null)
+        //{
+        //    objHeader.ClosedDate = string.Empty;
+        //}
+        //if (objHeader.ReClosedDate == null)
+        //{
+        //    objHeader.ReClosedDate = string.Empty;
+        //}
+
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";

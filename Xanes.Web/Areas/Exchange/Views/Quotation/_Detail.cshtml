@@ -122,25 +122,94 @@
         {
             <div class="row">
                 <div class="row col-md-6 col-12 mb-1">
-                    <div class="col-sm-5 col-lg-2 col-4">
+                    <div class="col-sm-5 col-lg-3 col-xl-2 col-4 me-xl-3 me-xxl-0">
                         <h5 class="text-white fs-6">Cta Ban Origen</h5>
                     </div>
-                    <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-5">
+                    <div class="col-xl-8 col-lg-7 col-sm-7 col-8 ms-lg-5 ms-xl-3 ms-xxl-5">
                         <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountSourceTrx.Name" readonly />
                     </div>
                 </div>
                 <div class="row col-md-6 col-12 mb-1">
-                    <div class="col-sm-5 col-lg-2 col-4">
+                    <div class="col-sm-5 col-lg-3 col-xl-2 col-4">
                         <h5 class="text-white fs-6">Cta Ban Destino</h5>
                     </div>
-                    <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-5">
+                    <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-lg-5">
                         <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountTargetTrx.Name" readonly />
                     </div>
                 </div>
             </div>
         }
+        <div class="row">
+            <div class="row col-xl-4 col-md-6 col-12 mb-1"
+                 data-bs-toggle="tooltip" data-bs-trigger="hover"
+                 data-bs-placement="top"
+                 data-bs-title="@Model.ModelCreateVM.DataModel.CreatedDate">
+                <div class="col-sm-5 col-lg-4 col-4">
+                    <h5 class="text-white fs-6">Creado por</h5>
+                </div>
+                <div class="col-xl-6 col-sm-7 col-8">
+                    <input class="form-control border p-1 shadow"
+                           id="createdBy" value="@Model.ModelCreateVM.DataModel.CreatedBy" readonly />
+                </div>
+            </div>
+            @if (Model.ModelCreateVM.DataModel.ClosedDate.HasValue)
+            {
+                <div class="row col-xl-4 col-md-6 col-12 mb-1"
+                     data-bs-toggle="tooltip" data-bs-trigger="hover"
+                     data-bs-placement="top"
+                     data-bs-title="@Model.ModelCreateVM.DataModel.ClosedDate.Value">
+                    <div class="col-sm-5 col-lg-4 col-4">
+                        <h5 class="text-white fs-6">Cerrado por</h5>
+                    </div>
+                    <div class="col-xl-6 col-sm-7 col-8">
+                        <input class="form-control border p-1 shadow"
+                               id="closedBy" value="@Model.ModelCreateVM.DataModel.ClosedBy" readonly />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                    <div class="col-sm-5 col-lg-4 col-4">
+                        <h5 class="text-white fs-6">Cerrado por</h5>
+                    </div>
+                    <div class="col-xl-6 col-sm-7 col-8">
+                        <input class="form-control border p-1 shadow"
+                               id="closedBy" value="@Model.ModelCreateVM.DataModel.ClosedBy" readonly />
+                    </div>
+                </div>
+            }
+
+            @if (Model.ModelCreateVM.DataModel.ReClosedDate.HasValue)
+            {
+                <div class="row col-xl-4 col-md-6 col-12 mb-1"
+                     data-bs-toggle="tooltip" data-bs-trigger="hover"
+                     data-bs-placement="top"
+                     data-bs-title="@Model.ModelCreateVM.DataModel.ReClosedDate.Value">
+                    <div class="col-sm-5 col-lg-4 col-4">
+                        <h5 class="text-white fs-6">Re-Cerrado por</h5>
+                    </div>
+                    <div class="col-xl-6 col-sm-7 col-8">
+                        <input class="form-control border p-1 shadow"
+                               id="reClosedBy" value="@Model.ModelCreateVM.DataModel.ReClosedBy" readonly />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row col-xl-4 col-md-6 col-12 mb-1">
+                    <div class="col-sm-5 col-lg-4 col-4">
+                        <h5 class="text-white fs-6">Re-Cerrado por</h5>
+                    </div>
+                    <div class="col-xl-6 col-sm-7 col-8">
+                        <input class="form-control border p-1 shadow"
+                               id="reClosedBy" value="@Model.ModelCreateVM.DataModel.ReClosedBy" readonly />
+                    </div>
+                </div>
+            }
+        </div>
     </div>
-    <hr/>
+    <hr />
     <div class="row mt-1">
         <div class="col-xl-6">
             <div class="row">
@@ -150,16 +219,16 @@
             </div>
             <table id="tblDeposit" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
                 <thead>
-                <tr>
-                    <th class="text-center align-middle my-0 py-0">#</th>
-                    <th data-priority="1" class="text-center align-middle my-0 py-0">Banco</th>
-                    <th data-priority="2" class="text-center align-middle my-0 py-0">Importe</th>
-                </tr>
+                    <tr>
+                        <th class="text-center align-middle my-0 py-0">#</th>
+                        <th data-priority="1" class="text-center align-middle my-0 py-0">Banco</th>
+                        <th data-priority="2" class="text-center align-middle my-0 py-0">Importe</th>
+                    </tr>
                 </thead>
                 <tfoot>
-                <tr>
-                    <th id="totalAmountDeposit" colspan="3"></th>
-                </tr>
+                    <tr>
+                        <th id="totalAmountDeposit" colspan="3"></th>
+                    </tr>
                 </tfoot>
             </table>
         </div>
@@ -171,17 +240,17 @@
             </div>
             <table id="tblTransfer" class="table table-hover table-bordered table-striped responsive nowrap" style="width: 100%">
                 <thead>
-                <tr>
-                    <th class="text-center align-middle my-0 py-0">#</th>
-                    <th data-priority="1" class="text-center align-middle my-0 py-0">Banco Origen</th>
-                    <th data-priority="2" class="text-center align-middle my-0 py-0">Banco Destino</th>
-                    <th data-priority="3" class="text-center align-middle my-0 py-0">Importe</th>
-                </tr>
+                    <tr>
+                        <th class="text-center align-middle my-0 py-0">#</th>
+                        <th data-priority="1" class="text-center align-middle my-0 py-0">Banco Origen</th>
+                        <th data-priority="2" class="text-center align-middle my-0 py-0">Banco Destino</th>
+                        <th data-priority="3" class="text-center align-middle my-0 py-0">Importe</th>
+                    </tr>
                 </thead>
                 <tfoot>
-                <tr>
-                    <th id="totalAmountTransfer" colspan="4"></th>
-                </tr>
+                    <tr>
+                        <th id="totalAmountTransfer" colspan="4"></th>
+                    </tr>
                 </tfoot>
             </table>
         </div>
