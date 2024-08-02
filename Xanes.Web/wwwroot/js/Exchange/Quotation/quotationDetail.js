@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     inputExchangeRateVariation = document.querySelector("#exchangeRateVariation");
     btnQuotationClosed = document.querySelector("#btnQuotationClosed");
 
+    let selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
+    $(selectBusinessExecutive).select2(select2Options);
     //Obtenemos el tipo de cambio en base a la fecha
     await fnTCByDate();
 

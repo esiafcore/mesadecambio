@@ -704,35 +704,58 @@ const fnLoadDatatable = () => {
                                     </a> `;
 
                     let buttons = `<div class="btn-group" role="group">`;
-
-
-                    if (row.isVoid) {
-                        buttons += `
+                    if (row.isLoan || row.isPayment) {
+                        if (row.isVoid) {
+                            buttons += `
+                            ${btnView}
+                                       `;
+                        } else if (row.isClosed && row.isPosted && !row.isVoid) {
+                            buttons += `
+                            ${btnView}
+                            ${btnVoid}
+                        `;
+                        } else if (row.isClosed && !row.isPosted && !row.isVoid) {
+                            buttons += `
+                            ${btnView}
+                            ${btnReClosed}
+                            ${btnVoid}
+                                       `;
+                        }
+                        else {
+                            buttons += `
+                            ${btnView}
+                            ${btnUpdate}
+                            ${btnDelete}
+                                       `;
+                        }
+                    } else {
+                        if (row.isVoid) {
+                            buttons += `
                             ${btnView}
                             ${btnPrint}
-                        `;
-                    } else if (row.isClosed && row.isPosted && !row.isVoid) {
-                        buttons += `
+                                       `;
+                        } else if (row.isClosed && row.isPosted && !row.isVoid) {
+                            buttons += `
                             ${btnView}
                             ${btnPrint}
                             ${btnVoid}
-                        `;
-                    } else if (row.isClosed && !row.isPosted && !row.isVoid) {
-                        buttons += `
+                                       `;
+                        } else if (row.isClosed && !row.isPosted && !row.isVoid) {
+                            buttons += `
                             ${btnView}
                             ${btnPrint}
                             ${btnReClosed}
                             ${btnVoid}
-                        `;
-                    }
-                    else {
-                        buttons += `
+                                       `;
+                        }
+                        else {
+                            buttons += `
                             ${btnView}
                             ${btnUpdate}
                             ${btnDelete}
-                        `;
+                                       `;
+                        }
                     }
-
                     buttons += `</div>`;
 
                     return buttons;

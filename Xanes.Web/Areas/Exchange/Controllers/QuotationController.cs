@@ -170,7 +170,7 @@ public class QuotationController : Controller
 
             objData = new Quotation
             {
-                DateTransa = DateOnly.FromDateTime(DateTime.Now),
+                DateTransa = processingDateString != null ? model.ProcessingDate : DateOnly.FromDateTime(DateTime.Now),
                 TypeNumeral = SD.QuotationType.Buy,
                 CurrencyTransaType = SD.CurrencyType.Foreign,
                 CurrencyTransferType = SD.CurrencyType.Base,
@@ -641,6 +641,20 @@ public class QuotationController : Controller
 
         objQt.CustomerId = obj.CustomerId;
 
+        //Verificamos si existe el ejecutivo
+        var objBusinessExecutive = _uow.BusinessExecutive
+            .Get(filter: x =>
+                x.CompanyId == obj.CompanyId &&
+                x.Id == obj.BusinessExecutiveId, isTracking: false);
+        if (objBusinessExecutive == null)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"Ejecutivo no encontrado";
+            return Json(jsonResponse);
+        }
+
+        objQt.BusinessExecutiveId = obj.BusinessExecutiveId;
+
         if (objQt.TypeNumeral == SD.QuotationType.Buy)
         {
             //TC COMPRA MENOR AL TC OFICIAL
@@ -782,7 +796,9 @@ public class QuotationController : Controller
             includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Cotización no encontrada";
+            return RedirectToAction(nameof(Index));
+
         }
 
         if (objHeader.IsAdjustment)
@@ -793,8 +809,6 @@ public class QuotationController : Controller
         {
             ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         }
-
-
 
         if (objHeader.IsClosed && !objHeader.IsPosted)
         {
@@ -807,7 +821,9 @@ public class QuotationController : Controller
 
         if (objBankList == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Banco no encontrado";
+            return RedirectToAction(nameof(Index));
+
         }
 
         var objCurrencyList = _uow.Currency
@@ -816,7 +832,8 @@ public class QuotationController : Controller
 
         if (objCurrencyList == null)
         {
-            return NotFound();
+            return RedirectToAction(nameof(Index));
+
         }
 
         var objTypeList = _uow.QuotationType
@@ -825,16 +842,29 @@ public class QuotationController : Controller
 
         if (objTypeList == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Tipo de Transacción no encontrado";
+            return RedirectToAction(nameof(Index));
         }
 
         var objBankAccountList = _uow.BankAccount
             .GetAll(filter: x => x.CompanyId == _companyId).ToList();
         if (objBankAccountList == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Cuenta Bancaria no encontrada";
+            return RedirectToAction(nameof(Index));
         }
 
+        var objBusinessExecutiveList = _uow.BusinessExecutive
+            .GetAll(x => (x.CompanyId == _companyId)
+                         && (x.IsActive)).ToList();
+
+        if (objBusinessExecutiveList == null || objBusinessExecutiveList.Count == 0)
+        {
+            TempData[AC.Error] = $"Ejecutivo no encontrado";
+            return RedirectToAction(nameof(Index));
+        }
+
+        model.ModelCreateVM.BusinessExecutiveList = objBusinessExecutiveList;
         model.ModelCreateVM.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         model.ModelCreateVM.BankAccountTargetList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         model.ModelCreateVM.CurrencyTransaList = objCurrencyList
@@ -843,11 +873,12 @@ public class QuotationController : Controller
         model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
         model.ModelCreateVM.QuotationTypeList = objTypeList;
-        model.ModelCreateVM.CurrencySourceTarget =
-            $"{objHeader.CurrencyDepositTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
-        //model.ModelCreateVM.CustomerList = objCustomerList.Select(x => new SelectListItem { Text = x.CommercialName, Value = x.Id.ToString() });
+        var currencyTarget =
+            objHeader.TypeNumeral != SD.QuotationType.Sell ?
+                objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
 
-        //model.BankList = objBankList.Select(x => new SelectListItem { Text = $"{x.Code}", Value = x.Id.ToString() });
+        model.ModelCreateVM.CurrencySourceTarget =
+            $"{objHeader.CurrencyTransaTrx.Code} - {currencyTarget}";
         model.BankList = objBankList;
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
@@ -1034,7 +1065,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -1053,8 +1084,12 @@ public class QuotationController : Controller
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+        var currencyTarget =
+            objHeader.TypeNumeral != SD.QuotationType.Sell ?
+                objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
+
         model.ModelCreateVM.CurrencySourceTarget =
-            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
+            $"{objHeader.CurrencyTransaTrx.Code} - {currencyTarget}";
         return View(model);
     }
 
@@ -1067,7 +1102,7 @@ public class QuotationController : Controller
         ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
+            includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
             return NotFound();
@@ -1083,25 +1118,15 @@ public class QuotationController : Controller
         }
 
         model.BankList = objBankList;
-
-        //if (objHeader.CreatedDate == null)
-        //{
-        //    objHeader.CreatedDate = string.Empty;
-        //}
-        //if (objHeader.ClosedDate == null)
-        //{
-        //    objHeader.ClosedDate = string.Empty;
-        //}
-        //if (objHeader.ReClosedDate == null)
-        //{
-        //    objHeader.ReClosedDate = string.Empty;
-        //}
-
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+        var currencyTarget = 
+            objHeader.TypeNumeral != SD.QuotationType.Sell ?
+                objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
+
         model.ModelCreateVM.CurrencySourceTarget =
-            $"{objHeader.CurrencyTransaTrx.Code} - {objHeader.CurrencyTransferTrx.Code}";
+            $"{objHeader.CurrencyTransaTrx.Code} - {currencyTarget}";
         return View(model);
     }
 
