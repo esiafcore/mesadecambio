@@ -36,7 +36,7 @@
                     <h5 class="text-white fs-6">Fecha</h5>
                 </div>
                 <div class="col-xl-6 col-sm-7 col-8">
-                    <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.DateTransa" readonly />
+                    <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.DateTransa.ToShortDateString()" readonly />
                 </div>
             </div>
             @if (Model.ModelCreateVM.DataModel.TypeNumeral != SD.QuotationType.Transfer)
