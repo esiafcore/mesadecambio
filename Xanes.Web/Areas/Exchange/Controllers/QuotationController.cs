@@ -436,6 +436,7 @@ public class QuotationController : Controller
                 obj.CurrencyTransaId = objBankAccountSource.CurrencyId;
                 obj.CurrencyDepositId = objBankAccountSource.CurrencyId;
                 obj.CurrencyTransferId = objBankAccountSource.CurrencyId;
+                obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
             }
 
             //Verificamos si existe el ejecutivo
