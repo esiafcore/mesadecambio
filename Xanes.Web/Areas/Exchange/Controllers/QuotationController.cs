@@ -1761,7 +1761,7 @@ public class QuotationController : Controller
             _uow.Save();
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
+            //jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
             return Json(jsonResponse);
         }
         catch (Exception ex)

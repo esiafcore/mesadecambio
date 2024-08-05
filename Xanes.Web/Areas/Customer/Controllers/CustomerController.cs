@@ -173,8 +173,8 @@ public class CustomerController : Controller
         }
         else
         {
-            obj.FirstName = ".";
-            obj.LastName = ".";
+            obj.FirstName = string.Empty;
+            obj.LastName = string.Empty;
             //obj.CommercialName = string.Empty;
 
         }
@@ -340,7 +340,7 @@ public class CustomerController : Controller
 
                 _uow.Customer.Add(obj);
                 _uow.Save();
-                TempData["success"] = "Customer created successfully";
+                TempData["success"] = "Cliente creado correctamente";
             }
             else
             {
@@ -371,7 +371,7 @@ public class CustomerController : Controller
 
                 _uow.Customer.Update(obj);
                 _uow.Save();
-                TempData["success"] = "Customer updated successfully";
+                TempData["success"] = "Cliente actualizado correctamente";
 
             }
 

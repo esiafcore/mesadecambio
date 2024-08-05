@@ -646,7 +646,7 @@ const fndeleteRow = async (id) => {
                 text: jsonResponse.errorMessages
             });
         } else {
-            toastr.success(jsonResponse.successMessages);
+            //toastr.success(jsonResponse.successMessages);
             dataTableDeposit.ajax.reload();
             dataTableTransfer.ajax.reload();
         }
