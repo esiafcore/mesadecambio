@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
 using Xanes.Utility;
-using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
 [Table("quotations", Schema = "fac")]
@@ -258,7 +257,7 @@ public class Quotation : Entity, ICloneable
     public bool IsBank { get; set; } = false;
 
     [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name = "Id BusinessExecutive")]
+    [Display(Name = "Id Ejecutivo")]
     [ForeignKey(nameof(BusinessExecutiveTrx))]
     public int BusinessExecutiveId { get; set; }
     [ValidateNever]

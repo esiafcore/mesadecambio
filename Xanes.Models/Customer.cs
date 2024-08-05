@@ -87,7 +87,6 @@ public class Customer: EntityInactivated, ICloneable
     [Display(Name = "Dirección Principal")]
     public string? AddressPrimary { get; set; }
 
-
     [Required(ErrorMessage = "El campo {0} es requerido")]
     [Display(Name = "Es Banco")]
     public bool IsBank { get; set; }
@@ -98,6 +97,12 @@ public class Customer: EntityInactivated, ICloneable
 
     [NotMapped]
     public int? TotalQuotations { get; set; }
+
+    [Display(Name = "Id Ejecutivo")]
+    [ForeignKey(nameof(BusinessExecutiveTrx))]
+    public int? BusinessExecutiveId { get; set; }
+    [ValidateNever]
+    public virtual BusinessExecutive? BusinessExecutiveTrx { get; set; }
 
     public object Clone()
     {

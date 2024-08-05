@@ -742,6 +742,10 @@ public class QuotationController : Controller
                 }
             }
         }
+        else
+        {
+            obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
+        }
 
         objQt.AmountRevenue = obj.AmountRevenue;
         objQt.AmountCommission = obj.AmountCommission;
@@ -751,7 +755,7 @@ public class QuotationController : Controller
         objQt.DateTransa = obj.DateTransa;
         objQt.ExchangeRateBuyTransa = obj.ExchangeRateBuyTransa;
         objQt.ExchangeRateSellTransa = obj.ExchangeRateSellTransa;
-
+        objQt.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
         //Seteamos campos de auditoria
         objQt.UpdatedBy = _userName ?? AC.LOCALHOSTME;
         objQt.UpdatedDate = DateTime.UtcNow;
@@ -929,6 +933,29 @@ public class QuotationController : Controller
                 jsonResponse.IsSuccess = false;
                 jsonResponse.ErrorMessages = $"Registro padre no encontrado";
                 return Json(jsonResponse);
+            }
+
+            if (objHeader.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (obj.QuotationDetailType == QuotationDetailType.Deposit)
+                {
+                    obj.CurrencyDetailId = objHeader.CurrencyTransaId;
+                }
+                else if(obj.QuotationDetailType == QuotationDetailType.Transfer)
+                {
+                    obj.CurrencyDetailId = objHeader.CurrencyTransferId;
+                }
+            }
+            else if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (obj.QuotationDetailType == QuotationDetailType.Deposit)
+                {
+                    obj.CurrencyDetailId = objHeader.CurrencyDepositId;
+                }
+                else if (obj.QuotationDetailType == QuotationDetailType.Transfer)
+                {
+                    obj.CurrencyDetailId = objHeader.CurrencyTransaId;
+                }
             }
 
             //Verificamos si existe la moneda
@@ -2730,6 +2757,7 @@ public class QuotationController : Controller
                     header.CurrencyTransaId = objBankAccountSource.CurrencyId;
                     header.CurrencyDepositId = objBankAccountSource.CurrencyId;
                     header.CurrencyTransferId = objBankAccountSource.CurrencyId;
+                    header.ExchangeRateOfficialReal = header.ExchangeRateOfficialTransa;
 
                     objQuotationDetailList = objQuotationDetailList.Where(x => x.ParentId != header.Id).ToList();
 
@@ -2841,15 +2869,35 @@ public class QuotationController : Controller
 
                     foreach (var detail in childrens)
                     {
-                        if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                        if (header.TypeNumeral == SD.QuotationType.Buy)
                         {
-                            detail.LineNumber = lineNumberDeposit;
-                            lineNumberDeposit++;
+                            if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                            {
+                                detail.CurrencyDetailId = header.CurrencyTransaId;
+                                detail.LineNumber = lineNumberDeposit;
+                                lineNumberDeposit++;
+                            }
+                            else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                            {
+                                detail.CurrencyDetailId = header.CurrencyTransferId;
+                                detail.LineNumber = lineNumberTransfer;
+                                lineNumberTransfer++;
+                            }
                         }
-                        else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                        else if (header.TypeNumeral == SD.QuotationType.Sell)
                         {
-                            detail.LineNumber = lineNumberTransfer;
-                            lineNumberTransfer++;
+                            if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                            {
+                                detail.CurrencyDetailId = header.CurrencyDepositId;
+                                detail.LineNumber = lineNumberDeposit;
+                                lineNumberDeposit++;
+                            }
+                            else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                            {
+                                detail.CurrencyDetailId = header.CurrencyTransaId;
+                                detail.LineNumber = lineNumberTransfer;
+                                lineNumberTransfer++;
+                            }
                         }
                     }
                 }

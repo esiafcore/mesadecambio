@@ -150,6 +150,7 @@ const fnInitializeSelectCustomer = () => {
 const fnCreateDetailFormSubmit = async (event) => {
 
     try {
+        fntoggleLoading();
         event.preventDefault();
         const formObject = event.currentTarget;
 
@@ -187,6 +188,8 @@ const fnCreateDetailFormSubmit = async (event) => {
             text: error
         });
 
+    } finally {
+        fntoggleLoading();
     }
 }
 
@@ -569,7 +572,7 @@ const fnShowModalUpdateHeader = () => {
 
 const fnShowModalDeposit = async () => {
     fnClearModalDeposit();
-    document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nueva Cotización";
+    document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Nuevo Deposito";
     document.querySelector("#infoModalDeposit").innerHTML = tableRowLabelDeposit.value;
     await fnSelectTableSourceDeposit();
     //fnLoadDatatableBankDeposit();
@@ -718,7 +721,7 @@ const fnReClosed = async (id) => {
 //Funcion para actualizar los detalles
 const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
     if (quotationDetailType == QuotationDetailType.Deposit) {
-        document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Cotización";
+        document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Deposito";
         idDetailDeposit.value = id;
 
         let rowDataToSelect = null;

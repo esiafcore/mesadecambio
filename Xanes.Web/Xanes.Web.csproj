@@ -8,6 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Customer\Data\**" />
+    <Compile Remove="Areas\Customer\Models\**" />
+    <Compile Remove="Controllers\**" />
+    <Content Remove="Areas\Customer\Data\**" />
+    <Content Remove="Areas\Customer\Models\**" />
+    <Content Remove="Controllers\**" />
+    <EmbeddedResource Remove="Areas\Customer\Data\**" />
+    <EmbeddedResource Remove="Areas\Customer\Models\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Areas\Customer\Data\**" />
+    <None Remove="Areas\Customer\Models\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\images\banks\02551a1f-910f-4090-81fe-7a9138bf831c.svg" />
     <Content Remove="wwwroot\images\banks\1b35d28d-1367-4325-93c0-1ed5fe5d86b5.svg" />
     <Content Remove="wwwroot\images\banks\2e353f98-cf92-4172-8fa8-730bd26013df.svg" />
@@ -50,9 +65,6 @@
   <ItemGroup>
     <Folder Include="Areas\Auth\Data\" />
     <Folder Include="Areas\Auth\Models\" />
-    <Folder Include="Areas\Customer\Data\" />
-    <Folder Include="Areas\Customer\Models\" />
-    <Folder Include="Controllers\" />
     <Folder Include="Localization\" />
     <Folder Include="wwwroot\images\banks\" />
   </ItemGroup>

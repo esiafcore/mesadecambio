@@ -5,7 +5,7 @@
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" name="ParentId" hidden />
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" name="CompanyId" hidden />
     <input asp-for="DataModel.QuotationDetailType" value="@((int)SD.QuotationDetailType.Transfer)" name="QuotationDetailType" hidden />
-    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyDepositId" name="CurrencyDetailId" hidden />
+    <input asp-for="DataModel.CurrencyDetailId" value="@Model.ModelCreateVM.DataModel.CurrencyTransferId" name="CurrencyDetailId" hidden />
     <input asp-for="DataModel.BankTargetId" value="@Model.DataModel.BankSourceId" id="bankTargetTransfer" name="BankTargetId" hidden />
     <input asp-for="DataModel.BankSourceId" value="@Model.DataModel.BankTargetId" id="bankSourceTransfer" name="BankSourceId" hidden />
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
