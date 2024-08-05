@@ -55,7 +55,7 @@ public class CustomerController : Controller
         }
 
         var obj = _uow.Customer.Get(filter: x => (x.Id == id)
-        , includeProperties: "TypeTrx,SectorTrx,IdentificationTypeTrx"
+        , includeProperties: "TypeTrx,SectorTrx,IdentificationTypeTrx,BusinessExecutiveTrx"
         , isTracking: false);
 
         if (obj == null)
@@ -422,7 +422,7 @@ public class CustomerController : Controller
         }
 
         var obj = _uow.Customer.Get(filter: x => (x.Id == id)
-            , includeProperties: "TypeTrx,SectorTrx,IdentificationTypeTrx"
+            , includeProperties: "TypeTrx,SectorTrx,IdentificationTypeTrx,BusinessExecutiveTrx"
             , isTracking: false);
 
         if (obj == null)

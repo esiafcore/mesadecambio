@@ -29,6 +29,10 @@
         <input asp-for="IdentificationNumber" type="text" readonly="readonly" class="form-control border-0 shadow" />
         <label asp-for="IdentificationNumber" class="ms-2"></label>
     </div>
+    <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+        <input asp-for="BusinessExecutiveTrx.Code" type="text" readonly="readonly" class="form-control border-0 shadow" />
+        <label class="ms-2">Ejecutivo</label>
+    </div>
     <div class="form-floating pb-1 pt-2 col-md-12">
         <input asp-for="BusinessName" type="text" readonly="readonly" class="form-control border-0 shadow" />
         @if (Model.TypeTrx.Numeral == (int)SD.PersonType.NaturalPerson)

@@ -189,7 +189,11 @@ public class QuotationController : Controller
         {
             ViewData[AC.Title] = "Actualizar - Cotización";
 
-            objData = _uow.Quotation.Get(filter: x => (x.CompanyId == _companyId && x.Id == id));
+            objData = _uow.Quotation
+                .Get(filter: x =>
+                    (x.CompanyId == _companyId &&
+                     x.Id == id),
+                    includeProperties: "CustomerTrx");
 
             if (objData == null)
             {
@@ -215,8 +219,13 @@ public class QuotationController : Controller
         {
             var objCustomer =
                  _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.DataModel.CustomerId));
+
+            objCustomer.BusinessExecutiveId =
+                (objCustomer.BusinessExecutiveId is null ? 0 : objCustomer.BusinessExecutiveId);
+
             listCustomer.Add(objCustomer);
-            model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            //model.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            model.CustomerList = listCustomer;
         }
 
         return View(model);
@@ -895,8 +904,10 @@ public class QuotationController : Controller
         {
             var objCustomer =
                 _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.ModelCreateVM.DataModel.CustomerId));
+
             listCustomer.Add(objCustomer);
-            model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            //model.ModelCreateVM.CustomerList = listCustomer.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            model.ModelCreateVM.CustomerList = listCustomer;
         }
 
         return View(model);
@@ -941,7 +952,7 @@ public class QuotationController : Controller
                 {
                     obj.CurrencyDetailId = objHeader.CurrencyTransaId;
                 }
-                else if(obj.QuotationDetailType == QuotationDetailType.Transfer)
+                else if (obj.QuotationDetailType == QuotationDetailType.Transfer)
                 {
                     obj.CurrencyDetailId = objHeader.CurrencyTransferId;
                 }
@@ -1149,7 +1160,7 @@ public class QuotationController : Controller
         model.ModelCreateVM.DataModel = objHeader;
         model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
         model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
-        var currencyTarget = 
+        var currencyTarget =
             objHeader.TypeNumeral != SD.QuotationType.Sell ?
                 objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
 
@@ -1847,7 +1858,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList;
             return Json(jsonResponse);
         }
         catch (Exception ex)

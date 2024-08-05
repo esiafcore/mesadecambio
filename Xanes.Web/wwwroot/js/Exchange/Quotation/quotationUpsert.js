@@ -481,8 +481,9 @@ const fnGetCustomer = async () => {
 
                             jsonData.data.forEach((item) => {
                                 let option = document.createElement("option");
-                                option.value = item.value;
-                                option.text = item.text;
+                                option.value = item.id;
+                                option.text = item.businessName;
+                                option.setAttribute("data-executive", item.businessExecutiveId);
                                 selectCustomer.appendChild(option);
                             });
 
@@ -509,6 +510,11 @@ const fnGetCustomer = async () => {
                             } else {
                                 $(selectCustomer).on('select2:select', async function (e) {
                                     divExchangeRateHistory.hidden = false;
+
+                                    var executiveId = $(e.params.data.element).data('executive');
+                                    if (executiveId != 0)
+                                        $(selectBusinessExecutive).val(executiveId).trigger('change');
+
                                     fnLoadDatatable(e.params.data.id);
                                 });
                             }
@@ -518,7 +524,7 @@ const fnGetCustomer = async () => {
                             divExchangeRateHistory.hidden = true;
                         });
 
-                        $(selectCustomer).select2('focus');                     
+                        $(selectCustomer).select2('focus');
                     }
                 });
             });
@@ -575,7 +581,7 @@ const fnLoadCustomer = async (searchTerm) => {
 
             // Abrir Select2 nuevamente
             $(selectCustomer).select2('open');
-        
+
             document.querySelector(".select2-search__field").value = searchTerm;
         }
 

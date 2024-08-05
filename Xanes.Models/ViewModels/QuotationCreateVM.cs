@@ -12,7 +12,7 @@ public class QuotationCreateVM
     public string CurrencySourceTarget { get; set; } = string.Empty;
 
     [ValidateNever]
-    public IEnumerable<SelectListItem> CustomerList { get; set; } = new List<SelectListItem>();
+    public List<Customer> CustomerList { get; set; } = new();
 
     [ValidateNever]
     public IEnumerable<SelectListItem>? BankAccountSourceList { get; set; } = null;

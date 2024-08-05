@@ -51,10 +51,21 @@
                     <div class="row col-xl-8 col-12 ps-2 mb-1" id="divCustomer">
                         <div class="col-4 col-sm-5 col-md-5 col-lg-2 me-lg-0 ps-3">Cliente</div>
                         <div class="col-8 col-sm-7 col-md-7 col-lg-7 ms-xl-1 ps-lg-2 ps-xl-2">
-                            <select asp-for="DataModel.CustomerId" asp-items="@Model.CustomerList"
+                            <select asp-for="DataModel.CustomerId" name="CustomerId"
+                                    class="form-control border p-1 shadow" id="selectCustomer">
+                                <option selected disabled>-- Seleccionar --</option>
+                                @foreach (var customer in Model.CustomerList)
+                                {
+                                    <option value="@customer.Id"
+                                            data-executive="@(customer.BusinessExecutiveId)" disabled>
+                                        @customer.BusinessName
+                                    </option>
+                                }
+                            </select>
+                           @*  <select asp-for="DataModel.CustomerId" asp-items="@Model.CustomerList"
                                     class="form-select border p-1 shadow" id="selectCustomer" name="CustomerId">
                                 <option disabled selected>--Select Cliente--</option>
-                            </select>
+                            </select> *@
                             <span asp-validation-for="DataModel.CustomerId" class="text-danger"></span>
                         </div>
                     </div>
