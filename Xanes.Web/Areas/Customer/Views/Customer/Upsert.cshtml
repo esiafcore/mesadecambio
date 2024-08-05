@@ -92,7 +92,17 @@
                     <label asp-for="DataModel.SectorId" class="ms-2">Sector</label>
                     <span asp-validation-for="DataModel.SectorId" class="text-danger"></span>
                 </div>
-                <div class="col-md-6">
+                <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
+                    <select asp-for="DataModel.BusinessExecutiveId"
+                            class="form-select border-0 shadow select2me" name="BusinessExecutiveId" id="selectBusinessExecutive">
+                        @foreach (var executive in Model.BusinessExecutiveList)
+                        {
+                            <option value="@executive.Id" data-loan="@executive.IsLoan" 
+                                    data-payment="@executive.IsPayment">@executive.Code</option>
+                        }
+                    </select>
+                    <label class="ms-2">Ejecutivo</label>
+                    <span asp-validation-for="DataModel.BusinessExecutiveId" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6">
                     @if (Model.DataModel.Id != 0)

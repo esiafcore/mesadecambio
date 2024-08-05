@@ -1,5 +1,6 @@
 ﻿let typeNumeral, inputTypeNumeral, typeNumerals;
 let personName = "";
+let selectBusinessExecutive;
 
 let labelType, divNaturalPerson, divLegalPerson;
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,7 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     labelType = document.querySelector("#labelType");
     divNaturalPerson = document.querySelector(".naturalPerson");
     divLegalPerson = document.querySelector(".legalPerson");
+    selectBusinessExecutive = document.querySelector("#selectBusinessExecutive");
 
+    $(selectBusinessExecutive).select2(select2Options);
 
     let inputId = document.getElementById("DataModel_Id");
     //$("#DataModel_CategoryId").select2(select2Options);
@@ -183,6 +186,6 @@ function naturalNames_onChange(e) {
 
         document.querySelector("#commercialName").value = personName;
         document.querySelector("#businessName").value = personName;
-        console.log(personName);
+        //console.log(personName);
     }
 }

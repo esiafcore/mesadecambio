@@ -135,13 +135,25 @@ public class CustomerController : Controller
         var objIdentificationType = _uow.IdentificationType
             .GetAll(filter: x => (x.CompanyId == _companyId && x.IsActive)).ToList();
 
+        var objBusinessExecutiveList = _uow.BusinessExecutive
+            .GetAll(x => (x.CompanyId == _companyId)
+                         && (x.IsActive))
+            .ToList();
+
+        if (objBusinessExecutiveList == null || objBusinessExecutiveList.Count == 0)
+        {
+            TempData[AC.Error] = $"Ejecutivo no encontrado";
+            return RedirectToAction(nameof(Index));
+        }
+
 
         var dataVM = new Models.ViewModels.CustomerCreateVM()
         {
             DataModel = obj,
             IdentificationTypeList = objIdentificationType,
             TypeList = typeSelectList,
-            SectorList = sectorList
+            SectorList = sectorList,
+            BusinessExecutiveList = objBusinessExecutiveList
         };
 
         return View(dataVM);
@@ -152,6 +164,7 @@ public class CustomerController : Controller
     {
         StringBuilder errorsMessagesBuilder = new();
         JsonResultResponse? jsonResponse = new();
+        var objBusinessExecutive = new BusinessExecutive();
 
         //if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
         //{
@@ -200,6 +213,16 @@ public class CustomerController : Controller
                 return Json(jsonResponse);
             }
 
+            //Verificamos si existe el ejecutivo
+            objBusinessExecutive = _uow.BusinessExecutive.Get(filter: x =>
+                x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
+
+            if (objBusinessExecutive == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Ejecutivo no encontrado";
+                return Json(jsonResponse);
+            }
 
             //Verificamos si existe el tipo
             var objType = _uow.PersonType.Get(filter: x =>

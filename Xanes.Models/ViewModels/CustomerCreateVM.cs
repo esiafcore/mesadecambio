@@ -22,4 +22,6 @@ public class CustomerCreateVM
     [ValidateNever]
     public List<CustomerSector> SectorList { get; set; }
 
+    [ValidateNever]
+    public List<BusinessExecutive> BusinessExecutiveList { get; set; } = new();
 }
