@@ -512,7 +512,7 @@ const fnGetCustomer = async () => {
                                     divExchangeRateHistory.hidden = false;
 
                                     var executiveId = $(e.params.data.element).data('executive');
-                                    if (executiveId != 0)
+                                    if (executiveId && executiveId != 0)
                                         $(selectBusinessExecutive).val(executiveId).trigger('change');
 
                                     fnLoadDatatable(e.params.data.id);
@@ -652,8 +652,9 @@ const fnChangeCustomers = async (onlyCompanies) => {
 
             jsonResponse.data.forEach((item) => {
                 let option = document.createElement("option");
-                option.value = item.value;
-                option.text = item.text;
+                option.value = item.id;
+                option.text = item.businessName;
+                option.setAttribute("data-executive", item.businessExecutiveId);
                 selectCustomer.appendChild(option);
             });
 

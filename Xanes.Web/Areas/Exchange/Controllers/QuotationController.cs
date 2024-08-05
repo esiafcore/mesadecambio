@@ -1020,7 +1020,7 @@ public class QuotationController : Controller
                 obj.CreatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.QuotationDetail.Add(obj);
                 _uow.Save();
-                TempData[AC.Success] = $"Cotización creada correctamente";
+                //TempData[AC.Success] = $"Cotización creada correctamente";
             }
             else
             {
@@ -1046,7 +1046,7 @@ public class QuotationController : Controller
                 _uow.QuotationDetail.Update(objDetail);
                 _uow.Save();
 
-                TempData[AC.Success] = $"Cotización actualizada correctamente";
+                //TempData[AC.Success] = $"Cotización actualizada correctamente";
             }
 
             //Obtenemos los hijos
@@ -1813,7 +1813,7 @@ public class QuotationController : Controller
             }
 
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList.Select(x => new SelectListItem { Text = x.BusinessName, Value = x.Id.ToString() });
+            jsonResponse.Data = objCustomerList;
             return Json(jsonResponse);
         }
         catch (Exception ex)

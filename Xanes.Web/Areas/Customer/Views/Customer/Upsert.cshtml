@@ -125,22 +125,22 @@
                     <span asp-validation-for="DataModel.IdentificationNumber" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.FirstName" type="text" class="form-control border-0 shadow" name="FirstName" onchange="" />
+                    <input asp-for="DataModel.FirstName" value="@Model.DataModel.FirstName" type="text" class="form-control border-0 shadow" name="FirstName" onchange="" />
                     <label asp-for="DataModel.FirstName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.FirstName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.SecondName" type="text" class="form-control border-0 shadow" name="SecondName" />
+                    <input asp-for="DataModel.SecondName" value="@Model.DataModel.SecondName" type="text" class="form-control border-0 shadow" name="SecondName" />
                     <label asp-for="DataModel.SecondName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.SecondName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.LastName" type="text" class="form-control border-0 shadow" name="LastName" />
+                    <input asp-for="DataModel.LastName" value="@Model.DataModel.LastName" type="text" class="form-control border-0 shadow" name="LastName" />
                     <label asp-for="DataModel.LastName" class="ms-2"></label>
                     <span asp-validation-for="DataModel.LastName" class="text-danger"></span>
                 </div>
                 <div class="form-floating mt-1 pb-1 pt-1 col-md-6 personNatural_div">
-                    <input asp-for="DataModel.SecondSurname" type="text" class="form-control border-0 shadow" name="SecondSurname" />
+                    <input asp-for="DataModel.SecondSurname" value="@Model.DataModel.SecondSurname" type="text" class="form-control border-0 shadow" name="SecondSurname" />
                     <label asp-for="DataModel.SecondSurname" class="ms-2"></label>
                     <span asp-validation-for="DataModel.SecondSurname" class="text-danger"></span>
                 </div>

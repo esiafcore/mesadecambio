@@ -301,8 +301,9 @@ const fnChangeCustomers = async (onlyCompanies) => {
 
             jsonResponse.data.forEach((item) => {
                 let option = document.createElement("option");
-                option.value = item.value;
-                option.text = item.text;
+                option.value = item.id;
+                option.text = item.businessName;
+                option.setAttribute("data-executive", item.businessExecutiveId);
                 selectCustomer.appendChild(option);
             });
 
@@ -1311,7 +1312,7 @@ function fnLoadDatatableTransfer() {
             });
             if (typeNumeral == QuotationType.Buy) {
                 amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                pending = (amount.toFixed(decimalTransa)) - (total);
+                pending = (amount.toFixed(decimalTransa)) - (total.toFixed(decimalTransa));
             } else if (typeNumeral == QuotationType.Sell) {
                 if (currencyType == CurrencyType.Foreign) {
                     pending = fnparseFloat(amountHeader) - total;

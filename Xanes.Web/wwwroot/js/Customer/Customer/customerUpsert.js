@@ -141,7 +141,7 @@ const personType_onClick = async (objElem) => {
     let currentValue = objElem.value;
     if (currentValue == PersonType.Natural) {
         personNaturalDiv.forEach((item) => {
-            item.style.display = styleShow;
+            item.hidden = false;
         });
         personLegalDiv.style.display = styleHide;
         labelType.hidden = false;
@@ -156,7 +156,7 @@ const personType_onClick = async (objElem) => {
 
         personLegalDiv.style.display = styleShow;
         personNaturalDiv.forEach((item) => {
-            item.style.display = styleHide;
+            item.hidden = true;
         });
     }
 

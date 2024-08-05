@@ -166,19 +166,18 @@ public class CustomerController : Controller
         JsonResultResponse? jsonResponse = new();
         var objBusinessExecutive = new BusinessExecutive();
 
-        //if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
-        //{
-        //    obj.BusinessName = string.Empty;
-        //    obj.CommercialName = string.Empty;
-        //}
-        //else
-        //{
-        //    obj.FirstName = string.Empty;
-        //    obj.SecondName = string.Empty;
-        //    obj.LastName = string.Empty;
-        //    obj.CommercialName = string.Empty;
+        if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
+        {
+            obj.BusinessName = string.Empty;
+            obj.CommercialName = string.Empty;
+        }
+        else
+        {
+            obj.FirstName = ".";
+            obj.LastName = ".";
+            //obj.CommercialName = string.Empty;
 
-        //}
+        }
 
         //Datos son validos
         if (ModelState.IsValid)
@@ -213,16 +212,21 @@ public class CustomerController : Controller
                 return Json(jsonResponse);
             }
 
-            //Verificamos si existe el ejecutivo
-            objBusinessExecutive = _uow.BusinessExecutive.Get(filter: x =>
-                x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
-
-            if (objBusinessExecutive == null)
+            if (obj.BusinessExecutiveId.HasValue && obj.BusinessExecutiveId != 0)
             {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Ejecutivo no encontrado";
-                return Json(jsonResponse);
+                //Verificamos si existe el ejecutivo
+                objBusinessExecutive = _uow.BusinessExecutive.Get(filter: x =>
+                    x.CompanyId == obj.CompanyId && x.Id == obj.BusinessExecutiveId);
+
+                if (objBusinessExecutive == null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = $"Ejecutivo no encontrado";
+                    return Json(jsonResponse);
+                }
+
             }
+
 
             //Verificamos si existe el tipo
             var objType = _uow.PersonType.Get(filter: x =>
