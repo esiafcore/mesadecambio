@@ -168,15 +168,22 @@ public class CustomerController : Controller
 
         if (obj.TypeNumeral == (int)SD.PersonType.NaturalPerson)
         {
-            obj.BusinessName = string.Empty;
-            obj.CommercialName = string.Empty;
-        }
-        else
-        {
-            obj.FirstName = string.Empty;
-            obj.LastName = string.Empty;
-            //obj.CommercialName = string.Empty;
+            jsonResponse.IsSuccess = true;
 
+            if (obj.FirstName is null || obj.FirstName == string.Empty)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"El primer nombre es requerido. ";
+            }
+
+            if (obj.LastName is null || obj.LastName == string.Empty)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages += $"El primer apellido es requerido.";
+            }
+
+            if (!jsonResponse.IsSuccess)
+                return Json(jsonResponse);
         }
 
         //Datos son validos
@@ -322,7 +329,7 @@ public class CustomerController : Controller
                     if (isIdentificationExist)
                     {
                         jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"# Identificación {obj.Code} ya existe";
+                        jsonResponse.ErrorMessages = $"# Identificación {obj.IdentificationNumber} ya existe";
                         return Json(jsonResponse);
                     }
                 }

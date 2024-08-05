@@ -61,7 +61,7 @@ public class Customer: EntityInactivated, ICloneable
 
     [MaxLength(250, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Primer Nombre")]
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; } = null!;
 
     [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Segundo Nombre")]
@@ -69,7 +69,7 @@ public class Customer: EntityInactivated, ICloneable
 
     [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Primero Apellido")]
-    public string LastName { get; set; } = null!;
+    public string? LastName { get; set; } = null!;
 
     [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
     [Display(Name = "Segundo Apellido")]

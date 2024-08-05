@@ -157,8 +157,8 @@ const personType_onClick = async (objElem) => {
         personLegalDiv.style.display = styleShow;
         personNaturalDiv.forEach((item) => {
             item.hidden = true;
-            inputFirstName.value = ".";
-            inputLastName.value = ".";
+            //inputFirstName.value = ".";
+            //inputLastName.value = ".";
         });
     }
 
