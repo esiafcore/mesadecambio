@@ -137,6 +137,11 @@ const identificationType_onClick = async (objElem) => {
 
 
 const personType_onClick = async (objElem) => {
+    let id = document.querySelector("#uid").value;
+    let select = false;
+    if (id && id == 0) {
+        select = true;
+    }
 
     let currentValue = objElem.value;
     if (currentValue == PersonType.Natural) {
@@ -147,7 +152,12 @@ const personType_onClick = async (objElem) => {
         labelType.hidden = false;
         divNaturalPerson.hidden = false;
         divLegalPerson.hidden = true;
-
+        if (select) {
+            var radios = document.querySelectorAll('.identification-natural');
+            if (radios.length > 0) {
+                radios[0].checked = true;
+            }
+        }
     }
     else if (currentValue == PersonType.Legal) {
         labelType.hidden = false;
@@ -156,12 +166,17 @@ const personType_onClick = async (objElem) => {
 
         personLegalDiv.style.display = styleShow;
         personNaturalDiv.forEach((item) => {
-            item.hidden = true;
-            //inputFirstName.value = ".";
-            //inputLastName.value = ".";
+            item.hidden = true;        
         });
-    }
 
+        if (select) {
+            var radios = document.querySelectorAll('.identification-legal');
+            if (radios.length > 0) {
+                radios[0].checked = true;
+            }
+        }
+
+    }
 }
 
 

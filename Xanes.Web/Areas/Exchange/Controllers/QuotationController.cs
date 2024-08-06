@@ -15,7 +15,9 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using System.IO.Compression;
 using System.Security.Claims;
+using Stimulsoft.Report.Export;
 using Xanes.LoggerService;
+using static Stimulsoft.Report.Help.StiHelpProvider;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -3161,7 +3163,11 @@ public class QuotationController : Controller
 
             foreach (var itemDetailList in transaDetailsGroup)
             {
-                var transaction = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == itemDetailList.Key, includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx");
+                var transaction = _uow
+                    .Quotation.Get(filter: x =>
+                        x.CompanyId == _companyId &&
+                        x.Id == itemDetailList.Key,
+                        includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx");
 
                 if (transaction is null)
                 {
@@ -3170,8 +3176,11 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
-                var tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa;
-                var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString() : tcExchange.RoundTo(_decimalExchangeFull).ToString();
+                var tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ?
+                    transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa;
+                var tcExchangeString = !transaction.IsAdjustment ?
+                    tcExchange.RoundTo(_decimalExchange).ToString() :
+                    tcExchange.RoundTo(_decimalExchangeFull).ToString();
 
                 foreach (var itemDetail in itemDetailList)
                 {
@@ -3305,6 +3314,203 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
     }
+
+
+    // Exportar a Excel las Operaciones
+    [HttpPost]
+    public JsonResult ExportOperationToExcel([FromBody] List<int> quotationIds)
+    {
+        JsonResultResponse jsonResponse = new();
+        StiReport reportResult = new();
+
+        try
+        {
+            // Cargar y verificar el archivo del reporte
+            var fileName = "OperationList.mrt";
+            var filePath = Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Reporte no encontrado";
+                return Json(jsonResponse);
+            }
+
+            // Verificar extensión del archivo
+            if (Path.GetExtension(fileName).ToUpper() != ".MRT")
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Reporte inválido";
+                return Json(jsonResponse);
+            }
+
+            // Obtener configuraciones y validaciones adicionales
+            var configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            if (configFac == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Configuración de facturación no encontrada";
+                return Json(jsonResponse);
+            }
+
+            var company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            if (company == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Compañía no encontrada";
+                return Json(jsonResponse);
+            }
+
+            // Obtener la cotización
+            var transactionList = _uow.Quotation.GetAll(filter: x => (x.CompanyId == _companyId)
+                                                                     && (quotationIds.Contains(x.Id))
+                                                                        // No se incluyen TRA
+                                                                        && (x.TypeNumeral != SD.QuotationType.Transfer),
+                includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
+                .OrderByDescending(x => x.Id)
+                .ToList();
+
+            if (transactionList is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            if (transactionList.Count() == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay operaciones";
+                return Json(jsonResponse);
+            }
+
+            List<TransaODTVM> transaListVM = new();
+
+            foreach (var transaction in transactionList)
+            {
+                var currency = "";
+
+                if (transaction.TypeNumeral == SD.QuotationType.Buy ||
+                    transaction.TypeNumeral == SD.QuotationType.Transfer)
+                {
+                    currency =
+                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}";
+                }
+                else
+                {
+                    currency =
+                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyDepositTrx.Code}";
+                }
+
+
+                var transa = new TransaODTVM
+                {
+                    Id = transaction.Id,
+                    CompanyId = transaction.CompanyId,
+                    TypeNumeral = transaction.TypeNumeral,
+                    NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}",
+                    CustomerFullName = transaction.CustomerTrx.BusinessName,
+                    CurrencySourceTarget = currency,
+                    ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
+                    ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
+                    AmountTransaction = transaction.AmountTransactionRpt,
+                    AmountRevenue = transaction.AmountRevenueRpt,
+                    AmountCost = transaction.AmountCostRpt,
+                    TotalDeposit = transaction.TotalDepositRpt,
+                    TotalTransfer = transaction.TotalTransferRpt,
+                    ExecutiveCode = transaction.BusinessExecutiveCode,
+                    IsClosed = transaction.IsClosed,
+                    IsVoid = transaction.IsVoid,
+                    CreatedBy = transaction.CreatedBy,
+                    ClosedBy = transaction.ClosedBy,
+                    DateTransa = transaction.DateTransa
+                };
+
+                transaListVM.Add(transa);
+            }
+
+
+            int countBuy = 0, countSell = 0;
+            decimal amountNetBuy = 0, amountNetSell = 0, amountNetDepositBuy = 0, amountNetDepositSell = 0, amountNetTransferBuy = 0, amountNetTransferSell = 0;
+            decimal amountNetCostBuy = 0, amountNetCostSell = 0, amountNetRevenueBuy = 0, amountNetRevenueSell = 0;
+
+            countBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Count();
+            countSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Count();
+            amountNetBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountTransaction);
+            amountNetCostBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCost);
+            amountNetDepositBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalDeposit);
+            amountNetTransferBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalTransfer);
+            amountNetRevenueBuy = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenue);
+            amountNetSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountTransaction);
+            amountNetCostSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCost);
+            amountNetDepositSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalDeposit);
+            amountNetTransferSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalTransfer);
+            amountNetRevenueSell = transaListVM.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenue);
+
+            // Cargar reporte
+            reportResult.Load(StiNetCoreHelper.MapPath(this, filePath));
+            // Configuración del reporte
+            reportResult.Dictionary.Variables["parCountBuy"].ValueObject = countBuy;
+            reportResult.Dictionary.Variables["parCountSell"].ValueObject = countSell;
+            reportResult.Dictionary.Variables["parAmountNetBuy"].ValueObject = amountNetBuy;
+            reportResult.Dictionary.Variables["parAmountNetCostBuy"].ValueObject = amountNetCostBuy;
+            reportResult.Dictionary.Variables["parAmountNetDepositBuy"].ValueObject = amountNetDepositBuy;
+            reportResult.Dictionary.Variables["parAmountNetTransferBuy"].ValueObject = amountNetTransferBuy;
+            reportResult.Dictionary.Variables["parAmountNetRevenueBuy"].ValueObject = amountNetRevenueBuy;
+            reportResult.Dictionary.Variables["parAmountNetSell"].ValueObject = amountNetSell;
+            reportResult.Dictionary.Variables["parAmountNetCostSell"].ValueObject = amountNetCostSell;
+            reportResult.Dictionary.Variables["parAmountNetDepositSell"].ValueObject = amountNetDepositSell;
+            reportResult.Dictionary.Variables["parAmountNetTransferSell"].ValueObject = amountNetTransferSell;
+            reportResult.Dictionary.Variables["parAmountNetRevenueSell"].ValueObject = amountNetRevenueSell;
+            reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)ReportTransaType.Operation];
+            reportResult.Dictionary.Variables[AC.ParDecimalTransaction].ValueObject = _decimalTransa;
+            reportResult.Dictionary.Variables[AC.ParDecimalExchangeRate].ValueObject = _decimalExchange;
+            reportResult.Dictionary.Variables[AC.ParNameCompany].ValueObject = $"{company.Name}";
+            reportResult.Dictionary.Variables[AC.ParFileImagePath].ValueObject = $"{company.ImageLogoUrl}";
+
+            DateOnly minDate = transaListVM.Min(t => t.DateTransa);
+            DateOnly maxDate = transaListVM.Max(t => t.DateTransa);
+
+            reportResult.Dictionary.Variables[AC.ParFilterDescription].ValueObject = $"Fecha Inicial: {minDate} Fecha Final: {maxDate}";
+
+            reportResult.RegBusinessObject(AC.DatRep, transaListVM);
+            reportResult.Compile();
+            reportResult.Render();
+
+            byte[] excelData;
+            var excelSettings = new StiExcel2007ExportSettings();
+            using (var stream = new MemoryStream())
+            {
+                reportResult.ExportDocument(StiExportFormat.Excel2007, stream, excelSettings);
+                excelData = stream.ToArray();
+            }
+
+            var exportReporteBase64 = Convert.ToBase64String(excelData);
+            DateTime dateReport = DateTime.Now;
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = new
+            {
+                ContentFile = exportReporteBase64,
+                ContentType = AC.ContentTypeExcel,
+                Filename = $"ListadoDeOperaciones_{dateReport:yyyyMMdd}_{dateReport:HHmmss}.xlsx"
+            };
+            return Json(jsonResponse);
+
+        }
+        catch (Exception ex)
+        {
+            // Log error details for debugging
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message;
+            return Json(jsonResponse);
+        }
+    }
+
 
     #endregion
 }

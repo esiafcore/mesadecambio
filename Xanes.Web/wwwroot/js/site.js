@@ -130,7 +130,9 @@ const styleShowInline = "inline-block";
 
 const ToggleLoadingText = {
     Printing: "Imprimiendo...",
-    GeneratePdf: "Generado PDF..."
+    GeneratePdf: "Generado PDF...",
+    GenerateExcel: "Generado Excel..."
+
 
 }
 const ButtonsText = {

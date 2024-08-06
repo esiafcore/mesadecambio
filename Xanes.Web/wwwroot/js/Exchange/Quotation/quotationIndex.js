@@ -839,6 +839,15 @@ const fnLoadDatatable = () => {
     });
 }
 
+
+const fnvalidContent = async () => {
+    const result = await getfilteredDataFromDatatable();
+    // si se imprime
+    if (result.isSuccess) {
+        await fnexportToExcel(result.data);
+    }
+};
+
 // Obtener los datos filtrados disponibles en el datatable
 const getfilteredDataFromDatatable = async () => {
     const reponseIsPrint = {
@@ -886,6 +895,48 @@ const getfilteredDataFromDatatable = async () => {
     reponseIsPrint.isSuccess = true;
     reponseIsPrint.data = ids;
     return reponseIsPrint;
+};
+
+// Exportar datos del datatable a Excel
+const fnexportToExcel = async (quotationIds) => {
+    try {
+
+        fntoggleLoading('Generando Excel...');
+
+        const url = `/exchange/quotation/ExportOperationToExcel`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            const linkDownload = document.createElement('a');
+            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
+            linkDownload.download = jsonResponse.data.filename;
+            linkDownload.click();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en la conexión',
+            text: e.message
+        });
+    } finally {
+        fntoggleLoading();
+    }
 };
 
 // Exportar datos del datatable a PDF
