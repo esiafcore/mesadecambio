@@ -37,7 +37,6 @@
     <Relations isList="true" count="0" />
     <Report isRef="0" />
     <Resources isList="true" count="0" />
-    <UserFunctions isList="true" count="0" />
     <Variables isList="true" count="18">
       <value>,parFileImagePath,parFileImagePath,,System.String,,False,False,False,False,,_x0031_6803973931b4e6ba3eb524a9dca130a</value>
       <value>,parNameCompany,parNameCompany,,System.String,,False,False,False,False,,_x0032_cacf64e5a32473290b2ad8502c89aa4</value>
@@ -80,56 +79,60 @@
               <Expressions isList="true" count="0" />
               <IconColor>68, 114, 196</IconColor>
               <ImageURL>{parFileImagePath}</ImageURL>
+              <Margins>0,0,0,0</Margins>
               <Name>ImgLogo</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
               <Stretch>True</Stretch>
             </ImgLogo>
-            <Text4 Ref="6" type="Text" isKey="true">
+            <NameCompany Ref="6" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>62,0,318,8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,20,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text4</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>NameCompany</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
               <Text>{parNameCompany}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text4>
-            <Text5 Ref="7" type="Text" isKey="true">
+            </NameCompany>
+            <NameReport Ref="7" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>62,8,318,8</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,16,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text5</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>NameReport</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
               <Text>{parNameReport}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text5>
-            <Text44 Ref="8" type="Text" isKey="true">
+            </NameReport>
+            <NameFilter Ref="8" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <ClientRectangle>62,16,318,10</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,14,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text44</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>NameFilter</Name>
               <Page isRef="3" />
               <Parent isRef="4" />
               <Text>{parFilterDescription}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text44>
+            </NameFilter>
           </Components>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
@@ -144,11 +147,12 @@
             <Pagination Ref="10" type="Text" isKey="true">
               <Border>None;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
-              <ClientRectangle>176,0,184,10</ClientRectangle>
+              <ClientRectangle>176,0,204,10</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Pagination</Name>
               <Page isRef="3" />
               <Parent isRef="9" />
@@ -157,21 +161,22 @@
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
             </Pagination>
-            <Text3 Ref="11" type="Text" isKey="true">
+            <Time Ref="11" type="Text" isKey="true">
               <Border>None;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>0,0,176,10</ClientRectangle>
               <Conditions isList="true" count="0" />
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
-              <Name>Text3</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Time</Name>
               <Page isRef="3" />
               <Parent isRef="9" />
               <Text>{Time}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text3>
+            </Time>
           </Components>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
@@ -179,13 +184,14 @@
           <Page isRef="3" />
           <Parent isRef="3" />
         </PageFooterBand1>
-        <Text24 Ref="12" type="Text" isKey="true">
+        <Anonimo2 Ref="12" type="Text" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>458,88,16,6</ClientRectangle>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Arial,8</Font>
-          <Name>Text24</Name>
+          <Margins>0,0,0,0</Margins>
+          <Name>Anonimo2</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
           <Text>{
@@ -197,14 +203,15 @@
   }
 }</Text>
           <TextBrush>Black</TextBrush>
-        </Text24>
-        <Text45 Ref="13" type="Text" isKey="true">
+        </Anonimo2>
+        <Anonimo1 Ref="13" type="Text" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>498,36,16,6</ClientRectangle>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
           <Font>Arial,8</Font>
-          <Name>Text45</Name>
+          <Margins>0,0,0,0</Margins>
+          <Name>Anonimo1</Name>
           <Page isRef="3" />
           <Parent isRef="3" />
           <Text>{
@@ -217,12 +224,12 @@
   }
 }</Text>
           <TextBrush>Black</TextBrush>
-        </Text45>
+        </Anonimo1>
         <Header Ref="14" type="HeaderBand" isKey="true">
           <Brush>Transparent</Brush>
           <ClientRectangle>0,34,380,8</ClientRectangle>
           <Components isList="true" count="16">
-            <Headerdatrep_code Ref="15" type="Text" isKey="true">
+            <Headerdatrep_NumberSeq Ref="15" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>0,0,16,8</ClientRectangle>
@@ -230,15 +237,16 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Headerdatrep_code</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_NumberSeq</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>#Seq</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Headerdatrep_code>
-            <Headerdatrep_IdentNumberCode Ref="16" type="Text" isKey="true">
+            </Headerdatrep_NumberSeq>
+            <Headerdatrep_NumberOp Ref="16" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>16,0,22,8</ClientRectangle>
@@ -246,15 +254,16 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Headerdatrep_IdentNumberCode</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_NumberOp</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>#Op</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Headerdatrep_IdentNumberCode>
-            <Headerdatrep_identNumber Ref="17" type="Text" isKey="true">
+            </Headerdatrep_NumberOp>
+            <Headerdatrep_DateTransa Ref="17" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>38,0,24,8</ClientRectangle>
@@ -262,15 +271,16 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Headerdatrep_identNumber</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_DateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Fecha</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Headerdatrep_identNumber>
-            <Headerdatrep_comercialName Ref="18" type="Text" isKey="true">
+            </Headerdatrep_DateTransa>
+            <Headerdatrep_Customer Ref="18" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>62,0,58,8</ClientRectangle>
@@ -278,15 +288,16 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Headerdatrep_comercialName</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Customer</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Cliente</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Headerdatrep_comercialName>
-            <Headerdatrep_phoneNumber Ref="19" type="Text" isKey="true">
+            </Headerdatrep_Customer>
+            <Headerdatrep_ExchangeRateTransa Ref="19" type="Text" isKey="true">
               <Border>Top, Left, Bottom;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>140,0,24,8</ClientRectangle>
@@ -294,7 +305,8 @@
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Headerdatrep_phoneNumber</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_ExchangeRateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>  TC
@@ -302,8 +314,8 @@ Com/Vta</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Headerdatrep_phoneNumber>
-            <Text6 Ref="20" type="Text" isKey="true">
+            </Headerdatrep_ExchangeRateTransa>
+            <Headerdatrep_ExchangeRateOficial Ref="20" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>164,0,24,8</ClientRectangle>
@@ -311,7 +323,8 @@ Com/Vta</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text6</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_ExchangeRateOficial</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>  TC
@@ -319,8 +332,8 @@ Oficial</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text6>
-            <Text7 Ref="21" type="Text" isKey="true">
+            </Headerdatrep_ExchangeRateOficial>
+            <Headerdatrep_Amount Ref="21" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>188,0,22,8</ClientRectangle>
@@ -328,15 +341,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text7</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Amount</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Monto</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text7>
-            <Text8 Ref="22" type="Text" isKey="true">
+            </Headerdatrep_Amount>
+            <Headerdatrep_Deposit Ref="22" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>210,0,24,8</ClientRectangle>
@@ -344,15 +358,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text8</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Deposit</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Depósito</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text8>
-            <Text1 Ref="23" type="Text" isKey="true">
+            </Headerdatrep_Deposit>
+            <Headerdatrep_Transfer Ref="23" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>234,0,22,8</ClientRectangle>
@@ -360,15 +375,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text1</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Transfer</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Transfer</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text1>
-            <Text9 Ref="24" type="Text" isKey="true">
+            </Headerdatrep_Transfer>
+            <Headerdatrep_Costo Ref="24" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>256,0,24,8</ClientRectangle>
@@ -376,15 +392,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text9</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Costo</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Costo</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text9>
-            <Text10 Ref="25" type="Text" isKey="true">
+            </Headerdatrep_Costo>
+            <Headerdatrep_Ingreso Ref="25" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>280,0,24,8</ClientRectangle>
@@ -392,15 +409,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text10</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Ingreso</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Ingreso</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text10>
-            <Text11 Ref="26" type="Text" isKey="true">
+            </Headerdatrep_Ingreso>
+            <Headerdatrep_Eje Ref="26" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>304,0,12,8</ClientRectangle>
@@ -408,15 +426,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text11</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Eje</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Eje</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text11>
-            <Text12 Ref="27" type="Text" isKey="true">
+            </Headerdatrep_Eje>
+            <Headerdatrep_Closed Ref="27" type="Text" isKey="true">
               <Border>Top, Left, Bottom;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>316,0,16,8</ClientRectangle>
@@ -424,15 +443,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text12</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_Closed</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Closed</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text12>
-            <Text13 Ref="28" type="Text" isKey="true">
+            </Headerdatrep_Closed>
+            <Headerdatrep_CreatedBy Ref="28" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>332,0,24,8</ClientRectangle>
@@ -440,15 +460,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text13</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_CreatedBy</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Creado Por</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text13>
-            <Text14 Ref="29" type="Text" isKey="true">
+            </Headerdatrep_CreatedBy>
+            <Headerdatrep_ClosedBy Ref="29" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>356,0,24,8</ClientRectangle>
@@ -456,15 +477,16 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text14</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_ClosedBy</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>Cerrado Por</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text14>
-            <Text49 Ref="30" type="Text" isKey="true">
+            </Headerdatrep_ClosedBy>
+            <Headerdatrep_CurrencySourceTarget Ref="30" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>Transparent</Brush>
               <ClientRectangle>120,0,20,8</ClientRectangle>
@@ -472,7 +494,8 @@ Oficial</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
-              <Name>Text49</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>Headerdatrep_CurrencySourceTarget</Name>
               <Page isRef="3" />
               <Parent isRef="14" />
               <Text>  Mon 
@@ -480,7 +503,7 @@ Ori-Des</Text>
               <TextBrush>Black</TextBrush>
               <TextOptions>,,,,WordWrap=True,A=0</TextOptions>
               <Type>Expression</Type>
-            </Text49>
+            </Headerdatrep_CurrencySourceTarget>
           </Components>
           <Conditions isList="true" count="0" />
           <Expressions isList="true" count="0" />
@@ -493,7 +516,7 @@ Ori-Des</Text>
           <BusinessObjectGuid>3cf0d9c4e6904b81a595386bed5f4a06</BusinessObjectGuid>
           <ClientRectangle>0,50,380,6</ClientRectangle>
           <Components isList="true" count="16">
-            <Datadatrep_code Ref="32" type="Text" isKey="true">
+            <Datadatrep_NumberSeq Ref="32" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>0,0,16,6</ClientRectangle>
@@ -502,7 +525,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>8,3,0,0</Margins>
-              <Name>Datadatrep_code</Name>
+              <Name>Datadatrep_NumberSeq</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.Id}</Text>
@@ -510,8 +533,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_code>
-            <Datadatrep_identNumber Ref="33" type="Text" isKey="true">
+            </Datadatrep_NumberSeq>
+            <Datadatrep_DateTransa Ref="33" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>38,0,24,6</ClientRectangle>
@@ -520,7 +543,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Datadatrep_identNumber</Name>
+              <Name>Datadatrep_DateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.DateTransa}</Text>
@@ -528,8 +551,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_identNumber>
-            <Datadatrep_isActive Ref="34" type="Text" isKey="true">
+            </Datadatrep_DateTransa>
+            <Datadatrep_Closed Ref="34" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>316,0,16,6</ClientRectangle>
@@ -538,7 +561,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Datadatrep_isActive</Name>
+              <Name>Datadatrep_Closed</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.IsClosed ? "S" : "N"}</Text>
@@ -546,8 +569,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_isActive>
-            <Datadatrep_identNumberCode Ref="35" type="Text" isKey="true">
+            </Datadatrep_Closed>
+            <Datadatrep_NumberOp Ref="35" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>16,0,22,6</ClientRectangle>
@@ -556,7 +579,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>8,3,0,0</Margins>
-              <Name>Datadatrep_identNumberCode</Name>
+              <Name>Datadatrep_NumberOp</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.NumberTransa}</Text>
@@ -564,8 +587,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_identNumberCode>
-            <Datadatrep_comercialName Ref="36" type="Text" isKey="true">
+            </Datadatrep_NumberOp>
+            <Datadatrep_Customer Ref="36" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>62,0,58,6</ClientRectangle>
@@ -573,7 +596,7 @@ Ori-Des</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
               <Margins>8,3,0,0</Margins>
-              <Name>Datadatrep_comercialName</Name>
+              <Name>Datadatrep_Customer</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.CustomerFullName}</Text>
@@ -581,8 +604,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Datadatrep_comercialName>
-            <Text2 Ref="37" type="Text" isKey="true">
+            </Datadatrep_Customer>
+            <Datadatrep_ClosedBy Ref="37" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>356,0,24,6</ClientRectangle>
@@ -591,7 +614,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text2</Name>
+              <Name>Datadatrep_ClosedBy</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.ClosedBy}</Text>
@@ -599,8 +622,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text2>
-            <Text15 Ref="38" type="Text" isKey="true">
+            </Datadatrep_ClosedBy>
+            <Datadatrep_CreatedBy Ref="38" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>332,0,24,6</ClientRectangle>
@@ -609,7 +632,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text15</Name>
+              <Name>Datadatrep_CreatedBy</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.CreatedBy}</Text>
@@ -617,8 +640,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text15>
-            <Text16 Ref="39" type="Text" isKey="true">
+            </Datadatrep_CreatedBy>
+            <Datadatrep_Eje Ref="39" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>304,0,12,6</ClientRectangle>
@@ -627,7 +650,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Center</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text16</Name>
+              <Name>Datadatrep_Eje</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.ExecutiveCode}</Text>
@@ -635,8 +658,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text16>
-            <Text17 Ref="40" type="Text" isKey="true">
+            </Datadatrep_Eje>
+            <Datadatrep_Ingreso Ref="40" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>280,0,24,6</ClientRectangle>
@@ -645,7 +668,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text17</Name>
+              <Name>Datadatrep_Ingreso</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountRevenue)}</Text>
@@ -653,8 +676,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text17>
-            <Text18 Ref="41" type="Text" isKey="true">
+            </Datadatrep_Ingreso>
+            <Datadatrep_Costo Ref="41" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>256,0,24,6</ClientRectangle>
@@ -663,7 +686,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text18</Name>
+              <Name>Datadatrep_Costo</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountCost)}</Text>
@@ -671,8 +694,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text18>
-            <Text19 Ref="42" type="Text" isKey="true">
+            </Datadatrep_Costo>
+            <Datadatrep_Transfer Ref="42" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>234,0,22,6</ClientRectangle>
@@ -681,7 +704,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text19</Name>
+              <Name>Datadatrep_Transfer</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.TotalTransfer)}</Text>
@@ -689,8 +712,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text19>
-            <Text20 Ref="43" type="Text" isKey="true">
+            </Datadatrep_Transfer>
+            <Datadatrep_Deposit Ref="43" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>210,0,24,6</ClientRectangle>
@@ -699,7 +722,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text20</Name>
+              <Name>Datadatrep_Deposit</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.TotalDeposit)}</Text>
@@ -707,8 +730,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text20>
-            <Text21 Ref="44" type="Text" isKey="true">
+            </Datadatrep_Deposit>
+            <Datadatrep_Amount Ref="44" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>188,0,22,6</ClientRectangle>
@@ -717,7 +740,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text21</Name>
+              <Name>Datadatrep_Amount</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", datrep.AmountTransaction)}</Text>
@@ -725,8 +748,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text21>
-            <Text22 Ref="45" type="Text" isKey="true">
+            </Datadatrep_Amount>
+            <Datadatrep_ExchangeRateOficial Ref="45" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>164,0,24,6</ClientRectangle>
@@ -735,7 +758,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text22</Name>
+              <Name>Datadatrep_ExchangeRateOficial</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalExchangeRate + "}", datrep.ExchangeRateOfficialTransa)}</Text>
@@ -743,8 +766,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text22>
-            <Text23 Ref="46" type="Text" isKey="true">
+            </Datadatrep_ExchangeRateOficial>
+            <Datadatrep_ExchangeRateTransa Ref="46" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>140,0,24,6</ClientRectangle>
@@ -753,7 +776,7 @@ Ori-Des</Text>
               <Font>Tahoma,8</Font>
               <HorAlignment>Right</HorAlignment>
               <Margins>3,3,0,0</Margins>
-              <Name>Text23</Name>
+              <Name>Datadatrep_ExchangeRateTransa</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{Format("{0:N" + parDecimalExchangeRate + "}", datrep.ExchangeRateTransa)}</Text>
@@ -761,8 +784,8 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text23>
-            <Text50 Ref="47" type="Text" isKey="true">
+            </Datadatrep_ExchangeRateTransa>
+            <Datadatrep_CurrencySourceTarget Ref="47" type="Text" isKey="true">
               <Brush>Transparent</Brush>
               <CanGrow>True</CanGrow>
               <ClientRectangle>120,0,20,6</ClientRectangle>
@@ -770,7 +793,7 @@ Ori-Des</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8</Font>
               <Margins>8,3,0,0</Margins>
-              <Name>Text50</Name>
+              <Name>Datadatrep_CurrencySourceTarget</Name>
               <Page isRef="3" />
               <Parent isRef="31" />
               <Text>{datrep.CurrencySourceTarget}</Text>
@@ -778,7 +801,7 @@ Ori-Des</Text>
               <TextOptions>,,,Trimming=EllipsisCharacter,,A=0</TextOptions>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text50>
+            </Datadatrep_CurrencySourceTarget>
           </Components>
           <Conditions isList="true" count="2">
             <value>_x007B__x0028_datrep.IsClosed_x0020__x003D__x003D__x0020_false_x0029__x007D_,[0:0:0],[246:254:165],Arial_x002C_8,True,False,,,None</value>
@@ -800,7 +823,7 @@ Ori-Des</Text>
           <Brush>Transparent</Brush>
           <ClientRectangle>0,64,380,2</ClientRectangle>
           <Components isList="true" count="8">
-            <Text26 Ref="49" type="Text" isKey="true">
+            <FooterBand1_White1 Ref="49" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>[255:255:255]</Brush>
               <ClientRectangle>304,0,76,6</ClientRectangle>
@@ -808,14 +831,15 @@ Ori-Des</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
-              <Name>Text26</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterBand1_White1</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text26>
-            <Text27 Ref="50" type="Text" isKey="true">
+            </FooterBand1_White1>
+            <FooterBand1_TotalTransfer1 Ref="50" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>[255:255:255]</Brush>
               <ClientRectangle>234,0,22,6</ClientRectangle>
@@ -823,7 +847,8 @@ Ori-Des</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
-              <Name>Text27</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterBand1_TotalTransfer1</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", 
@@ -831,8 +856,8 @@ SumD(datrep.TotalTransfer))}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text27>
-            <Text28 Ref="51" type="Text" isKey="true">
+            </FooterBand1_TotalTransfer1>
+            <FooterBand1_TotalDeposit1 Ref="51" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>[255:255:255]</Brush>
               <ClientRectangle>210,0,24,6</ClientRectangle>
@@ -840,7 +865,8 @@ SumD(datrep.TotalTransfer))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
-              <Name>Text28</Name>
+              <Margins>0,0,0,0</Margins>
+              <Name>FooterBand1_TotalDeposit1</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
               <Text>{Format("{0:N" + parDecimalTransaction + "}", 
@@ -848,7 +874,7 @@ SumD(datrep.TotalDeposit))}</Text>
               <TextBrush>Black</TextBrush>
               <Type>Expression</Type>
               <VertAlignment>Center</VertAlignment>
-            </Text28>
+            </FooterBand1_TotalDeposit1>
             <Text29 Ref="52" type="Text" isKey="true">
               <Border>All;[165:165:165];1;Solid;False;4;Black</Border>
               <Brush>[255:255:255]</Brush>
@@ -857,6 +883,7 @@ SumD(datrep.TotalDeposit))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text29</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
@@ -874,6 +901,7 @@ SumD(datrep.AmountTransaction))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text32</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
@@ -889,6 +917,7 @@ SumD(datrep.AmountTransaction))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text31</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
@@ -906,6 +935,7 @@ SumD(datrep.AmountCost))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text42</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
@@ -923,6 +953,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text46</Name>
               <Page isRef="3" />
               <Parent isRef="48" />
@@ -950,6 +981,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text26</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -965,6 +997,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text30</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -981,6 +1014,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text33</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -997,6 +1031,7 @@ SumD(datrep.AmountRevenue))}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text27</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1014,6 +1049,7 @@ parAmountNetTransferBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text28</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1031,6 +1067,7 @@ parAmountNetDepositBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text29</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1048,6 +1085,7 @@ parAmountNetBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text25</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1065,6 +1103,7 @@ parAmountNetCostBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text35</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1082,6 +1121,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text47</Name>
               <Page isRef="3" />
               <Parent isRef="57" />
@@ -1109,6 +1149,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text36</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1124,6 +1165,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text40</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1140,6 +1182,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text41</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1156,6 +1199,7 @@ parAmountNetRevenueBuy)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text37</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1173,6 +1217,7 @@ parAmountNetTransferSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text38</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1190,6 +1235,7 @@ parAmountNetDepositSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text39</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1207,6 +1253,7 @@ parAmountNetSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text34</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1224,6 +1271,7 @@ parAmountNetCostSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,8,Bold</Font>
               <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text43</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1241,6 +1289,7 @@ parAmountNetRevenueSell)}</Text>
               <Expressions isList="true" count="0" />
               <Font>Tahoma,10,Bold</Font>
               <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
               <Name>Text48</Name>
               <Page isRef="3" />
               <Parent isRef="67" />
@@ -1280,13 +1329,13 @@ parAmountNetRevenueSell)}</Text>
     <value>Stimulsoft.Report.Dll</value>
   </ReferencedAssemblies>
   <ReportAlias>Report</ReportAlias>
-  <ReportChanged>7/31/2024 12:33:19 PM</ReportChanged>
+  <ReportChanged>8/6/2024 10:04:03 AM</ReportChanged>
   <ReportCreated>6/21/2023 7:47:25 AM</ReportCreated>
-  <ReportFile>C:\Users\Administrador\source\repos\XanesN8\XanesN8.UI\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
-  <ReportGuid>d1d07fd2e8d040eca309d7c6104621cd</ReportGuid>
+  <ReportFile>C:\Users\Administrador\source\repos\mesadecambio\Xanes.Web\Areas\Exchange\Reports\OperationList.mrt</ReportFile>
+  <ReportGuid>d21f778e3bce4981b24454b2295dce70</ReportGuid>
   <ReportName>Report</ReportName>
   <ReportUnit>Millimeters</ReportUnit>
-  <ReportVersion>2024.3.1.0</ReportVersion>
+  <ReportVersion>2023.4.1.0</ReportVersion>
   <Script>using System;
 using System.Drawing;
 using System.Windows.Forms;

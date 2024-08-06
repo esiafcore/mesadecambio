@@ -156,6 +156,7 @@ const personType_onClick = async (objElem) => {
             var radios = document.querySelectorAll('.identification-natural');
             if (radios.length > 0) {
                 radios[0].checked = true;
+                identificationType_onClick(radios[0])
             }
         }
     }
@@ -173,6 +174,7 @@ const personType_onClick = async (objElem) => {
             var radios = document.querySelectorAll('.identification-legal');
             if (radios.length > 0) {
                 radios[0].checked = true;
+                identificationType_onClick(radios[0])
             }
         }
 
