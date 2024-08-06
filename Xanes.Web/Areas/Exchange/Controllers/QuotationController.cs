@@ -3482,16 +3482,20 @@ public class QuotationController : Controller
             byte[] excelData;
             var excelSettings = new StiExcel2007ExportSettings
             {
-                //// Configura para exportar todas las páginas
-                //PageRange = true,
+                // Exportar solo los datos, sin incluir encabezados de página o pies de página
+                ExportDataOnly = true,
 
-                //// Configura los encabezados
-                //UseOnePageHeaderAndFooter = true,
+                // Exportar formatos de objetos activos
+                ExportObjectFormatting = true,
 
-                //// Exporta formatos de objetos activos
-                //ExportObjectFormatting = StiExcel2007Export.ActiveFormats
+                // No usar un encabezado y pie de página en todas las páginas (esto debería ser el comportamiento predeterminado)
+                UseOnePageHeaderAndFooter = false,
+
+                // No incluir saltos de página si no son necesarios
+                ExportPageBreaks = false
             };
 
+            
             using (var excelStream = new MemoryStream())
             {
                 reportResult.ExportDocument(StiExportFormat.Excel, excelStream, excelSettings);
