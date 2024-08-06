@@ -643,7 +643,8 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
         //Verificamos si existe el cliente
-        var objCustomer = _uow.Customer.Get(filter: x => x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId, isTracking: false);
+        var objCustomer = _uow.Customer.Get(filter: x =>
+            x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId, isTracking: false);
         if (objCustomer == null)
         {
             jsonResponse.IsSuccess = false;
@@ -3475,20 +3476,33 @@ public class QuotationController : Controller
             reportResult.Dictionary.Variables[AC.ParFilterDescription].ValueObject = $"Fecha Inicial: {minDate} Fecha Final: {maxDate}";
 
             reportResult.RegBusinessObject(AC.DatRep, transaListVM);
-            reportResult.Compile();
             reportResult.Render();
 
+            // Exportar reporte a Excel y guardar en memoria
             byte[] excelData;
-            var excelSettings = new StiExcel2007ExportSettings();
-            using (var stream = new MemoryStream())
+            var excelSettings = new StiExcel2007ExportSettings
             {
-                reportResult.ExportDocument(StiExportFormat.Excel2007, stream, excelSettings);
-                excelData = stream.ToArray();
+                //// Configura para exportar todas las páginas
+                //PageRange = true,
+
+                //// Configura los encabezados
+                //UseOnePageHeaderAndFooter = true,
+
+                //// Exporta formatos de objetos activos
+                //ExportObjectFormatting = StiExcel2007Export.ActiveFormats
+            };
+
+            using (var excelStream = new MemoryStream())
+            {
+                reportResult.ExportDocument(StiExportFormat.Excel, excelStream, excelSettings);
+                excelData = excelStream.ToArray();
             }
 
+            // Convertir los bytes a base64
             var exportReporteBase64 = Convert.ToBase64String(excelData);
             DateTime dateReport = DateTime.Now;
 
+            // Devolver el base64 como parte de la respuesta JSON
             jsonResponse.IsSuccess = true;
             jsonResponse.Data = new
             {
@@ -3496,8 +3510,10 @@ public class QuotationController : Controller
                 ContentType = AC.ContentTypeExcel,
                 Filename = $"ListadoDeOperaciones_{dateReport:yyyyMMdd}_{dateReport:HHmmss}.xlsx"
             };
+
             return Json(jsonResponse);
 
+            //reportResult.Compile();
         }
         catch (Exception ex)
         {

@@ -53,11 +53,10 @@
                         <div class="col-8 col-sm-7 col-md-7 col-lg-7 ms-xl-1 ps-lg-2 ps-xl-2">
                             <select asp-for="DataModel.CustomerId" name="CustomerId"
                                     class="form-control border p-1 shadow" id="selectCustomer">
-                                <option selected disabled>-- Seleccionar --</option>
                                 @foreach (var customer in Model.CustomerList)
                                 {
                                     <option value="@customer.Id"
-                                            data-executive="@(customer.BusinessExecutiveId)" disabled>
+                                            data-executive="@(customer.BusinessExecutiveId)">
                                         @customer.BusinessName
                                     </option>
                                 }

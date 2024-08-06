@@ -572,8 +572,9 @@ const fnLoadCustomer = async (searchTerm) => {
 
             jsonData.data.forEach((item) => {
                 let option = document.createElement("option");
-                option.value = item.value;
-                option.text = item.text;
+                option.value = item.id;
+                option.text = item.businessName;
+                option.setAttribute("data-executive", item.businessExecutiveId);
                 selectCustomer.appendChild(option);
             });
 

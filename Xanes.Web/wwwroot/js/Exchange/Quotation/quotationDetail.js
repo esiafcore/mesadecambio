@@ -151,12 +151,15 @@ const fnCreateDetailFormSubmit = async (event) => {
 
     try {
         fntoggleLoading();
+
         event.preventDefault();
         const formObject = event.currentTarget;
 
         const url = `${formObject.action}`;
         const formData = new FormData(formObject);
-
+        //for (let [key, value] of formData.entries()) {
+        //    console.log(`${key}: ${value}`);
+        //}
         const response = await fetch(url, {
             method: 'POST',
             body: formData
