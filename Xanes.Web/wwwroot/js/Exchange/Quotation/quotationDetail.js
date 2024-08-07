@@ -402,7 +402,7 @@ const fnGetCustomer = async () => {
                             if (executiveId != 0)
                                 $(selectBusinessExecutive).val(executiveId).trigger('change');
                         });
-                        
+
                         $(selectCustomer).select2('focus');
 
                     }
@@ -1160,7 +1160,7 @@ function fnLoadDatatableDeposit() {
             footerCell.addClass('footer-left text-end');
             let total = 0, pending = 0, deposit = 0, label = "Depositar";
             data.forEach((item) => {
-                total += item.amountDetail;
+                total += fnparseFloat(item.amountDetail.toFixed(decimalTransa));
             });
             if (typeNumeral == QuotationType.Buy) {
                 pending = fnparseFloat(amountHeader) - total;
@@ -1169,14 +1169,14 @@ function fnLoadDatatableDeposit() {
 
                 if (currencyType == CurrencyType.Foreign) {
                     deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                    pending = (deposit.toFixed(decimalTransa)) - (total);
+                    pending = (deposit.toFixed(decimalTransa)) - (total.toFixed(decimalTransa));
                 } else if (currencyType == CurrencyType.Additional) {
                     if (currencyTypeDeposit == CurrencyType.Foreign) {
                         deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                        pending = (deposit.toFixed(decimalTransa)) - (total.toFixed(decimalTransa));
                     } else if (currencyTypeDeposit == CurrencyType.Base) {
                         deposit = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
-                        pending = (deposit.toFixed(decimalTransa)) - (total);
+                        pending = (deposit.toFixed(decimalTransa)) - (total.toFixed(decimalTransa));
                     }
                 }
             } else {
@@ -1186,7 +1186,7 @@ function fnLoadDatatableDeposit() {
             }
 
             if (typeNumeral != QuotationType.Transfer) {
-                if (pending == 0) {
+                if (pending.toFixed(decimalTransa) == 0) {
                     document.querySelector("#btnCreateDetailDeposit").hidden = true;
                     isPendingDeposit = false;
                 } else {
@@ -1311,25 +1311,25 @@ function fnLoadDatatableTransfer() {
             footerCell.addClass('footer-left text-end');
             let total = 0, pending = 0, transfer = 0, label = "Transferir";
             data.forEach((item) => {
-                total += item.amountDetail;
+                total += fnparseFloat(item.amountDetail.toFixed(decimalTransa));
             });
             if (typeNumeral == QuotationType.Buy) {
                 amount = fnparseFloat(amountHeader) * fnparseFloat(TCHeader.value);
                 pending = (amount.toFixed(decimalTransa)) - (total.toFixed(decimalTransa));
             } else if (typeNumeral == QuotationType.Sell) {
                 if (currencyType == CurrencyType.Foreign) {
-                    pending = fnparseFloat(amountHeader) - total;
+                    pending = fnparseFloat(amountHeader) - total.toFixed(decimalTransa);
                 } else if (currencyType == CurrencyType.Additional) {
                     if (currencyTypeDeposit == CurrencyType.Base) {
-                        pending = fnparseFloat(amountHeader) - total;
+                        pending = fnparseFloat(amountHeader) - total.toFixed(decimalTransa);
                     } else if (currencyTypeDeposit == CurrencyType.Foreign) {
-                        pending = fnparseFloat(amountHeader) - total;
+                        pending = fnparseFloat(amountHeader) - total.toFixed(decimalTransa);
                     }
                 }
             }
 
             if (typeNumeral != QuotationType.Transfer) {
-                if (pending == 0) {
+                if (pending.toFixed(decimalTransa) == 0) {
                     document.querySelector("#btnCreateDetailTransfer").hidden = true;
                     isPendingTransfer = false;
                 } else {
