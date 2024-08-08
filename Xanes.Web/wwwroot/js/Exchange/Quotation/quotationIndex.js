@@ -841,7 +841,7 @@ const fnLoadDatatable = () => {
 
 
 const fnvalidContent = async () => {
-    const result = await getfilteredDataFromDatatable();
+    const result = await getfilteredDataFromDatatable(false);
     // si se imprime
     if (result.isSuccess) {
         await fnexportToExcel(result.data);
@@ -849,7 +849,7 @@ const fnvalidContent = async () => {
 };
 
 // Obtener los datos filtrados disponibles en el datatable
-const getfilteredDataFromDatatable = async () => {
+const getfilteredDataFromDatatable = async (valid = true) => {
     const reponseIsPrint = {
         isSuccess: true
     };
@@ -867,28 +867,31 @@ const getfilteredDataFromDatatable = async () => {
         return reponseIsPrint;
     }
 
-    if (countData > limitBatchCreditNote) {
-        const result = await Swal.fire({
-            title: `&#191;Está seguro de imprimir las transacciones?`,
-            html: `Se van a imprimir ${countData} registros. <br>Esto supera el limite permitido de ${limitBatchCreditNote}`,
-            icon: "warning",
-            showCancelButton: true,
-            reverseButtons: true,
-            focusConfirm: false,
-            confirmButtonText: ButtonsText.Confirm,
-            cancelButtonText: ButtonsText.Cancel,
-            customClass: {
-                confirmButton: "btn btn-success px-3 mx-2",
-                cancelButton: "btn btn-primary px-3 mx-2"
-            },
-            buttonsStyling: false
-        });
+    if (valid) {
+        if (countData > limitBatchCreditNote) {
+            const result = await Swal.fire({
+                title: `&#191;Está seguro de imprimir las transacciones?`,
+                html: `Se van a imprimir ${countData} registros. <br>Esto supera el limite permitido de ${limitBatchCreditNote}`,
+                icon: "warning",
+                showCancelButton: true,
+                reverseButtons: true,
+                focusConfirm: false,
+                confirmButtonText: ButtonsText.Confirm,
+                cancelButtonText: ButtonsText.Cancel,
+                customClass: {
+                    confirmButton: "btn btn-success px-3 mx-2",
+                    cancelButton: "btn btn-primary px-3 mx-2"
+                },
+                buttonsStyling: false
+            });
 
-        if (!result.isConfirmed) {
-            reponseIsPrint.isSuccess = false;
-            return reponseIsPrint;
+            if (!result.isConfirmed) {
+                reponseIsPrint.isSuccess = false;
+                return reponseIsPrint;
+            }
         }
     }
+
 
     // Obtener solo las propiedades 'id' de cada objeto en 'data'
     const ids = data.map(item => item.id);
