@@ -41,7 +41,7 @@ public class CustomerController : Controller
         ViewData[AC.Title] = "Clientes";
 
         var objList = _uow.Customer.GetAll(filter: x => (x.CompanyId == _companyId)
-        , includeProperties: "TypeTrx,SectorTrx").ToList();
+        , includeProperties: "TypeTrx,SectorTrx,BusinessExecutiveTrx").ToList();
         return View(objList);
     }
 
@@ -932,7 +932,7 @@ public class CustomerController : Controller
     {
         JsonResultResponse? jsonResponse = new();
         var objList = _uow.Customer
-            .GetAll(x => (x.CompanyId == _companyId), includeProperties: "SectorTrx,TypeTrx").ToList();
+            .GetAll(x => (x.CompanyId == _companyId), includeProperties: "SectorTrx,TypeTrx,BusinessExecutiveTrx").ToList();
 
         if (objList == null)
         {

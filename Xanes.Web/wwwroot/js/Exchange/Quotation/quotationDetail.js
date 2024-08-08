@@ -806,6 +806,7 @@ const fnVerificateIsPending = () => {
 const fnBtnAddPendingDeposit = () => {
     amountDeposit.value = formatterAmount().format(fnparseFloat(pendingDeposit));
 };
+
 //Funcion para asignar el pendiente al monto del detalle en transferencia
 const fnBtnAddPendingTransfer = () => {
     amountTransfer.value = formatterAmount().format(fnparseFloat(pendingTransfer));

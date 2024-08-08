@@ -45,6 +45,10 @@ const fnLoadDatatable = () => {
                 , orderable: true
             },
             {
+                data: 'businessExecutiveTrx.code', "width": "5%"
+                , orderable: true
+            },
+            {
                 data: 'isActive', "width": "5%"
                 , render: function (data, type, row) {
                     return data ? YesNo.Yes : YesNo.No;
