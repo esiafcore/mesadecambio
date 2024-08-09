@@ -272,7 +272,7 @@ public class QuotationController : Controller
 
             obj.TypeId = objQuotationType.Id;
 
-            if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
+            if (objQuotationType.Numeral != (int)SD.QuotationType.Transport)
             {
                 //Verificamos si existe la moneda de la Transaccion
                 objCurrency = _uow.Currency.Get(filter: x =>
@@ -510,7 +510,7 @@ public class QuotationController : Controller
                 if (showMessages)
                     TempData["success"] = "Cotización creada exitosamente";
 
-                if (obj.TypeNumeral == SD.QuotationType.Transfer)
+                if (obj.TypeNumeral == SD.QuotationType.Transport)
                 {
                     if (obj.BankAccountTargetTrx != null)
                     {
@@ -569,7 +569,7 @@ public class QuotationController : Controller
                 if (showMessages)
                     TempData["success"] = "Cotización actualizada exitosamente";
 
-                if (obj.TypeNumeral == SD.QuotationType.Transfer)
+                if (obj.TypeNumeral == SD.QuotationType.Transport)
                 {
                     var objDetails = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.ParentId == obj.Id).ToList();
                     foreach (var detail in objDetails)
@@ -776,7 +776,7 @@ public class QuotationController : Controller
         _uow.Quotation.Update(objQt);
         _uow.Save();
 
-        if (objQt.TypeNumeral == SD.QuotationType.Transfer)
+        if (objQt.TypeNumeral == SD.QuotationType.Transport)
         {
 
             var objDetails = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.ParentId == objQt.Id).ToList();
@@ -2332,7 +2332,7 @@ public class QuotationController : Controller
                                     }
                                 }
 
-                                if (objQuotationType.Numeral != (int)SD.QuotationType.Transfer)
+                                if (objQuotationType.Numeral != (int)SD.QuotationType.Transport)
                                 {
                                     var monTransa = worksheet.Cell(4, 6).GetString().Trim();
                                     if (string.IsNullOrWhiteSpace(monTransa))
@@ -2674,7 +2674,7 @@ public class QuotationController : Controller
 
             foreach (var header in objQuotationList)
             {
-                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                if (header.TypeNumeral != SD.QuotationType.Transport)
                 {
                     if (header.TypeNumeral == SD.QuotationType.Buy)
                     {
@@ -2865,7 +2865,7 @@ public class QuotationController : Controller
                     header.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 }
 
-                if (header.TypeNumeral != SD.QuotationType.Transfer)
+                if (header.TypeNumeral != SD.QuotationType.Transport)
                 {
                     var childrens = objQuotationDetailList
                         .Where(x => x.ParentId == header.Id).ToList();
@@ -3366,7 +3366,7 @@ public class QuotationController : Controller
             var transactionList = _uow.Quotation.GetAll(filter: x => (x.CompanyId == _companyId)
                                                                      && (quotationIds.Contains(x.Id))
                                                                         // No se incluyen TRA
-                                                                        && (x.TypeNumeral != SD.QuotationType.Transfer),
+                                                                        && (x.TypeNumeral != SD.QuotationType.Transport),
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -3393,7 +3393,7 @@ public class QuotationController : Controller
                 var currency = "";
 
                 if (transaction.TypeNumeral == SD.QuotationType.Buy ||
-                    transaction.TypeNumeral == SD.QuotationType.Transfer)
+                    transaction.TypeNumeral == SD.QuotationType.Transport)
                 {
                     currency =
                         $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}";

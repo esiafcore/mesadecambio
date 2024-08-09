@@ -699,7 +699,7 @@ const fnChangeCustomers = async (onlyCompanies) => {
 };
 
 const fnLoadOptionSelectBusiness = (type) => {
-    if (type != QuotationType.Transfer) {
+    if (type != QuotationType.Transport) {
         $(selectBusinessExecutive).find('option').each(function () {
             if ($(this).data('loan') === "True" || $(this).data('payment') === "True") {
                 $(this).prop('disabled', false);

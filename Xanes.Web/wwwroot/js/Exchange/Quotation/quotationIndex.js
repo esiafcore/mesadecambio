@@ -603,7 +603,7 @@ const fnLoadDatatable = () => {
                 , render: function (data, type, row) {
                     let currencyTarget = "";
 
-                    if (row.typeNumeral == QuotationType.Transfer) {
+                    if (row.typeNumeral == QuotationType.Transport) {
                         currencyTarget = row.currencyTransferTrx.code;
                     } else if (row.typeNumeral == QuotationType.Sell) {
                         currencyTarget = row.currencyDepositTrx.code;

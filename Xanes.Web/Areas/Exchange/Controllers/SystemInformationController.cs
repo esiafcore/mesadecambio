@@ -635,7 +635,7 @@ public class SystemInformationController : Controller
                 .GetAll(filter: x => (x.CompanyId == _companyId)
                                          && (x.DateTransa >= reportData.DateTransaInitial)
                                          && (x.DateTransa <= reportData.DateTransaFinal)
-                                         && (x.TypeNumeral == SD.QuotationType.Transfer),
+                                         && (x.TypeNumeral == SD.QuotationType.Transport),
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx")
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -780,7 +780,7 @@ public class SystemInformationController : Controller
                                                                      && (x.DateTransa >= reportData.DateTransaInitial)
                                                                      && (x.DateTransa <= reportData.DateTransaFinal)
                                                                         // No se incluyen TRA
-                                                                        && (x.TypeNumeral != SD.QuotationType.Transfer),
+                                                                        && (x.TypeNumeral != SD.QuotationType.Transport),
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx")
                 .OrderByDescending(x => x.Id)
                 .ToList();
@@ -807,7 +807,7 @@ public class SystemInformationController : Controller
                 var currency = "";
 
                 if (transaction.TypeNumeral == SD.QuotationType.Buy ||
-                    transaction.TypeNumeral == SD.QuotationType.Transfer)
+                    transaction.TypeNumeral == SD.QuotationType.Transport)
                 {
                     currency =
                         $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}";

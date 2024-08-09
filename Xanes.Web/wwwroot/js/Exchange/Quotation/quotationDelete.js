@@ -86,7 +86,7 @@ const fndeleteRow = async (id) => {
 };
 function fnLoadDatatableDeposit() {
     let typeDetail = QuotationDetailType.Deposit;
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         typeDetail = QuotationDetailType.CreditTransfer;
     }
 
@@ -121,7 +121,7 @@ function fnLoadDatatableDeposit() {
                     "20%", orderable: false,
                 "render": (data) => {
                     let dataCode;
-                    if (typeNumeral != QuotationType.Transfer) {
+                    if (typeNumeral != QuotationType.Transport) {
                         dataCode = data.bankSourceTrx.code;
                     } else {
                         dataCode = data.bankTargetTrx.code;
@@ -203,7 +203,7 @@ function fnLoadDatatableDeposit() {
 function fnLoadDatatableTransfer() {
 
     let typeDetail = QuotationDetailType.Transfer;
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         typeDetail = QuotationDetailType.DebitTransfer;
     }
 
@@ -292,7 +292,7 @@ function fnLoadDatatableTransfer() {
                 }
             }
 
-            if (typeNumeral != QuotationType.Transfer) {
+            if (typeNumeral != QuotationType.Transport) {
 
                 if (typeNumeral == QuotationType.Buy) {
                     if (currencyType == CurrencyType.Foreign) {
@@ -330,7 +330,7 @@ function fnLoadDatatableTransfer() {
         }
     });
 
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         dataTableTransfer.column(2).visible(false);
     }
 }

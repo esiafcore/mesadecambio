@@ -211,7 +211,7 @@ public class QuotationLegacyController : Controller
                 quotation.AmountCost = quotationLegacy.AmountCost;
                 quotation.AmountRevenue = quotationLegacy.AmountRevenue;
 
-                if (quotation.TypeNumeral == SD.QuotationType.Transfer)
+                if (quotation.TypeNumeral == SD.QuotationType.Transport)
                 {
                     var objBankAccountSource =
                         objBankAccountList
@@ -327,7 +327,7 @@ public class QuotationLegacyController : Controller
                 string bankSourceCode = detailLegacy.BankSourceCode.Split('-')[0];
                 string bankTargetCode = detailLegacy.BankTargetCode.Split('-')[0];
 
-                if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transfer)
+                if (detailLegacy.TypeNumeral == (int)SD.QuotationType.Transport)
                 {
                     if (detail.QuotationDetailType == SD.QuotationDetailType.CreditTransfer)
                     {

@@ -1059,7 +1059,7 @@ function fnLoadDatatableBankDeposit(index = 0) {
 }
 function fnLoadDatatableDeposit() {
     let typeDetail = QuotationDetailType.Deposit;
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         typeDetail = QuotationDetailType.CreditTransfer;
     }
 
@@ -1098,7 +1098,7 @@ function fnLoadDatatableDeposit() {
                     "20%", orderable: false,
                 "render": (data) => {
                     let dataCode;
-                    if (typeNumeral != QuotationType.Transfer) {
+                    if (typeNumeral != QuotationType.Transport) {
                         dataCode = data.bankSourceTrx.code;
                     } else {
                         dataCode = data.bankTargetTrx.code;
@@ -1186,7 +1186,7 @@ function fnLoadDatatableDeposit() {
                 isPendingDeposit = false;
             }
 
-            if (typeNumeral != QuotationType.Transfer) {
+            if (typeNumeral != QuotationType.Transport) {
                 if (pending.toFixed(decimalTransa) == 0) {
                     document.querySelector("#btnCreateDetailDeposit").hidden = true;
                     isPendingDeposit = false;
@@ -1211,14 +1211,14 @@ function fnLoadDatatableDeposit() {
         }
     });
 
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         dataTableDeposit.column(3).visible(false);
     }
 }
 function fnLoadDatatableTransfer() {
 
     let typeDetail = QuotationDetailType.Transfer;
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         typeDetail = QuotationDetailType.DebitTransfer;
     }
 
@@ -1329,7 +1329,7 @@ function fnLoadDatatableTransfer() {
                 }
             }
 
-            if (typeNumeral != QuotationType.Transfer) {
+            if (typeNumeral != QuotationType.Transport) {
                 if (pending.toFixed(decimalTransa) == 0) {
                     document.querySelector("#btnCreateDetailTransfer").hidden = true;
                     isPendingTransfer = false;
@@ -1377,7 +1377,7 @@ function fnLoadDatatableTransfer() {
         }
     });
 
-    if (typeNumeral == QuotationType.Transfer) {
+    if (typeNumeral == QuotationType.Transport) {
         dataTableTransfer.column(2).visible(false);
         dataTableTransfer.column(4).visible(false);
     }

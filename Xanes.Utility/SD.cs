@@ -33,7 +33,7 @@ public static class SD
     {
         Buy = 1,
         Sell = 2,
-        Transfer = 4
+        Transport = 4
     }
 
     [Flags]
@@ -41,7 +41,7 @@ public static class SD
     {
         Compra = 1,
         Venta = 2,
-        Trasferencia = 4
+        Traslado = 4
     }
 
     [Flags]

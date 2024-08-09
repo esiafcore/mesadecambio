@@ -205,7 +205,7 @@ const QuotationDetailType = {
 const QuotationType = {
     Buy: 1,
     Sell: 2,
-    Transfer: 4
+    Transport: 4
 }
 
 
