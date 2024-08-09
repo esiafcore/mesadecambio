@@ -79,6 +79,8 @@ const fnAdjustmentDates = () => {
 // Evento antes de enviar formularios para agregar validaciones  
 const fnsendFormValidate = async (event) => {
     try {
+
+        fntoggleLoading("Imprimiendo..")
         event.preventDefault();
 
         let resultResponse = {
@@ -125,6 +127,8 @@ const fnsendFormValidate = async (event) => {
                 text: resultResponse.message
             });
         }
+
+        fntoggleLoading();
 
     } catch (error) {
         Swal.fire({

@@ -250,14 +250,30 @@ public class SystemInformationController : Controller
             throw new Exception($"Monedas no encontradas");
         }
 
-        var codeBase = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Base);
-        var codeForeign = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Foreign);
-        var codeAdditional = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Additional);
+        var codeBase = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Base).Abbreviation;
+        var codeForeign = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Foreign).Abbreviation;
+        var codeAdditional = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Additional).Abbreviation;
+
+        var totalEntryBase = reportTotalList.Sum(x => x.TotalEntryBase);
+        var totalEntryForeign = reportTotalList.Sum(x => x.TotalEntryForeign);
+        var totalEntryAdditional = reportTotalList.Sum(x => x.TotalEntryAdditional);
+
+        var totalOutputBase = reportTotalList.Sum(x => x.TotalOutputBase);
+        var totalOutputForeign = reportTotalList.Sum(x => x.TotalOutputForeign);
+        var totalOutputAdditional = reportTotalList.Sum(x => x.TotalOutputAdditional);
 
         // Setear parametros
         reportResult.Dictionary.Variables["parCurrencyCodeBase"].ValueObject = codeBase;
         reportResult.Dictionary.Variables["parCurrencyCodeForeign"].ValueObject = codeForeign;
         reportResult.Dictionary.Variables["parCurrencyCodeAdditional"].ValueObject = codeAdditional;
+
+
+        reportResult.Dictionary.Variables["parTotalEntryBase"].ValueObject = totalEntryBase;
+        reportResult.Dictionary.Variables["parTotalEntryForeign"].ValueObject = totalEntryForeign;
+        reportResult.Dictionary.Variables["parTotalEntryAdditional"].ValueObject = totalEntryAdditional;
+        reportResult.Dictionary.Variables["parTotalOutputBase"].ValueObject = totalOutputBase;
+        reportResult.Dictionary.Variables["parTotalOutputForeign"].ValueObject = totalOutputForeign;
+        reportResult.Dictionary.Variables["parTotalOutputAdditional"].ValueObject = totalOutputAdditional;
 
         reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
 
@@ -686,9 +702,9 @@ public class SystemInformationController : Controller
                 transaListVM.Add(transa);
 
                 // Obtener los tipos de cambio
-                var currencyRateList = _uow.CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId && x.DateTransa == transaction.DateTransa);
-                var exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?.OfficialRate ?? 1M;
-                var exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?.OfficialRate ?? 1M;
+                //var currencyRateList = _uow.CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId && x.DateTransa == transaction.DateTransa);
+                //var exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?.OfficialRate ?? 1M;
+                //var exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?.OfficialRate ?? 1M;
 
                 // Obtener banco de origen
                 var sourceBankCode = bankList.First(x => x.Id == transaction.BankAccountSourceTrx!.ParentId).Code;
@@ -697,17 +713,6 @@ public class SystemInformationController : Controller
                     bankTotals[sourceBankCode] = new TransportTotalVM { BankCode = sourceBankCode };
                 }
 
-                var mtosExc = cvtExc
-                    .ConverterExchangeTo(transaction.CurrencyTransaType,
-                        transaction.AmountTransaction,
-                        exchangeRateForeign,
-                        exchangeRateAdditional,
-                        decimalTrx: _decimalTransa);
-
-                bankTotals[sourceBankCode].TotalOutputBase += mtosExc.AmountBase;
-                bankTotals[sourceBankCode].TotalOutputForeign += mtosExc.AmountForeign;
-                bankTotals[sourceBankCode].TotalOutputAdditional += mtosExc.AmountAdditional;
-
                 // Obtener banco de destino
                 var targetBankCode = bankList.First(x => x.Id == transaction.BankAccountTargetTrx!.ParentId).Code;
                 if (!bankTotals.ContainsKey(targetBankCode))
@@ -715,60 +720,29 @@ public class SystemInformationController : Controller
                     bankTotals[targetBankCode] = new TransportTotalVM { BankCode = targetBankCode };
                 }
 
-                bankTotals[targetBankCode].TotalEntryBase += mtosExc.AmountBase;
-                bankTotals[targetBankCode].TotalEntryForeign += mtosExc.AmountForeign;
-                bankTotals[targetBankCode].TotalEntryAdditional += mtosExc.AmountAdditional;
+                //var mtosExc = cvtExc
+                //    .ConverterExchangeTo(transaction.CurrencyTransaType,
+                //        transaction.AmountTransaction,
+                //        exchangeRateForeign,
+                //        exchangeRateAdditional,
+                //        decimalTrx: _decimalTransa);
 
-                //var total = new TransportTotalVM();
+                switch (transaction.CurrencyTransaType)
+                {
+                    case CurrencyType.Base:
+                        bankTotals[sourceBankCode].TotalOutputBase += transaction.AmountTransactionRpt;
+                        bankTotals[targetBankCode].TotalEntryBase += transaction.AmountTransactionRpt;
 
-                //total.BankCode = bankList.First(x => x.Id == transaction.BankAccountSourceTrx.ParentId).Code;
-
-
-                //var currencyRateList = _uow
-                //    .CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId &&
-                //                                      x.DateTransa == transaction.DateTransa);
-
-                //var exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?
-                //    .OfficialRate ?? 1M;
-
-                //var exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?
-                //    .OfficialRate ?? 1M;
-
-                //// Convertir a las otras monedas
-                //ConverterExchange cvtExc = new();
-                //var mtosExc = cvtExc.ConverterExchangeTo(transaction.CurrencyTransaType, transaction.AmountTransaction,
-                //    exchangeRateForeign, exchangeRateAdditional,
-                //    decimalTrx: _decimalTransa);
-
-                //total.TotalOutputBase = mtosExc.AmountBase;
-                //total.TotalOutputForeign = mtosExc.AmountForeign;
-                //total.TotalOutputAdditional = mtosExc.AmountAdditional;
-                ////mtosExc.SetInit(); // Limpiar
-                //totalListVM.Add(total);
-
-                //total.BankCode = bankList.First(x => x.Id == transaction.BankAccountTargetTrx.ParentId).Code;
-
-
-                //currencyRateList = _uow
-                //   .CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId &&
-                //                                     x.DateTransa == transaction.DateTransa);
-
-                //exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?
-                //   .OfficialRate ?? 1M;
-
-                //exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?
-                //   .OfficialRate ?? 1M;
-
-                // Convertir a las otras monedas
-                //mtosExc = cvtExc.ConverterExchangeTo(transaction.CurrencyTransaType, transaction.AmountTransaction,
-                //   exchangeRateForeign, exchangeRateAdditional,
-                //   decimalTrx: _decimalTransa);
-
-                //total.TotalEntryBase = mtosExc.AmountBase;
-                //total.TotalEntryForeign = mtosExc.AmountForeign;
-                //total.TotalEntryAdditional = mtosExc.AmountAdditional;
-                //mtosExc.SetInit(); // Limpiar
-                //totalListVM.Add(total);
+                        break;
+                    case CurrencyType.Foreign:
+                        bankTotals[sourceBankCode].TotalOutputForeign += transaction.AmountTransactionRpt;
+                        bankTotals[targetBankCode].TotalEntryForeign += transaction.AmountTransactionRpt;
+                        break;
+                    case CurrencyType.Additional:
+                        bankTotals[sourceBankCode].TotalOutputAdditional += transaction.AmountTransactionRpt;
+                        bankTotals[targetBankCode].TotalEntryAdditional += transaction.AmountTransactionRpt;
+                        break;
+                }
             }
 
             // Convertir diccionario a lista y guardar en sesión
