@@ -50,18 +50,33 @@ public class SystemInformationController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        string? processingDateString = HttpContext.Session.GetString(AC.ProcessingDate)
-            ?? DateOnly.FromDateTime(DateTime.Now).ToString();
-        DateOnly dateFilter = DateOnly.Parse(processingDateString);
-        ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
+        try
+        {
+            string? processingDateString = HttpContext.Session.GetString(AC.ProcessingDate)
+                ?? DateOnly.FromDateTime(DateTime.Now).ToString();
+            DateOnly dateFilter = DateOnly.Parse(processingDateString);
+            ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
 
-        // TITULO DE LA PAGINA
-        ViewData[AC.Title] = "Sistema de Información";
+            // TITULO DE LA PAGINA
+            ViewData[AC.Title] = "Sistema de Información";
 
-        return View();
+            return View();
+        }
+        catch (Exception ex)
+        {
+            TempData[AC.Success] = ex.Message;
+            return RedirectToAction("Index", "Home", new { area = "Exchange" });
+        }
     }
 
     // TRANSACCIONES ====>
+    // Transport List
+    [HttpPost]
+    public IActionResult PrintTransaTransportList(TransactionReportVM reportDataVm)
+    {
+        return PrintReport(reportDataVm, reportDataVm.ReportType);
+    }
+
     // Operation List
     [HttpPost]
     public IActionResult PrintTransaOperationList(TransactionReportVM reportDataVm)
@@ -97,7 +112,6 @@ public class SystemInformationController : Controller
 
         return View("~/Views/Shared/IndexReport.cshtml");
     }
-
 
     //! RENDERIZACION DE REPORTE ===>
     #region ImplementacionReporte
@@ -141,8 +155,11 @@ public class SystemInformationController : Controller
                 case SD.ReportTransaType.Transfer:
                     report = SetReportDataForTransfer(reportDataVmTrans);
                     break;
-            }
 
+                case SD.ReportTransaType.Transport:
+                    report = SetReportDataForTransport(reportDataVmTrans);
+                    break;
+            }
 
             // Obtener datos de compañia
             company = _uow.Company.Get(filter: x => x.Id == _companyId);
@@ -182,8 +199,75 @@ public class SystemInformationController : Controller
 
     #endregion ImplementacionReporte
 
-
     // FUNCIONES PARA CONFIGURAR LOS REPORTES A UTILIZAR =====>
+    private StiReport SetReportDataForTransport(TransactionReportVM modelVm)
+    {
+        StiReport reportResult = new();
+
+        _parametersReport.Add(ParametersReport.FileName, SD.SystemInformationReportTypeFileName[(short)modelVm.ReportType]);
+        _parametersReport.Add(ParametersReport.FilePath,
+            $"{Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", $"{SD.SystemInformationReportTypeFileName[(short)modelVm.ReportType]}")}");
+
+        // Verificar que existe el archivo del reporte
+        if (!System.IO.File.Exists(_parametersReport[ParametersReport.FilePath]?.ToString() ?? string.Empty))
+        {
+            throw new Exception($"{AC.ReportFileNotFound}");
+        }
+
+        if (Path.GetExtension(_parametersReport[ParametersReport.FileName]?.ToString() ?? string.Empty).ToUpper() != ".MRT")
+        {
+            throw new Exception($"{AC.ReportFileInvalid}");
+        }
+
+        reportResult.Load(StiNetCoreHelper.MapPath(this, _parametersReport[ParametersReport.FilePath]?.ToString() ?? string.Empty));
+
+        // Obtener datos
+        // Veficar que hay datos del reporte guardados
+        var reportDataListJson = HttpContext.Session.GetString(AC.ReportListData);
+        if (reportDataListJson is null)
+        {
+            throw new Exception($"{AC.ReportDataErrorLoad}");
+        }
+        var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
+        // Guardar los datos
+        _parametersReport.Add(ParametersReport.ListData, reportDataList);
+
+        //int countBuy = 0, countSell = 0;
+        //decimal amountNetBuy = 0, amountNetSell = 0, amountNetDepositBuy = 0, amountNetDepositSell = 0, amountNetTransferBuy = 0, amountNetTransferSell = 0;
+        //decimal amountNetCostBuy = 0, amountNetCostSell = 0, amountNetRevenueBuy = 0, amountNetRevenueSell = 0;
+
+        //countBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Count();
+        //countSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Count();
+        //amountNetBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountTransaction);
+        //amountNetCostBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCost);
+        //amountNetDepositBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalDeposit);
+        //amountNetTransferBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalTransfer);
+        //amountNetRevenueBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenue);
+        //amountNetSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountTransaction);
+        //amountNetCostSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCost);
+        //amountNetDepositSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalDeposit);
+        //amountNetTransferSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalTransfer);
+        //amountNetRevenueSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenue);
+
+        // Setear parametros
+        //reportResult.Dictionary.Variables["parCountBuy"].ValueObject = countBuy;
+        //reportResult.Dictionary.Variables["parCountSell"].ValueObject = countSell;
+        //reportResult.Dictionary.Variables["parAmountNetBuy"].ValueObject = amountNetBuy;
+        //reportResult.Dictionary.Variables["parAmountNetCostBuy"].ValueObject = amountNetCostBuy;
+        //reportResult.Dictionary.Variables["parAmountNetDepositBuy"].ValueObject = amountNetDepositBuy;
+        //reportResult.Dictionary.Variables["parAmountNetTransferBuy"].ValueObject = amountNetTransferBuy;
+        //reportResult.Dictionary.Variables["parAmountNetRevenueBuy"].ValueObject = amountNetRevenueBuy;
+        //reportResult.Dictionary.Variables["parAmountNetSell"].ValueObject = amountNetSell;
+        //reportResult.Dictionary.Variables["parAmountNetCostSell"].ValueObject = amountNetCostSell;
+        //reportResult.Dictionary.Variables["parAmountNetDepositSell"].ValueObject = amountNetDepositSell;
+        //reportResult.Dictionary.Variables["parAmountNetTransferSell"].ValueObject = amountNetTransferSell;
+        //reportResult.Dictionary.Variables["parAmountNetRevenueSell"].ValueObject = amountNetRevenueSell;
+
+        reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
+
+        return reportResult;
+    }
+
     private StiReport SetReportDataForOperation(TransactionReportVM modelVm)
     {
         StiReport reportResult = new();
@@ -369,8 +453,7 @@ public class SystemInformationController : Controller
 
         return reportResult;
     }
-
-
+    
     // Obtener las vistas parciales para renderizarlas
     [HttpPost]
     public IActionResult GetPartialView(SD.ReportTransaType reportType)
@@ -409,12 +492,47 @@ public class SystemInformationController : Controller
                 transaVM = resultResponse.Data as TransactionReportVM;
 
                 return PartialView(partialViewName, transaVM);
+
+            case SD.ReportTransaType.Transport:
+                resultResponse = SetDataPartialViewTransport(reportType);
+                if (!resultResponse.IsSuccess || (resultResponse.Data == null))
+                {
+                    return BadRequest(resultResponse.ErrorMessages);
+                }
+                transaVM = resultResponse.Data as TransactionReportVM;
+
+                return PartialView(partialViewName, transaVM);
         }
 
         return PartialView(partialViewName);
     }
 
     //Configurar modelo para cada vista parcial (si lo requiere)
+    // Reporte => Listado de Operaciones
+    private JsonResultResponse SetDataPartialViewTransport(SD.ReportTransaType typeReport)
+    {
+        JsonResultResponse? resultResponse = new() { IsSuccess = true };
+
+        try
+        {
+            var modelVm = new TransactionReportVM()
+            {
+                ReportType = typeReport,
+                DateTransaInitial = DateOnly.FromDateTime(DateTime.Now),
+                DateTransaFinal = DateOnly.FromDateTime(DateTime.Now)
+            };
+
+            resultResponse.Data = modelVm;
+            return resultResponse;
+        }
+        catch (Exception e)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = e.Message;
+            return resultResponse;
+        }
+    }
+
     // Reporte => Listado de Operaciones
     private JsonResultResponse SetDataPartialViewOperation(SD.ReportTransaType typeReport)
     {
@@ -489,9 +607,86 @@ public class SystemInformationController : Controller
             return resultResponse;
         }
     }
-
-
+    
     // VALIDAR QUE EXISTAN DATOS PARA EL REPORTE Y GUARDARLOS ======>
+
+    [HttpPost]
+    public JsonResult VerificationDataForTransport([FromBody] TransactionReportVM reportData)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StiReport reportResult = new();
+
+        try
+        {
+            // Obtener la cotización
+            var transactionList = _uow.Quotation
+                .GetAll(filter: x => (x.CompanyId == _companyId)
+                                         && (x.DateTransa >= reportData.DateTransaInitial)
+                                         && (x.DateTransa <= reportData.DateTransaFinal)
+                                         && (x.TypeNumeral == SD.QuotationType.Transfer),
+                includeProperties: "TypeTrx,CustomerTrx,CurrencyDepositTrx,CurrencyTransferTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx")
+                .OrderByDescending(x => x.Id)
+                .ToList();
+
+            if (transactionList is null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            if (transactionList.Count() == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay operaciones";
+                return Json(jsonResponse);
+            }
+
+            List<TransaODTVM> transaListVM = new();
+
+            foreach (var transaction in transactionList)
+            {
+                var transa = new TransaODTVM
+                {
+                    Id = transaction.Id,
+                    CompanyId = transaction.CompanyId,
+                    TypeNumeral = transaction.TypeNumeral,
+                    NumberTransa = $"{Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral)}-{transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}",
+                    CustomerFullName = transaction.CustomerTrx.BusinessName,
+                    CurrencySourceTarget = transaction.CurrencyTransaTrx.Code,
+                    ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
+                    AmountTransaction = transaction.AmountTransactionRpt,
+                    AmountCommission = transaction.AmountCommissionRpt,
+                    BankAccountSourceName = transaction.BankAccountSourceTrx.Name,
+                    BankAccountTargetName = transaction.BankAccountTargetTrx.Name,
+                    ExecutiveCode = transaction.BusinessExecutiveCode,
+                    IsClosed = transaction.IsClosed,
+                    IsVoid = transaction.IsVoid,
+                    CreatedBy = transaction.CreatedBy,
+                    ClosedBy = transaction.ClosedBy,
+                    DateTransa = transaction.DateTransa
+                };
+
+                transaListVM.Add(transa);
+            }
+
+            // Guardar los datos en el contexto
+            var reportListData = JsonConvert.SerializeObject(transaListVM);
+            HttpContext.Session.SetString(AC.ReportListData, reportListData);
+            HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString(AC.DefaultDateFormatView));
+            HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString(AC.DefaultDateFormatView));
+            jsonResponse.IsSuccess = true;
+            return Json(jsonResponse);
+        }
+        catch (Exception e)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"{e.Message}";
+            return Json(jsonResponse);
+        }
+    }
+
     [HttpPost]
     public JsonResult VerificationDataForOperation([FromBody] TransactionReportVM reportData)
     {

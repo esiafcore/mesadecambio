@@ -10,6 +10,8 @@ public class TransaODTVM : Quotation
     public string CurrencySourceTarget { get; set; }
     public string BankSourceCode { get; set; }
     public string BankTargetCode { get; set; }
+    public string BankAccountSourceName { get; set; }
+    public string BankAccountTargetName { get; set; }
     public string ExecutiveCode { get; set; }
     public int IdDetail { get; set; }
     public decimal ExchangeRateTransa { get; set; } = 0M;

@@ -66,7 +66,7 @@ public static class SD
         NAT = 1,
         JUR = 2
     }
-    
+
     [Flags]
     public enum IdentificationTypeNumber : int
     {
@@ -102,7 +102,7 @@ public static class SD
     }
 
     [Flags]
-    public enum TypeSequential: short
+    public enum TypeSequential : short
     {
         Draft = 1,
         Official = 2
@@ -122,7 +122,8 @@ public static class SD
     {
         Operation = 1,
         Deposit = 2,
-        Transfer = 4
+        Transfer = 4,
+        Transport = 8
     }
 
     [Flags]
@@ -166,7 +167,8 @@ public static class SD
         // Transacciones
         { (short)ReportTransaType.Operation,"Listado de Operaciones"},
         { (short)ReportTransaType.Deposit,"Listado de Depositos"},
-        { (short)ReportTransaType.Transfer,"Listado de Transferencias"}
+        { (short)ReportTransaType.Transfer,"Listado de Transferencias"},
+        { (short)ReportTransaType.Transport,"Listado de Traslados"}
     };
 
     public static Dictionary<short, string> SystemInformationReportTypeFileName = new()
@@ -174,7 +176,8 @@ public static class SD
         // Transacciones
         { (short)ReportTransaType.Operation,"OperationList.mrt"},
         { (short)ReportTransaType.Deposit,"DepositList.mrt"},
-        { (short)ReportTransaType.Transfer,"TransferList.mrt"}
+        { (short)ReportTransaType.Transfer,"TransferList.mrt"},
+        { (short) ReportTransaType.Transport,"TransportList.mrt"}
     };
 
     // nombre las vistas parciales
@@ -182,7 +185,8 @@ public static class SD
     {
         { (short)ReportTransaType.Operation,"_TransaTypeOperation"},
         { (short)ReportTransaType.Deposit,"_TransaTypeDeposit"},
-        { (short)ReportTransaType.Transfer,"_TransaTypeTransfer"}
+        { (short)ReportTransaType.Transfer,"_TransaTypeTransfer"},
+        { (short)ReportTransaType.Transport,"_TransaTypeTransport"}
     };
 
 

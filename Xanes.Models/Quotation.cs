@@ -142,6 +142,21 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Monto Comisión TRF")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCommission { get; set; } = 0M;
+    [NotMapped]
+    public decimal AmountCommissionRpt
+    {
+        get
+        {
+            var total = this.AmountCommission;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
 
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Monto Mesa Cambio")]

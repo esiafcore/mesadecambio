@@ -111,6 +111,10 @@ const fnsendFormValidate = async (event) => {
             resultResponse = await fnvalidateTransfer(plainFormData);
         }
 
+        if (plainFormData.ReportType == SystemInformationReportType.Transport) {
+            resultResponse = await fnvalidateTransport(plainFormData);
+        }
+
         // Continuar flujo normal del formulario
         if (resultResponse.isSuccess) {
             formObject.submit();
@@ -129,6 +133,44 @@ const fnsendFormValidate = async (event) => {
             text: error
         });
     }
+};
+
+const fnvalidateTransport = async (plainFormData) => {
+    const resultResponse = {
+        isSuccess: true
+    };
+
+    // Validar que existan registros disponibles
+    const url = `${window.location.origin}/Exchange/SystemInformation/VerificationDataForTransport`;
+    const formDataJsonString = JSON.stringify(plainFormData);
+    let fetchOptions = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: formDataJsonString
+    };
+
+    const response = await fetch(url, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: errorMessage
+        });
+    } else {
+        let jsonResponse = await response.json();
+        if (!jsonResponse.isSuccess) {
+            fnShowModalMessages(jsonResponse);
+            resultResponse.isSuccess = false;
+            return resultResponse;
+        }
+    }
+
+    return resultResponse;
 };
 
 const fnvalidateOperation = async (plainFormData) => {

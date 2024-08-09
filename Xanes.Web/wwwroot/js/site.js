@@ -76,7 +76,8 @@ const SystemInformationReportType = {
     // Transacciones
     Operation: 1,
     Deposit: 2,
-    Transfer: 4
+    Transfer: 4,
+    Transport: 8
 };
 
 const customMessagesSelect = {

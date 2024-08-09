@@ -6,6 +6,7 @@ let inputIncludeVoid, includeVoid;
 let searchValue;
 let btnFilter;
 let clean = false;
+
 document.addEventListener("DOMContentLoaded", function () {
     containerMain = document.querySelector("#containerMain");
     containerMain.className = "container-fluid";
@@ -838,7 +839,6 @@ const fnLoadDatatable = () => {
         }
     });
 }
-
 
 const fnvalidContent = async () => {
     const result = await getfilteredDataFromDatatable(false);

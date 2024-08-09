@@ -1,19 +1,15 @@
 ﻿<div class="container col-xl-11 col-12 p-1 border border-2 m-0">
-
     <div class="row">
         <div class="col-12 pt-2">
             <h3 class="text-primary">@ViewData[AC.Title]</h3>
         </div>
     </div>
-
     <hr class="p-0" />
-
     <div class="row">
         <div class="col-md-5 col-12">
             <h5 class="text-info">Reportes</h5>
-
-
             <div class="accordion" id="select-group">
+
                 <!-- Transacciiones -->
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
@@ -34,26 +30,25 @@
                                 <option value="@((short)SD.ReportTransaType.Transfer)">
                                     @(SD.SystemInformationReportTypeName[(short)SD.ReportTransaType.Transfer])
                                 </option>
+                                <option value="@((short)SD.ReportTransaType.Transport)">
+                                    @(SD.SystemInformationReportTypeName[(short)SD.ReportTransaType.Transport])
+                                </option>
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
         <!--Criterios-->
         <div class="col-md-7 col-12 criteria d-none">
             <h5 class="text-info">Criterios</h5>
-
             <div class="container p-1 border border-2 border-opacity-25 m-0 d-none" id="report-filters">
-                @* <partial name="_BalanceCatalogue" /> *@
+              
+
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @section Scripts {
