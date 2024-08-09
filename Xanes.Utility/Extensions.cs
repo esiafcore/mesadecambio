@@ -1,4 +1,6 @@
 ﻿namespace Xanes.Utility;
+using static Xanes.Utility.SD;
+
 public static class Extensions
 {
     public static DateTime ToDateTimeConvert(this DateOnly d)
@@ -20,6 +22,48 @@ public static class Extensions
         return decimal
             .TryParse(d.ToString($"N{decimals}")
                 , out decimal anvalueReturn) ? anvalueReturn : d;
+    }
+
+    public static Decimal ExchangeTo(this Decimal d, CurrencyType currencySource
+        , CurrencyType currencyTarget
+        , decimal exchangeTarget, int roundDecimal)
+    {
+        decimal amountExchange = 0M;
+
+        // Base to Foreign
+        if ((currencySource == CurrencyType.Base)
+            && (currencyTarget == CurrencyType.Foreign)
+            && (exchangeTarget != 0))
+        {
+            amountExchange = d / exchangeTarget;
+            amountExchange = amountExchange.RoundTo(roundDecimal);
+        }
+        // Foreign to Base
+        else if ((currencySource == CurrencyType.Foreign)
+                 && (currencyTarget == CurrencyType.Base)
+                 && (exchangeTarget != 0))
+        {
+            amountExchange = d * exchangeTarget;
+            amountExchange = amountExchange.RoundTo(roundDecimal);
+        }
+        // Base to Additional
+        else if ((currencySource == CurrencyType.Base)
+                 && (currencyTarget == CurrencyType.Additional)
+                 && (exchangeTarget != 0))
+        {
+            amountExchange = d / exchangeTarget;
+            amountExchange = amountExchange.RoundTo(roundDecimal);
+        }
+        // Additional to Base
+        else if ((currencySource == CurrencyType.Additional)
+                 && (currencyTarget == CurrencyType.Base)
+                 && (exchangeTarget != 0))
+        {
+            amountExchange = d * exchangeTarget;
+            amountExchange = amountExchange.RoundTo(roundDecimal);
+        }
+
+        return amountExchange;
     }
 
 }

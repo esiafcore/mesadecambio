@@ -158,6 +158,7 @@ public class SystemInformationController : Controller
 
                 case SD.ReportTransaType.Transport:
                     report = SetReportDataForTransport(reportDataVmTrans);
+                    report.RegBusinessObject("datreptotal", _parametersReport[ParametersReport.ListTotal]);
                     break;
             }
 
@@ -229,39 +230,34 @@ public class SystemInformationController : Controller
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
         var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
+
+
+        var reportTotalListJson = HttpContext.Session.GetString(AC.ReportListTotal);
+        if (reportTotalListJson is null)
+        {
+            throw new Exception($"{AC.ReportDataErrorLoad}");
+        }
+        var reportTotalList = JsonConvert.DeserializeObject<List<TransportTotalVM>>(reportTotalListJson);
+
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
+        _parametersReport.Add(ParametersReport.ListTotal, reportTotalList);
 
-        //int countBuy = 0, countSell = 0;
-        //decimal amountNetBuy = 0, amountNetSell = 0, amountNetDepositBuy = 0, amountNetDepositSell = 0, amountNetTransferBuy = 0, amountNetTransferSell = 0;
-        //decimal amountNetCostBuy = 0, amountNetCostSell = 0, amountNetRevenueBuy = 0, amountNetRevenueSell = 0;
+        var currencyList = _uow.Currency
+            .GetAll(x => x.CompanyId == _companyId && x.IsActive).ToList();
+        if (currencyList is null || currencyList.Count == 0)
+        {
+            throw new Exception($"Monedas no encontradas");
+        }
 
-        //countBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Count();
-        //countSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Count();
-        //amountNetBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountTransaction);
-        //amountNetCostBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCost);
-        //amountNetDepositBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalDeposit);
-        //amountNetTransferBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalTransfer);
-        //amountNetRevenueBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenue);
-        //amountNetSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountTransaction);
-        //amountNetCostSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCost);
-        //amountNetDepositSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalDeposit);
-        //amountNetTransferSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalTransfer);
-        //amountNetRevenueSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenue);
+        var codeBase = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Base);
+        var codeForeign = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Foreign);
+        var codeAdditional = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Additional);
 
         // Setear parametros
-        //reportResult.Dictionary.Variables["parCountBuy"].ValueObject = countBuy;
-        //reportResult.Dictionary.Variables["parCountSell"].ValueObject = countSell;
-        //reportResult.Dictionary.Variables["parAmountNetBuy"].ValueObject = amountNetBuy;
-        //reportResult.Dictionary.Variables["parAmountNetCostBuy"].ValueObject = amountNetCostBuy;
-        //reportResult.Dictionary.Variables["parAmountNetDepositBuy"].ValueObject = amountNetDepositBuy;
-        //reportResult.Dictionary.Variables["parAmountNetTransferBuy"].ValueObject = amountNetTransferBuy;
-        //reportResult.Dictionary.Variables["parAmountNetRevenueBuy"].ValueObject = amountNetRevenueBuy;
-        //reportResult.Dictionary.Variables["parAmountNetSell"].ValueObject = amountNetSell;
-        //reportResult.Dictionary.Variables["parAmountNetCostSell"].ValueObject = amountNetCostSell;
-        //reportResult.Dictionary.Variables["parAmountNetDepositSell"].ValueObject = amountNetDepositSell;
-        //reportResult.Dictionary.Variables["parAmountNetTransferSell"].ValueObject = amountNetTransferSell;
-        //reportResult.Dictionary.Variables["parAmountNetRevenueSell"].ValueObject = amountNetRevenueSell;
+        reportResult.Dictionary.Variables["parCurrencyCodeBase"].ValueObject = codeBase;
+        reportResult.Dictionary.Variables["parCurrencyCodeForeign"].ValueObject = codeForeign;
+        reportResult.Dictionary.Variables["parCurrencyCodeAdditional"].ValueObject = codeAdditional;
 
         reportResult.Dictionary.Variables[AC.ParNameReport].ValueObject = SD.SystemInformationReportTypeName[(short)modelVm.ReportType];
 
@@ -453,7 +449,7 @@ public class SystemInformationController : Controller
 
         return reportResult;
     }
-    
+
     // Obtener las vistas parciales para renderizarlas
     [HttpPost]
     public IActionResult GetPartialView(SD.ReportTransaType reportType)
@@ -607,7 +603,7 @@ public class SystemInformationController : Controller
             return resultResponse;
         }
     }
-    
+
     // VALIDAR QUE EXISTAN DATOS PARA EL REPORTE Y GUARDARLOS ======>
 
     [HttpPost]
@@ -643,7 +639,26 @@ public class SystemInformationController : Controller
                 return Json(jsonResponse);
             }
 
+            //Obtenemos los ids de los bancos 
+            var bankIds = transactionList
+                .SelectMany(x => new[] { x.BankAccountSourceTrx!.ParentId, x.BankAccountTargetTrx!.ParentId })
+                .Distinct()
+                .ToList();
+
+            var bankList = _uow.Bank.GetAll(x => x.CompanyId == _companyId &&
+                                                 bankIds.Contains(x.Id)).ToList();
+            if (bankList is null || bankList.Count == 0)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Bancos no encontrados";
+                return Json(jsonResponse);
+            }
+
             List<TransaODTVM> transaListVM = new();
+
+            // Crear diccionario para almacenar los totales por banco
+            Dictionary<string, TransportTotalVM> bankTotals = new();
+            ConverterExchange cvtExc = new();
 
             foreach (var transaction in transactionList)
             {
@@ -669,11 +684,103 @@ public class SystemInformationController : Controller
                 };
 
                 transaListVM.Add(transa);
+
+                // Obtener los tipos de cambio
+                var currencyRateList = _uow.CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId && x.DateTransa == transaction.DateTransa);
+                var exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?.OfficialRate ?? 1M;
+                var exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?.OfficialRate ?? 1M;
+
+                // Obtener banco de origen
+                var sourceBankCode = bankList.First(x => x.Id == transaction.BankAccountSourceTrx!.ParentId).Code;
+                if (!bankTotals.ContainsKey(sourceBankCode))
+                {
+                    bankTotals[sourceBankCode] = new TransportTotalVM { BankCode = sourceBankCode };
+                }
+
+                var mtosExc = cvtExc
+                    .ConverterExchangeTo(transaction.CurrencyTransaType,
+                        transaction.AmountTransaction,
+                        exchangeRateForeign,
+                        exchangeRateAdditional,
+                        decimalTrx: _decimalTransa);
+
+                bankTotals[sourceBankCode].TotalOutputBase += mtosExc.AmountBase;
+                bankTotals[sourceBankCode].TotalOutputForeign += mtosExc.AmountForeign;
+                bankTotals[sourceBankCode].TotalOutputAdditional += mtosExc.AmountAdditional;
+
+                // Obtener banco de destino
+                var targetBankCode = bankList.First(x => x.Id == transaction.BankAccountTargetTrx!.ParentId).Code;
+                if (!bankTotals.ContainsKey(targetBankCode))
+                {
+                    bankTotals[targetBankCode] = new TransportTotalVM { BankCode = targetBankCode };
+                }
+
+                bankTotals[targetBankCode].TotalEntryBase += mtosExc.AmountBase;
+                bankTotals[targetBankCode].TotalEntryForeign += mtosExc.AmountForeign;
+                bankTotals[targetBankCode].TotalEntryAdditional += mtosExc.AmountAdditional;
+
+                //var total = new TransportTotalVM();
+
+                //total.BankCode = bankList.First(x => x.Id == transaction.BankAccountSourceTrx.ParentId).Code;
+
+
+                //var currencyRateList = _uow
+                //    .CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId &&
+                //                                      x.DateTransa == transaction.DateTransa);
+
+                //var exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?
+                //    .OfficialRate ?? 1M;
+
+                //var exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?
+                //    .OfficialRate ?? 1M;
+
+                //// Convertir a las otras monedas
+                //ConverterExchange cvtExc = new();
+                //var mtosExc = cvtExc.ConverterExchangeTo(transaction.CurrencyTransaType, transaction.AmountTransaction,
+                //    exchangeRateForeign, exchangeRateAdditional,
+                //    decimalTrx: _decimalTransa);
+
+                //total.TotalOutputBase = mtosExc.AmountBase;
+                //total.TotalOutputForeign = mtosExc.AmountForeign;
+                //total.TotalOutputAdditional = mtosExc.AmountAdditional;
+                ////mtosExc.SetInit(); // Limpiar
+                //totalListVM.Add(total);
+
+                //total.BankCode = bankList.First(x => x.Id == transaction.BankAccountTargetTrx.ParentId).Code;
+
+
+                //currencyRateList = _uow
+                //   .CurrencyExchangeRate.GetAll(x => x.CompanyId == _companyId &&
+                //                                     x.DateTransa == transaction.DateTransa);
+
+                //exchangeRateForeign = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Foreign)?
+                //   .OfficialRate ?? 1M;
+
+                //exchangeRateAdditional = currencyRateList.FirstOrDefault(x => x.CurrencyType == CurrencyType.Additional)?
+                //   .OfficialRate ?? 1M;
+
+                // Convertir a las otras monedas
+                //mtosExc = cvtExc.ConverterExchangeTo(transaction.CurrencyTransaType, transaction.AmountTransaction,
+                //   exchangeRateForeign, exchangeRateAdditional,
+                //   decimalTrx: _decimalTransa);
+
+                //total.TotalEntryBase = mtosExc.AmountBase;
+                //total.TotalEntryForeign = mtosExc.AmountForeign;
+                //total.TotalEntryAdditional = mtosExc.AmountAdditional;
+                //mtosExc.SetInit(); // Limpiar
+                //totalListVM.Add(total);
             }
 
+            // Convertir diccionario a lista y guardar en sesión
+            var totalListVM = bankTotals.Values.ToList();
+
             // Guardar los datos en el contexto
+            var reportListTotal = JsonConvert.SerializeObject(totalListVM);
+            HttpContext.Session.SetString(AC.ReportListTotal, reportListTotal);
+
             var reportListData = JsonConvert.SerializeObject(transaListVM);
             HttpContext.Session.SetString(AC.ReportListData, reportListData);
+
             HttpContext.Session.SetString("DateTransaInitial", reportData.DateTransaInitial.ToString(AC.DefaultDateFormatView));
             HttpContext.Session.SetString("DateTransaFinal", reportData.DateTransaFinal.ToString(AC.DefaultDateFormatView));
             jsonResponse.IsSuccess = true;

@@ -63,6 +63,7 @@ public static class AC
     public static string ParIsGeneral = "parIsGeneral";
     public static string DatRep = "datrep";
     public static string ReportListData = "ListaDatosReporte";
+    public static string ReportListTotal = "ListaTotalesReporte";
     public static string ObjectReportData = "ObjetoReporte";
     public static string FilterReportData = "FilterReportData";
     public static string ReportDataType = "TipoReporte";

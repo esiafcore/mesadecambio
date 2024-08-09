@@ -141,7 +141,8 @@ public static class SD
         FilePath = 3,
         ListData = 4,
         FiltersDescription = 5,
-        FileName = 6
+        FileName = 6,
+        ListTotal = 7
     }
 
     public enum MonthName : short
