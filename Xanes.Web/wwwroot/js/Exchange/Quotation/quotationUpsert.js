@@ -10,7 +10,7 @@ let typeCurrent;
 
 //Variables para los contenedores de los botones
 let btnSave, btnNext, btnClosed, btnReClosed;
-//Bton de salvar o siguiente
+//Bton de sallet o siguiente
 let btnSaveNext = document.querySelector("#btnSaveNext");
 
 //Variables para saber si hay que redirigir al home o al detalle y mostrar el mensaje al crear
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     //Establecer ejecutivo por defecto
     $(selectBusinessExecutive).val(executiveIdByDefault).trigger('change');
-    var selectedOptionActive = $(selectBusinessExecutive).find(':selected');
+    let selectedOptionActive = $(selectBusinessExecutive).find(':selected');
 
     if (selectedOptionActive[0].dataset.loan === "True" || selectedOptionActive[0].dataset.payment === "True") {
         fnHiddenButton(true);
@@ -498,7 +498,7 @@ const fnGetCustomer = async () => {
 
                         fntoggleLoading();
 
-                        var options = selectCustomer.getElementsByTagName('option');
+                        let options = selectCustomer.getElementsByTagName('option');
                         if (options.length > 0) {
                             // Selecciona el primer elemento
 
@@ -511,9 +511,17 @@ const fnGetCustomer = async () => {
                                 $(selectCustomer).on('select2:select', async function (e) {
                                     divExchangeRateHistory.hidden = false;
 
-                                    var executiveId = $(e.params.data.element).data('executive');
-                                    if (executiveId && executiveId != 0)
-                                        $(selectBusinessExecutive).val(executiveId).trigger('change');
+                                    let executiveId = $(e.params.data.element).data('executive');
+                                    if (executiveId && executiveId != 0) {
+                                        let optionExists = $(selectBusinessExecutive).find('option[value="' + executiveId + '"]').length > 0;
+
+                                        if (optionExists) {
+                                            $(selectBusinessExecutive).val(executiveId).trigger('change');
+                                        } else {
+                                            $(selectBusinessExecutive).val(executiveIdByDefault).trigger('change');
+                                        }
+
+                                    }
 
                                     fnLoadDatatable(e.params.data.id);
                                 });
@@ -588,7 +596,7 @@ const fnLoadCustomer = async (searchTerm) => {
 
         fntoggleLoading();
 
-        var options = selectCustomer.getElementsByTagName('option');
+        let options = selectCustomer.getElementsByTagName('option');
         if (options.length > 0) {
             // Selecciona el primer elemento
 
@@ -660,7 +668,7 @@ const fnChangeCustomers = async (onlyCompanies) => {
             });
 
             fnInitializeSelectCustomer();
-            var options = selectCustomer.getElementsByTagName('option');
+            let options = selectCustomer.getElementsByTagName('option');
             if (options.length > 0) {
                 // Selecciona el primer elemento
 
