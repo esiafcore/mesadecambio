@@ -35,6 +35,7 @@
     <None Remove="Areas\Exchange\Reports\OperationList.mrt" />
     <None Remove="Areas\Exchange\Reports\Quotation.mrt" />
     <None Remove="Areas\Exchange\Reports\TransferList.mrt" />
+    <None Remove="Areas\Exchange\Reports\TransportList.mrt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,19 +99,22 @@
 
   <ItemGroup>
     <Content Include="Areas\Exchange\Reports\TransferList.mrt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Areas\Exchange\Reports\DepositList.mrt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Areas\Exchange\Reports\OperationList.mrt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Areas\Exchange\Reports\Quotation.mrt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Areas\Exchange\Reports\TransportList.mrt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
