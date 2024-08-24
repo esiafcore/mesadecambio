@@ -868,10 +868,12 @@ public class SystemInformationController : Controller
         try
         {
             // Obtener la cotización
-            var transactionDetailList = _uow.QuotationDetail.GetAll(filter: x => x.CompanyId == _companyId && x.QuotationDetailType == QuotationDetailType.Deposit
-                    && x.ParentTrx.DateTransa >= reportData.DateTransaInitial &&
-                    x.ParentTrx.DateTransa <= reportData.DateTransaFinal,
-                includeProperties: "ParentTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+            var transactionDetailList = _uow.QuotationDetail
+                .GetAll(filter: x => (x.CompanyId == _companyId)
+                    && (x.QuotationDetailType == QuotationDetailType.Deposit)
+                    && (x.ParentTrx.DateTransa >= reportData.DateTransaInitial) 
+                    && (x.ParentTrx.DateTransa <= reportData.DateTransaFinal),
+                includeProperties: "ParentTrx,ParentTrx.BusinessExecutiveTrx,CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
 
             if (transactionDetailList is null)
             {
@@ -880,7 +882,7 @@ public class SystemInformationController : Controller
                 return Json(jsonResponse);
             }
 
-            if (transactionDetailList.Count() == 0)
+            if (transactionDetailList.Count == 0)
             {
                 jsonResponse.IsSuccess = false;
                 jsonResponse.IsInfo = true;
@@ -888,9 +890,13 @@ public class SystemInformationController : Controller
                 return Json(jsonResponse);
             }
 
+            //Convertir Id de Clientes en un List
             var customerIds = transactionDetailList.Select(x => x.ParentTrx.CustomerId).Distinct().ToList();
 
-            var customerList = _uow.Customer.GetAll(filter: x => x.CompanyId == _companyId && customerIds.Contains(x.Id)).ToList();
+            // Obtener listado de Clientes
+            var customerList = _uow.Customer
+                .GetAll(filter: x => (x.CompanyId == _companyId) 
+                    && customerIds.Contains(x.Id)).ToList();
 
             if (customerList is null)
             {
@@ -906,18 +912,19 @@ public class SystemInformationController : Controller
                 var customer = customerList.FirstOrDefault(c => c.Id == transaction.ParentTrx.CustomerId);
 
                 //switch (transaction.CurrencyDetailTrx.Numeral .ParentTrx.CurrencyTransferType)
-                switch (transaction.CurrencyDetailTrx.Numeral)
+                switch (transaction.ParentTrx.CurrencyDepositType)
                 {
-                    case (int)CurrencyType.Base:
+                    case CurrencyType.Base:
                         amountMB = transaction.AmountDetail;
                         break;
-                    case (int)CurrencyType.Foreign:
+                    case CurrencyType.Foreign:
                         amountMF = transaction.AmountDetail;
                         break;
-                    case (int)CurrencyType.Additional:
+                    case CurrencyType.Additional:
                         amountMA = transaction.AmountDetail;
                         break;
                 }
+
                 var transa = new TransaODTVM
                 {
                     Id = transaction.ParentId,

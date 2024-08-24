@@ -99,22 +99,19 @@ const fnsendFormValidate = async (event) => {
             plainFormData.ReportType = parseInt(plainFormData.ReportType);
         }
 
-
-        if (plainFormData.ReportType == SystemInformationReportType.Operation) {
-
-            resultResponse = await fnvalidateOperation(plainFormData);
-        }
-
-        if (plainFormData.ReportType == SystemInformationReportType.Deposit) {
-            resultResponse = await fnvalidateDeposit(plainFormData);
-        }
-
-        if (plainFormData.ReportType == SystemInformationReportType.Transfer) {
-            resultResponse = await fnvalidateTransfer(plainFormData);
-        }
-
-        if (plainFormData.ReportType == SystemInformationReportType.Transport) {
-            resultResponse = await fnvalidateTransport(plainFormData);
+        switch (plainFormData.ReportType) {
+            case SystemInformationReportType.Operation:
+                resultResponse = await fnvalidateOperation(plainFormData);
+                break;
+            case SystemInformationReportType.Deposit:
+                resultResponse = await fnvalidateDeposit(plainFormData);
+                break;
+            case SystemInformationReportType.Transfer:
+                resultResponse = await fnvalidateTransfer(plainFormData);
+                break;
+            case SystemInformationReportType.Transport:
+                resultResponse = await fnvalidateTransport(plainFormData);
+                break;
         }
 
         // Continuar flujo normal del formulario

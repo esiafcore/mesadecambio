@@ -77,7 +77,7 @@
     <Content Update="wwwroot\images\companies\Factoring-logo-500px.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\js\Exchange\SystemInformation\indexReport.js">
+    <Content Update="wwwroot\js\Exchange\SystemInformation\IndexReport.js">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>

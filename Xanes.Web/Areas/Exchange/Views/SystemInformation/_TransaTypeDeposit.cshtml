@@ -1,6 +1,8 @@
 ﻿@model TransactionReportVM
 
-<form method="post" id="formFilters" asp-area="Exchange" asp-controller="SystemInformation" asp-action="PrintTransaDepositList" target="_blank" onsubmit="fnsendFormValidate(event)">
+<form method="post" id="formFilters" asp-area="Exchange" 
+    asp-controller="SystemInformation" asp-action="PrintTransaDepositList"
+    target="_blank" onsubmit="fnsendFormValidate(event)">
 
     <!-- TIPO  -->
     <input asp-for="ReportType" name="ReportType" hidden />
