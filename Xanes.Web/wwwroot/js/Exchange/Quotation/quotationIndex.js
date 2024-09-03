@@ -632,12 +632,12 @@ const fnLoadDatatable = () => {
                 , orderable: true
             },
             {
-                data: 'amountRevenue', "width": "10%"
+                data: 'amountRevenueReal', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
             },
             {
-                data: 'amountCost', "width": "10%"
+                data: 'amountCostReal', "width": "10%"
                 , render: DataTable.render.number(null, null, decimalTransa)
                 , orderable: false
             },

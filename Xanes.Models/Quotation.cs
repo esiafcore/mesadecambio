@@ -167,6 +167,7 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Ingreso Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountRevenue { get; set; } = 0M;
+   
     [NotMapped]
     public decimal AmountRevenueRpt
     {
@@ -183,16 +184,59 @@ public class Quotation : Entity, ICloneable
         }
     }
 
+    [NotMapped]
+    public decimal AmountRevenueRealRpt
+    {
+        get
+        {
+            var total = this.AmountRevenueReal;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Ingreso Real Transacción")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountRevenueReal { get; set; } = 0M;
+
     [Required(ErrorMessage = "{0} es un campo requerido.")]
     [Display(Name = "Costo Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;
+
     [NotMapped]
     public decimal AmountCostRpt
     {
         get
         {
             var total = this.AmountCost;
+
+            if ((!this.IsClosed) || (this.IsVoid))
+            {
+                total = 0M;
+            }
+
+            return total;
+        }
+    }
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Costo Real Transacción")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountCostReal { get; set; } = 0M;
+
+    [NotMapped]
+    public decimal AmountCostRealRpt
+    {
+        get
+        {
+            var total = this.AmountCostReal;
 
             if ((!this.IsClosed) || (this.IsVoid))
             {

@@ -319,15 +319,15 @@ public class SystemInformationController : Controller
         countBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Count();
         countSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Count();
         amountNetBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountTransaction);
-        amountNetCostBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCost);
+        amountNetCostBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountCostReal);
         amountNetDepositBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalDeposit);
         amountNetTransferBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.TotalTransfer);
-        amountNetRevenueBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenue);
+        amountNetRevenueBuy = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Buy).Sum(x => x.AmountRevenueReal);
         amountNetSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountTransaction);
-        amountNetCostSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCost);
+        amountNetCostSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountCostReal);
         amountNetDepositSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalDeposit);
         amountNetTransferSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.TotalTransfer);
-        amountNetRevenueSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenue);
+        amountNetRevenueSell = reportDataList.Where(x => x.TypeNumeral == SD.QuotationType.Sell).Sum(x => x.AmountRevenueReal);
 
 
         // Setear parametros
@@ -763,7 +763,7 @@ public class SystemInformationController : Controller
         catch (Exception e)
         {
             jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"{e.Message}";
+            jsonResponse.ErrorMessages = e.Message;
             return Json(jsonResponse);
         }
     }
@@ -830,8 +830,8 @@ public class SystemInformationController : Controller
                     ExchangeRateTransa = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa,
                     ExchangeRateOfficialTransa = transaction.ExchangeRateOfficialTransa,
                     AmountTransaction = transaction.AmountTransactionRpt,
-                    AmountRevenue = transaction.AmountRevenueRpt,
-                    AmountCost = transaction.AmountCostRpt,
+                    AmountRevenue = transaction.AmountRevenueRealRpt,
+                    AmountCost = transaction.AmountCostRealRpt,
                     TotalDeposit = transaction.TotalDepositRpt,
                     TotalTransfer = transaction.TotalTransferRpt,
                     ExecutiveCode = transaction.BusinessExecutiveCode,
@@ -856,7 +856,7 @@ public class SystemInformationController : Controller
         catch (Exception e)
         {
             jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"{e.Message}";
+            jsonResponse.ErrorMessages = e.Message;
             return Json(jsonResponse);
         }
     }
@@ -959,7 +959,7 @@ public class SystemInformationController : Controller
         catch (Exception e)
         {
             jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"{e.Message}";
+            jsonResponse.ErrorMessages = e.Message;
             return Json(jsonResponse);
         }
     }
@@ -1055,7 +1055,7 @@ public class SystemInformationController : Controller
         catch (Exception e)
         {
             jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"{e.Message}";
+            jsonResponse.ErrorMessages = e.Message;
             return Json(jsonResponse);
         }
     }
