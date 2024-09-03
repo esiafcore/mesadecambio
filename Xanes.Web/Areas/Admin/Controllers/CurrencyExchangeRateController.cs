@@ -94,7 +94,8 @@ public class CurrencyExchangeRateController : Controller
 
         if (id == null || id == 0)
         {
-            return NotFound();
+            TempData[AC.Error] = $"El id es invalido";
+            return RedirectToAction(nameof(Index));
         }
 
         var obj = _uow.CurrencyExchangeRate
@@ -102,7 +103,8 @@ public class CurrencyExchangeRateController : Controller
 
         if (obj == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"El tipo de cambio no fue encontrado";
+            return RedirectToAction(nameof(Index));
         }
 
         return View(obj);

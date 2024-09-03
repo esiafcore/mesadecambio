@@ -562,8 +562,12 @@ const fnTCByDate = async () => {
             inputExchangeRateOfficialTransa.value = 1;
         }
 
-    } catch (error) {
-        alert(error);
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
     }
 };
 

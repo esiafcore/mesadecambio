@@ -60,7 +60,8 @@ public class BusinessExecutiveController : Controller
 
             if (obj == null)
             {
-                return NotFound();
+                TempData[AC.Error] = $"Ejecutivo no encontrado";
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -162,7 +163,8 @@ public class BusinessExecutiveController : Controller
 
         if (obj == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Ejecutivo no encontrado";
+            return RedirectToAction(nameof(Index));
         }
 
         var dataVM = new Models.ViewModels.BusinessExecutiveVM()
@@ -183,7 +185,8 @@ public class BusinessExecutiveController : Controller
 
         if (obj == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Ejecutivo no encontrado";
+            return RedirectToAction(nameof(Index));
         }
 
         var dataVM = new Models.ViewModels.BusinessExecutiveVM()

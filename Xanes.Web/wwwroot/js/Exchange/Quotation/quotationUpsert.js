@@ -425,11 +425,19 @@ const fnGetBankAccounts = async () => {
                 //$(selectBankAccountTarget).select2(select2Options);
 
             } else {
-                alert(jsonResponse.errorMessages);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: jsonResponse.errorMessages
+                });
             }
 
-        } catch (error) {
-            alert(error);
+        } catch (e) {
+            Swal.fire({
+                icon: 'error',
+                title: "Error en la conexión",
+                text: e
+            });
         }
     });
 };

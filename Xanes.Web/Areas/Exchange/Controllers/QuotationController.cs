@@ -1104,13 +1104,23 @@ public class QuotationController : Controller
 
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
-        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
+        //ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Cotización no encontrada";
+            return RedirectToAction(nameof(Index));
+        }
+
+        if (objHeader.IsAdjustment)
+        {
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchangeFull);
+        }
+        else
+        {
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         }
 
         var objBankList = _uow.Bank
@@ -1119,7 +1129,8 @@ public class QuotationController : Controller
 
         if (objBankList == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Bancos no encontrados";
+            return RedirectToAction(nameof(Index));
         }
 
         model.BankList = objBankList;
@@ -1132,6 +1143,7 @@ public class QuotationController : Controller
 
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {currencyTarget}";
+
         return View(model);
     }
 
@@ -1141,13 +1153,23 @@ public class QuotationController : Controller
 
         QuotationDetailVM model = new();
         ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
-        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
+        //ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
         var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
             includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
         if (objHeader == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Cotización no encontrada";
+            return RedirectToAction(nameof(Index));
+        }
+
+        if (objHeader.IsAdjustment)
+        {
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchangeFull);
+        }
+        else
+        {
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         }
 
         var objBankList = _uow.Bank
@@ -1156,7 +1178,8 @@ public class QuotationController : Controller
 
         if (objBankList == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Bancos no encontrados";
+            return RedirectToAction(nameof(Index));
         }
 
         model.BankList = objBankList;
@@ -1169,6 +1192,10 @@ public class QuotationController : Controller
 
         model.ModelCreateVM.CurrencySourceTarget =
             $"{objHeader.CurrencyTransaTrx.Code} - {currencyTarget}";
+
+        ViewBag.TotalTransfer = JsonConvert.SerializeObject(objHeader.TotalTransfer);
+        ViewBag.TotalDeposit = JsonConvert.SerializeObject(objHeader.TotalDeposit);
+
         return View(model);
     }
 
@@ -3316,7 +3343,6 @@ public class QuotationController : Controller
         }
     }
 
-
     // Exportar a Excel las Operaciones
     [HttpPost]
     public JsonResult ExportOperationToExcel([FromBody] List<int> quotationIds)
@@ -3530,7 +3556,5 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
     }
-
-
     #endregion
 }

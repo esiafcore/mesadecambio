@@ -48,7 +48,8 @@ public class CurrencyController : Controller
 
             if (obj == null)
             {
-                return NotFound();
+                TempData[AC.Error] = $"Moneda no encontrada";
+                return RedirectToAction(nameof(Index));
             }
             return View(obj);
         }
@@ -134,14 +135,16 @@ public class CurrencyController : Controller
 
         if (id == null || id == 0)
         {
-            return NotFound();
+            TempData[AC.Error] = $"El id es invalido";
+            return RedirectToAction(nameof(Index));
         }
 
         var obj = _uow.Currency.Get(x => (x.Id == id), isTracking: false);
 
         if (obj == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Moneda no encontrada";
+            return RedirectToAction(nameof(Index));
         }
 
         return View(obj);
@@ -154,7 +157,8 @@ public class CurrencyController : Controller
 
         if (obj == null)
         {
-            return NotFound();
+            TempData[AC.Error] = $"Moneda no encontrada";
+            return RedirectToAction(nameof(Index));
         }
         _uow.Currency.Remove(obj);
         _uow.Save();

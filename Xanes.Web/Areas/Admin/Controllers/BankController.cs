@@ -57,7 +57,8 @@ public class BankController : Controller
 
             if (obj == null)
             {
-                return NotFound();
+                TempData[AC.Error] = $"Banco no encontrado";
+                return RedirectToAction(nameof(Index));
             }
 
             return View(obj);
