@@ -294,7 +294,6 @@ public class QuotationController : Controller
                 var currencyForeign = objCurrencyRateList
                     .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
 
-
                 obj.TypeId = objQuotationType.Id;
 
                 if (objQuotationType.Numeral != (int)SD.QuotationType.Transport)
@@ -384,6 +383,9 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost * currencyForeign;
                                 obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
+
+                                obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                                obj.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
                             }
                         }
                     }
@@ -411,7 +413,7 @@ public class QuotationController : Controller
                         }
 
                         obj.CurrencyDepositId = objCurrency.Id;
-
+                        obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
                         //TC VENTA MENOR AL TC OFICIAL
                         if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
                         {
@@ -458,6 +460,9 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost * currencyForeign;
                                 obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
+
+                                obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                                obj.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
                             }
                         }
                     }
@@ -732,10 +737,8 @@ public class QuotationController : Controller
 
             var currencyForeign = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
-            var currencyAdditional = objCurrencyRateList
-                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Additional))?.OfficialRate ?? 1;
-
-
+            
+            obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
             if (objQt.TypeNumeral == SD.QuotationType.Buy)
             {
                 //TC COMPRA MENOR AL TC OFICIAL
@@ -784,6 +787,9 @@ public class QuotationController : Controller
 
                         obj.AmountCostReal = obj.AmountCost * currencyForeign;
                         obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
+
+                        obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                        obj.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
                     }
                 }
             }
@@ -836,6 +842,9 @@ public class QuotationController : Controller
 
                         obj.AmountCostReal = obj.AmountCost * currencyForeign;
                         obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
+
+                        obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                        obj.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
                     }
                 }
             }
@@ -1598,8 +1607,6 @@ public class QuotationController : Controller
 
             var currencyForeign = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
-            var currencyAdditional = objCurrencyRateList
-                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Additional))?.OfficialRate ?? 1;
 
 
             if (objQuotation.TypeNumeral == SD.QuotationType.Buy)
@@ -1652,6 +1659,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost * currencyForeign;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue * currencyForeign;
+
+                        objQuotation.ExchangeRateOfficialReal = currencyForeign * objQuotation.ExchangeRateOfficialTransa;
+                        objQuotation.ExchangeRateBuyReal = currencyForeign * objQuotation.ExchangeRateBuyTransa;
                     }
                 }
             }
@@ -1705,6 +1715,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost * currencyForeign;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue * currencyForeign;
+
+                        objQuotation.ExchangeRateOfficialReal = currencyForeign * objQuotation.ExchangeRateOfficialTransa;
+                        objQuotation.ExchangeRateSellReal = currencyForeign * objQuotation.ExchangeRateSellTransa;
                     }
                 }
             }
@@ -2974,6 +2987,9 @@ public class QuotationController : Controller
 
                                 header.AmountCostReal = header.AmountCost * currencyForeign;
                                 header.AmountRevenueReal = header.AmountRevenue * currencyForeign;
+
+                                header.ExchangeRateOfficialReal = currencyForeign * header.ExchangeRateOfficialTransa;
+                                header.ExchangeRateBuyReal = currencyForeign * header.ExchangeRateBuyTransa;
                             }
                         }
                     }
@@ -3026,6 +3042,9 @@ public class QuotationController : Controller
 
                                 header.AmountCostReal = header.AmountCost * currencyForeign;
                                 header.AmountRevenueReal = header.AmountRevenue * currencyForeign;
+
+                                header.ExchangeRateOfficialReal = currencyForeign * header.ExchangeRateOfficialTransa;
+                                header.ExchangeRateSellReal = currencyForeign * header.ExchangeRateSellTransa;
                             }
                         }
                     }
