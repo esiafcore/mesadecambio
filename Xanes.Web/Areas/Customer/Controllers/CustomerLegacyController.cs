@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
-using Xanes.Models.Dtos;
+using Xanes.Models.Dtos.XanesN4;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 #pragma warning disable CS8604

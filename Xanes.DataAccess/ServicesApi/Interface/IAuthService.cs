@@ -1,4 +1,4 @@
-﻿using Xanes.Models.Dtos;
+﻿using Xanes.Models.Dtos.XanesN8;
 
 namespace Xanes.DataAccess.ServicesApi.Interface;
 public interface IAuthService

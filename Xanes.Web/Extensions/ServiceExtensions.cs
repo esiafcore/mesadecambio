@@ -23,6 +23,9 @@ public static class ServiceExtensions
 
         services.AddHttpClient<IAuthService, AuthService>();
         services.AddTransient<IAuthService, AuthService>();
+
+        services.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
+        services.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
     }
 }
 

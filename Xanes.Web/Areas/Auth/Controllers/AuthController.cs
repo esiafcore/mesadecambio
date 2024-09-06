@@ -11,6 +11,7 @@ using Xanes.LoggerService;
 using Xanes.Models.Dtos;
 using Xanes.Models.Shared;
 using Xanes.Utility;
+using Xanes.Models.Dtos.XanesN8;
 
 namespace Xanes.Web.Areas.Auth.Controllers;
 [Area("Auth")]

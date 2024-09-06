@@ -1,4 +1,4 @@
-﻿namespace Xanes.Models.Dtos;
+﻿namespace Xanes.Models.Dtos.XanesN8;
 
 public class RespuestaAutenticacionDto
 {

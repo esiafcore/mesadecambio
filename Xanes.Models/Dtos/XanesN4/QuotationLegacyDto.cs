@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Xanes.Models.Dtos;
+namespace Xanes.Models.Dtos.XanesN4;
 
 public class QuotationLegacyDto
 {
