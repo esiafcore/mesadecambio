@@ -1,5 +1,9 @@
-﻿using Xanes.DataAccess.ServicesApi.Interface;
-using Xanes.DataAccess.ServicesApi.Service;
+﻿using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN4;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN8;
+using Xanes.DataAccess.ServicesApi.Service.eSiafN4;
+using Xanes.DataAccess.ServicesApi.Service.XanesN4;
+using Xanes.DataAccess.ServicesApi.Service.XanesN8;
 using Xanes.LoggerService;
 
 namespace Xanes.Web.Extensions;
@@ -26,6 +30,18 @@ public static class ServiceExtensions
 
         services.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
         services.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
+
+        services.AddHttpClient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
+        services.AddTransient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
+        
+        services.AddHttpClient<IConfigBcoService, ConfigBcoService>();
+        services.AddTransient<IConfigBcoService, ConfigBcoService>();
+
+        services.AddHttpClient<IConsecutivoBcoService, ConsecutivoBcoService>();
+        services.AddTransient<IConsecutivoBcoService, ConsecutivoBcoService>();
+
+        services.AddHttpClient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
+        services.AddTransient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
     }
 }
 

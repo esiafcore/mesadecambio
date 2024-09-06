@@ -1,22 +1,22 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
 using Xanes.Models.Dtos.eSiafN4;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 
-namespace Xanes.DataAccess.ServicesApi.Service;
+namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 
-public class TransaccionBcoService : BaseService, ITransaccionBcoService
+public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleService
 {
     private string _actionUrl;
     private IConfiguration _configuration;
     public string _companyId;
-    public TransaccionBcoService(IHttpClientFactory httpClient,
+    public TransaccionBcoDetalleService(IHttpClientFactory httpClient,
         IConfiguration configuration
     ) : base(httpClient, configuration)
     {
         // configuration.GetValue<string>("ServicesUrl:Version")
-        _actionUrl = string.Format("{0}transaccionesbco"
+        _actionUrl = string.Format("{0}transaccionesbcodetalle"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
         _configuration = configuration;
         _companyId = _configuration.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
@@ -33,6 +33,17 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
+    public Task<T> GetAllByParentAsync<T>(string token, int pageSize, int pageNumber, Guid id, int fiscalYear, int fiscalMonth)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/getallbyparent?uidparent={1}&uidcia={2}&yearfiscal={3}&mesfiscal={4}&pagina={5}&recordsPorPagina={6}",
+                _actionUrl, id.ToString(), _companyId, fiscalYear, fiscalMonth, pageNumber, pageSize),
+            Token = token
+        });
+    }
+
     public Task<T> GetAsync<T>(string token, Guid id)
     {
         return SendAsync<T>(new APIRequest()
@@ -43,7 +54,7 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
-    public Task<T> CreateAsync<T>(string token, TransaccionesBcoDtoCreate body)
+    public Task<T> CreateAsync<T>(string token, TransaccionesBcoDetalleDtoCreate body)
     {
         return SendAsync<T>(new APIRequest()
         {
@@ -54,7 +65,7 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
-    public Task<T> UpdateAsync<T>(string token, TransaccionesBcoDtoUpdate body)
+    public Task<T> UpdateAsync<T>(string token, TransaccionesBcoDetalleDtoUpdate body)
     {
         return SendAsync<T>(new APIRequest()
         {
@@ -71,6 +82,16 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         {
             ApiType = HttpMethod.Delete,
             Url = string.Format("{0}/{1}", _actionUrl, id.ToString()),
+            Token = token
+        });
+    }
+
+    public Task<T> DeleteByParentAsync<T>(string token, Guid id)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Delete,
+            Url = string.Format("{0}/deletebyparent{1}", _actionUrl, id.ToString()),
             Token = token
         });
     }

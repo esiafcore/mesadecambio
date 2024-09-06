@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN8;
 using Xanes.Models.Dtos.XanesN8;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 
-namespace Xanes.DataAccess.ServicesApi.Service;
+namespace Xanes.DataAccess.ServicesApi.Service.XanesN8;
 
 public class AuthService : BaseService, IAuthService
 {

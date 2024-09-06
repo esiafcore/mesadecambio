@@ -1,21 +1,21 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN4;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 
-namespace Xanes.DataAccess.ServicesApi.Service;
+namespace Xanes.DataAccess.ServicesApi.Service.XanesN4;
 
-public class QuotationDetailLegacyService : BaseService, IQuotationDetailLegacyService
+public class QuotationLegacyService : BaseService, IQuotationLegacyService
 {
     private string _actionUrl;
     private IConfiguration _configuration;
 
-    public QuotationDetailLegacyService(IHttpClientFactory httpClient,
+    public QuotationLegacyService(IHttpClientFactory httpClient,
         IConfiguration configuration
     ) : base(httpClient, configuration)
     {
         // configuration.GetValue<string>("ServicesUrl:Version")
-        _actionUrl = string.Format("{0}quotationsdetaillegacy"
+        _actionUrl = string.Format("{0}quotationslegacy"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
         _configuration = configuration;
     }

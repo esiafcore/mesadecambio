@@ -3,7 +3,7 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
-using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN4;
 using Xanes.LoggerService;
 using Xanes.Models;
 using Xanes.Models.Dtos.XanesN4;

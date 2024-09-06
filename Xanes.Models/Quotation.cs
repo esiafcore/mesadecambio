@@ -304,6 +304,10 @@ public class Quotation : Entity, ICloneable
     public bool IsVoid { get; set; }
 
     [Required]
+    [Display(Name = "Está Aprobado?")]
+    public bool IsApproved { get; set; }
+
+    [Required]
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
 

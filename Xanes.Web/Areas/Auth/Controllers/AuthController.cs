@@ -6,12 +6,12 @@ using System.Security.Claims;
 using System.Text;
 using Newtonsoft.Json;
 using Xanes.DataAccess.Repository.IRepository;
-using Xanes.DataAccess.ServicesApi.Interface;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 using Xanes.Models.Dtos.XanesN8;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN8;
 
 namespace Xanes.Web.Areas.Auth.Controllers;
 [Area("Auth")]

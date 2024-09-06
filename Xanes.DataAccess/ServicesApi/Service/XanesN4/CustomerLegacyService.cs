@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Xanes.DataAccess.ServicesApi.Interface;
+using Xanes.DataAccess.ServicesApi.Interface.XanesN4;
 using Xanes.Models.Shared;
 
-namespace Xanes.DataAccess.ServicesApi.Service;
+namespace Xanes.DataAccess.ServicesApi.Service.XanesN4;
 
 public class CustomerLegacyService : BaseService, ICustomerLegacyService
 {
