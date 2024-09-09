@@ -6,29 +6,29 @@ using Xanes.Utility;
 
 namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 
-public class ConsecutivoBcoDetalleService : BaseService, IConsecutivoBcoDetalleService
+public class CuentaBancariaService : BaseService, ICuentaBancariaService
 {
     private string _actionUrl;
     private IConfiguration _cfg;
     public string _companyId;
-    public ConsecutivoBcoDetalleService(IHttpClientFactory httpClient,
+    public CuentaBancariaService(IHttpClientFactory httpClient,
         IConfiguration configuration
     ) : base(httpClient, configuration)
     {
         // configuration.GetValue<string>("ServicesUrl:Version")
-        _actionUrl = string.Format("{0}consecutivosbcodetalle"
+        _actionUrl = string.Format("{0}cuentasbancarias"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
         _cfg = configuration;
         _companyId = _cfg.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
     }
 
-    public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber, int fiscalYear, int fiscalMonth)
+    public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber)
     {
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?companyId={1}&yearfiscal={2}&mesfiscal={3}&pagina={4}&recordsPorPagina={5}",
-                _actionUrl, _companyId, fiscalYear, fiscalMonth, pageNumber, pageSize),
+            Url = string.Format("{0}?companyId={1}&pagina={2}&recordsPorPagina={3}",
+                _actionUrl, _companyId, pageNumber, pageSize),
             Token = token
         });
     }
@@ -43,15 +43,15 @@ public class ConsecutivoBcoDetalleService : BaseService, IConsecutivoBcoDetalleS
         });
     }
 
-    public Task<T> UpdateAsync<T>(string token, ConsecutivosBcoDetalleDtoUpdate body)
+    public Task<T> GetAllByBankAsync<T>(string token, string codigo)
     {
         return SendAsync<T>(new APIRequest()
         {
-            ApiType = HttpMethod.Put,
-            Url = string.Format("{0}/{1}", _actionUrl, body.UidCia.ToString()),
-            Data = body,
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/getallbybank?companyId={1}&codigo={2}", _actionUrl, _companyId, codigo),
             Token = token
         });
     }
+
 }
 

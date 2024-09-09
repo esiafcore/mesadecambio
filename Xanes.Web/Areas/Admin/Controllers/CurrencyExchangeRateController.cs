@@ -15,17 +15,17 @@ namespace Xanes.Web.Areas.Admin.Controllers;
 public class CurrencyExchangeRateController : Controller
 {
     private readonly IUnitOfWork _uow;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _cfg;
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
     public CurrencyExchangeRateController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
-        _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
-        _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
+        _decimalTransa = _cfg.GetValue<int>("ApplicationSettings:DecimalTransa");
+        _decimalExchange = _cfg.GetValue<int>("ApplicationSettings:DecimalExchange");
     }
 
     public IActionResult Index(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)

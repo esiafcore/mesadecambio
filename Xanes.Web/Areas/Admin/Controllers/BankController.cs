@@ -10,7 +10,7 @@ namespace Xanes.Web.Areas.Admin.Controllers;
 public class BankController : Controller
 {
     private readonly IUnitOfWork _uow;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _cfg;
     private readonly IWebHostEnvironment _webHostEnvironment;
 
     private readonly int _companyId;
@@ -19,9 +19,9 @@ public class BankController : Controller
         , IWebHostEnvironment webHostEnvironment)
     {
         _uow = uow;
-        _configuration = configuration;
+        _cfg = configuration;
         _webHostEnvironment = webHostEnvironment;
-        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
     }
     // GET
     public IActionResult Index()

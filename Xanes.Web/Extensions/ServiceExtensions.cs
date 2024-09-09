@@ -10,38 +10,44 @@ namespace Xanes.Web.Extensions;
 
 public static class ServiceExtensions
 {
-    public static void ConfigureLoggerService(this IServiceCollection services) =>
-        services.AddSingleton<ILoggerManager, LoggerManager>();
+    public static void ConfigureLoggerService(this IServiceCollection srvs) =>
+        srvs.AddSingleton<ILoggerManager, LoggerManager>();
 
-    public static void ConfigureHttpClientService(this IServiceCollection services)
+    public static void ConfigureHttpClientService(this IServiceCollection srvs)
     {
         //Authentication and Authorization
-        services.AddHttpClient<IQuotationLegacyService, QuotationLegacyService>();
-        services.AddTransient<IQuotationLegacyService, QuotationLegacyService>();
+        srvs.AddHttpClient<IQuotationLegacyService, QuotationLegacyService>();
+        srvs.AddTransient<IQuotationLegacyService, QuotationLegacyService>();
 
-        services.AddHttpClient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
-        services.AddTransient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
+        srvs.AddHttpClient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
+        srvs.AddTransient<IQuotationDetailLegacyService, QuotationDetailLegacyService>();
 
-        services.AddHttpClient<ICustomerLegacyService, CustomerLegacyService>();
-        services.AddTransient<ICustomerLegacyService, CustomerLegacyService>();
+        srvs.AddHttpClient<ICustomerLegacyService, CustomerLegacyService>();
+        srvs.AddTransient<ICustomerLegacyService, CustomerLegacyService>();
 
-        services.AddHttpClient<IAuthService, AuthService>();
-        services.AddTransient<IAuthService, AuthService>();
+        srvs.AddHttpClient<IAuthService, AuthService>();
+        srvs.AddTransient<IAuthService, AuthService>();
 
-        services.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
-        services.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
+        srvs.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
+        srvs.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
 
-        services.AddHttpClient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
-        services.AddTransient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
+        srvs.AddHttpClient<ICuentaBancariaService, CuentaBancariaService>();
+        srvs.AddTransient<ICuentaBancariaService, CuentaBancariaService>();
+
+        srvs.AddHttpClient<IBancoService, BancoService>();
+        srvs.AddTransient<IBancoService, BancoService>();
+
+        srvs.AddHttpClient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
+        srvs.AddTransient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
         
-        services.AddHttpClient<IConfigBcoService, ConfigBcoService>();
-        services.AddTransient<IConfigBcoService, ConfigBcoService>();
+        srvs.AddHttpClient<IConfigBcoService, ConfigBcoService>();
+        srvs.AddTransient<IConfigBcoService, ConfigBcoService>();
 
-        services.AddHttpClient<IConsecutivoBcoService, ConsecutivoBcoService>();
-        services.AddTransient<IConsecutivoBcoService, ConsecutivoBcoService>();
+        srvs.AddHttpClient<IConsecutivoBcoService, ConsecutivoBcoService>();
+        srvs.AddTransient<IConsecutivoBcoService, ConsecutivoBcoService>();
 
-        services.AddHttpClient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
-        services.AddTransient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
+        srvs.AddHttpClient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
+        srvs.AddTransient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
     }
 }
 

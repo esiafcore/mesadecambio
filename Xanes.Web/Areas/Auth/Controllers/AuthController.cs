@@ -23,13 +23,13 @@ public class AuthController : Controller
     private readonly int _companyId;
     private readonly IUnitOfWork _uow;
 
-    public AuthController(IAuthService service
+    public AuthController(IAuthService srv
         , ILoggerManager logger
         , IConfiguration cfg
         , IUnitOfWork uow)
     {
         _logger = logger;
-        _srv = service;
+        _srv = srv;
         _cfg = cfg;
         _uow = uow;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");

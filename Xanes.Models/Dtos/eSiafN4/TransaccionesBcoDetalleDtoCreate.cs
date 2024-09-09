@@ -13,15 +13,15 @@ public class TransaccionesBcoDetalleDtoCreate
     public Guid? ProyectoActividadUid { get; set; }
     public Guid? UidDocumento { get; set; }
     public string CodigoDocumento { get; set; }
-    public int NumeroLinea { get; set; }
-    public short TipoMovimiento { get; set; }
-    public decimal TipoCambioMonfor { get; set; }
-    public decimal TipoCambioMonxtr { get; set; }
-    public decimal TipoCambioParaMonfor { get; set; }
-    public decimal TipoCambioParaMonxtr { get; set; }
-    public decimal MontoMonbas { get; set; }
-    public decimal MontoMonfor { get; set; }
-    public decimal MontoMonxtr { get; set; }
+    public int NumeroLinea { get; set; } = 0;
+    public short TipoMovimiento { get; set; } = 0;
+    public decimal TipoCambioMonfor { get; set; } = 0M;
+    public decimal TipoCambioMonxtr { get; set; } = 0M;
+    public decimal TipoCambioParaMonfor { get; set; } = 0M;
+    public decimal TipoCambioParaMonxtr { get; set; } = 0M;
+    public decimal MontoMonbas { get; set; } = 0M;
+    public decimal MontoMonfor { get; set; } = 0M;
+    public decimal MontoMonxtr { get; set; } = 0M;
     public Guid? UidBeneficiario { get; set; }
     public Guid? UidEntidad { get; set; }
     public short? TipoBeneficiario { get; set; }
@@ -29,5 +29,5 @@ public class TransaccionesBcoDetalleDtoCreate
     public string Comentarios { get; set; }
     public short? TipoRegistro { get; set; }
     public bool InddeCuadratura { get; set; }
-    public short NumeroTipoCambio { get; set; }
+    public short NumeroTipoCambio { get; set; } = 0;
 }

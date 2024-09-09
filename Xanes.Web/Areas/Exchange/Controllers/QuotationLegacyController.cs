@@ -25,7 +25,7 @@ public class QuotationLegacyController : Controller
     private readonly int _companyId;
     private string _sessionToken;
 
-    public QuotationLegacyController(IQuotationLegacyService service
+    public QuotationLegacyController(IQuotationLegacyService srv
         , ILoggerManager logger
         , IConfiguration cfg
         , IUnitOfWork uow
@@ -33,7 +33,7 @@ public class QuotationLegacyController : Controller
         , IHttpContextAccessor httpCtxAcc)
     {
         _logger = logger;
-        _srv = service;
+        _srv = srv;
         _cfg = cfg;
         _uow = uow;
         _srvDetail = srvDetail;

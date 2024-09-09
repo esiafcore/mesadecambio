@@ -9,7 +9,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 public class ConsecutivoBcoService : BaseService, IConsecutivoBcoService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
     public string _companyId;
     public ConsecutivoBcoService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -18,8 +18,8 @@ public class ConsecutivoBcoService : BaseService, IConsecutivoBcoService
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}consecutivosbco"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
     }
 
     public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber)
@@ -27,7 +27,7 @@ public class ConsecutivoBcoService : BaseService, IConsecutivoBcoService
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?uidcia={1}&pagina={2}&recordsPorPagina={3}",
+            Url = string.Format("{0}?companyId={1}&pagina={2}&recordsPorPagina={3}",
                 _actionUrl, _companyId, pageNumber, pageSize),
             Token = token
         });

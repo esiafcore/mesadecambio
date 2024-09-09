@@ -9,7 +9,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
     public string _companyId;
     public TransaccionBcoDetalleService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -18,8 +18,8 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}transaccionesbcodetalle"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
     }
 
     public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber, int fiscalYear, int fiscalMonth)
@@ -27,7 +27,7 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?uidcia={1}&yearfiscal={2}&mesfiscal={3}&pagina={4}&recordsPorPagina={5}",
+            Url = string.Format("{0}?companyId={1}&yearfiscal={2}&mesfiscal={3}&pagina={4}&recordsPorPagina={5}",
                 _actionUrl, _companyId, fiscalYear, fiscalMonth, pageNumber, pageSize),
             Token = token
         });
@@ -38,7 +38,7 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}/getallbyparent?uidparent={1}&uidcia={2}&yearfiscal={3}&mesfiscal={4}&pagina={5}&recordsPorPagina={6}",
+            Url = string.Format("{0}/getallbyparent?uidparent={1}&companyId={2}&yearfiscal={3}&mesfiscal={4}&pagina={5}&recordsPorPagina={6}",
                 _actionUrl, id.ToString(), _companyId, fiscalYear, fiscalMonth, pageNumber, pageSize),
             Token = token
         });
@@ -56,6 +56,8 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
 
     public Task<T> CreateAsync<T>(string token, TransaccionesBcoDetalleDtoCreate body)
     {
+        body.UidCia = Guid.Parse(_companyId);
+
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Post,
@@ -67,6 +69,8 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
 
     public Task<T> UpdateAsync<T>(string token, TransaccionesBcoDetalleDtoUpdate body)
     {
+        body.UidCia = Guid.Parse(_companyId);
+
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Put,

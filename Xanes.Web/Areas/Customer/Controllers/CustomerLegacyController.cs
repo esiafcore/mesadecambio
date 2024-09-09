@@ -25,14 +25,14 @@ public class CustomerLegacyController : Controller
     private readonly IUnitOfWork _uow;
     private string _sessionToken;
 
-    public CustomerLegacyController(ICustomerLegacyService service
+    public CustomerLegacyController(ICustomerLegacyService srv
         , ILoggerManager logger
         , IConfiguration cfg
         , IUnitOfWork uow
         , IHttpContextAccessor httpCtxAcc)
     {
         _logger = logger;
-        _srv = service;
+        _srv = srv;
         _cfg = cfg;
         _uow = uow;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");

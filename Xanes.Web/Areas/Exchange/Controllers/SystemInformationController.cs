@@ -16,7 +16,7 @@ namespace Xanes.Web.Areas.Exchange.Controllers;
 public class SystemInformationController : Controller
 {
     private readonly IUnitOfWork _uow;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _cfg;
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
@@ -28,10 +28,10 @@ public class SystemInformationController : Controller
     public SystemInformationController(IUnitOfWork uow, IConfiguration configuration, IWebHostEnvironment hostEnvironment)
     {
         _uow = uow;
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
-        _decimalTransa = _configuration.GetValue<int>("ApplicationSettings:DecimalTransa");
-        _decimalExchange = _configuration.GetValue<int>("ApplicationSettings:DecimalExchange");
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
+        _decimalTransa = _cfg.GetValue<int>("ApplicationSettings:DecimalTransa");
+        _decimalExchange = _cfg.GetValue<int>("ApplicationSettings:DecimalExchange");
         _hostEnvironment = hostEnvironment;
 
         _parametersReport = new();

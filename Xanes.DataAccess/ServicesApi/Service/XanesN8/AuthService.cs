@@ -9,7 +9,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.XanesN8;
 public class AuthService : BaseService, IAuthService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
 
     public AuthService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -18,7 +18,7 @@ public class AuthService : BaseService, IAuthService
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}usuarios"
             , configuration.GetValue<string>(AC.ServicesUrlApiPath));
-        _configuration = configuration;
+        _cfg = configuration;
     }
 
     public Task<T> LoginAsync<T>(CredencialesUsuarioDto obj)

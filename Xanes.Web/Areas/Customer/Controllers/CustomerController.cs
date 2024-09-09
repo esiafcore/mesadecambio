@@ -18,7 +18,7 @@ namespace Xanes.Web.Areas.Customer.Controllers;
 public class CustomerController : Controller
 {
     private readonly IUnitOfWork _uow;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _cfg;
     private readonly int _companyId;
     private readonly ConfigCxc _cfgCxc;
 
@@ -30,8 +30,8 @@ public class CustomerController : Controller
     public CustomerController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
         _cfgCxc = _uow.ConfigCxc
             .Get(filter: x => (x.CompanyId == _companyId));
     }

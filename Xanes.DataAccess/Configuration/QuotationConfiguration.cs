@@ -39,7 +39,6 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.IsClosed).HasDefaultValue(false);
         builder.Property(b => b.IsAdjustment).HasDefaultValue(false);
         builder.Property(b => b.IsVoid).HasDefaultValue(false);
-        builder.Property(b => b.IsApproved).HasDefaultValue(false);
         
         builder.Property(b => b.TypeNumeral).HasDefaultValue(SD.QuotationType.Buy)
             .HasSentinel(default);

@@ -9,14 +9,14 @@ namespace Xanes.Web.Areas.Exchange.Controllers;
 public class BusinessExecutiveController : Controller
 {
     private readonly IUnitOfWork _uow;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _cfg;
     private readonly int _companyId;
 
     public BusinessExecutiveController(IUnitOfWork uow, IConfiguration configuration)
     {
         _uow = uow;
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<int>("ApplicationSettings:CompanyId");
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
     }
 
     [HttpGet]

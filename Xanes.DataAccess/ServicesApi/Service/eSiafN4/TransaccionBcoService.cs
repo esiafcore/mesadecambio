@@ -9,7 +9,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 public class TransaccionBcoService : BaseService, ITransaccionBcoService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
     public string _companyId;
     public TransaccionBcoService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -18,8 +18,8 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}transaccionesbco"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
     }
 
     public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber, int fiscalYear, int fiscalMonth)
@@ -27,7 +27,7 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}?uidcia={1}&yearfiscal={2}&mesfiscal={3}&pagina={4}&recordsPorPagina={5}",
+            Url = string.Format("{0}?companyId={1}&yearfiscal={2}&mesfiscal={3}&pagina={4}&recordsPorPagina={5}",
                 _actionUrl, _companyId, fiscalYear, fiscalMonth, pageNumber, pageSize),
             Token = token
         });
@@ -43,8 +43,23 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
+    public Task<T> GetNextSecuentialNumberAsync<T>(
+        string token, Guid bankAccountId, int fiscalYear, int fiscalMonth,
+        short tipo, short subtipo, Enumeradores.ConsecutivoTipo consecutivo, bool isSave)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/getnextsecuentialnumber?companyId={1}&bankAccountId={2}&fiscalYear={3}&fiscalMonth={4}&tipo={5}&subtipo={6}&consecutivo={7}&isSave={8}",
+                _actionUrl, _companyId, bankAccountId.ToString(), fiscalYear, fiscalMonth, tipo, subtipo, consecutivo, isSave),
+            Token = token
+        });
+    }
+
     public Task<T> CreateAsync<T>(string token, TransaccionesBcoDtoCreate body)
     {
+        body.UidCia = Guid.Parse(_companyId);
+
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Post,
@@ -56,6 +71,8 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
 
     public Task<T> UpdateAsync<T>(string token, TransaccionesBcoDtoUpdate body)
     {
+        body.UidCia = Guid.Parse(_companyId);
+
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Put,

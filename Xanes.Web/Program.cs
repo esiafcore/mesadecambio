@@ -11,7 +11,7 @@ using Xanes.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add srvs to the container.
 builder.Services.ConfigureLoggerService();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();

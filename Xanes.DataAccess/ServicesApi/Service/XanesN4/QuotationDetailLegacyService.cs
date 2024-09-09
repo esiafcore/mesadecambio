@@ -8,7 +8,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.XanesN4;
 public class QuotationDetailLegacyService : BaseService, IQuotationDetailLegacyService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
 
     public QuotationDetailLegacyService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -17,7 +17,7 @@ public class QuotationDetailLegacyService : BaseService, IQuotationDetailLegacyS
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}quotationsdetaillegacy"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
-        _configuration = configuration;
+        _cfg = configuration;
     }
 
     public Task<T> GetAllLegacyAsync<T>(string token, int pageSize, int pageNumber, DateOnly beginDate, DateOnly endDate, string? identificationNumber = null)

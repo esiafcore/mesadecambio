@@ -9,7 +9,7 @@ namespace Xanes.DataAccess.ServicesApi.Service.eSiafN4;
 public class ConfigBcoService : BaseService, IConfigBcoService
 {
     private string _actionUrl;
-    private IConfiguration _configuration;
+    private IConfiguration _cfg;
     public string _companyId;
     public ConfigBcoService(IHttpClientFactory httpClient,
         IConfiguration configuration
@@ -18,8 +18,8 @@ public class ConfigBcoService : BaseService, IConfigBcoService
         // configuration.GetValue<string>("ServicesUrl:Version")
         _actionUrl = string.Format("{0}configbco"
             , configuration.GetValue<string>("ServicesUrl:UrlApi"));
-        _configuration = configuration;
-        _companyId = _configuration.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
+        _cfg = configuration;
+        _companyId = _cfg.GetValue<string>(AC.SecreteSiafN4CompanyUid) ?? string.Empty;
     }
 
     public Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber)
@@ -33,23 +33,12 @@ public class ConfigBcoService : BaseService, IConfigBcoService
         });
     }
 
-    public Task<T> GetAsync<T>(string token, Guid id)
+    public Task<T> GetAsync<T>(string token)
     {
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}/{1}", _actionUrl, id.ToString()),
-            Token = token
-        });
-    }
-
-    public Task<T> UpdateAsync<T>(string token, ConfigBcoDtoUpdate body)
-    {
-        return SendAsync<T>(new APIRequest()
-        {
-            ApiType = HttpMethod.Put,
-            Url = string.Format("{0}/{1}", _actionUrl, body.UidCia.ToString()),
-            Data = body,
+            Url = string.Format("{0}/{1}", _actionUrl, _companyId),
             Token = token
         });
     }
