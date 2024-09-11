@@ -671,6 +671,7 @@ const fndeleteRow = async (id) => {
 const fnClosed = async (id) => {
 
     try {
+        fntoggleLoading();
 
         let url = `/exchange/quotation/Closed?id=${id}`;
 
@@ -697,6 +698,8 @@ const fnClosed = async (id) => {
             title: "Error en la conexión",
             text: e
         });
+    } finally {
+        fntoggleLoading();
     }
 };
 

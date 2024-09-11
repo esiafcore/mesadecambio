@@ -1,8 +1,8 @@
-﻿
-namespace Xanes.Models.Dtos.eSiafN4;
+﻿namespace Xanes.Models.Dtos.eSiafN4;
 
 public class ConfigBcoDtoCreate
 {
+    public Guid UidCia { get; set; }
     public Guid? CuentaContableDifPositivaConciliacion { get; set; }
     public Guid? CuentaContableDifNegativaConciliacion { get; set; }
     public Guid? CuentacontableInterfaz { get; set; }

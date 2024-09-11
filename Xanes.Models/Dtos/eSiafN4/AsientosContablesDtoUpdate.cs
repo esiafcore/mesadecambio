@@ -1,6 +1,6 @@
 ﻿namespace Xanes.Models.Dtos.eSiafN4;
 
-public class AsientosContablesDto
+public class AsientosContablesDtoUpdate
 {
     public Guid UidRegist { get; set; }
     public Guid UidCia { get; set; }
@@ -34,17 +34,7 @@ public class AsientosContablesDto
     public string SerieInternaAnula { get; set; }
     public short? YearFiscalAnula { get; set; }
     public short? MesFiscalAnula { get; set; }
-    public Guid? UidRegistRef { get; set; }
+    public Guid? UidRegistref { get; set; }
     public bool IndOkay { get; set; }
     public string ComentariosSistema { get; set; }
-    public DateTime CreFch { get; set; }
-    public string CreUsr { get; set; }
-    public string CreHsn { get; set; }
-    public string CreHid { get; set; }
-    public string CreIps { get; set; }
-    public DateTime ModFch { get; set; }
-    public string ModUsr { get; set; }
-    public string ModHsn { get; set; }
-    public string ModHid { get; set; }
-    public string ModIps { get; set; }
 }

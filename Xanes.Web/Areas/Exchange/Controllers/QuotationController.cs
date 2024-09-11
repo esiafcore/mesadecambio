@@ -35,9 +35,12 @@ public class QuotationController : Controller
     private readonly IConfiguration _cfg;
     private readonly ITransaccionBcoService _srvTransaBco;
     private readonly ITransaccionBcoDetalleService _srvTransaBcoDetalle;
+    private readonly IAsientoContableService _srvAsiento;
+    private readonly IAsientoContableDetalleService _srvAsientoDetalle;
     private readonly ICuentaBancariaService _srvCuentaBancaria;
     private readonly IBancoService _srvBanco;
     private readonly IConfigBcoService _srvConfigBco;
+    private readonly IConfigCntService _srvConfigCnt;
 
     private readonly int _companyId;
     private readonly int _decimalTransa;
@@ -1867,7 +1870,7 @@ public class QuotationController : Controller
             if (srvResponse is null)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                jsonResponse.ErrorMessages = "No se pudo obtener la respuesta"; 
                 return Json(jsonResponse);
             }
 
@@ -2064,8 +2067,8 @@ public class QuotationController : Controller
                 transaBco.NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}";
                 transaBco.TipoCambioMonfor = exchangeRate;
                 transaBco.TipoCambioMonxtr = exchangeRate;
-                transaBco.TipoCambioparaMonfor = exchangeRate;
-                transaBco.TipoCambioparaMonxtr = exchangeRate;
+                transaBco.TipoCambioParaMonfor = exchangeRate;
+                transaBco.TipoCambioParaMonxtr = exchangeRate;
                 transaBco.MontoMonbas = mtosExc.AmountBase;
                 transaBco.MontoMonfor = mtosExc.AmountForeign;
                 transaBco.MontoMonxtr = mtosExc.AmountAdditional;
@@ -2115,8 +2118,8 @@ public class QuotationController : Controller
                 transaBcoDetalle.TipoMovimiento = (short)mexAccountMovementType.Debit;
                 transaBcoDetalle.TipoCambioMonfor = transaBcoDto.TipoCambioMonfor;
                 transaBcoDetalle.TipoCambioMonxtr = transaBcoDto.TipoCambioMonxtr;
-                //transaBcoDetalle.TipoCambioParaMonfor = transaBcoDto.TipoCambioparaMonfor;
-                //transaBcoDetalle.TipoCambioParaMonxtr = transaBcoDto.TipoCambioparaMonxtr;
+                //transaBcoDetalle.TipoCambioParaMonfor = transaBcoDto.TipoCambioParaMonfor;
+                //transaBcoDetalle.TipoCambioParaMonxtr = transaBcoDto.TipoCambioParaMonxtr;
                 transaBcoDetalle.MontoMonbas = mtosExc.AmountBase;
                 transaBcoDetalle.MontoMonfor = mtosExc.AmountForeign;
                 transaBcoDetalle.MontoMonxtr = mtosExc.AmountAdditional;
@@ -2157,8 +2160,8 @@ public class QuotationController : Controller
                 transaBcoDetalle.TipoMovimiento = (short)mexAccountMovementType.Credit;
                 transaBcoDetalle.TipoCambioMonfor = transaBcoDto.TipoCambioMonfor;
                 transaBcoDetalle.TipoCambioMonxtr = transaBcoDto.TipoCambioMonxtr;
-                //transaBcoDetalle.TipoCambioParaMonfor = transaBcoDto.TipoCambioparaMonfor;
-                //transaBcoDetalle.TipoCambioParaMonxtr = transaBcoDto.TipoCambioparaMonxtr;
+                //transaBcoDetalle.TipoCambioParaMonfor = transaBcoDto.TipoCambioParaMonfor;
+                //transaBcoDetalle.TipoCambioParaMonxtr = transaBcoDto.TipoCambioParaMonxtr;
                 transaBcoDetalle.MontoMonbas = mtosExc.AmountBase;
                 transaBcoDetalle.MontoMonfor = mtosExc.AmountForeign;
                 transaBcoDetalle.MontoMonxtr = mtosExc.AmountAdditional;

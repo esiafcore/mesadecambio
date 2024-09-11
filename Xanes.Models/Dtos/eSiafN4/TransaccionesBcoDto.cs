@@ -25,8 +25,8 @@ public class TransaccionesBcoDto
     public Guid? UidTransaccionAnula { get; set; }
     public decimal TipoCambioMonfor { get; set; }
     public decimal TipoCambioMonxtr { get; set; }
-    public decimal TipoCambioparaMonfor { get; set; }
-    public decimal TipoCambioparaMonxtr { get; set; }
+    public decimal TipoCambioParaMonfor { get; set; }
+    public decimal TipoCambioParaMonxtr { get; set; }
     public int NumeroObjeto { get; set; }
     public int NumeroEstado { get; set; }
     public string Comentarios { get; set; } = null!;

@@ -27,15 +27,15 @@ public static class ServiceExtensions
 
         srvs.AddHttpClient<IAuthService, AuthService>();
         srvs.AddTransient<IAuthService, AuthService>();
-
-        srvs.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
-        srvs.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
-
+        
         srvs.AddHttpClient<ICuentaBancariaService, CuentaBancariaService>();
         srvs.AddTransient<ICuentaBancariaService, CuentaBancariaService>();
 
         srvs.AddHttpClient<IBancoService, BancoService>();
         srvs.AddTransient<IBancoService, BancoService>();
+
+        srvs.AddHttpClient<ITransaccionBcoService, TransaccionBcoService>();
+        srvs.AddTransient<ITransaccionBcoService, TransaccionBcoService>();
 
         srvs.AddHttpClient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
         srvs.AddTransient<ITransaccionBcoDetalleService, TransaccionBcoDetalleService>();
@@ -48,6 +48,22 @@ public static class ServiceExtensions
 
         srvs.AddHttpClient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
         srvs.AddTransient<IConsecutivoBcoDetalleService, ConsecutivoBcoDetalleService>();
+
+        srvs.AddHttpClient<IAsientoContableService, AsientoContableService>();
+        srvs.AddTransient<IAsientoContableService, AsientoContableService>();
+
+        srvs.AddHttpClient<IAsientoContableDetalleService, AsientoContableDetalleService>();
+        srvs.AddTransient<IAsientoContableDetalleService, AsientoContableDetalleService>();
+
+        srvs.AddHttpClient<IConfigCntService, ConfigCntService>();
+        srvs.AddTransient<IConfigCntService, ConfigCntService>();
+
+        srvs.AddHttpClient<IConsecutivoCntService, ConsecutivoCntService>();
+        srvs.AddTransient<IConsecutivoCntService, ConsecutivoCntService>();
+
+        srvs.AddHttpClient<IConsecutivoCntDetalleService, ConsecutivoCntDetalleService>();
+        srvs.AddTransient<IConsecutivoCntDetalleService, ConsecutivoCntDetalleService>();
+
     }
 }
 
