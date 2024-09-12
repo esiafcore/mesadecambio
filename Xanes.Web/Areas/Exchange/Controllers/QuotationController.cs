@@ -18,7 +18,6 @@ using System.IO.Compression;
 using System.Security.Claims;
 using Stimulsoft.Report.Export;
 using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
-using Xanes.Models.Shared;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
 
@@ -39,6 +38,8 @@ public class QuotationController : Controller
     private readonly IAsientoContableDetalleService _srvAsientoDetalle;
     private readonly ICuentaBancariaService _srvCuentaBancaria;
     private readonly IBancoService _srvBanco;
+    private readonly IModuloService _srvModulo;
+    private readonly IModuloDocumentoService _srvModuloDocumento;
     private readonly IConfigBcoService _srvConfigBco;
     private readonly IConfigCntService _srvConfigCnt;
 
@@ -66,7 +67,11 @@ public class QuotationController : Controller
         ITransaccionBcoService srvTransaBco,
         ITransaccionBcoDetalleService srvTransaBcoDetalle,
         ICuentaBancariaService srvCuentaBancaria,
-        IBancoService srvBanco, IConfigBcoService srvConfigBco)
+        IBancoService srvBanco, IConfigBcoService srvConfigBco,
+        IAsientoContableService srvAsiento, 
+        IAsientoContableDetalleService srvAsientoDetalle, 
+        IConfigCntService srvConfigCnt, 
+        IModuloService srvModulo, IModuloDocumentoService srvModuloDocumento)
     {
         _uow = uow;
         _cfg = configuration;
@@ -93,6 +98,11 @@ public class QuotationController : Controller
         _srvCuentaBancaria = srvCuentaBancaria;
         _srvBanco = srvBanco;
         _srvConfigBco = srvConfigBco;
+        _srvAsiento = srvAsiento;
+        _srvAsientoDetalle = srvAsientoDetalle;
+        _srvConfigCnt = srvConfigCnt;
+        _srvModulo = srvModulo;
+        _srvModuloDocumento = srvModuloDocumento;
         _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
         _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
         _sessionToken = _contextAccessor.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
@@ -1870,7 +1880,7 @@ public class QuotationController : Controller
             if (srvResponse is null)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = "No se pudo obtener la respuesta"; 
+                jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return Json(jsonResponse);
             }
 
@@ -1908,7 +1918,14 @@ public class QuotationController : Controller
                 CuentasBancariasDto? bankAccountDto = new();
                 TransaccionResponse? transaResponse = new();
                 TransaccionesBcoDto? transaBcoDto = new();
+                AsientosContablesDto? asientoDto = new();
+                AsientosContablesDetalleDto? asientoDetalleDto = new();
                 TransaccionesBcoDetalleDto? transaBcoDetalleDto = new();
+                List<TransaccionesBcoDetalleDto>? transaBcoDetalleDtoList = new();
+                List<AsientosContablesDetalleDto>? asientoDetalleDtoList = new();
+                ModulosDto? moduloDto = new();
+                ModulosDocumentosDto? moduloDocumentoDto = new();
+
                 srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, detail.BankSourceTrx.Code);
                 if (srvResponse is null)
                 {
@@ -2014,7 +2031,7 @@ public class QuotationController : Controller
                     if (transaResponse is null)
                     {
                         jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Consecutivo no encontrado";
+                        jsonResponse.ErrorMessages = $"Consecutivo bancario no encontrado";
                         return Json(jsonResponse);
                     }
                 }
@@ -2026,12 +2043,18 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
-                decimal exchangeRate = objHeader.TypeNumeral switch
+                decimal exchangeRate = 0;
+
+                if (detail.QuotationDetailType == QuotationDetailType.Deposit)
                 {
-                    SD.QuotationType.Sell => objHeader.ExchangeRateSellTransa,
-                    SD.QuotationType.Buy => objHeader.ExchangeRateBuyTransa,
-                    _ => objHeader.ExchangeRateOfficialTransa
-                };
+                    exchangeRate = objHeader.TypeNumeral switch
+                    {
+                        SD.QuotationType.Sell => objHeader.ExchangeRateSellTransa,
+                        SD.QuotationType.Buy => objHeader.ExchangeRateBuyTransa,
+                        _ => objHeader.ExchangeRateOfficialTransa
+                    };
+                }
+
 
                 ConverterExchange cvtExc = new();
 
@@ -2111,7 +2134,67 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
+                srvResponse = await _srvModulo.GetByNumberAsync<APIResponse>(_sessionToken, (int)mexModules.Bank);
+                if (srvResponse is null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return Json(jsonResponse);
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    moduloDto = JsonConvert.DeserializeObject<ModulosDto>(Convert.ToString(srvResponse.result));
+
+                    if (moduloDto is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = $"Modulo bancario no encontrado";
+                        return Json(jsonResponse);
+                    }
+
+                    srvResponse =
+                        await _srvModuloDocumento.GetByNumberAsync<APIResponse>(_sessionToken, moduloDto.UidRegist,
+                            (int)mexModules.Bank);
+                    if (srvResponse is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                        return Json(jsonResponse);
+                    }
+
+                    if (srvResponse is { isSuccess: true })
+                    {
+                        moduloDocumentoDto = JsonConvert.DeserializeObject<ModulosDocumentosDto>(Convert.ToString(srvResponse.result));
+
+                        if (moduloDocumentoDto is null)
+                        {
+                            jsonResponse.IsSuccess = false;
+                            jsonResponse.ErrorMessages = $"Modulo documento bancario no encontrado";
+                            return Json(jsonResponse);
+                        }
+                    }
+                    else if (srvResponse is { isSuccess: false })
+                    {
+                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                        return Json(jsonResponse);
+                    }
+
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return Json(jsonResponse);
+                }
+
+                //Crear detalles
                 TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new();
+                transaBcoDetalle.UidDocumento = moduloDocumentoDto.UidRegist;
+                transaBcoDetalle.CodigoDocumento = moduloDocumentoDto.Codigo;
                 transaBcoDetalle.UidRegistPad = transaBcoDto.UidRegist;
                 transaBcoDetalle.UidCuentaContable = bankAccountDto.UidCuentaContable.Value;
                 transaBcoDetalle.NumeroLinea = 1;
@@ -2126,7 +2209,7 @@ public class QuotationController : Controller
                 transaBcoDetalle.IndDiferencial = false;
                 transaBcoDetalle.InddeCuadratura = false;
                 transaBcoDetalle.TipoRegistro = (short)mexBankDetailType.AutomaticCounterPart;
-                //Crear detalles
+
                 srvResponse = await _srvTransaBcoDetalle.CreateAsync<APIResponse>(_sessionToken, transaBcoDetalle);
                 if (srvResponse is null)
                 {
@@ -2145,6 +2228,8 @@ public class QuotationController : Controller
                         jsonResponse.ErrorMessages = $"Detalle transacción bancaria no encontrada";
                         return Json(jsonResponse);
                     }
+
+                    transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
                 }
                 else if (srvResponse is { isSuccess: false })
                 {
@@ -2154,6 +2239,9 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
+                transaBcoDetalle.UidRegist = Guid.Empty;
+                transaBcoDetalle.UidDocumento = moduloDocumentoDto.UidRegist;
+                transaBcoDetalle.CodigoDocumento = moduloDocumentoDto.Codigo;
                 transaBcoDetalle.UidRegistPad = transaBcoDto.UidRegist;
                 transaBcoDetalle.UidCuentaContable = configBcoDto.CuentacontableInterfaz.Value;
                 transaBcoDetalle.NumeroLinea = 2;
@@ -2168,7 +2256,7 @@ public class QuotationController : Controller
                 transaBcoDetalle.IndDiferencial = false;
                 transaBcoDetalle.InddeCuadratura = false;
                 transaBcoDetalle.TipoRegistro = (short)mexBankDetailType.AutomaticCounterPart;
-                //Crear detalles
+
                 srvResponse = await _srvTransaBcoDetalle.CreateAsync<APIResponse>(_sessionToken, transaBcoDetalle);
                 if (srvResponse is null)
                 {
@@ -2187,6 +2275,9 @@ public class QuotationController : Controller
                         jsonResponse.ErrorMessages = $"Detalle transacción bancaria no encontrada";
                         return Json(jsonResponse);
                     }
+
+                    transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
+
                 }
                 else if (srvResponse is { isSuccess: false })
                 {
@@ -2197,6 +2288,143 @@ public class QuotationController : Controller
                 }
 
 
+                string numberTransaCnt = string.Empty;
+
+                srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
+                    _sessionToken, bankAccountDto.UidRegist,
+                    objHeader.DateTransa.Year, objHeader.DateTransa.Month,
+                    tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+                if (srvResponse is null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return Json(jsonResponse);
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    numberTransaCnt = JsonConvert.DeserializeObject<string>(Convert.ToString(srvResponse.result)) ?? string.Empty;
+
+                    if (numberTransaCnt is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = $"Consecutivo contable no encontrado";
+                        return Json(jsonResponse);
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return Json(jsonResponse);
+                }
+
+                AsientosContablesDtoCreate asientoCnt = new();
+                asientoCnt.UidModuloDocumento = moduloDocumentoDto.UidRegist;
+                asientoCnt.UidModulo = moduloDto.UidRegist;
+                asientoCnt.UidCia = transaBcoDto.UidCia;
+                asientoCnt.Comentarios = transaBcoDto.Comentarios;
+                asientoCnt.FechaTransa = transaBcoDto.FechaTransa;
+                asientoCnt.MesFiscal = transaBcoDto.MesFiscal;
+                asientoCnt.YearFiscal = transaBcoDto.YearFiscal;
+                asientoCnt.TipoCambioMonfor = transaBcoDto.TipoCambioMonfor;
+                asientoCnt.TipoCambioMonxtr = transaBcoDto.TipoCambioMonxtr;
+                asientoCnt.TipoCambioParaMonfor = transaBcoDto.TipoCambioParaMonfor;
+                asientoCnt.TipoCambioParaMonxtr = transaBcoDto.TipoCambioParaMonxtr;
+                asientoCnt.MontoCreditoMonbas = transaBcoDto.MontoCreditoMonbas;
+                asientoCnt.MontoCreditoMonfor = transaBcoDto.MontoCreditoMonfor;
+                asientoCnt.MontoCreditoMonxtr = transaBcoDto.MontoCreditoMonxtr;
+                asientoCnt.MontoDebitoMonbas = transaBcoDto.MontoDebitoMonbas;
+                asientoCnt.MontoDebitoMonfor = transaBcoDto.MontoDebitoMonfor;
+                asientoCnt.MontoDebitoMonxtr = transaBcoDto.MontoDebitoMonxtr;
+                asientoCnt.NumeroLineas = transaBcoDto.NumeroLineas;
+                asientoCnt.NumeroMoneda = transaBcoDto.NumeroMoneda;
+                asientoCnt.NumeroObjeto = (int)mexJournalObjects.JournalEntry;
+                asientoCnt.NumeroEstado = (int)mexJournalEntryStages.Draft;
+                asientoCnt.SerieInterna = transaBcoDto.SerieInterna;
+                asientoCnt.NumeroTransaccionRef = transaBcoDto.NumeroTransaccionRef;
+                asientoCnt.NumeroTransaccion = numberTransaCnt;
+                asientoCnt.IndOkay = true;
+
+                //Crear cabecera
+                srvResponse = await _srvAsiento.CreateAsync<APIResponse>(_sessionToken, asientoCnt);
+                if (srvResponse is null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return Json(jsonResponse);
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    asientoDto = JsonConvert.DeserializeObject<AsientosContablesDto>(Convert.ToString(srvResponse.result));
+
+                    if (asientoDto is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = $"Asiento contable no encontrado";
+                        return Json(jsonResponse);
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    jsonResponse.IsSuccess = false;
+                    jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return Json(jsonResponse);
+                }
+
+
+                foreach (var detailTransa in transaBcoDetalleDtoList)
+                {
+                    //Crear detalles
+                    AsientosContablesDetalleDtoCreate asientoDetalle = new();
+                    asientoDetalle.UidDocumento = moduloDocumentoDto.UidRegist;
+                    asientoDetalle.CodigoDocumento = moduloDocumentoDto.Codigo;
+                    asientoDetalle.UidRegistPad = asientoDto.UidRegist;
+                    asientoDetalle.UidCuentaContable = detailTransa.UidCuentaContable;
+                    asientoDetalle.NumeroLinea = detailTransa.NumeroLinea;
+                    asientoDetalle.TipoMovimiento = detailTransa.TipoMovimiento;
+                    asientoDetalle.TipoCambioMonfor = detailTransa.TipoCambioMonfor;
+                    asientoDetalle.TipoCambioMonxtr = detailTransa.TipoCambioMonxtr;
+                    //asientoDetalle.TipoCambioParaMonfor = transaBcoDto.TipoCambioParaMonfor;
+                    //asientoDetalle.TipoCambioParaMonxtr = transaBcoDto.TipoCambioParaMonxtr;
+                    asientoDetalle.MontoMonbas = detailTransa.MontoMonbas;
+                    asientoDetalle.MontoMonfor = detailTransa.MontoMonfor;
+                    asientoDetalle.MontoMonxtr = detailTransa.MontoMonxtr;
+                    asientoDetalle.IndDiferencial = false;
+                    asientoDetalle.InddeCuadratura = false;
+
+                    srvResponse = await _srvAsientoDetalle.CreateAsync<APIResponse>(_sessionToken, asientoDetalle);
+                    if (srvResponse is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                        return Json(jsonResponse);
+                    }
+
+                    if (srvResponse is { isSuccess: true })
+                    {
+                        asientoDetalleDto = JsonConvert.DeserializeObject<AsientosContablesDetalleDto>(Convert.ToString(srvResponse.result));
+
+                        if (asientoDetalleDto is null)
+                        {
+                            jsonResponse.IsSuccess = false;
+                            jsonResponse.ErrorMessages = $"Detalle asiento contable no encontrado";
+                            return Json(jsonResponse);
+                        }
+
+                        asientoDetalleDtoList.Add(asientoDetalleDto);
+                    }
+                    else if (srvResponse is { isSuccess: false })
+                    {
+                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                        return Json(jsonResponse);
+                    }
+                }
 
             }
 

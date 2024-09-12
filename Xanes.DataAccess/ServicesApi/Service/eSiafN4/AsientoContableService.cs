@@ -43,18 +43,18 @@ public class AsientoContableService : BaseService, IAsientoContableService
         });
     }
 
-    //public Task<T> GetNextSecuentialNumberAsync<T>(
-    //    string token, Guid bankAccountId, int fiscalYear, int fiscalMonth,
-    //    short tipo, short subtipo, Enumeradores.ConsecutivoTipo consecutivo, bool isSave)
-    //{
-    //    return SendAsync<T>(new APIRequest()
-    //    {
-    //        ApiType = HttpMethod.Get,
-    //        Url = string.Format("{0}/getnextsecuentialnumber?companyId={1}&bankAccountId={2}&fiscalYear={3}&fiscalMonth={4}&tipo={5}&subtipo={6}&consecutivo={7}&isSave={8}",
-    //            _actionUrl, _companyId, bankAccountId.ToString(), fiscalYear, fiscalMonth, tipo, subtipo, consecutivo, isSave),
-    //        Token = token
-    //    });
-    //}
+    public Task<T> GetNextSecuentialNumberAsync<T>(
+        string token, Guid bankAccountId, int fiscalYear, int fiscalMonth,
+        short tipo, short subtipo, Enumeradores.ConsecutivoTipo consecutivo, bool isSave)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/getnextsecuentialnumber?companyId={1}&bankAccountId={2}&fiscalYear={3}&fiscalMonth={4}&tipo={5}&subtipo={6}&consecutivo={7}&isSave={8}",
+                _actionUrl, _companyId, bankAccountId.ToString(), fiscalYear, fiscalMonth, tipo, subtipo, consecutivo, isSave),
+            Token = token
+        });
+    }
 
     public Task<T> CreateAsync<T>(string token, AsientosContablesDtoCreate body)
     {

@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Exchange\Controllers\QuotationController.cs~RF348c202.TMP" />
     <None Remove="Areas\Exchange\Reports\DepositList.mrt" />
     <None Remove="Areas\Exchange\Reports\OperationList.mrt" />
     <None Remove="Areas\Exchange\Reports\Quotation.mrt" />

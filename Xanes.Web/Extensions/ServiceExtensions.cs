@@ -64,6 +64,12 @@ public static class ServiceExtensions
         srvs.AddHttpClient<IConsecutivoCntDetalleService, ConsecutivoCntDetalleService>();
         srvs.AddTransient<IConsecutivoCntDetalleService, ConsecutivoCntDetalleService>();
 
+        srvs.AddHttpClient<IModuloService, ModuloService>();
+        srvs.AddTransient<IModuloService, ModuloService>();
+
+        srvs.AddHttpClient<IModuloDocumentoService, ModuloDocumentoService>();
+        srvs.AddTransient<IModuloDocumentoService, ModuloDocumentoService>();
+
     }
 }
 

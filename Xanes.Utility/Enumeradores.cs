@@ -109,5 +109,36 @@ public static class Enumeradores
         TransferenciaDebito = 2,
         TransferenciaCredito = 4
     }
+
+    public enum mexModules : int
+    {
+        Config = 1,
+        Account = 2,
+        Bank = 4,
+        Inventory = 8,
+        Quotation = 16,
+        Invoice = 32,
+        AccountsReceivable = 64,
+        Purchase = 128,
+        Importation = 256,
+        AccountsPayable = 512,
+        Payroll = 1024,
+        Assistance = 2048,
+        Budget = 4096,
+        FixedAssets = 8192,
+        WorkInProgress = 16384
+    }
+
+    public enum mexModuleBankDocument : int
+    {
+        Check = 1,
+        Deposit = 2,
+        DebitNote = 4,
+        CreditNote = 8,
+        DebitTransfer = 16,
+        CreditTransfer = 32,
+        DebitExchangeDifferential = 64,
+        CreditExchangeDifferential = 128
+    }
 }
 
