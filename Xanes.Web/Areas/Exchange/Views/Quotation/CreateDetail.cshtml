@@ -12,7 +12,7 @@
                 @if (ViewData["IsReClosed"] != null)
                 {
                     <div class="col-6 col-md-7 col-lg-5 col-xl-4">
-                        <a onclick="fnReClosed(@Model.ModelCreateVM.DataModel.Id)" id="btnQuotationClosed"
+                        <a onclick="fnClosed('@Model.ModelCreateVM.DataModel.Id', true)" id="btnQuotationClosed"
                            class="btn btn-info form-control btn-sm border" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top"
                            data-bs-title="Re-Cerrar" hidden>
                             <i class="bi bi-check-square-fill"></i> Re-Cerrar

@@ -2051,6 +2051,9 @@ public class QuotationController : Controller
                                         jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
                                         return Json(jsonResponse);
                                     }
+
+                                    detail.JournalEntryId = null;
+                                    detail.BankTransactionId = null;
                                 }
                             }
                             else if (srvResponse is { isSuccess: false })
@@ -3352,56 +3355,6 @@ public class QuotationController : Controller
     }
 
 
-    [HttpPost, ActionName("ReClosed")]
-    public JsonResult ReClosedPost(int id)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-        if (id == 0)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"El id es requerido";
-            return Json(jsonResponse);
-        }
-
-        try
-        {
-            var objHeader = _uow.Quotation
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
-            if (objHeader == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cotización no encontrada";
-                return Json(jsonResponse);
-            }
-
-            //objHeader.IsPosted = true;
-
-            //Seteamos campos de auditoria
-            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.UpdatedDate = DateTime.UtcNow;
-            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.ReClosedDate = DateTime.UtcNow;
-            objHeader.ReClosedHostName = AC.LOCALHOSTPC;
-            objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            _uow.Quotation.Update(objHeader);
-            _uow.Save();
-            jsonResponse.IsSuccess = true;
-            TempData["success"] = $"Cotización re-cerrada correctamente";
-            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
-
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
-        }
-    }
-
     [HttpPost, ActionName("Void")]
     public JsonResult VoidPost(int id)
     {
@@ -3521,30 +3474,6 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
     }
-
-    //[HttpDelete]
-    //public IActionResult Delete(int? id)
-    //{
-
-    //    var rowToBeDeleted = _uow.Quotation.Get(filter: u => (u.Id == id)
-    //        , isTracking: false);
-
-    //    if (rowToBeDeleted == null)
-    //    {
-    //        return Json(new { success = false, message = "Quotation don´t exist" });
-    //    }
-
-    //    _uow.Bank.RemoveByFilter(filter: u => (u.Id == rowToBeDeleted.Id));
-
-    //    return Json(new
-    //    {
-    //        isSuccess = true
-    //        ,
-    //        successMessages = "Quotation Successfully Removed"
-    //        ,
-    //        errorMessages = string.Empty
-    //    });
-    //}
 
     [HttpPost]
     public JsonResult GetCustomers(bool onlyCompanies = false)

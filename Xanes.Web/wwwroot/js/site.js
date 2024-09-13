@@ -12,6 +12,15 @@ const fnEnableTooltip = () => {
     });
 };
 
+// Funcion para mover modales
+function fnmakeModalDraggable(modalId) {
+    $("#" + modalId).draggable({
+        handle: ".modal-header",
+        cursor: "move"
+    });
+}
+
+
 const LocalTimeDefault = "T00:00:00";
 
 const defaultDecimalTransa = 2;
