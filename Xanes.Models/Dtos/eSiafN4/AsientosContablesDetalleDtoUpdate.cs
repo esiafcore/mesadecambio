@@ -36,7 +36,7 @@ public class AsientosContablesDetalleDtoUpdate
 
     public decimal TipoCambioParaMonfor { get; set; }
 
-    public decimal TipoCambioMonParaMonxtr { get; set; }
+    public decimal TipoCambioParaMonxtr { get; set; }
 
     public decimal MontoMonbas { get; set; }
 

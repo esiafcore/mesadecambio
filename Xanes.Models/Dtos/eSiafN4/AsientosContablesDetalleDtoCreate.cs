@@ -30,19 +30,19 @@ public class AsientosContablesDetalleDtoCreate
 
     public short TipoMovimiento { get; set; }
 
-    public decimal TipoCambioMonfor { get; set; }
+    public decimal TipoCambioMonfor { get; set; } = 0M;
 
-    public decimal TipoCambioMonxtr { get; set; }
+    public decimal TipoCambioMonxtr { get; set; } = 0M;
 
-    public decimal TipoCambioParaMonfor { get; set; }
+    public decimal TipoCambioParaMonfor { get; set; } = 0M;
 
-    public decimal TipoCambioMonParaMonxtr { get; set; }
+    public decimal TipoCambioParaMonxtr { get; set; } = 0M;
 
-    public decimal MontoMonbas { get; set; }
+    public decimal MontoMonbas { get; set; } = 0M;
 
-    public decimal MontoMonfor { get; set; }
+    public decimal MontoMonfor { get; set; } = 0M;
 
-    public decimal MontoMonxtr { get; set; }
+    public decimal MontoMonxtr { get; set; } = 0M;
 
     public Guid? UidBeneficiario { get; set; }
 
