@@ -43,6 +43,16 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
+    public Task<T> GetIsAprovalAsync<T>(string token, Guid id)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/isaproval?id={1}", _actionUrl, id.ToString()),
+            Token = token
+        });
+    }
+
     public Task<T> GetNextSecuentialNumberAsync<T>(
         string token, Guid bankAccountId, int fiscalYear, int fiscalMonth,
         short tipo, short subtipo, Enumeradores.ConsecutivoTipo consecutivo, bool isSave)

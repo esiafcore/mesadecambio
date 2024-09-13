@@ -6,6 +6,7 @@ public interface ITransaccionBcoService
 {
     Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber, int fiscalYear, int fiscalMonth);
     Task<T> GetAsync<T>(string token, Guid id);
+    Task<T> GetIsAprovalAsync<T>(string token, Guid id);
     Task<T> GetNextSecuentialNumberAsync<T>(
         string token, Guid bankAccountId, int fiscalYear, 
         int fiscalMonth, short tipo, short subtipo,

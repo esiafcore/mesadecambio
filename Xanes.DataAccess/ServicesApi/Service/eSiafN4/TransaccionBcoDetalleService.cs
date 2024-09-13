@@ -95,7 +95,7 @@ public class TransaccionBcoDetalleService : BaseService, ITransaccionBcoDetalleS
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Delete,
-            Url = string.Format("{0}/deletebyparent{1}", _actionUrl, id.ToString()),
+            Url = string.Format("{0}/deletebyparent?id={1}", _actionUrl, id.ToString()),
             Token = token
         });
     }

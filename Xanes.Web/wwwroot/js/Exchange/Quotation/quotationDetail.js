@@ -583,6 +583,7 @@ const fnClearModalTransfer = () => {
 
 const fnShowModalUpdateHeader = () => {
     $('#modalUpdateHeader').modal('show');
+    fnmakeModalDraggable("modalUpdateHeader");
 };
 
 const fnShowModalDeposit = async () => {
@@ -668,12 +669,12 @@ const fndeleteRow = async (id) => {
 };
 
 //Funcion para cerrar la cotizacion
-const fnClosed = async (id) => {
+const fnClosed = async (id, isReclosed = false) => {
 
     try {
         fntoggleLoading();
 
-        let url = `/exchange/quotation/Closed?id=${id}`;
+        let url = `/exchange/quotation/Closed?id=${id}&isReclosed=${isReclosed}`;
 
         const response = await fetch(url, {
             method: 'POST'
@@ -703,40 +704,41 @@ const fnClosed = async (id) => {
     }
 };
 
-//Funcion para re-cerrar la cotizacion
-const fnReClosed = async (id) => {
+////Funcion para re-cerrar la cotizacion
+//const fnReClosed = async (id) => {
 
-    try {
+//    try {
 
-        let url = `/exchange/quotation/ReClosed?id=${id}`;
+//        let url = `/exchange/quotation/ReClosed?id=${id}`;
 
-        const response = await fetch(url, {
-            method: 'POST'
-        });
+//        const response = await fetch(url, {
+//            method: 'POST'
+//        });
 
-        const jsonResponse = await response.json();
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            if (jsonResponse.urlRedirect) {
-                window.location.href = jsonResponse.urlRedirect;
-            }
-        }
+//        const jsonResponse = await response.json();
+//        if (!jsonResponse.isSuccess) {
+//            Swal.fire({
+//                icon: 'error',
+//                title: 'Error',
+//                text: jsonResponse.errorMessages
+//            });
+//        } else {
+//            if (jsonResponse.urlRedirect) {
+//                window.location.href = jsonResponse.urlRedirect;
+//            }
+//        }
 
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: "Error en la conexión",
-            text: e
-        });
-    }
-};
+//    } catch (e) {
+//        Swal.fire({
+//            icon: 'error',
+//            title: "Error en la conexión",
+//            text: e
+//        });
+//    }
+//};
 
 //Funcion para actualizar los detalles
+
 const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
     if (quotationDetailType == QuotationDetailType.Deposit) {
         document.querySelector("#staticBackdropLabelDeposit").innerHTML = "Actualizar Deposito";
