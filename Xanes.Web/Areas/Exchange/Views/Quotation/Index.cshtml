@@ -1,7 +1,8 @@
 ﻿@model TransactionReportVM
 
 <div class="card shadow border-0 mt-1">
-    <form method="post" id="formPrint" asp-area="Exchange" asp-controller="SystemInformation" asp-action="PrintTransaOperationList" target="_blank">
+    <form method="post" id="formPrint" asp-area="Exchange" asp-controller="SystemInformation"
+        asp-action="PrintTransaOperationList" target="_blank">
         <input asp-for="ReportType" value="@((short)SD.ReportTransaType.Operation)" name="ReportType" hidden />
         <input asp-for="DateTransaInitial" name="DateTransaInitial" type="date" id="dateInitialReport" hidden />
         <input asp-for="DateTransaFinal" name="DateTransaFinal" type="date" id="dateFinalReport" hidden />
@@ -9,20 +10,22 @@
             <div class="row align-items-center">
                 <div class="col-4 text-start">
                     <a class="btn btn-info border" asp-controller="Quotation" asp-action="Upsert"
-                       data-bs-toggle="tooltip" data-bs-trigger="hover"
-                       onclick="fnredirectBtnIndex(event)" data-bs-placement="top"
-                       data-bs-title="Nuevo Cotización">
+                        data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fnredirectBtnIndex(event)"
+                        data-bs-placement="top" data-bs-title="Nuevo Cotización">
                         <i class="bi bi-plus-circle"></i> Nuevo
                     </a>
-                    <button class="btn btn-secondary border" type="submit"
-                            data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fntoggleLoading('Generando Reporte...')"
-                            data-bs-placement="top" data-bs-title="Imprimir Operaciones">
+                    <button class="btn btn-outline-secondary border border-2" type="submit" data-bs-toggle="tooltip"
+                        data-bs-trigger="hover" onclick="fntoggleLoading('Generando Reporte...')"
+                        data-bs-placement="top" data-bs-title="Imprimir Operaciones">
                         <i class="bi bi-printer-fill"></i> Imprimir
                     </button>
-                    <a class="btn btn-success border"
-                            data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fnvalidContent()"
-                            data-bs-placement="top" data-bs-title="Exportar Operaciones a Excel">
+                    <a class="btn btn-success border" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                        onclick="fnvalidContent()" data-bs-placement="top" data-bs-title="Exportar Operaciones a Excel">
                         <i class="bi bi-journal-arrow-down"></i> Excel
+                    </a>
+                    <a class="btn btn-outline-info border border-2" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                        onclick="fnredirectBtnIndex(event)" data-bs-placement="top" data-bs-title="Regenerar Asientos">
+                        <i class="bi bi-arrow-left-right"></i> Asientos
                     </a>
                 </div>
                 <div class="col-4 text-center">
