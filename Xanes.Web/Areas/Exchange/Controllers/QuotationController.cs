@@ -2116,6 +2116,12 @@ public class QuotationController : Controller
                     return resultResponse;
                 }
 
+                if (detail.BankSourceTrx.BankAccountExcludeUId.HasValue)
+                {
+                    bankAccountList = bankAccountList
+                        .Where(x => x.UidRegist != detail.BankSourceTrx.BankAccountExcludeUId.Value).ToList();
+                }
+
                 bankAccountDto = bankAccountList
                     .FirstOrDefault(x => x.NumeroMoneda == (short)detail.CurrencyDetailTrx.Numeral);
 
@@ -2562,8 +2568,15 @@ public class QuotationController : Controller
                     return resultResponse;
                 }
 
+                if (detail.BankSourceTrx.BankAccountExcludeUId.HasValue)
+                {
+                    bankAccountList = bankAccountList
+                        .Where(x => x.UidRegist != detail.BankSourceTrx.BankAccountExcludeUId.Value).ToList();
+                }
+
                 bankAccountDto = bankAccountList
                     .FirstOrDefault(x => x.NumeroMoneda == (short)detail.CurrencyDetailTrx.Numeral);
+
 
                 if (bankAccountDto is null)
                 {
