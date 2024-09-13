@@ -6,6 +6,7 @@ using Xanes.DataAccess.Data;
 using Xanes.DataAccess.Repository;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Utility;
+using Xanes.Web;
 using Xanes.Web.CustomMiddleware;
 using Xanes.Web.Extensions;
 
@@ -15,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureLoggerService();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddAutoMapper(typeof(MappingConfig));
 builder.Services.ConfigureHttpClientService();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

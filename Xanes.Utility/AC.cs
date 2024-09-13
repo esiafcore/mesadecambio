@@ -5,6 +5,11 @@ public static class AC
     public const string SecretUserId = "DbConnection:UserId";
     public const string SecretUserPwd = "DbConnection:Password";
     public const string SecreteSiafN4CompanyUid = "eSiafN4CompanyUid";
+    public const string SecreteSiafN4BeneficiaryUid = "eSiafN4BeneficiaryUid";
+    public const string SecreteSiafN4EntityUid = "eSiafN4EntityUid";
+    public const string SecreteSiafN4CustomerName = "eSiafN4CustomerName";
+    public const string SecreteSiafN4CustomerIdentificationNumber = "eSiafN4CustomerIdentificationNumber";
+    
     public static string Si = "Si";
     public static string No = "No";
     public static string Error = "error";

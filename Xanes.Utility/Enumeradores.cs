@@ -140,5 +140,14 @@ public static class Enumeradores
         DebitExchangeDifferential = 64,
         CreditExchangeDifferential = 128
     }
+
+    public enum mexBeneficiaryTypeNumber : short
+    {
+        Employee = 1,
+        Customer = 2,
+        Vendor = 4,
+        Other = 8
+    }
+
 }
 
