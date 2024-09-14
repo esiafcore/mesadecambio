@@ -1837,314 +1837,73 @@ public class QuotationController : Controller
         }
     }
 
-    [HttpPost, ActionName("Closed")]
-    public async Task<JsonResult> ClosedPost(int id, bool isReclosed = false)
+    [HttpPost, ActionName("Regenerate")]
+    public async Task<JsonResult> RegenerateTransactions([FromBody] List<int> quotationIds)
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
-        APIResponse? srvResponse = new();
-        ConfigBcoDto? configBcoDto = new();
-        ConfigCntDto? configCntDto = new();
-
-        if (id == 0)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"El id es requerido";
-            return Json(jsonResponse);
-        }
 
         try
         {
-            var objHeader = _uow.Quotation
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-                    includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BusinessExecutiveTrx");
-            if (objHeader == null)
+            var transactionList = _uow.Quotation
+                .GetAll(filter: x => (x.CompanyId == _companyId)
+                                         && (quotationIds.Contains(x.Id))
+                                         && (x.IsClosed)
+                                         && (x.TypeNumeral != SD.QuotationType.Transport))
+                                        .ToList();
+
+            if (transactionList is null || transactionList.Count() == 0)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                jsonResponse.IsInfo = true;
+                jsonResponse.ErrorMessages = $"No hay operaciones";
                 return Json(jsonResponse);
             }
 
+            quotationIds = transactionList.Select(x => x.Id).ToList();
 
-            if (!objHeader.IsLoan && !objHeader.IsPayment)
+            foreach (var id in quotationIds)
             {
-                var objDetailList = _uow.QuotationDetail
-                .GetAll(filter: x => x.ParentId == objHeader.Id,
-                    includeProperties: "CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+                var resultResponse = await
+                    fnLogicGenerateTransactions(id);
 
-                if (objDetailList == null || objDetailList.Count == 0)
+                if (!resultResponse.IsSuccess)
                 {
                     jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = $"Detalles de Cotización no encontrados";
+                    jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
                     return Json(jsonResponse);
-                }
-
-                srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
-                if (srvResponse is null)
-                {
-                    jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                    return Json(jsonResponse);
-                }
-
-                if (srvResponse is { isSuccess: true })
-                {
-                    configBcoDto = JsonConvert.DeserializeObject<ConfigBcoDto>(Convert.ToString(srvResponse.result));
-
-                    if (configBcoDto is null)
-                    {
-                        jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Configuración bancaria no encontrada";
-                        return Json(jsonResponse);
-                    }
-
-                    if (configBcoDto.CuentacontableInterfaz == null || configBcoDto.CuentacontableInterfaz == Guid.Empty)
-                    {
-                        jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
-                        return Json(jsonResponse);
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return Json(jsonResponse);
-                }
-
-                srvResponse = await _srvConfigCnt.GetAsync<APIResponse>(_sessionToken);
-                if (srvResponse is null)
-                {
-                    jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                    return Json(jsonResponse);
-                }
-
-                if (srvResponse is { isSuccess: true })
-                {
-                    configCntDto = JsonConvert.DeserializeObject<ConfigCntDto>(Convert.ToString(srvResponse.result));
-
-                    if (configCntDto is null)
-                    {
-                        jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Configuración contable no encontrada";
-                        return Json(jsonResponse);
-                    }
-
-                    if (configCntDto.CuentaContableGananciaDiferencial == null || configCntDto.CuentaContableGananciaDiferencial == Guid.Empty)
-                    {
-                        jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Configuración contable cuentas contable de ganancia por dif. cambiario es requerida";
-                        return Json(jsonResponse);
-                    }
-
-                    if (configCntDto.CuentaContablePerdidaDiferencial == null || configCntDto.CuentaContablePerdidaDiferencial == Guid.Empty)
-                    {
-                        jsonResponse.IsSuccess = false;
-                        jsonResponse.ErrorMessages = $"Configuración contable cuentas contable de perdida por dif. cambiario es requerida";
-                        return Json(jsonResponse);
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return Json(jsonResponse);
-                }
-
-                foreach (var detail in objDetailList)
-                {
-                    ResultResponse? resultResponse = new();
-
-                    if (isReclosed)
-                    {
-                        if (detail.BankTransactionId.HasValue)
-                        {
-                            srvResponse = await _srvTransaBco.GetIsAprovalAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
-                            if (srvResponse is null)
-                            {
-                                jsonResponse.IsSuccess = false;
-                                jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                                return Json(jsonResponse);
-                            }
-
-                            if (srvResponse is { isSuccess: true })
-                            {
-                                var isaproval = JsonConvert.DeserializeObject<bool>(Convert.ToString(srvResponse.result));
-
-                                if (isaproval)
-                                {
-                                    objHeader.IsPosted = true;
-                                    objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-                                    objHeader.UpdatedDate = DateTime.UtcNow;
-                                    objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-                                    objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                                    _uow.Quotation.Update(objHeader);
-                                    _uow.Save();
-
-                                    jsonResponse.IsSuccess = false;
-                                    jsonResponse.ErrorMessages = $"No se puede re-cerrar, porque la transacción bancaria esta aprobada";
-                                    return Json(jsonResponse);
-                                }
-                                else
-                                {
-                                    //Eliminamos las transacciones relacionadas
-
-                                    srvResponse = await _srvTransaBcoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
-                                    if (srvResponse is null)
-                                    {
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                                        return Json(jsonResponse);
-                                    }
-                                    else if (srvResponse is { isSuccess: false })
-                                    {
-                                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                                        return Json(jsonResponse);
-                                    }
-
-                                    srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
-                                    if (srvResponse is null)
-                                    {
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                                        return Json(jsonResponse);
-                                    }
-                                    else if (srvResponse is { isSuccess: false })
-                                    {
-                                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                                        return Json(jsonResponse);
-                                    }
-
-                                    srvResponse = await _srvAsientoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, detail.JournalEntryId!.Value);
-                                    if (srvResponse is null)
-                                    {
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                                        return Json(jsonResponse);
-                                    }
-                                    else if (srvResponse is { isSuccess: false })
-                                    {
-                                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                                        return Json(jsonResponse);
-                                    }
-
-                                    srvResponse = await _srvAsiento.DeleteAsync<APIResponse>(_sessionToken, detail.JournalEntryId!.Value);
-                                    if (srvResponse is null)
-                                    {
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                                        return Json(jsonResponse);
-                                    }
-                                    else if (srvResponse is { isSuccess: false })
-                                    {
-                                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                                        jsonResponse.IsSuccess = false;
-                                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                                        return Json(jsonResponse);
-                                    }
-
-                                    detail.JournalEntryId = null;
-                                    detail.BankTransactionId = null;
-                                }
-                            }
-                            else if (srvResponse is { isSuccess: false })
-                            {
-                                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                                jsonResponse.IsSuccess = false;
-                                jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                                return Json(jsonResponse);
-                            }
-
-                        }
-                        TempData["success"] = $"Cotización re-cerrada correctamente";
-                        objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
-                        objHeader.ReClosedDate = DateTime.UtcNow;
-                        objHeader.ReClosedHostName = AC.LOCALHOSTPC;
-                        objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-
-                    }
-                    else
-                    {
-                        TempData["success"] = $"Cotización cerrada correctamente";
-
-                        var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
-                            x.TypeNumeral == objHeader.TypeNumeral &&
-                            x.DateTransa == objHeader.DateTransa &&
-                            x.InternalSerial == AC.InternalSerialOfficial);
-
-                        if (nextSeq == null)
-                        {
-                            jsonResponse.IsSuccess = false;
-                            jsonResponse.ErrorMessages = $"Consecutivo de cotización no encontrado";
-                            return Json(jsonResponse);
-                        }
-
-                        objHeader.IsClosed = true;
-                        objHeader.Numeral = nextSeq;
-                        objHeader.InternalSerial = AC.InternalSerialOfficial;
-                        objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-                        objHeader.ClosedDate = DateTime.UtcNow;
-                        objHeader.ClosedHostName = AC.LOCALHOSTPC;
-                        objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                    }
-
-                    if (detail.QuotationDetailType == QuotationDetailType.Deposit)
-                    {
-                        resultResponse = await
-                            fnLogicDeposit(objHeader, detail, configBcoDto);
-
-                        if (!resultResponse.IsSuccess || resultResponse.Data == null)
-                        {
-                            jsonResponse.IsSuccess = false;
-                            jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
-                            return Json(jsonResponse);
-                        }
-
-                        var detailUpdate = (QuotationDetail)resultResponse.Data;
-                        detailUpdate.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-                        detailUpdate.UpdatedDate = DateTime.UtcNow;
-                        detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
-                        detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                        _uow.QuotationDetail.Update(detailUpdate);
-                    }
-                    else
-                    {
-                        resultResponse = await
-                            fnLogicTransfer(objHeader, detail, configBcoDto, configCntDto);
-
-                        if (!resultResponse.IsSuccess || resultResponse.Data == null)
-                        {
-                            jsonResponse.IsSuccess = false;
-                            jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
-                            return Json(jsonResponse);
-                        }
-
-                        var detailUpdate = (QuotationDetail)resultResponse.Data;
-                        detailUpdate.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-                        detailUpdate.UpdatedDate = DateTime.UtcNow;
-                        detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
-                        detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                        _uow.QuotationDetail.Update(detailUpdate);
-                    }
                 }
             }
 
-            //Seteamos campos de auditoria
-            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.UpdatedDate = DateTime.UtcNow;
-            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            _uow.Quotation.Update(objHeader);
-            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            jsonResponse.SuccessMessages = "Se Regeneraron correctamente";
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost, ActionName("Closed")]
+    public async Task<JsonResult> ClosedPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+
+        try
+        {
+            var resultResponse = await
+                 fnLogicGenerateTransactions(id);
+
+            if (!resultResponse.IsSuccess)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
+                return Json(jsonResponse);
+            }
+
             jsonResponse.IsSuccess = true;
             jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
 
@@ -2155,6 +1914,393 @@ public class QuotationController : Controller
             jsonResponse.IsSuccess = false;
             jsonResponse.ErrorMessages = ex.Message.ToString();
             return Json(jsonResponse);
+        }
+    }
+
+    private async Task<ResultResponse> fnLogicGenerateTransactions(int id)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        APIResponse? srvResponse = new();
+        ConfigBcoDto? configBcoDto = new();
+        ConfigCntDto? configCntDto = new();
+        bool isReclosed = false;
+        try
+        {
+            if (id == 0)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = $"El id es requerido";
+                return resultResponse;
+            }
+
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
+                    includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BusinessExecutiveTrx");
+            if (objHeader == null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = $"Cotización no encontrada";
+                return resultResponse;
+            }
+
+            //Si esta cerrado entonces recerramos wey
+            isReclosed = (objHeader.IsClosed);
+
+            if (!objHeader.IsLoan && !objHeader.IsPayment && !objHeader.IsPosted)
+            {
+                var objDetailList = _uow.QuotationDetail
+                .GetAll(filter: x => x.ParentId == objHeader.Id,
+                    includeProperties: "CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+                if (objDetailList == null || objDetailList.Count == 0)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Detalles de Cotización no encontrados";
+                    return resultResponse;
+                }
+
+                resultResponse = await
+                    fnCheckChildrenPosted(objHeader, objDetailList, true);
+
+                if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataList == null)
+                {
+                    resultResponse.IsSuccess = false;
+                    return resultResponse;
+                }
+
+                objHeader = (Quotation)resultResponse.Data;
+                objDetailList = (List<QuotationDetail>)resultResponse.DataList;
+
+
+
+                srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
+                if (srvResponse is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return resultResponse;
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    configBcoDto = JsonConvert.DeserializeObject<ConfigBcoDto>(Convert.ToString(srvResponse.result));
+
+                    if (configBcoDto is null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages =  $"Configuración bancaria no encontrada";
+                        return resultResponse;
+                    }
+
+                    if (configBcoDto.CuentacontableInterfaz == null || configBcoDto.CuentacontableInterfaz == Guid.Empty)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
+                        return resultResponse;
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return resultResponse;
+                }
+
+                srvResponse = await _srvConfigCnt.GetAsync<APIResponse>(_sessionToken);
+                if (srvResponse is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return resultResponse;
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    configCntDto = JsonConvert.DeserializeObject<ConfigCntDto>(Convert.ToString(srvResponse.result));
+
+                    if (configCntDto is null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Configuración contable no encontrada";
+                        return resultResponse;
+                    }
+
+                    if (configCntDto.CuentaContableGananciaDiferencial == null || configCntDto.CuentaContableGananciaDiferencial == Guid.Empty)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Configuración contable cuentas contable de ganancia por dif. cambiario es requerida";
+                        return resultResponse;
+                    }
+
+                    if (configCntDto.CuentaContablePerdidaDiferencial == null || configCntDto.CuentaContablePerdidaDiferencial == Guid.Empty)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Configuración contable cuentas contable de perdida por dif. cambiario es requerida";
+                        return resultResponse;
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return resultResponse;
+                }
+
+                foreach (var detail in objDetailList)
+                {
+                    if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                    {
+                        resultResponse = await
+                            fnLogicDeposit(objHeader, detail, configBcoDto);
+
+                        if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                        {
+                            resultResponse.IsSuccess = false;
+                            return resultResponse;
+                        }
+
+                        var detailUpdate = (QuotationDetail)resultResponse.Data;
+                        detailUpdate.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+                        detailUpdate.UpdatedDate = DateTime.UtcNow;
+                        detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
+                        detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                        _uow.QuotationDetail.Update(detailUpdate);
+                    }
+                    else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
+                    {
+                        resultResponse = await
+                            fnLogicTransfer(objHeader, detail, configBcoDto, configCntDto);
+
+                        if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                        {
+                            resultResponse.IsSuccess = false;
+                            return resultResponse;
+                        }
+
+                        var detailUpdate = (QuotationDetail)resultResponse.Data;
+                        detailUpdate.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+                        detailUpdate.UpdatedDate = DateTime.UtcNow;
+                        detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
+                        detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                        _uow.QuotationDetail.Update(detailUpdate);
+                    }
+                }
+
+                if (isReclosed)
+                {
+                    TempData["success"] = $"Cotización re-cerrada correctamente";
+                    objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
+                    objHeader.ReClosedDate = DateTime.UtcNow;
+                    objHeader.ReClosedHostName = AC.LOCALHOSTPC;
+                    objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+
+                }
+                else
+                {
+                    TempData["success"] = $"Cotización cerrada correctamente";
+
+                    var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
+                        x.TypeNumeral == objHeader.TypeNumeral &&
+                        x.DateTransa == objHeader.DateTransa &&
+                        x.InternalSerial == AC.InternalSerialOfficial);
+
+                    if (nextSeq == null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Consecutivo de cotización no encontrado";
+                        return resultResponse;
+                    }
+
+                    objHeader.IsClosed = true;
+                    objHeader.Numeral = nextSeq;
+                    objHeader.InternalSerial = AC.InternalSerialOfficial;
+                    objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
+                    objHeader.ClosedDate = DateTime.UtcNow;
+                    objHeader.ClosedHostName = AC.LOCALHOSTPC;
+                    objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                }
+
+                //Seteamos campos de auditoria
+                objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+                objHeader.UpdatedDate = DateTime.UtcNow;
+                objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+                objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                _uow.Quotation.Update(objHeader);
+                _uow.Save();
+            }
+
+            resultResponse.IsSuccess = true;
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnCheckChildrenPosted(Quotation objHeader, List<QuotationDetail> objDetailList, bool isDeleteTransa)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        bool isPosted = true;
+        try
+        {
+            foreach (var detail in objDetailList)
+            {
+                if (detail.BankTransactionId.HasValue)
+                {
+                    var srvResponse = await _srvTransaBco.GetIsAprovalAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
+                    if (srvResponse is null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                        return resultResponse;
+                    }
+
+                    if (srvResponse is { isSuccess: true })
+                    {
+                        var isaproval = JsonConvert.DeserializeObject<bool>(Convert.ToString(srvResponse.result));
+
+                        if (isaproval)
+                        {
+                            detail.IsBankTransactionPosted = true;
+                            continue;
+                        }
+                        else
+                        {
+                            // Transacción no aprobada.
+                            isPosted = false;
+
+                            if (isDeleteTransa)
+                            {
+                                //Eliminamos las transacciones relacionadas
+                                resultResponse = await
+                                    fnDeleteTransactions(detail.BankTransactionId!.Value, detail.JournalEntryId!.Value);
+
+                                if (!resultResponse.IsSuccess)
+                                {
+                                    resultResponse.IsSuccess = false;
+                                    return resultResponse;
+                                }
+
+                                detail.JournalEntryId = null;
+                                detail.IsJournalEntryPosted = false;
+                                detail.BankTransactionId = null;
+                                detail.IsBankTransactionPosted = false;
+                            }
+                        }
+                    }
+                    else if (srvResponse is { isSuccess: false })
+                    {
+                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                        return resultResponse;
+                    }
+                }
+                else
+                {
+                    detail.IsBankTransactionPosted = false;
+                    isPosted = false;
+                }
+            }
+
+            // Actualizamos la cabecera si todas las transacciones están aprobadas.
+            objHeader.IsPosted = isPosted;
+
+            resultResponse.Data = objHeader;
+            resultResponse.DataList = objDetailList;
+            resultResponse.IsSuccess = true;
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnDeleteTransactions(Guid transaId, Guid asientoId)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+
+        try
+        {
+            var srvResponse = await _srvTransaBcoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, transaId);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, transaId);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            srvResponse = await _srvAsientoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, asientoId);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            srvResponse = await _srvAsiento.DeleteAsync<APIResponse>(_sessionToken, asientoId);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
         }
     }
 

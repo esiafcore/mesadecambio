@@ -840,6 +840,51 @@ const fnLoadDatatable = () => {
     });
 }
 
+const fngetIdsDatatable = async () => {
+    const result = await getfilteredDataFromDatatable(false);
+    if (result.isSuccess) {
+        await fnRegenerateTransaction(result.data);
+    }
+}
+
+const fnRegenerateTransaction = async (quotationIds) => {
+    try {
+
+        fntoggleLoading('Generando...');
+
+        const url = `/exchange/quotation/Regenerate`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            toastr.success(jsonResponse.successMessages);
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en la conexión',
+            text: e.message
+        });
+    } finally {
+        fntoggleLoading();
+    }
+};
+
 const fnvalidContent = async () => {
     const result = await getfilteredDataFromDatatable(false);
     // si se imprime
