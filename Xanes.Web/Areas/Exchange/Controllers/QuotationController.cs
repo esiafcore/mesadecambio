@@ -1840,7 +1840,7 @@ public class QuotationController : Controller
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
-
+        //ToDo : 
         try
         {
             var transactionList = _uow.Quotation
@@ -1971,9 +1971,9 @@ public class QuotationController : Controller
             }
 
             //Si esta cerrado entonces recerramos wey
-            isReclosed = (objHeader.IsClosed);
+            isReclosed = (objHeader.IsClosed & !objHeader.IsPosted);
 
-            if (!objHeader.IsLoan && !objHeader.IsPayment && !objHeader.IsPosted)
+            if (!objHeader.IsLoan && objHeader is {IsPayment: false, IsPosted: false})
             {
                 var objDetailList = _uow.QuotationDetail
                 .GetAll(filter: x => x.ParentId == objHeader.Id,
@@ -1995,8 +1995,8 @@ public class QuotationController : Controller
                     return resultResponse;
                 }
 
-                objHeader = (Quotation)resultResponse.Data;
-                objDetailList = (List<QuotationDetail>)resultResponse.DataList;
+                objHeader = (Quotation)resultResponse.Data!;
+                objDetailList = (List<QuotationDetail>)resultResponse.DataList!;
 
                 resultResponse = await fnGetConfigurations();
 
@@ -2013,7 +2013,7 @@ public class QuotationController : Controller
                 {
                     if (isReclosed)
                     {
-                        if (detail.BankTransactionId.HasValue && detail.JournalEntryId.HasValue)
+                        if (detail is {BankTransactionId: not null, JournalEntryId: not null})
                         {
                             //Eliminamos las transacciones relacionadas
                             resultResponse = await
@@ -2130,28 +2130,29 @@ public class QuotationController : Controller
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
-        bool isPosted = true;
+        var isPosted = true;
         List<string> errorsMessages = new();
 
         try
         {
+            //Actualizar en rango los detalles
             foreach (var detail in objDetailList)
             {
-                string tipo = string.Empty;
+                string typeName = string.Empty;
 
                 switch (detail.QuotationDetailType)
                 {
                     case QuotationDetailType.Deposit:
-                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.Deposit];
+                        typeName = QuotationDetailTypeName[(short)QuotationDetailType.Deposit];
                         break;
                     case QuotationDetailType.Transfer:
-                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.Transfer];
+                        typeName = QuotationDetailTypeName[(short)QuotationDetailType.Transfer];
                         break;
                     case QuotationDetailType.DebitTransfer:
-                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.DebitTransfer];
+                        typeName = QuotationDetailTypeName[(short)QuotationDetailType.DebitTransfer];
                         break;
                     case QuotationDetailType.CreditTransfer:
-                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.CreditTransfer];
+                        typeName = QuotationDetailTypeName[(short)QuotationDetailType.CreditTransfer];
                         break;
                 }
 
@@ -2172,7 +2173,15 @@ public class QuotationController : Controller
                         if (isaproval)
                         {
                             detail.IsBankTransactionPosted = true;
-                            errorsMessages.Add($" {tipo} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} -");
+                            var informationMessage = $" {typeName} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} -";
+                            if (errorsMessages.Count == 0)
+                            {
+                                errorsMessages.Add($"{informationMessage}");
+                            }
+                            else
+                            {
+                                errorsMessages.Add($"{informationMessage} {Environment.NewLine}");
+                            }
                         }
                         else
                         {
@@ -2220,10 +2229,11 @@ public class QuotationController : Controller
                 _uow.Quotation.Update(objHeader);
 
                 resultResponse.IsSuccess = false;
+                resultResponse.IsInfo = true;
                 resultResponse.ErrorMessages =
                     "Verificamos que la cotización está contabilizada, por lo que no se podrá re-cerrar";
+                return resultResponse;
             }
-
 
             resultResponse.Data = objHeader;
             resultResponse.DataList = objDetailList;
@@ -2319,7 +2329,7 @@ public class QuotationController : Controller
     private async Task<ResultResponse> fnLogicDeposit(Quotation objHeader, QuotationDetail detail, ConfigBcoDto configBcoDto)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
-
+        //Comentariar todo wey
         try
         {
             BancosDto? bankDto = new();
@@ -2355,6 +2365,17 @@ public class QuotationController : Controller
 
             bankAccountDto = (CuentasBancariasDto)resultResponse.Data;
 
+            resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.Deposit);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
+            {
+                resultResponse.IsSuccess = false;
+                return resultResponse;
+            }
+
+            moduloDto = (ModulosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+
             short tipo = (short)(TransaccionBcoTipo.Deposito);
             short subtipo = (short)(TransaccionBcoDepositoSubtipo.Deposito);
 
@@ -2371,6 +2392,22 @@ public class QuotationController : Controller
             }
 
             transaResponse = (TransaccionResponse)resultResponse.Data;
+
+            string numberTransaCnt = string.Empty;
+
+            resultResponse = await fnGetNextSecuential(
+                mexModules.Account,
+                bankAccountDto.UidRegist,
+                objHeader.DateTransa.Year,
+                objHeader.DateTransa.Month, tipo, subtipo);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
+            {
+                resultResponse.IsSuccess = false;
+                return resultResponse;
+            }
+
+            numberTransaCnt = (string)resultResponse.Data;
 
             decimal exchangeRate = objHeader.TypeNumeral switch
             {
@@ -2447,17 +2484,6 @@ public class QuotationController : Controller
             detail.BankTransactionId = transaBcoDto.UidRegist;
             detail.IsBankTransactionPosted = false;
 
-            resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.Deposit);
-
-            if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
-            {
-                resultResponse.IsSuccess = false;
-                return resultResponse;
-            }
-
-            moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
-
             //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
             {
@@ -2524,22 +2550,6 @@ public class QuotationController : Controller
 
             //Agg a la lista
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
-
-            string numberTransaCnt = string.Empty;
-
-            resultResponse = await fnGetNextSecuential(
-                mexModules.Account,
-                bankAccountDto.UidRegist,
-                objHeader.DateTransa.Year,
-                objHeader.DateTransa.Month, tipo, subtipo);
-
-            if (!resultResponse.IsSuccess || resultResponse.Data == null)
-            {
-                resultResponse.IsSuccess = false;
-                return resultResponse;
-            }
-
-            numberTransaCnt = (string)resultResponse.Data;
 
             //Creamos el comprobante
             AsientosContablesDtoCreate asientoCnt = new()
@@ -2923,7 +2933,7 @@ public class QuotationController : Controller
                 transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
                 //Actualizamos el numero de lineas del padre
-                transaBcoDto.NumeroLineas = 3;
+                transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
             }
 
             string numberTransaCnt = string.Empty;
