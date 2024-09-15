@@ -682,11 +682,7 @@ const fnClosed = async (id, isReclosed = false) => {
 
         const jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
+            fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
         } else {
             if (jsonResponse.urlRedirect) {
                 window.location.href = jsonResponse.urlRedirect;

@@ -19,6 +19,8 @@ public static class AC
     public const int DecimalExchange = 4;
     public const int ParDecimalExchange = 4;
     public const int DecimalExchangeDouble = 8;
+    public static string DecimalTransaFormat = "0,0.00";
+
     public const string XlsFormatRateExchange = "#,##0.0000";
     public static char SeparationCharProperties = ',';
 

@@ -1837,6 +1837,8 @@ public class QuotationController : Controller
         }
     }
 
+    #region Contabilización
+
     [HttpPost, ActionName("Regenerate")]
     public async Task<JsonResult> RegenerateTransactions([FromBody] List<int> quotationIds)
     {
@@ -1866,6 +1868,19 @@ public class QuotationController : Controller
             {
                 var resultResponse = await
                     fnLogicGenerateTransactions(id);
+
+                if (resultResponse.IsInfo && resultResponse.Data != null)
+                {
+                    jsonResponse.IsSuccess = false;
+                    var errorList = (List<string>)resultResponse.Data;
+                    foreach (var error in errorList)
+                    {
+                        jsonResponse.ErrorMessages += error + Environment.NewLine;
+                    }
+
+                    jsonResponse.IsWarning = true;
+                    return Json(jsonResponse);
+                }
 
                 if (!resultResponse.IsSuccess)
                 {
@@ -1897,9 +1912,24 @@ public class QuotationController : Controller
             var resultResponse = await
                  fnLogicGenerateTransactions(id);
 
+            if (resultResponse.IsInfo && resultResponse.Data != null)
+            {
+                jsonResponse.IsSuccess = false;
+                var errorList = (List<string>)resultResponse.Data;
+                foreach (var error in errorList)
+                {
+                    jsonResponse.ErrorMessages += error + Environment.NewLine;
+                }
+
+                jsonResponse.TitleMessages = "Detalles Contabilizados";
+                jsonResponse.IsWarning = true;
+                return Json(jsonResponse);
+            }
+
             if (!resultResponse.IsSuccess)
             {
                 jsonResponse.IsSuccess = false;
+                jsonResponse.TitleMessages = AC.Error.ToUpper();
                 jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
                 return Json(jsonResponse);
             }
@@ -1912,6 +1942,7 @@ public class QuotationController : Controller
         catch (Exception ex)
         {
             jsonResponse.IsSuccess = false;
+            jsonResponse.TitleMessages = AC.Error.ToUpper();
             jsonResponse.ErrorMessages = ex.Message.ToString();
             return Json(jsonResponse);
         }
@@ -1920,8 +1951,6 @@ public class QuotationController : Controller
     private async Task<ResultResponse> fnLogicGenerateTransactions(int id)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
-        StringBuilder errorsMessagesBuilder = new();
-        APIResponse? srvResponse = new();
         ConfigBcoDto? configBcoDto = new();
         ConfigCntDto? configCntDto = new();
         bool isReclosed = false;
@@ -1937,6 +1966,7 @@ public class QuotationController : Controller
             var objHeader = _uow.Quotation
                 .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
                     includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BusinessExecutiveTrx");
+
             if (objHeader == null)
             {
                 resultResponse.IsSuccess = false;
@@ -1961,9 +1991,9 @@ public class QuotationController : Controller
                 }
 
                 resultResponse = await
-                    fnCheckChildrenPosted(objHeader, objDetailList, true);
+                    fnCheckChildrenPosted(objHeader, objDetailList);
 
-                if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataList == null)
+                if (!resultResponse.IsSuccess || resultResponse.IsInfo)
                 {
                     resultResponse.IsSuccess = false;
                     return resultResponse;
@@ -1972,85 +2002,41 @@ public class QuotationController : Controller
                 objHeader = (Quotation)resultResponse.Data;
                 objDetailList = (List<QuotationDetail>)resultResponse.DataList;
 
+                resultResponse = await fnGetConfigurations();
 
-
-                srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
-                if (srvResponse is null)
+                if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                     return resultResponse;
                 }
 
-                if (srvResponse is { isSuccess: true })
-                {
-                    configBcoDto = JsonConvert.DeserializeObject<ConfigBcoDto>(Convert.ToString(srvResponse.result));
-
-                    if (configBcoDto is null)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages =  $"Configuración bancaria no encontrada";
-                        return resultResponse;
-                    }
-
-                    if (configBcoDto.CuentacontableInterfaz == null || configBcoDto.CuentacontableInterfaz == Guid.Empty)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
-                        return resultResponse;
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return resultResponse;
-                }
-
-                srvResponse = await _srvConfigCnt.GetAsync<APIResponse>(_sessionToken);
-                if (srvResponse is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                    return resultResponse;
-                }
-
-                if (srvResponse is { isSuccess: true })
-                {
-                    configCntDto = JsonConvert.DeserializeObject<ConfigCntDto>(Convert.ToString(srvResponse.result));
-
-                    if (configCntDto is null)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Configuración contable no encontrada";
-                        return resultResponse;
-                    }
-
-                    if (configCntDto.CuentaContableGananciaDiferencial == null || configCntDto.CuentaContableGananciaDiferencial == Guid.Empty)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Configuración contable cuentas contable de ganancia por dif. cambiario es requerida";
-                        return resultResponse;
-                    }
-
-                    if (configCntDto.CuentaContablePerdidaDiferencial == null || configCntDto.CuentaContablePerdidaDiferencial == Guid.Empty)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Configuración contable cuentas contable de perdida por dif. cambiario es requerida";
-                        return resultResponse;
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return resultResponse;
-                }
+                configBcoDto = (ConfigBcoDto)resultResponse.Data;
+                configCntDto = (ConfigCntDto)resultResponse.DataChildren;
 
                 foreach (var detail in objDetailList)
                 {
+                    if (isReclosed)
+                    {
+                        if (detail.BankTransactionId.HasValue && detail.JournalEntryId.HasValue)
+                        {
+                            //Eliminamos las transacciones relacionadas
+                            resultResponse = await
+                                fnDeleteTransactions(detail.BankTransactionId!.Value, detail.JournalEntryId!.Value);
+
+                            if (!resultResponse.IsSuccess)
+                            {
+                                resultResponse.IsSuccess = false;
+                                return resultResponse;
+                            }
+
+                            detail.JournalEntryId = null;
+                            detail.IsJournalEntryPosted = false;
+                            detail.BankTransactionId = null;
+                            detail.IsBankTransactionPosted = false;
+                        }
+
+                    }
+
                     if (detail.QuotationDetailType == QuotationDetailType.Deposit)
                     {
                         resultResponse = await
@@ -2143,15 +2129,36 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnCheckChildrenPosted(Quotation objHeader, List<QuotationDetail> objDetailList, bool isDeleteTransa)
+    private async Task<ResultResponse> fnCheckChildrenPosted(
+        Quotation objHeader, List<QuotationDetail> objDetailList)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
         bool isPosted = true;
+        List<string> errorsMessages = new();
+
         try
         {
             foreach (var detail in objDetailList)
             {
+                string tipo = string.Empty;
+
+                switch (detail.QuotationDetailType)
+                {
+                    case QuotationDetailType.Deposit:
+                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.Deposit];
+                        break;
+                    case QuotationDetailType.Transfer:
+                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.Transfer];
+                        break;
+                    case QuotationDetailType.DebitTransfer:
+                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.DebitTransfer];
+                        break;
+                    case QuotationDetailType.CreditTransfer:
+                        tipo = QuotationDetailTypeName[(short)QuotationDetailType.CreditTransfer];
+                        break;
+                }
+
                 if (detail.BankTransactionId.HasValue)
                 {
                     var srvResponse = await _srvTransaBco.GetIsAprovalAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
@@ -2169,30 +2176,12 @@ public class QuotationController : Controller
                         if (isaproval)
                         {
                             detail.IsBankTransactionPosted = true;
-                            continue;
+                            errorsMessages.Add($" {tipo} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} -");
                         }
                         else
                         {
-                            // Transacción no aprobada.
+                            detail.IsBankTransactionPosted = false;
                             isPosted = false;
-
-                            if (isDeleteTransa)
-                            {
-                                //Eliminamos las transacciones relacionadas
-                                resultResponse = await
-                                    fnDeleteTransactions(detail.BankTransactionId!.Value, detail.JournalEntryId!.Value);
-
-                                if (!resultResponse.IsSuccess)
-                                {
-                                    resultResponse.IsSuccess = false;
-                                    return resultResponse;
-                                }
-
-                                detail.JournalEntryId = null;
-                                detail.IsJournalEntryPosted = false;
-                                detail.BankTransactionId = null;
-                                detail.IsBankTransactionPosted = false;
-                            }
                         }
                     }
                     else if (srvResponse is { isSuccess: false })
@@ -2208,10 +2197,37 @@ public class QuotationController : Controller
                     detail.IsBankTransactionPosted = false;
                     isPosted = false;
                 }
+
+                detail.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+                detail.UpdatedDate = DateTime.UtcNow;
+                detail.UpdatedHostName = AC.LOCALHOSTPC;
+                detail.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                _uow.QuotationDetail.Update(detail);
             }
 
-            // Actualizamos la cabecera si todas las transacciones están aprobadas.
-            objHeader.IsPosted = isPosted;
+            if (!isPosted)
+            {
+                if (errorsMessages.Count != 0)
+                {
+                    resultResponse.IsSuccess = true;
+                    resultResponse.IsInfo = true;
+                    resultResponse.Data = errorsMessages;
+                }
+            }
+            else
+            {
+                objHeader.IsPosted = true;
+                objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+                objHeader.UpdatedDate = DateTime.UtcNow;
+                objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+                objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+                _uow.Quotation.Update(objHeader);
+
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages =
+                    "Verificamos que la cotización está contabilizada, por lo que no se podrá re-cerrar";
+            }
+
 
             resultResponse.Data = objHeader;
             resultResponse.DataList = objDetailList;
@@ -2312,7 +2328,6 @@ public class QuotationController : Controller
         try
         {
             BancosDto? bankDto = new();
-            List<CuentasBancariasDto>? bankAccountList = new();
             CuentasBancariasDto? bankAccountDto = new();
             TransaccionResponse? transaResponse = new();
             TransaccionesBcoDto? transaBcoDto = new();
@@ -2323,90 +2338,43 @@ public class QuotationController : Controller
             ModulosDto? moduloDto = new();
             ModulosDocumentosDto? moduloDocumentoDto = new();
 
-            var srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, detail.BankSourceTrx.Code);
-            if (srvResponse is null)
+            resultResponse = await fnGetBank(detail.BankSourceTrx.Code);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                bankDto = JsonConvert.DeserializeObject<BancosDto>(Convert.ToString(srvResponse.result));
+            bankDto = (BancosDto)resultResponse.Data;
 
-                if (bankDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Banco: {detail.BankSourceTrx.Code} no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
+            resultResponse = await fnGetBankAccount(
+                bankDto.Codigo,
+                detail.BankSourceTrx.BankAccountExcludeUId,
+                (short)detail.CurrencyDetailTrx.Numeral);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
                 return resultResponse;
             }
 
-            srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankDto.Codigo);
-            if (srvResponse is null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                return resultResponse;
-            }
-
-            if (srvResponse is { isSuccess: true })
-            {
-                bankAccountList = JsonConvert.DeserializeObject<List<CuentasBancariasDto>>(Convert.ToString(srvResponse.result));
-
-                if (bankAccountList is null || bankAccountList.Count == 0)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Cuentas bancarias para el banco: {bankDto.Codigo} no encontradas";
-                    return resultResponse;
-                }
-
-                if (detail.BankSourceTrx.BankAccountExcludeUId.HasValue)
-                {
-                    bankAccountList = bankAccountList
-                        .Where(x => x.UidRegist != detail.BankSourceTrx.BankAccountExcludeUId.Value).ToList();
-                }
-
-                bankAccountDto = bankAccountList
-                    .FirstOrDefault(x => x.NumeroMoneda == (short)detail.CurrencyDetailTrx.Numeral);
-
-                if (bankAccountDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  "Cuenta bancaria no encontrada";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            bankAccountDto = (CuentasBancariasDto)resultResponse.Data;
 
             short tipo = (short)(TransaccionBcoTipo.Deposito);
             short subtipo = (short)(TransaccionBcoDepositoSubtipo.Deposito);
 
-            srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
+            var srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
                 _sessionToken, bankAccountDto.UidRegist,
                 objHeader.DateTransa.Year, objHeader.DateTransa.Month,
                 tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
                 resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
-
             if (srvResponse is { isSuccess: true })
             {
                 transaResponse = JsonConvert.DeserializeObject<TransaccionResponse>(Convert.ToString(srvResponse.result));
@@ -2501,64 +2469,18 @@ public class QuotationController : Controller
             detail.BankTransactionId = transaBcoDto.UidRegist;
             detail.IsBankTransactionPosted = false;
 
-            srvResponse = await _srvModulo.GetByNumberAsync<APIResponse>(_sessionToken, (int)mexModules.Bank);
-            if (srvResponse is null)
+            resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.Deposit);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                moduloDto = JsonConvert.DeserializeObject<ModulosDto>(Convert.ToString(srvResponse.result));
+            moduloDto = (ModulosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
 
-                if (moduloDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Modulo bancario no encontrado";
-                    return resultResponse;
-                }
-
-                srvResponse =
-                    await _srvModuloDocumento.GetByNumberAsync<APIResponse>(_sessionToken, moduloDto.UidRegist,
-                        (int)mexModuleBankDocument.Deposit);
-                if (srvResponse is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                    return resultResponse;
-                }
-
-                if (srvResponse is { isSuccess: true })
-                {
-                    moduloDocumentoDto = JsonConvert.DeserializeObject<ModulosDocumentosDto>(Convert.ToString(srvResponse.result));
-
-                    if (moduloDocumentoDto is null)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Modulo documento bancario no encontrado";
-                        return resultResponse;
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return resultResponse;
-                }
-
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
-
-            //Crear detalles
+            //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
             {
                 UidDocumento = moduloDocumentoDto.UidRegist,
@@ -2588,8 +2510,10 @@ public class QuotationController : Controller
 
             transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
 
+            //Agg a la lista
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
+            //Creamos el segundo detalle
             transaBcoDetalle = new()
             {
                 UidRegist = Guid.Empty,
@@ -2620,6 +2544,7 @@ public class QuotationController : Controller
 
             transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
 
+            //Agg a la lista
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
             string numberTransaCnt = string.Empty;
@@ -2628,6 +2553,7 @@ public class QuotationController : Controller
                 _sessionToken, bankAccountDto.UidRegist,
                 objHeader.DateTransa.Year, objHeader.DateTransa.Month,
                 tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -2654,6 +2580,7 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
+            //Creamos el comprobante
             AsientosContablesDtoCreate asientoCnt = new()
             {
                 UidModuloDocumento = moduloDocumentoDto.UidRegist,
@@ -2695,12 +2622,13 @@ public class QuotationController : Controller
 
             asientoDto = (AsientosContablesDto)resultResponse.Data!;
 
+            //Agg el id al detalle de la cotización
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
             foreach (var detailTransa in transaBcoDetalleDtoList)
             {
-                //Crear detalles
+                //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
                 {
                     UidDocumento = moduloDocumentoDto.UidRegist,
@@ -2721,18 +2649,16 @@ public class QuotationController : Controller
                 resultResponse = await
                     fnCreateJournalDetail(asientoDetalle);
 
-                if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                if (!resultResponse.IsSuccess)
                 {
                     resultResponse.IsSuccess = false;
                     return resultResponse;
                 }
-
-                asientoDetalleDto = (AsientosContablesDetalleDto)resultResponse.Data!;
-
-            };
+            }
 
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
+
             var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
@@ -2764,7 +2690,6 @@ public class QuotationController : Controller
         try
         {
             BancosDto? bankDto = new();
-            List<CuentasBancariasDto>? bankAccountList = new();
             CuentasBancariasDto? bankAccountDto = new();
             TransaccionResponse? transaResponse = new();
             TransaccionesBcoDto? transaBcoDto = new();
@@ -2775,84 +2700,37 @@ public class QuotationController : Controller
             ModulosDto? moduloDto = new();
             ModulosDocumentosDto? moduloDocumentoDto = new();
 
-            var srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, detail.BankSourceTrx.Code);
-            if (srvResponse is null)
+            resultResponse = await fnGetBank(detail.BankSourceTrx.Code);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                bankDto = JsonConvert.DeserializeObject<BancosDto>(Convert.ToString(srvResponse.result));
+            bankDto = (BancosDto)resultResponse.Data;
 
-                if (bankDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Banco: {detail.BankSourceTrx.Code} no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
+            resultResponse = await fnGetBankAccount(
+                bankDto.Codigo,
+                detail.BankSourceTrx.BankAccountExcludeUId,
+                (short)detail.CurrencyDetailTrx.Numeral);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
                 return resultResponse;
             }
 
-            srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankDto.Codigo);
-            if (srvResponse is null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                return resultResponse;
-            }
-
-            if (srvResponse is { isSuccess: true })
-            {
-                bankAccountList = JsonConvert.DeserializeObject<List<CuentasBancariasDto>>(Convert.ToString(srvResponse.result));
-
-                if (bankAccountList is null || bankAccountList.Count == 0)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Cuentas bancarias para el banco: {bankDto.Codigo} no encontradas";
-                    return resultResponse;
-                }
-
-                if (detail.BankSourceTrx.BankAccountExcludeUId.HasValue)
-                {
-                    bankAccountList = bankAccountList
-                        .Where(x => x.UidRegist != detail.BankSourceTrx.BankAccountExcludeUId.Value).ToList();
-                }
-
-                bankAccountDto = bankAccountList
-                    .FirstOrDefault(x => x.NumeroMoneda == (short)detail.CurrencyDetailTrx.Numeral);
-
-
-                if (bankAccountDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  "Cuenta bancaria no encontrada";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            bankAccountDto = (CuentasBancariasDto)resultResponse.Data;
 
             short tipo = (short)(TransaccionBcoTipo.Pago);
             short subtipo = (short)(TransaccionBcoPagoSubtipo.MesaCambio);
 
-            srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
+            var srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
                 _sessionToken, bankAccountDto.UidRegist,
                 objHeader.DateTransa.Year, objHeader.DateTransa.Month,
                 tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -2895,6 +2773,7 @@ public class QuotationController : Controller
                 exchangeRateTransa, exchangeRateTransa,
                 decimalTrx: AC.DecimalTransa);
 
+            //Creamos transaccion bancaria
             TransaccionesBcoDtoCreate transaBco = new()
             {
                 IndMesaDeCambio = true,
@@ -2959,72 +2838,27 @@ public class QuotationController : Controller
 
             transaBcoDto = (TransaccionesBcoDto)resultResponse.Data!;
 
+            //Agg referencia al detalle de la cotización
             detail.BankTransactionId = transaBcoDto.UidRegist;
             detail.IsBankTransactionPosted = false;
 
-            srvResponse = await _srvModulo.GetByNumberAsync<APIResponse>(_sessionToken, (int)mexModules.Bank);
-            if (srvResponse is null)
+            resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.Check);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                moduloDto = JsonConvert.DeserializeObject<ModulosDto>(Convert.ToString(srvResponse.result));
-
-                if (moduloDto is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Modulo bancario no encontrado";
-                    return resultResponse;
-                }
-
-                srvResponse =
-                    await _srvModuloDocumento.GetByNumberAsync<APIResponse>(_sessionToken, moduloDto.UidRegist,
-                        (int)mexModuleBankDocument.Check);
-                if (srvResponse is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                    return resultResponse;
-                }
-
-                if (srvResponse is { isSuccess: true })
-                {
-                    moduloDocumentoDto = JsonConvert.DeserializeObject<ModulosDocumentosDto>(Convert.ToString(srvResponse.result));
-
-                    if (moduloDocumentoDto is null)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Modulo documento bancario no encontrado";
-                        return resultResponse;
-                    }
-                }
-                else if (srvResponse is { isSuccess: false })
-                {
-                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                    return resultResponse;
-                }
-
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            moduloDto = (ModulosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
 
             mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRateOficial, exchangeRateOficial,
                 decimalTrx: AC.DecimalTransa);
 
 
-            //Crear detalles
+            //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
             {
                 UidDocumento = moduloDocumentoDto.UidRegist,
@@ -3058,13 +2892,14 @@ public class QuotationController : Controller
 
             transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
 
+            //Agg al detalle
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
             mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRateTransa, exchangeRateTransa,
                 decimalTrx: AC.DecimalTransa);
 
-
+            //Creamos el segundo detalle
             transaBcoDetalle = new()
             {
                 UidRegist = Guid.Empty,
@@ -3097,10 +2932,10 @@ public class QuotationController : Controller
 
             transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
 
+            //Agg al listado
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
-
-            //Tercer
+            //Si tiene ingreso o costo agg el tercer detalle
             if (objHeader.AmountCost != 0 || objHeader.AmountRevenue != 0)
             {
 
@@ -3111,6 +2946,7 @@ public class QuotationController : Controller
                     ? configCntDto.CuentaContableGananciaDiferencial!.Value
                         : configCntDto.CuentaContablePerdidaDiferencial!.Value);
 
+                //Creamos el tercer detalle
                 transaBcoDetalle = new()
                 {
                     UidRegist = Guid.Empty,
@@ -3139,9 +2975,10 @@ public class QuotationController : Controller
 
                 transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
 
+                //Agg al listado
                 transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
-                //Actualizar el padre
+                //Actualizamos el numero de lineas del padre
                 transaBcoDto.NumeroLineas = 3;
             }
 
@@ -3151,6 +2988,7 @@ public class QuotationController : Controller
                 _sessionToken, bankAccountDto.UidRegist,
                 objHeader.DateTransa.Year, objHeader.DateTransa.Month,
                 tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -3177,6 +3015,7 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
+            //Creamos el comprobante
             AsientosContablesDtoCreate asientoCnt = new()
             {
                 UidModuloDocumento = moduloDocumentoDto.UidRegist,
@@ -3218,12 +3057,13 @@ public class QuotationController : Controller
 
             asientoDto = (AsientosContablesDto)resultResponse.Data!;
 
+            //Agg referencia al detalle de la cotizacion
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
             foreach (var detailTransa in transaBcoDetalleDtoList)
             {
-                //Crear detalles
+                //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
                 {
                     UidDocumento = moduloDocumentoDto.UidRegist,
@@ -3244,17 +3084,16 @@ public class QuotationController : Controller
                 resultResponse = await
                     fnCreateJournalDetail(asientoDetalle);
 
-                if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                if (!resultResponse.IsSuccess)
                 {
                     resultResponse.IsSuccess = false;
                     return resultResponse;
                 }
-
-                asientoDetalleDto = (AsientosContablesDetalleDto)resultResponse.Data!;
             };
 
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
+
             var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
@@ -3480,7 +3319,6 @@ public class QuotationController : Controller
                 }
 
                 resultResponse.IsSuccess = true;
-                resultResponse.Data = asientoDetalleDto;
             }
             else if (srvResponse is { isSuccess: false })
             {
@@ -3500,6 +3338,296 @@ public class QuotationController : Controller
         }
     }
 
+    private async Task<ResultResponse> fnGetBank(string bankCode)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        BancosDto? bankDto = new();
+        try
+        {
+            var srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, bankCode);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                bankDto = JsonConvert.DeserializeObject<BancosDto>(Convert.ToString(srvResponse.result));
+
+                if (bankDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Banco: {bankCode} no encontrado";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            resultResponse.Data = bankDto;
+
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnGetBankAccount(string bankCode, Guid? bankAccountExcludeId, short currencyType)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        List<CuentasBancariasDto>? bankAccountList = new();
+        CuentasBancariasDto? bankAccountDto = new();
+        try
+        {
+            var srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankCode);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                bankAccountList = JsonConvert.DeserializeObject<List<CuentasBancariasDto>>(Convert.ToString(srvResponse.result));
+
+                if (bankAccountList is null || bankAccountList.Count == 0)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Cuentas bancarias para el banco: {bankCode} no encontradas";
+                    return resultResponse;
+                }
+
+                if (bankAccountExcludeId.HasValue)
+                {
+                    bankAccountList = bankAccountList
+                        .Where(x => x.UidRegist != bankAccountExcludeId.Value).ToList();
+                }
+
+                bankAccountDto = bankAccountList
+                    .FirstOrDefault(x => x.NumeroMoneda == currencyType);
+
+                if (bankAccountDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages =  "Cuenta bancaria no encontrada";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            resultResponse.Data = bankAccountDto;
+
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnGetDocument(int numberModule, int numberDocument)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        ModulosDto? moduloDto = new();
+        ModulosDocumentosDto? moduloDocumentoDto = new();
+        try
+        {
+            var srvResponse = await _srvModulo
+                .GetByNumberAsync<APIResponse>(_sessionToken, numberModule);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                moduloDto = JsonConvert.DeserializeObject<ModulosDto>(Convert.ToString(srvResponse.result));
+
+                if (moduloDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Modulo bancario no encontrado";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            srvResponse =
+                await _srvModuloDocumento
+                    .GetByNumberAsync<APIResponse>(_sessionToken, moduloDto.UidRegist,
+                    numberDocument);
+
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                moduloDocumentoDto = JsonConvert.DeserializeObject<ModulosDocumentosDto>(Convert.ToString(srvResponse.result));
+
+                if (moduloDocumentoDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Modulo documento bancario no encontrado";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            resultResponse.Data = moduloDto;
+            resultResponse.DataChildren = moduloDocumentoDto;
+
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnGetConfigurations()
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        ConfigBcoDto? configBcoDto = new();
+        ConfigCntDto? configCntDto = new();
+        try
+        {
+            var srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                configBcoDto = JsonConvert.DeserializeObject<ConfigBcoDto>(Convert.ToString(srvResponse.result));
+
+                if (configBcoDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages =  $"Configuración bancaria no encontrada";
+                    return resultResponse;
+                }
+
+                if (configBcoDto.CuentacontableInterfaz == null || configBcoDto.CuentacontableInterfaz == Guid.Empty)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            srvResponse = await _srvConfigCnt.GetAsync<APIResponse>(_sessionToken);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+
+            if (srvResponse is { isSuccess: true })
+            {
+                configCntDto = JsonConvert.DeserializeObject<ConfigCntDto>(Convert.ToString(srvResponse.result));
+
+                if (configCntDto is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración contable no encontrada";
+                    return resultResponse;
+                }
+
+                if (configCntDto.CuentaContableGananciaDiferencial == null || configCntDto.CuentaContableGananciaDiferencial == Guid.Empty)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración contable cuentas contable de ganancia por dif. cambiario es requerida";
+                    return resultResponse;
+                }
+
+                if (configCntDto.CuentaContablePerdidaDiferencial == null || configCntDto.CuentaContablePerdidaDiferencial == Guid.Empty)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración contable cuentas contable de perdida por dif. cambiario es requerida";
+                    return resultResponse;
+                }
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            resultResponse.Data = configBcoDto;
+            resultResponse.DataChildren = configCntDto;
+
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    #endregion
 
     [HttpPost, ActionName("Void")]
     public JsonResult VoidPost(int id)

@@ -117,6 +117,16 @@ public static class SD
         DebitTransfer = 8
     }
 
+    public static Dictionary<short, string> QuotationDetailTypeName = new()
+    {
+        { (short)QuotationDetailType.Deposit,"Deposito"},
+        { (short)QuotationDetailType.Transfer,"Transferencia"},
+        { (short)QuotationDetailType.DebitTransfer,"Transferencia de Credito"},
+        { (short)QuotationDetailType.CreditTransfer,"Transferencia de Debito"}
+    };
+
+
+
     [Flags]
     public enum ReportTransaType : short
     {

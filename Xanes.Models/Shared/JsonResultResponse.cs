@@ -15,6 +15,7 @@ public class JsonResultResponse
     public bool IsSuccess { get; set; }
     public bool IsInfo { get; set; }
     public bool IsWarning { get; set; }
+    public string TitleMessages { get; set; }
     public string ErrorMessages { get; set; }
     public string SuccessMessages { get; set; }
     public string DurationTime { get; set; } = null!;
