@@ -2323,7 +2323,6 @@ public class QuotationController : Controller
     private async Task<ResultResponse> fnLogicDeposit(Quotation objHeader, QuotationDetail detail, ConfigBcoDto configBcoDto)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
-        StringBuilder errorsMessagesBuilder = new();
 
         try
         {
@@ -2332,7 +2331,6 @@ public class QuotationController : Controller
             TransaccionResponse? transaResponse = new();
             TransaccionesBcoDto? transaBcoDto = new();
             AsientosContablesDto? asientoDto = new();
-            AsientosContablesDetalleDto? asientoDetalleDto = new();
             TransaccionesBcoDetalleDto? transaBcoDetalleDto = new();
             List<TransaccionesBcoDetalleDto>? transaBcoDetalleDtoList = new();
             ModulosDto? moduloDto = new();
@@ -2364,35 +2362,19 @@ public class QuotationController : Controller
             short tipo = (short)(TransaccionBcoTipo.Deposito);
             short subtipo = (short)(TransaccionBcoDepositoSubtipo.Deposito);
 
-            var srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
-                _sessionToken, bankAccountDto.UidRegist,
-                objHeader.DateTransa.Year, objHeader.DateTransa.Month,
-                tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+            resultResponse = await fnGetNextSecuential(
+                mexModules.Bank,
+                bankAccountDto.UidRegist,
+                objHeader.DateTransa.Year,
+                objHeader.DateTransa.Month, tipo, subtipo);
 
-            if (srvResponse is null)
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
-            if (srvResponse is { isSuccess: true })
-            {
-                transaResponse = JsonConvert.DeserializeObject<TransaccionResponse>(Convert.ToString(srvResponse.result));
 
-                if (transaResponse is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Consecutivo bancario no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            transaResponse = (TransaccionResponse)resultResponse.Data;
 
             decimal exchangeRate = objHeader.TypeNumeral switch
             {
@@ -2549,36 +2531,19 @@ public class QuotationController : Controller
 
             string numberTransaCnt = string.Empty;
 
-            srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
-                _sessionToken, bankAccountDto.UidRegist,
-                objHeader.DateTransa.Year, objHeader.DateTransa.Month,
-                tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+            resultResponse = await fnGetNextSecuential(
+                mexModules.Account,
+                bankAccountDto.UidRegist,
+                objHeader.DateTransa.Year,
+                objHeader.DateTransa.Month, tipo, subtipo);
 
-            if (srvResponse is null)
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                numberTransaCnt = JsonConvert.DeserializeObject<string>(Convert.ToString(srvResponse.result)) ?? string.Empty;
-
-                if (numberTransaCnt is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Consecutivo contable no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            numberTransaCnt = (string)resultResponse.Data;
 
             //Creamos el comprobante
             AsientosContablesDtoCreate asientoCnt = new()
@@ -2685,7 +2650,6 @@ public class QuotationController : Controller
     private async Task<ResultResponse> fnLogicTransfer(Quotation objHeader, QuotationDetail detail, ConfigBcoDto configBcoDto, ConfigCntDto configCntDto)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
-        StringBuilder errorsMessagesBuilder = new();
 
         try
         {
@@ -2694,7 +2658,6 @@ public class QuotationController : Controller
             TransaccionResponse? transaResponse = new();
             TransaccionesBcoDto? transaBcoDto = new();
             AsientosContablesDto? asientoDto = new();
-            AsientosContablesDetalleDto? asientoDetalleDto = new();
             TransaccionesBcoDetalleDto? transaBcoDetalleDto = new();
             List<TransaccionesBcoDetalleDto>? transaBcoDetalleDtoList = new();
             ModulosDto? moduloDto = new();
@@ -2726,36 +2689,21 @@ public class QuotationController : Controller
             short tipo = (short)(TransaccionBcoTipo.Pago);
             short subtipo = (short)(TransaccionBcoPagoSubtipo.MesaCambio);
 
-            var srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
-                _sessionToken, bankAccountDto.UidRegist,
-                objHeader.DateTransa.Year, objHeader.DateTransa.Month,
-                tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+            resultResponse = await fnGetNextSecuential(
+                mexModules.Bank,
+                bankAccountDto.UidRegist,
+                objHeader.DateTransa.Year,
+                objHeader.DateTransa.Month,
+                tipo,
+                subtipo);
 
-            if (srvResponse is null)
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                transaResponse = JsonConvert.DeserializeObject<TransaccionResponse>(Convert.ToString(srvResponse.result));
-
-                if (transaResponse is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Consecutivo bancario no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            transaResponse = (TransaccionResponse)resultResponse.Data;
 
             decimal exchangeRateOficial = objHeader.ExchangeRateOfficialTransa;
 
@@ -2984,36 +2932,19 @@ public class QuotationController : Controller
 
             string numberTransaCnt = string.Empty;
 
-            srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
-                _sessionToken, bankAccountDto.UidRegist,
-                objHeader.DateTransa.Year, objHeader.DateTransa.Month,
-                tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+            resultResponse = await fnGetNextSecuential(
+                mexModules.Account,
+                bankAccountDto.UidRegist,
+                objHeader.DateTransa.Year,
+                objHeader.DateTransa.Month, tipo, subtipo);
 
-            if (srvResponse is null)
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
                 resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
                 return resultResponse;
             }
 
-            if (srvResponse is { isSuccess: true })
-            {
-                numberTransaCnt = JsonConvert.DeserializeObject<string>(Convert.ToString(srvResponse.result)) ?? string.Empty;
-
-                if (numberTransaCnt is null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Consecutivo contable no encontrado";
-                    return resultResponse;
-                }
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
+            numberTransaCnt = (string)resultResponse.Data;
 
             //Creamos el comprobante
             AsientosContablesDtoCreate asientoCnt = new()
@@ -3616,6 +3547,109 @@ public class QuotationController : Controller
             resultResponse.IsSuccess = true;
             resultResponse.Data = configBcoDto;
             resultResponse.DataChildren = configCntDto;
+
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnGetNextSecuential(
+        mexModules modulo,
+        Guid bankAccountId,
+        int fiscalYear,
+        int fiscalMonth,
+        short tipo,
+        short subtipo)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        APIResponse? srvResponse;
+        TransaccionResponse? transaResponse = new();
+
+        try
+        {
+            if (modulo == mexModules.Bank)
+            {
+                srvResponse = await _srvTransaBco.GetNextSecuentialNumberAsync<APIResponse>(
+                    _sessionToken,
+                    bankAccountId,
+                    fiscalYear,
+                    fiscalMonth,
+                    tipo, subtipo,
+                    ConsecutivoTipo.Temporal,
+                    isSave: true);
+
+                if (srvResponse is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return resultResponse;
+                }
+                if (srvResponse is { isSuccess: true })
+                {
+                    transaResponse = JsonConvert.DeserializeObject<TransaccionResponse>(Convert.ToString(srvResponse.result));
+
+                    if (transaResponse is null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Consecutivo bancario no encontrado";
+                        return resultResponse;
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return resultResponse;
+                }
+
+                resultResponse.IsSuccess = true;
+                resultResponse.Data = transaResponse;
+            }
+            else if (modulo == mexModules.Account)
+            {
+                string numberTransaCnt = string.Empty;
+
+                srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
+                    _sessionToken, bankAccountId,
+                    fiscalYear, fiscalMonth,
+                    tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
+
+                if (srvResponse is null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                    return resultResponse;
+                }
+
+                if (srvResponse is { isSuccess: true })
+                {
+                    numberTransaCnt = JsonConvert.DeserializeObject<string>(Convert.ToString(srvResponse.result)) ?? string.Empty;
+
+                    if (numberTransaCnt is null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        resultResponse.ErrorMessages = $"Consecutivo contable no encontrado";
+                        return resultResponse;
+                    }
+                }
+                else if (srvResponse is { isSuccess: false })
+                {
+                    errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                    return resultResponse;
+                }
+
+                resultResponse.IsSuccess = true;
+                resultResponse.Data = numberTransaCnt;
+            }
 
             return resultResponse;
         }
