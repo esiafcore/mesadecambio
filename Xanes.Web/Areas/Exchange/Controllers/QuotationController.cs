@@ -21,7 +21,6 @@ using Stimulsoft.Report.Export;
 using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
-using Microsoft.EntityFrameworkCore;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -45,19 +44,16 @@ public class QuotationController : Controller
     private readonly IConfigBcoService _srvConfigBco;
     private readonly IConfigCntService _srvConfigCnt;
     private readonly IMapper _mapper;
-
     private readonly string _eSiafN4BeneficiaryUid;
     private readonly string _eSiafN4EntityUid;
     private readonly string _eSiafN4CustomerName;
     private readonly string _eSiafN4CustomerIdentificationNumber;
-
     private readonly int _companyId;
     private readonly int _decimalTransa;
     private readonly int _decimalExchange;
     private readonly int _decimalExchangeFull;
     private readonly decimal _variationMaxDeposit;
     private readonly int _limitBatchCreditNote;
-
     private Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IHttpContextAccessor _contextAccessor;
@@ -3916,6 +3912,7 @@ public class QuotationController : Controller
 
         return GenerarExcel("Cotizaciones.xlsx", objQuotationList);
     }
+
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Quotation> listEntities)
     {
         using (XLWorkbook wb = new XLWorkbook())
@@ -4970,6 +4967,7 @@ public class QuotationController : Controller
         ViewData["Title"] = $"Rpt - Nota de Crédito";
         return View("~/Views/Shared/IndexReport.cshtml");
     }
+
     public IActionResult GetReport()
     {
         try
@@ -4997,6 +4995,7 @@ public class QuotationController : Controller
             return Content($"Error al cargar el informe: {ex.Message}");
         }
     }
+
     public IActionResult ViewerEvent()
     {
         return StiNetCoreViewer.ViewerEventResult(this);
@@ -5556,5 +5555,6 @@ public class QuotationController : Controller
             return Json(jsonResponse);
         }
     }
+
     #endregion
 }
