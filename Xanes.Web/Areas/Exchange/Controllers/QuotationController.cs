@@ -2030,6 +2030,27 @@ public class QuotationController : Controller
                             detail.IsJournalEntryPosted = false;
                             detail.BankTransactionId = null;
                             detail.IsBankTransactionPosted = false;
+
+                            if (detail.QuotationDetailType == QuotationDetailType.DebitTransfer && objHeader.AmountCommission != 0)
+                            {
+                                if (detail is { BankTransactionTransferFeeId: not null, JournalEntryTransferFeeId: not null })
+                                {
+                                    //Eliminamos las transacciones relacionadas
+                                    resultResponse = await
+                                    fnDeleteTransactions(detail.BankTransactionTransferFeeId!.Value, detail.JournalEntryTransferFeeId!.Value);
+
+                                    if (!resultResponse.IsSuccess)
+                                    {
+                                        resultResponse.IsSuccess = false;
+                                        return resultResponse;
+                                    }
+
+                                    detail.JournalEntryTransferFeeId = null;
+                                    detail.IsJournalEntryTransferFeePosted = false;
+                                    detail.BankTransactionTransferFeeId = null;
+                                    detail.IsBankTransactionTransferFeePosted = false;
+                                }
+                            }
                         }
                     }
 
@@ -2433,7 +2454,7 @@ public class QuotationController : Controller
             }
 
             moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.DataChildren;
 
             short tipo = (short)(TransaccionBcoTipo.Deposito);
             short subtipo = (short)(TransaccionBcoDepositoSubtipo.Deposito);
@@ -2760,7 +2781,7 @@ public class QuotationController : Controller
             }
 
             moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.DataChildren;
 
             short tipo = (short)(TransaccionBcoTipo.Pago);
             short subtipo = (short)(TransaccionBcoPagoSubtipo.MesaCambio);
@@ -3153,7 +3174,7 @@ public class QuotationController : Controller
             bankAccountSourceDto = (CuentasBancariasDto)resultResponse.Data;
 
             resultResponse = await fnGetBankAccountTransfer(
-                bankDto.Codigo,
+                objHeader.BankAccountSourceTrx.ParentTrx.Code,
                 objHeader.BankAccountSourceTrx!.Code,
                 (short)objHeader.BankAccountSourceTrx!.CurrencyType);
 
@@ -3165,7 +3186,6 @@ public class QuotationController : Controller
 
             bankAccountTargetDto = (CuentasBancariasDto)resultResponse.Data;
 
-
             resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.CreditTransfer);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
@@ -3175,7 +3195,7 @@ public class QuotationController : Controller
             }
 
             moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.DataChildren;
 
             short tipo = (short)(TransaccionBcoTipo.Transferencia);
             short subtipo = (short)(TransaccionBcoTransferenciaSubtipo.TransferenciaCredito);
@@ -3491,7 +3511,7 @@ public class QuotationController : Controller
             bankAccountSourceDto = (CuentasBancariasDto)resultResponse.Data;
 
             resultResponse = await fnGetBankAccountTransfer(
-                bankDto.Codigo,
+                objHeader.BankAccountTargetTrx.ParentTrx.Code,
                 objHeader.BankAccountTargetTrx!.Code,
                 (short)objHeader.BankAccountTargetTrx!.CurrencyType);
 
@@ -3502,7 +3522,7 @@ public class QuotationController : Controller
             }
 
             bankAccountTargetDto = (CuentasBancariasDto)resultResponse.Data;
-            
+
             resultResponse = await fnGetDocument((int)mexModules.Bank, (int)mexModuleBankDocument.DebitTransfer);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
@@ -3512,7 +3532,7 @@ public class QuotationController : Controller
             }
 
             moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.DataChildren;
 
             short tipo = (short)(TransaccionBcoTipo.Transferencia);
             short subtipo = (short)(TransaccionBcoTransferenciaSubtipo.TransferenciaDebito);
@@ -3835,7 +3855,7 @@ public class QuotationController : Controller
             }
 
             moduloDto = (ModulosDto)resultResponse.Data;
-            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.Data;
+            moduloDocumentoDto = (ModulosDocumentosDto)resultResponse.DataChildren;
 
             short tipo = (short)(TransaccionBcoTipo.NotaDebito);
             short subtipo = (short)(TransaccionBcoNotaDebitoSubtipo.NotaDebito);
@@ -4500,7 +4520,6 @@ public class QuotationController : Controller
         }
     }
 
-
     private async Task<ResultResponse> fnGetDocument(int numberModule, int numberDocument)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
@@ -5063,7 +5082,6 @@ public class QuotationController : Controller
                 worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
                 worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-
 
                 var headerRow = worksheet.Row(3);
                 headerRow.Style.Font.Bold = true;
@@ -5929,6 +5947,12 @@ public class QuotationController : Controller
                     header.CurrencyTransferId = objBankAccountSource.CurrencyId;
                     header.ExchangeRateOfficialReal = header.ExchangeRateOfficialTransa;
 
+                    var objDetailCredit = objQuotationDetailList.First(x => x.ParentId == header.Id && 
+                                                                            x.QuotationDetailType == QuotationDetailType.CreditTransfer);
+                    var objDetailDebit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
+                                                                            x.QuotationDetailType == QuotationDetailType.DebitTransfer);
+
+
                     objQuotationDetailList = objQuotationDetailList.Where(x => x.ParentId != header.Id).ToList();
 
                     var objDetailBankAccountTarget = new QuotationDetail()
@@ -5944,7 +5968,9 @@ public class QuotationController : Controller
                         CreatedBy = AC.LOCALHOSTME,
                         CreatedDate = DateTime.UtcNow,
                         CreatedHostName = AC.LOCALHOSTPC,
-                        CreatedIpv4 = AC.Ipv4Default
+                        CreatedIpv4 = AC.Ipv4Default,
+                        BankTransactionId = objDetailCredit.BankTransactionId,
+                        JournalEntryId = objDetailCredit.JournalEntryId
                     };
 
                     objQuotationDetailList.Add(objDetailBankAccountTarget);
@@ -5962,7 +5988,12 @@ public class QuotationController : Controller
                         CreatedBy = AC.LOCALHOSTME,
                         CreatedDate = DateTime.UtcNow,
                         CreatedHostName = AC.LOCALHOSTPC,
-                        CreatedIpv4 = AC.Ipv4Default
+                        CreatedIpv4 = AC.Ipv4Default,
+                        BankTransactionId = objDetailDebit.BankTransactionId,
+                        JournalEntryId = objDetailDebit.JournalEntryId,
+                        BankTransactionTransferFeeId = objDetailDebit.BankTransactionTransferFeeId,
+                        JournalEntryTransferFeeId = objDetailDebit.JournalEntryTransferFeeId
+
                     };
 
                     objQuotationDetailList.Add(objDetailBankAccountSource);

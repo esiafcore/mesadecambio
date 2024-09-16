@@ -746,7 +746,7 @@ const fnLoadDatatable = () => {
                             ${btnView}
                             ${btnPrint}
                             ${btnReClosed}
-                            ${btnVoid}
+                           
                                        `;
                         }
                         else {
