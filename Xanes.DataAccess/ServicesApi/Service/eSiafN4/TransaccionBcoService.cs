@@ -66,8 +66,10 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
-    public Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId)
+    public Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid? transaBcoCommisionId)
     {
+        transaBcoCommisionId = (transaBcoCommisionId == null ? Guid.Empty : transaBcoCommisionId);
+
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Post,

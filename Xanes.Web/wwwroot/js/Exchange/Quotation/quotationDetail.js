@@ -682,6 +682,11 @@ const fnClosed = async (id, isReclosed = false) => {
 
         const jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
+
+            if (jsonResponse.titleMessages == "") {
+                titulo = "Error";
+            }
+
             fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
         } else {
             if (jsonResponse.urlRedirect) {

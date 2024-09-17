@@ -1955,7 +1955,7 @@ public class QuotationController : Controller
             var transactionList = _uow.Quotation
                 .GetAll(filter: x => (x.CompanyId == _companyId)
                                          && (quotationIds.Contains(x.Id))
-                                         && (x.IsClosed) 
+                                         && (x.IsClosed)
                                          && (!x.IsPayment) && (!x.IsLoan) && (!x.IsPosted))
                                         .ToList();
 
@@ -1974,23 +1974,29 @@ public class QuotationController : Controller
                 var resultResponse = await
                     fnLogicGenerateTransactions(id);
 
-                if (resultResponse.IsInfo && resultResponse.Data != null)
+                if (resultResponse.IsInfo)
                 {
-                    jsonResponse.IsSuccess = false;
-                    var errorList = (List<string>)resultResponse.Data;
-                    foreach (var error in errorList)
+                    if (resultResponse.Data != null)
                     {
-                        jsonResponse.ErrorMessages += error + Environment.NewLine;
+                        var errorList = (List<string>)resultResponse.Data;
+                        foreach (var error in errorList)
+                        {
+                            jsonResponse.ErrorMessages += error + Environment.NewLine;
+                        }
                     }
+                    else
+                    {
+                        jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
+                    }
+
                     jsonResponse.TitleMessages = "Detalles Contabilizados";
                     jsonResponse.IsWarning = true;
                     //return Json(jsonResponse);
                 }
-
-                if (!resultResponse.IsSuccess)
+                else if (!resultResponse.IsSuccess)
                 {
                     jsonResponse.IsSuccess = false;
-                    jsonResponse.TitleMessages = AC.Error.ToUpper();
+                    //jsonResponse.TitleMessages = AC.Error.ToUpper();
                     jsonResponse.ErrorMessages += resultResponse.ErrorMessages + Environment.NewLine;
                     //return Json(jsonResponse);
                 }
@@ -2025,21 +2031,28 @@ public class QuotationController : Controller
             var resultResponse = await
                  fnLogicGenerateTransactions(id);
 
-            if (resultResponse.IsInfo && resultResponse.Data != null)
+            if (resultResponse.IsInfo)
             {
                 jsonResponse.IsSuccess = false;
-                var errorList = (List<string>)resultResponse.Data;
-                foreach (var error in errorList)
+                if (resultResponse.Data != null)
                 {
-                    jsonResponse.ErrorMessages += error + Environment.NewLine;
+                    var errorList = (List<string>)resultResponse.Data;
+                    foreach (var error in errorList)
+                    {
+                        jsonResponse.ErrorMessages += error + Environment.NewLine;
+                    }
+                }
+                else
+                {
+                    jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
                 }
 
                 jsonResponse.TitleMessages = "Detalles Contabilizados";
                 jsonResponse.IsWarning = true;
+                //jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
                 return Json(jsonResponse);
             }
-
-            if (!resultResponse.IsSuccess)
+            else if (!resultResponse.IsSuccess)
             {
                 jsonResponse.IsSuccess = false;
                 jsonResponse.TitleMessages = AC.Error.ToUpper();
@@ -2071,27 +2084,35 @@ public class QuotationController : Controller
         Guid? objCommisionId = new();
 
         bool isReclosed = false;
+
+        if (id == 0)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = $"El id es requerido";
+            return resultResponse;
+        }
+
+        var objHeader = _uow.Quotation
+            .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
+                includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx");
+
+        if (objHeader == null)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = $"Cotización: {id} no encontrada";
+            return resultResponse;
+        }
+
+        if (objHeader.IsPosted)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.IsInfo = true;
+            resultResponse.ErrorMessages = $"Cotización: {id} ya está contabilizada";
+            return resultResponse;
+        }
+
         try
         {
-            if (id == 0)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = $"El id es requerido";
-                return resultResponse;
-            }
-
-            var objHeader = _uow.Quotation
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
-                    includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx");
-
-            if (objHeader == null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = $"Cotización no encontrada";
-                return resultResponse;
-            }
-
-
             resultResponse = await fnGetConfigurations();
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null || resultResponse.DataChildren == null)
@@ -2104,10 +2125,10 @@ public class QuotationController : Controller
             configCntDto = (ConfigCntDto)resultResponse.DataChildren;
 
             //Si esta cerrado entonces recerramos wey
-            isReclosed = (objHeader.IsClosed & !objHeader.IsPosted);
+            isReclosed = (objHeader.IsClosed);
 
 
-            if (!objHeader.IsLoan && objHeader is { IsPayment: false, IsPosted: false })
+            if (!objHeader.IsLoan && objHeader is { IsPayment: false })
             {
                 var objDetailList = _uow.QuotationDetail
                     .GetAll(filter: x => x.ParentId == objHeader.Id,
@@ -2116,7 +2137,7 @@ public class QuotationController : Controller
                 if (objDetailList == null || objDetailList.Count == 0)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Detalles de Cotización no encontrados";
+                    resultResponse.ErrorMessages = $"Detalles de Cotización: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral} no encontrados";
                     return resultResponse;
                 }
 
@@ -2179,6 +2200,7 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+                            _uow.Save();
                         }
                         else if (detail.QuotationDetailType == QuotationDetailType.Transfer)
                         {
@@ -2197,6 +2219,7 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+                            _uow.Save();
                         }
                     }
                     else
@@ -2218,6 +2241,7 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+                            _uow.Save();
 
                             objCreditId = detailUpdate.BankTransactionId;
                         }
@@ -2253,12 +2277,13 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+                            _uow.Save();
 
                             objDebitId = detailUpdate.BankTransactionId;
                             objCommisionId = detailUpdate.BankTransactionTransferFeeId;
 
                             resultResponse = await
-                                fnCreateTransactionBcoRel(objDebitId.Value, objCreditId.Value, objCommisionId.Value);
+                                fnCreateTransactionBcoRel(objDebitId.Value, objCreditId.Value, objCommisionId);
 
                             if (!resultResponse.IsSuccess)
                             {
@@ -2268,49 +2293,49 @@ public class QuotationController : Controller
                         }
                     }
                 }
-
-                if (isReclosed)
-                {
-                    TempData["success"] = $"Cotización re-cerrada correctamente";
-                    objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
-                    objHeader.ReClosedDate = DateTime.UtcNow;
-                    objHeader.ReClosedHostName = AC.LOCALHOSTPC;
-                    objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-
-                }
-                else
-                {
-                    TempData["success"] = $"Cotización cerrada correctamente";
-
-                    var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
-                        x.TypeNumeral == objHeader.TypeNumeral &&
-                        x.DateTransa == objHeader.DateTransa &&
-                        x.InternalSerial == AC.InternalSerialOfficial);
-
-                    if (nextSeq == null)
-                    {
-                        resultResponse.IsSuccess = false;
-                        resultResponse.ErrorMessages = $"Consecutivo de cotización no encontrado";
-                        return resultResponse;
-                    }
-
-                    objHeader.IsClosed = true;
-                    objHeader.Numeral = nextSeq;
-                    objHeader.InternalSerial = AC.InternalSerialOfficial;
-                    objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-                    objHeader.ClosedDate = DateTime.UtcNow;
-                    objHeader.ClosedHostName = AC.LOCALHOSTPC;
-                    objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                }
-
-                //Seteamos campos de auditoria
-                objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-                objHeader.UpdatedDate = DateTime.UtcNow;
-                objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-                objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-                _uow.Quotation.Update(objHeader);
-                _uow.Save();
             }
+
+            if (isReclosed)
+            {
+                TempData["success"] = $"Cotización re-cerrada correctamente";
+                objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
+                objHeader.ReClosedDate = DateTime.UtcNow;
+                objHeader.ReClosedHostName = AC.LOCALHOSTPC;
+                objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+
+            }
+            else
+            {
+                TempData["success"] = $"Cotización cerrada correctamente";
+
+                var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
+                    x.TypeNumeral == objHeader.TypeNumeral &&
+                    x.DateTransa == objHeader.DateTransa &&
+                    x.InternalSerial == AC.InternalSerialOfficial);
+
+                if (nextSeq == null)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Consecutivo de cotización: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral} no encontrado";
+                    return resultResponse;
+                }
+
+                objHeader.IsClosed = true;
+                objHeader.Numeral = nextSeq;
+                objHeader.InternalSerial = AC.InternalSerialOfficial;
+                objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
+                objHeader.ClosedDate = DateTime.UtcNow;
+                objHeader.ClosedHostName = AC.LOCALHOSTPC;
+                objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            }
+
+            //Seteamos campos de auditoria
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
 
             resultResponse.IsSuccess = true;
             return resultResponse;
@@ -2318,7 +2343,7 @@ public class QuotationController : Controller
         catch (Exception ex)
         {
             resultResponse.IsSuccess = false;
-            resultResponse.ErrorMessages = ex.Message;
+            resultResponse.ErrorMessages = ex.Message + $"{objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral}";
             return resultResponse;
         }
     }
@@ -2371,7 +2396,7 @@ public class QuotationController : Controller
                         if (isaproval)
                         {
                             detail.IsBankTransactionPosted = true;
-                            var informationMessage = $" {typeName} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} -";
+                            var informationMessage = $" {typeName} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} - COT: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral}.";
                             if (errorsMessages.Count == 0)
                             {
                                 errorsMessages.Add($"{informationMessage}");
@@ -2406,6 +2431,7 @@ public class QuotationController : Controller
                 detail.UpdatedHostName = AC.LOCALHOSTPC;
                 detail.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.QuotationDetail.Update(detail);
+                _uow.Save();
             }
 
             if (!isPosted)
@@ -2415,6 +2441,7 @@ public class QuotationController : Controller
                     resultResponse.IsSuccess = true;
                     resultResponse.IsInfo = true;
                     resultResponse.Data = errorsMessages;
+                    return resultResponse;
                 }
             }
             else
@@ -2425,11 +2452,11 @@ public class QuotationController : Controller
                 objHeader.UpdatedHostName = AC.LOCALHOSTPC;
                 objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                 _uow.Quotation.Update(objHeader);
-
+                _uow.Save();
                 resultResponse.IsSuccess = false;
                 resultResponse.IsInfo = true;
                 resultResponse.ErrorMessages =
-                    "Verificamos que la cotización está contabilizada, por lo que no se podrá re-cerrar";
+                    $"Verificamos que la cotización: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral} está contabilizada, por lo que no se podrá re-cerrar";
                 return resultResponse;
             }
 
@@ -4352,7 +4379,7 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnCreateTransactionBcoRel(Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId)
+    private async Task<ResultResponse> fnCreateTransactionBcoRel(Guid transaBcoDebitId, Guid transaBcoCreditId, Guid? transaBcoCommisionId)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
