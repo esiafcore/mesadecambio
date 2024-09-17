@@ -28,6 +28,8 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.AmountExchange).HasPrecision(18, 4).HasDefaultValue(0m);
         builder.Property(b => b.AmountRevenue).HasPrecision(18, 4).HasDefaultValue(0m);
         builder.Property(b => b.AmountCost).HasPrecision(18, 4).HasDefaultValue(0m);
+        builder.Property(b => b.AmountRevenueReal).HasPrecision(18, 4).HasDefaultValue(0m);
+        builder.Property(b => b.AmountCostReal).HasPrecision(18, 4).HasDefaultValue(0m);
         builder.Property(b => b.TotalDeposit).HasPrecision(18, 4).HasDefaultValue(0m);
         builder.Property(b => b.TotalTransfer).HasPrecision(18, 4).HasDefaultValue(0m);
 

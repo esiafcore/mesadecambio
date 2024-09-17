@@ -411,6 +411,8 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost;
                                 obj.AmountRevenueReal = obj.AmountRevenue;
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                         //Compra de Euros
@@ -424,6 +426,8 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost;
                                 obj.AmountRevenueReal = obj.AmountRevenue;
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                             //Factoring paga en Dolares
                             else if (obj.CurrencyTransferType == SD.CurrencyType.Foreign)
@@ -436,6 +440,9 @@ public class QuotationController : Controller
 
                                 obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
                                 obj.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
+
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                     }
@@ -490,6 +497,8 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost;
                                 obj.AmountRevenueReal = obj.AmountRevenue;
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                         //Venta de Euros
@@ -503,6 +512,8 @@ public class QuotationController : Controller
 
                                 obj.AmountCostReal = obj.AmountCost;
                                 obj.AmountRevenueReal = obj.AmountRevenue;
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                             //Cliente paga en Dolares
                             else if (obj.CurrencyDepositType == SD.CurrencyType.Foreign)
@@ -515,6 +526,9 @@ public class QuotationController : Controller
 
                                 obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
                                 obj.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
+
+                                obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                     }
@@ -820,6 +834,9 @@ public class QuotationController : Controller
 
                         obj.AmountCostReal = obj.AmountCost;
                         obj.AmountRevenueReal = obj.AmountRevenue;
+
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Compra de Euros
@@ -833,6 +850,9 @@ public class QuotationController : Controller
 
                         obj.AmountCostReal = obj.AmountCost;
                         obj.AmountRevenueReal = obj.AmountRevenue;
+
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Factoring paga en Dolares
                     else if (objQt.CurrencyTransferType == SD.CurrencyType.Foreign)
@@ -845,6 +865,9 @@ public class QuotationController : Controller
 
                         obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
                         obj.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
+
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -877,6 +900,9 @@ public class QuotationController : Controller
 
                         obj.AmountCostReal = obj.AmountCost;
                         obj.AmountRevenueReal = obj.AmountRevenue;
+
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Venta de Euros
@@ -891,6 +917,9 @@ public class QuotationController : Controller
                         obj.AmountCostReal = obj.AmountCost;
                         obj.AmountRevenueReal = obj.AmountRevenue;
 
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+
                     }
                     //Cliente paga en Dolares
                     else if (objQt.CurrencyDepositType == SD.CurrencyType.Foreign)
@@ -903,6 +932,9 @@ public class QuotationController : Controller
 
                         obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
                         obj.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
+
+                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -1164,12 +1196,12 @@ public class QuotationController : Controller
 
                 if (objHeader.AmountCost != 0)
                 {
-                    obj.AmountCost = (obj.PercentageCostRevenue * objHeader.AmountCost);
+                    obj.AmountCost = (obj.PercentageCostRevenue * objHeader.AmountCostReal);
                     obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
                 }
                 else if (objHeader.AmountRevenue != 0)
                 {
-                    obj.AmountRevenue = (obj.PercentageCostRevenue * objHeader.AmountRevenue);
+                    obj.AmountRevenue = (obj.PercentageCostRevenue * objHeader.AmountRevenueReal);
                     obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
                 }
 
@@ -1732,6 +1764,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Compra de Euros
@@ -1745,6 +1780,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Factoring paga en Dolares
                     else if (objQuotation.CurrencyTransferType == SD.CurrencyType.Foreign)
@@ -1757,6 +1795,9 @@ public class QuotationController : Controller
 
                         objQuotation.ExchangeRateOfficialReal = currencyForeign * objQuotation.ExchangeRateOfficialTransa;
                         objQuotation.ExchangeRateBuyReal = currencyForeign * objQuotation.ExchangeRateBuyTransa;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -1791,6 +1832,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Venta de Euros
@@ -1804,6 +1848,9 @@ public class QuotationController : Controller
 
                         objQuotation.AmountCostReal = objQuotation.AmountCost;
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenue;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Cliente paga en Dolares
                     else if (objQuotation.CurrencyDepositType == SD.CurrencyType.Foreign)
@@ -1816,6 +1863,9 @@ public class QuotationController : Controller
 
                         objQuotation.ExchangeRateOfficialReal = currencyForeign * objQuotation.ExchangeRateOfficialTransa;
                         objQuotation.ExchangeRateSellReal = currencyForeign * objQuotation.ExchangeRateSellTransa;
+
+                        objQuotation.AmountCostReal = objQuotation.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -3069,13 +3119,13 @@ public class QuotationController : Controller
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
             //Si tiene ingreso o costo agg el tercer detalle
-            if (objHeader.AmountCost != 0 || objHeader.AmountRevenue != 0)
+            if (objHeader.AmountCostReal != 0 || objHeader.AmountRevenueReal != 0)
             {
                 //Si no hay ingreso y costo ejemplo falta
 
 
 
-                bool isIngreso = objHeader.AmountRevenue != 0;
+                bool isIngreso = objHeader.AmountRevenueReal != 0;
                 decimal amountContraPart = (isIngreso ? detail.AmountRevenue : detail.AmountCost);
 
                 Guid accountId = (isIngreso
@@ -6017,6 +6067,9 @@ public class QuotationController : Controller
 
                                 header.AmountCostReal = header.AmountCost;
                                 header.AmountRevenueReal = header.AmountRevenue;
+
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                         //Compra de Euros
@@ -6031,6 +6084,9 @@ public class QuotationController : Controller
                                 header.AmountCostReal = header.AmountCost;
                                 header.AmountRevenueReal = header.AmountRevenue;
 
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+
                             }
                             //Factoring paga en Dolares
                             else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
@@ -6043,6 +6099,9 @@ public class QuotationController : Controller
 
                                 header.ExchangeRateOfficialReal = currencyForeign * header.ExchangeRateOfficialTransa;
                                 header.ExchangeRateBuyReal = currencyForeign * header.ExchangeRateBuyTransa;
+
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                     }
@@ -6074,6 +6133,9 @@ public class QuotationController : Controller
 
                                 header.AmountCostReal = header.AmountCost;
                                 header.AmountRevenueReal = header.AmountRevenue;
+
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                         //Venta de Euros
@@ -6088,6 +6150,9 @@ public class QuotationController : Controller
                                 header.AmountCostReal = header.AmountCost;
                                 header.AmountRevenueReal = header.AmountRevenue;
 
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+
                             }
                             //Cliente paga en Dolares
                             else if (header.CurrencyDepositType == SD.CurrencyType.Foreign)
@@ -6100,6 +6165,9 @@ public class QuotationController : Controller
 
                                 header.ExchangeRateOfficialReal = currencyForeign * header.ExchangeRateOfficialTransa;
                                 header.ExchangeRateSellReal = currencyForeign * header.ExchangeRateSellTransa;
+
+                                header.AmountCostReal = header.AmountCostReal.RoundTo(AC.DecimalTransa);
+                                header.AmountRevenueReal = header.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                             }
                         }
                     }
@@ -6289,12 +6357,12 @@ public class QuotationController : Controller
 
                         if (header.AmountCost != 0)
                         {
-                            detail.AmountCost = (detail.PercentageCostRevenue * header.AmountCost);
+                            detail.AmountCost = (detail.PercentageCostRevenue * header.AmountCostReal);
                             detail.AmountCost = detail.AmountCost.RoundTo(AC.DecimalTransa);
                         }
                         else if (header.AmountRevenue != 0)
                         {
-                            detail.AmountRevenue = (detail.PercentageCostRevenue * header.AmountRevenue);
+                            detail.AmountRevenue = (detail.PercentageCostRevenue * header.AmountRevenueReal);
                             detail.AmountRevenue = detail.AmountRevenue.RoundTo(AC.DecimalTransa);
                         }
 
