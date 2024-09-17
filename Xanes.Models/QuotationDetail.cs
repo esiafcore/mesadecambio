@@ -55,6 +55,21 @@ public class QuotationDetail: Entity, ICloneable
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal AmountDetail { get; set; } = 0M;
 
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Porcentaje Costo Ingreso")]
+    [DisplayFormat(DataFormatString = "{0:n6}", ApplyFormatInEditMode = true)]
+    public decimal PercentageCostRevenue { get; set; } = 0M;
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Ingreso Transacción")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountRevenue { get; set; } = 0M;
+
+    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Display(Name = "Costo Transacción")]
+    [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+    public decimal AmountCost { get; set; } = 0M;
+
     [Required]
     [Display(Name = "Está Contabilizado el Comprobante")]
     public bool IsJournalEntryPosted { get; set; }

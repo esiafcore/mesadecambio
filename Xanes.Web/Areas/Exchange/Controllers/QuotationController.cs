@@ -389,12 +389,15 @@ public class QuotationController : Controller
                         {
                             obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
                             obj.AmountCost = 0;
+                            obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                         }
                         //TC COMPRA MAYOR AL TC OFICIAL
                         else
                         {
                             obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                             obj.AmountRevenue = 0;
+                            obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
                         }
 
                         //Compra de dolares 
@@ -466,12 +469,14 @@ public class QuotationController : Controller
                         {
                             obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
                             obj.AmountRevenue = 0;
+                            obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
                         }
                         //TC VENTA MAYOR AL TC OFICIAL
                         else
                         {
                             obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                             obj.AmountCost = 0;
+                            obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
                         }
 
                         //Venta de dolares 
@@ -793,12 +798,15 @@ public class QuotationController : Controller
                 {
                     obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
+                    obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                 }
                 //TC COMPRA MAYOR AL TC OFICIAL
                 else
                 {
                     obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
+                    obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
                 }
 
                 //Compra de dolares 
@@ -847,12 +855,15 @@ public class QuotationController : Controller
                 {
                     obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
                     obj.AmountRevenue = 0;
+                    obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
                 }
                 //TC VENTA MAYOR AL TC OFICIAL
                 else
                 {
                     obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
                     obj.AmountCost = 0;
+                    obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                 }
 
                 //Venta de dolares 
@@ -1107,9 +1118,29 @@ public class QuotationController : Controller
                     jsonResponse.ErrorMessages = $"Registro padre no encontrado";
                     return Json(jsonResponse);
                 }
+                obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountTransaction);
 
                 if (objHeader.TypeNumeral == SD.QuotationType.Buy)
                 {
+                    if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                    {
+                        if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                        {
+                            obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountExchange);
+                        }
+                    }
+                    else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                    {
+                        if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                        {
+
+                        }
+                        else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
+                        {
+
+                        }
+                    }
+
                     if (obj.QuotationDetailType == QuotationDetailType.Deposit)
                     {
                         obj.CurrencyDetailId = objHeader.CurrencyTransaId;
@@ -1129,6 +1160,17 @@ public class QuotationController : Controller
                     {
                         obj.CurrencyDetailId = objHeader.CurrencyTransaId;
                     }
+                }
+
+                if (objHeader.AmountCost != 0)
+                {
+                    obj.AmountCost = (obj.PercentageCostRevenue * objHeader.AmountCost);
+                    obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
+                }
+                else if (objHeader.AmountRevenue != 0)
+                {
+                    obj.AmountRevenue = (obj.PercentageCostRevenue * objHeader.AmountRevenue);
+                    obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
                 }
 
                 //Verificamos si existe la moneda
@@ -1200,6 +1242,9 @@ public class QuotationController : Controller
                     objDetail.AmountDetail = obj.AmountDetail;
                     objDetail.BankSourceId = obj.BankSourceId;
                     objDetail.BankTargetId = obj.BankTargetId;
+                    objDetail.AmountRevenue = obj.AmountRevenue;
+                    objDetail.AmountCost = obj.AmountCost;
+                    objDetail.PercentageCostRevenue = obj.PercentageCostRevenue;
                     objDetail.QuotationDetailType = obj.QuotationDetailType;
                     objDetail.UpdatedBy = _userName ?? AC.LOCALHOSTME;
                     objDetail.UpdatedDate = DateTime.UtcNow;
@@ -1665,12 +1710,15 @@ public class QuotationController : Controller
                 {
                     objQuotation.AmountRevenue = (objQuotation.ExchangeRateOfficialTransa - objQuotation.ExchangeRateBuyTransa) * objQuotation.AmountTransaction;
                     objQuotation.AmountCost = 0;
+                    objQuotation.AmountRevenue = objQuotation.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                 }
                 //TC COMPRA MAYOR AL TC OFICIAL
                 else
                 {
                     objQuotation.AmountCost = (objQuotation.ExchangeRateBuyTransa - objQuotation.ExchangeRateOfficialTransa) * objQuotation.AmountTransaction;
                     objQuotation.AmountRevenue = 0;
+                    objQuotation.AmountCost = objQuotation.AmountCost.RoundTo(AC.DecimalTransa);
                 }
 
                 //Compra de dolares 
@@ -1721,12 +1769,15 @@ public class QuotationController : Controller
                 {
                     objQuotation.AmountCost = (objQuotation.ExchangeRateOfficialTransa - objQuotation.ExchangeRateSellTransa) * objQuotation.AmountTransaction;
                     objQuotation.AmountRevenue = 0;
+                    objQuotation.AmountCost = objQuotation.AmountCost.RoundTo(AC.DecimalTransa);
                 }
                 //TC VENTA MAYOR AL TC OFICIAL
                 else
                 {
                     objQuotation.AmountRevenue = (objQuotation.ExchangeRateSellTransa - objQuotation.ExchangeRateOfficialTransa) * objQuotation.AmountTransaction;
                     objQuotation.AmountCost = 0;
+                    objQuotation.AmountRevenue = objQuotation.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                 }
 
                 //Venta de dolares 
@@ -1872,17 +1923,24 @@ public class QuotationController : Controller
                     {
                         jsonResponse.ErrorMessages += error + Environment.NewLine;
                     }
-
+                    jsonResponse.TitleMessages = "Detalles Contabilizados";
                     jsonResponse.IsWarning = true;
-                    return Json(jsonResponse);
+                    //return Json(jsonResponse);
                 }
 
                 if (!resultResponse.IsSuccess)
                 {
                     jsonResponse.IsSuccess = false;
-                    jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
-                    return Json(jsonResponse);
+                    jsonResponse.TitleMessages = AC.Error.ToUpper();
+                    jsonResponse.ErrorMessages += resultResponse.ErrorMessages + Environment.NewLine;
+                    //return Json(jsonResponse);
                 }
+            }
+
+            if (jsonResponse.ErrorMessages != string.Empty)
+            {
+                jsonResponse.IsSuccess = false;
+                return Json(jsonResponse);
             }
 
             jsonResponse.IsSuccess = true;
@@ -1892,6 +1950,7 @@ public class QuotationController : Controller
         catch (Exception ex)
         {
             jsonResponse.IsSuccess = false;
+            jsonResponse.TitleMessages = AC.Error.ToUpper();
             jsonResponse.ErrorMessages = ex.Message.ToString();
             return Json(jsonResponse);
         }
@@ -2472,7 +2531,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Abbreviation} {objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -2814,7 +2873,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Abbreviation} {objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3012,13 +3071,16 @@ public class QuotationController : Controller
             //Si tiene ingreso o costo agg el tercer detalle
             if (objHeader.AmountCost != 0 || objHeader.AmountRevenue != 0)
             {
+                //Si no hay ingreso y costo ejemplo falta
+
+
 
                 bool isIngreso = objHeader.AmountRevenue != 0;
-                decimal amountContraPart = (objHeader.AmountRevenue != 0 ? objHeader.AmountRevenue : objHeader.AmountCost);
+                decimal amountContraPart = (isIngreso ? detail.AmountRevenue : detail.AmountCost);
 
                 Guid accountId = (isIngreso
-                    ? configCntDto.CuentaContableGananciaDiferencial!.Value
-                        : configCntDto.CuentaContablePerdidaDiferencial!.Value);
+                ? configCntDto.CuentaContableGananciaDiferencial!.Value
+                    : configCntDto.CuentaContablePerdidaDiferencial!.Value);
 
                 //Creamos el tercer detalle
                 transaBcoDetalle = new()
@@ -3289,7 +3351,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Abbreviation} {objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3641,7 +3703,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Abbreviation} {objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3978,7 +4040,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Abbreviation} {objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -5933,12 +5995,15 @@ public class QuotationController : Controller
                         {
                             header.AmountRevenue = (header.ExchangeRateOfficialTransa - header.ExchangeRateBuyTransa) * header.AmountTransaction;
                             header.AmountCost = 0;
+                            header.AmountRevenue = header.AmountRevenue.RoundTo(AC.DecimalTransa);
+
                         }
                         //TC COMPRA MAYOR AL TC OFICIAL
                         else
                         {
                             header.AmountCost = (header.ExchangeRateBuyTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
                             header.AmountRevenue = 0;
+                            header.AmountCost = header.AmountCost.RoundTo(AC.DecimalTransa);
                         }
 
                         //Compra de dolares 
@@ -5988,12 +6053,14 @@ public class QuotationController : Controller
                         {
                             header.AmountCost = (header.ExchangeRateOfficialTransa - header.ExchangeRateSellTransa) * header.AmountTransaction;
                             header.AmountRevenue = 0;
+                            header.AmountCost = header.AmountCost.RoundTo(AC.DecimalTransa);
                         }
                         //TC VENTA MAYOR AL TC OFICIAL
                         else
                         {
                             header.AmountRevenue = (header.ExchangeRateSellTransa - header.ExchangeRateOfficialTransa) * header.AmountTransaction;
                             header.AmountCost = 0;
+                            header.AmountRevenue = header.AmountRevenue.RoundTo(AC.DecimalTransa);
                         }
 
                         //Venta de dolares 
@@ -6170,8 +6237,27 @@ public class QuotationController : Controller
 
                     foreach (var detail in childrens)
                     {
+                        detail.PercentageCostRevenue = (detail.AmountDetail / header.AmountTransaction);
+
                         if (header.TypeNumeral == SD.QuotationType.Buy)
                         {
+                            if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                            {
+                                if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                                {
+                                    detail.PercentageCostRevenue = (detail.AmountDetail / header.AmountExchange);
+                                }
+                            }
+                            else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                            {
+                                if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                                {
+                                }
+                                else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
+                                {
+                                }
+                            }
+
                             if (detail.QuotationDetailType == QuotationDetailType.Deposit)
                             {
                                 detail.CurrencyDetailId = header.CurrencyTransaId;
@@ -6200,6 +6286,18 @@ public class QuotationController : Controller
                                 lineNumberTransfer++;
                             }
                         }
+
+                        if (header.AmountCost != 0)
+                        {
+                            detail.AmountCost = (detail.PercentageCostRevenue * header.AmountCost);
+                            detail.AmountCost = detail.AmountCost.RoundTo(AC.DecimalTransa);
+                        }
+                        else if (header.AmountRevenue != 0)
+                        {
+                            detail.AmountRevenue = (detail.PercentageCostRevenue * header.AmountRevenue);
+                            detail.AmountRevenue = detail.AmountRevenue.RoundTo(AC.DecimalTransa);
+                        }
+
                     }
                 }
             }

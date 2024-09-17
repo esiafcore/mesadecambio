@@ -12,7 +12,10 @@ public class QuotationDetailConfiguration : IEntityTypeConfiguration<QuotationDe
         builder.HasKey(x => x.Id);
         builder.Property(x => x.CompanyId).ValueGeneratedOnAdd().HasDefaultValue(1);
         builder.Property(x => x.LineNumber).ValueGeneratedOnAdd().HasDefaultValue(1);
-        builder.Property(b => b.AmountDetail).HasPrecision(18, 4);
+        builder.Property(b => b.AmountDetail).HasPrecision(18, 4).HasDefaultValue(0M);
+        builder.Property(b => b.AmountCost).HasPrecision(18, 4).HasDefaultValue(0M);
+        builder.Property(b => b.AmountRevenue).HasPrecision(18, 4).HasDefaultValue(0M);
+        builder.Property(b => b.PercentageCostRevenue).HasPrecision(18, 6).HasDefaultValue(0M);
         builder.Property(b => b.IsBankTransactionPosted).HasDefaultValue(false);
         builder.Property(b => b.IsBankTransactionVoidPosted).HasDefaultValue(false);
         builder.Property(b => b.IsBankTransactionTransferFeePosted).HasDefaultValue(false);
