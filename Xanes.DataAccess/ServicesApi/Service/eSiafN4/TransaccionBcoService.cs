@@ -66,7 +66,7 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
-    public Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId)
+    public Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid?transaBcoCommisionId)
     {
         return SendAsync<T>(new APIRequest()
         {

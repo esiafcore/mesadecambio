@@ -359,7 +359,7 @@ const fnReClosed = async (id) => {
 
     try {
 
-        let url = `/exchange/quotation/ReClosed?id=${id}`;
+        let url = `/exchange/quotation/Closed?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'
@@ -367,17 +367,15 @@ const fnReClosed = async (id) => {
 
         const jsonResponse = await response.json();
         if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
+            if (jsonResponse.titleMessages == "") {
+                titulo = "Error";
+            }
+            fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
         } else {
             if (jsonResponse.urlRedirect) {
                 window.location.href = jsonResponse.urlRedirect;
             }
         }
-
     } catch (e) {
         Swal.fire({
             icon: 'error',
