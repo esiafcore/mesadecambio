@@ -1150,6 +1150,7 @@ public class QuotationController : Controller
                     jsonResponse.ErrorMessages = $"Registro padre no encontrado";
                     return Json(jsonResponse);
                 }
+
                 obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountTransaction);
 
                 if (objHeader.TypeNumeral == SD.QuotationType.Buy)
@@ -1203,6 +1204,13 @@ public class QuotationController : Controller
                 {
                     obj.AmountRevenue = (obj.PercentageCostRevenue * objHeader.AmountRevenueReal);
                     obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+                }
+
+                if (obj.QuotationDetailType == QuotationDetailType.Deposit)
+                {
+                    obj.PercentageCostRevenue = 0;
+                    obj.AmountRevenue = 0;
+                    obj.AmountCost = 0;
                 }
 
                 //Verificamos si existe la moneda
@@ -6364,6 +6372,13 @@ public class QuotationController : Controller
                         {
                             detail.AmountRevenue = (detail.PercentageCostRevenue * header.AmountRevenueReal);
                             detail.AmountRevenue = detail.AmountRevenue.RoundTo(AC.DecimalTransa);
+                        }
+
+                        if (detail.QuotationDetailType == QuotationDetailType.Deposit)
+                        {
+                            detail.PercentageCostRevenue = 0;
+                            detail.AmountRevenue = 0;
+                            detail.AmountCost = 0;
                         }
 
                     }
