@@ -1986,7 +1986,7 @@ public class QuotationController : Controller
                     }
                     else
                     {
-                        jsonResponse.ErrorMessages = resultResponse.ErrorMessages;
+                        jsonResponse.ErrorMessages += resultResponse.ErrorMessages + Environment.NewLine;
                     }
 
                     jsonResponse.TitleMessages = "Detalles Contabilizados";
