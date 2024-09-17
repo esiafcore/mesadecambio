@@ -1049,7 +1049,7 @@ public class QuotationController : Controller
             model.BankList = objBankList;
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
-            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
             model.DataModel = new();
             model.DataModel.CompanyId = _companyId;
 
@@ -1306,7 +1306,7 @@ public class QuotationController : Controller
             model.BankList = objBankList;
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
-            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
             var currencyTarget =
                 objHeader.TypeNumeral != SD.QuotationType.Sell ?
                     objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
@@ -1365,7 +1365,7 @@ public class QuotationController : Controller
             model.BankList = objBankList;
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
-            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral}";
+            model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
             var currencyTarget =
                 objHeader.TypeNumeral != SD.QuotationType.Sell ?
                     objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
@@ -1846,8 +1846,7 @@ public class QuotationController : Controller
             var transactionList = _uow.Quotation
                 .GetAll(filter: x => (x.CompanyId == _companyId)
                                          && (quotationIds.Contains(x.Id))
-                                         && (x.IsClosed)
-                                         && (x.TypeNumeral != SD.QuotationType.Transport))
+                                         && (x.IsClosed))
                                         .ToList();
 
             if (transactionList is null || transactionList.Count() == 0)
@@ -2492,7 +2491,7 @@ public class QuotationController : Controller
             decimal exchangeRate = objHeader.TypeNumeral switch
             {
                 SD.QuotationType.Sell => objHeader.ExchangeRateSellTransa,
-                SD.QuotationType.Buy => objHeader.ExchangeRateBuyTransa,
+                SD.QuotationType.Buy => objHeader.ExchangeRateOfficialTransa,
                 _ => objHeader.ExchangeRateOfficialTransa
             };
 
@@ -2501,6 +2500,10 @@ public class QuotationController : Controller
             var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
+
+            var numberTransaFull =
+                $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
+
 
             TransaccionesBcoDtoCreate transaBco = new()
             {
@@ -2514,7 +2517,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -2528,7 +2531,7 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}",
+                NumeroTransaccionRef = $"{numberTransaFull}",
                 TipoCambioMonfor = exchangeRate,
                 TipoCambioMonxtr = exchangeRate,
                 TipoCambioParaMonfor = exchangeRate,
@@ -2827,12 +2830,21 @@ public class QuotationController : Controller
                 _ => objHeader.ExchangeRateOfficialTransa
             };
 
+            decimal exchangeRate = objHeader.TypeNumeral switch
+            {
+                SD.QuotationType.Sell => exchangeRateOficial,
+                SD.QuotationType.Buy => exchangeRateTransa,
+                _ => objHeader.ExchangeRateOfficialTransa
+            };
 
             ConverterExchange cvtExc = new();
 
             var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                exchangeRateTransa, exchangeRateTransa,
+                exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
+
+            var numberTransaFull =
+                $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
             //Creamos transaccion bancaria
             TransaccionesBcoDtoCreate transaBco = new()
@@ -2847,7 +2859,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"{numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -2861,14 +2873,20 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}",
+                NumeroTransaccionRef = $"{numberTransaFull}",
                 TipoCambioMonfor = exchangeRateOficial,
                 TipoCambioMonxtr = exchangeRateOficial,
-                TipoCambioParaMonfor = exchangeRateTransa,
-                TipoCambioParaMonxtr = exchangeRateTransa,
+                TipoCambioParaMonfor = exchangeRate,
+                TipoCambioParaMonxtr = exchangeRate,
                 MontoMonbas = mtosExc.AmountBase,
                 MontoMonfor = mtosExc.AmountForeign,
                 MontoMonxtr = mtosExc.AmountAdditional,
+                SubtotalNetoMonbas = mtosExc.AmountBase,
+                SubtotalNetoMonfor = mtosExc.AmountForeign,
+                SubtotalNetoMonxtr = mtosExc.AmountAdditional,
+                TotalMonbas = mtosExc.AmountBase,
+                TotalMonfor = mtosExc.AmountForeign,
+                TotalMonxtr = mtosExc.AmountAdditional,
                 MontoDebitoMonbas = mtosExc.AmountBase,
                 MontoDebitoMonfor = mtosExc.AmountForeign,
                 MontoDebitoMonxtr = mtosExc.AmountAdditional,
@@ -2904,7 +2922,7 @@ public class QuotationController : Controller
             detail.IsBankTransactionPosted = false;
 
             mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                exchangeRateOficial, exchangeRateOficial,
+                exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
 
@@ -2945,9 +2963,60 @@ public class QuotationController : Controller
             //Agg al detalle
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
-            mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                exchangeRateTransa, exchangeRateTransa,
-                decimalTrx: AC.DecimalTransa);
+            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                //Venta de dolares 
+                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                {
+                    //Cliente paga en Cordobas
+                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Base)
+                    {
+                        exchangeRate = exchangeRateTransa;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
+                    }
+                }//Venta de Euros
+                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    //Cliente paga en Cordobas
+                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Base)
+                    {
+
+                    }//Cliente paga en Dolares
+                    else if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    {
+
+                    }
+                }
+            }
+            else
+            {
+                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                {
+                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+
+                        exchangeRate = exchangeRateOficial;
+
+                        mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Foreign, transaBcoDetalleDto.MontoMonfor,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
+                    }
+                }
+                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+
+                    }
+                    else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    {
+
+                    }
+                }
+            }
 
             //Creamos el segundo detalle
             transaBcoDetalle = new()
@@ -3238,6 +3307,10 @@ public class QuotationController : Controller
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
+            var numberTransaFull =
+                $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
+
+
             TransaccionesBcoDtoCreate transaBco = new()
             {
                 IndMesaDeCambio = true,
@@ -3250,7 +3323,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS A {bankAccountTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3265,7 +3338,7 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}",
+                NumeroTransaccionRef = $"{numberTransaFull}",
                 TipoCambioMonfor = exchangeRate,
                 TipoCambioMonxtr = exchangeRate,
                 TipoCambioParaMonfor = 1,
@@ -3575,6 +3648,10 @@ public class QuotationController : Controller
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
+            var numberTransaFull =
+                $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
+
+
             TransaccionesBcoDtoCreate transaBco = new()
             {
                 IndMesaDeCambio = true,
@@ -3587,7 +3664,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS A {bankAccountTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3602,7 +3679,7 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}",
+                NumeroTransaccionRef = $"{numberTransaFull}",
                 TipoCambioMonfor = exchangeRate,
                 TipoCambioMonxtr = exchangeRate,
                 TipoCambioParaMonfor = 1,
@@ -3898,6 +3975,9 @@ public class QuotationController : Controller
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
+            var numberTransaFull =
+                $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
+
             TransaccionesBcoDtoCreate transaBco = new()
             {
                 IndMesaDeCambio = true,
@@ -3910,7 +3990,7 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA {objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA DESDE {objHeader.BankAccountTargetTrx.Code} - {numberTransaFull} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
@@ -3924,7 +4004,7 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{objHeader.TypeTrx.Code}-MC-#{objHeader.Numeral}",
+                NumeroTransaccionRef = $"{numberTransaFull}",
                 TipoCambioMonfor = exchangeRate,
                 TipoCambioMonxtr = exchangeRate,
                 TipoCambioParaMonfor = 1,
@@ -5947,7 +6027,7 @@ public class QuotationController : Controller
                     header.CurrencyTransferId = objBankAccountSource.CurrencyId;
                     header.ExchangeRateOfficialReal = header.ExchangeRateOfficialTransa;
 
-                    var objDetailCredit = objQuotationDetailList.First(x => x.ParentId == header.Id && 
+                    var objDetailCredit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
                                                                             x.QuotationDetailType == QuotationDetailType.CreditTransfer);
                     var objDetailDebit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
                                                                             x.QuotationDetailType == QuotationDetailType.DebitTransfer);
