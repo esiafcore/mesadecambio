@@ -1948,6 +1948,10 @@ public class QuotationController : Controller
         ResultResponse? resultResponse = new() { IsSuccess = true };
         ConfigBcoDto? configBcoDto = new();
         ConfigCntDto? configCntDto = new();
+        Guid? objDebitId = new();
+        Guid? objCreditId = new();
+        Guid? objCommisionId = new();
+
         bool isReclosed = false;
         try
         {
@@ -2009,15 +2013,15 @@ public class QuotationController : Controller
                 objHeader = (Quotation)resultResponse.Data!;
                 objDetailList = (List<QuotationDetail>)resultResponse.DataList!;
 
-                foreach (var detail in objDetailList)
+                foreach (var detail in objDetailList.OrderBy(x => x.QuotationDetailType))
                 {
                     if (isReclosed)
                     {
-                        if (detail is { BankTransactionId: not null, JournalEntryId: not null })
+                        if (detail is { BankTransactionId: not null })
                         {
                             //Eliminamos las transacciones relacionadas
                             resultResponse = await
-                                fnDeleteTransactions(detail.BankTransactionId!.Value, detail.JournalEntryId!.Value);
+                                fnDeleteTransactions(detail.BankTransactionId!.Value);
 
                             if (!resultResponse.IsSuccess)
                             {
@@ -2029,27 +2033,10 @@ public class QuotationController : Controller
                             detail.IsJournalEntryPosted = false;
                             detail.BankTransactionId = null;
                             detail.IsBankTransactionPosted = false;
-
-                            if (detail.QuotationDetailType == QuotationDetailType.DebitTransfer && objHeader.AmountCommission != 0)
-                            {
-                                if (detail is { BankTransactionTransferFeeId: not null, JournalEntryTransferFeeId: not null })
-                                {
-                                    //Eliminamos las transacciones relacionadas
-                                    resultResponse = await
-                                    fnDeleteTransactions(detail.BankTransactionTransferFeeId!.Value, detail.JournalEntryTransferFeeId!.Value);
-
-                                    if (!resultResponse.IsSuccess)
-                                    {
-                                        resultResponse.IsSuccess = false;
-                                        return resultResponse;
-                                    }
-
-                                    detail.JournalEntryTransferFeeId = null;
-                                    detail.IsJournalEntryTransferFeePosted = false;
-                                    detail.BankTransactionTransferFeeId = null;
-                                    detail.IsBankTransactionTransferFeePosted = false;
-                                }
-                            }
+                            detail.JournalEntryTransferFeeId = null;
+                            detail.IsJournalEntryTransferFeePosted = false;
+                            detail.BankTransactionTransferFeeId = null;
+                            detail.IsBankTransactionTransferFeePosted = false;
                         }
                     }
 
@@ -2112,6 +2099,8 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+
+                            objCreditId = detailUpdate.BankTransactionId;
                         }
                         else if (detail.QuotationDetailType == QuotationDetailType.DebitTransfer)
                         {
@@ -2145,9 +2134,20 @@ public class QuotationController : Controller
                             detailUpdate.UpdatedHostName = AC.LOCALHOSTPC;
                             detailUpdate.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
                             _uow.QuotationDetail.Update(detailUpdate);
+
+                            objDebitId = detailUpdate.BankTransactionId;
+                            objCommisionId = detailUpdate.BankTransactionTransferFeeId;
+
+                            resultResponse = await
+                                fnCreateTransactionBcoRel(objDebitId.Value, objCreditId.Value, objCommisionId.Value);
+
+                            if (!resultResponse.IsSuccess)
+                            {
+                                resultResponse.IsSuccess = false;
+                                return resultResponse;
+                            }
                         }
                     }
-
                 }
 
                 if (isReclosed)
@@ -2327,59 +2327,14 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnDeleteTransactions(Guid transaId, Guid asientoId)
+    private async Task<ResultResponse> fnDeleteTransactions(Guid transaId)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
 
         try
         {
-            var srvResponse = await _srvTransaBcoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, transaId);
-            if (srvResponse is null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                return resultResponse;
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
-
-            srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, transaId);
-            if (srvResponse is null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                return resultResponse;
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
-
-            srvResponse = await _srvAsientoDetalle.DeleteByParentAsync<APIResponse>(_sessionToken, asientoId);
-            if (srvResponse is null)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
-                return resultResponse;
-            }
-            else if (srvResponse is { isSuccess: false })
-            {
-                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
-                return resultResponse;
-            }
-
-            srvResponse = await _srvAsiento.DeleteAsync<APIResponse>(_sessionToken, asientoId);
+            var srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, transaId);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -3208,7 +3163,8 @@ public class QuotationController : Controller
         ResultResponse? resultResponse = new() { IsSuccess = true };
         try
         {
-            BancosDto? bankDto = new();
+            BancosDto? bankSourceDto = new();
+            BancosDto? bankTargetDto = new();
             CuentasBancariasDto? bankAccountSourceDto = new();
             CuentasBancariasDto? bankAccountTargetDto = new();
             TransaccionResponse? transaResponse = new();
@@ -3219,7 +3175,7 @@ public class QuotationController : Controller
             ModulosDto? moduloDto = new();
             ModulosDocumentosDto? moduloDocumentoDto = new();
 
-            resultResponse = await fnGetBank(detail.BankSourceTrx.Code);
+            resultResponse = await fnGetBank(objHeader.BankAccountTargetTrx.ParentTrx.Code);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
@@ -3227,10 +3183,20 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
-            bankDto = (BancosDto)resultResponse.Data;
+            bankSourceDto = (BancosDto)resultResponse.Data;
+
+            resultResponse = await fnGetBank(objHeader.BankAccountSourceTrx.ParentTrx.Code);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
+            {
+                resultResponse.IsSuccess = false;
+                return resultResponse;
+            }
+
+            bankTargetDto = (BancosDto)resultResponse.Data;
 
             resultResponse = await fnGetBankAccountTransfer(
-                bankDto.Codigo,
+                bankSourceDto.Codigo,
                 objHeader.BankAccountTargetTrx!.Code,
                 (short)objHeader.BankAccountTargetTrx!.CurrencyType);
 
@@ -3323,12 +3289,12 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"TRASLADO DE FONDOS A {bankAccountTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
                 YearMonthFiscal = $"{objHeader.DateTransa.Year}{objHeader.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}",
-                UidBanco = bankDto.UidRegist,
+                UidBanco = bankSourceDto.UidRegist,
                 UidCuentaBancaria = bankAccountSourceDto.UidRegist,
                 UidCuentaBancariaRef = bankAccountTargetDto.UidRegist,
                 UidTipo = transaResponse.TipoId,
@@ -3549,7 +3515,8 @@ public class QuotationController : Controller
         ResultResponse? resultResponse = new() { IsSuccess = true };
         try
         {
-            BancosDto? bankDto = new();
+            BancosDto? bankSourceDto = new();
+            BancosDto? bankTargetDto = new();
             CuentasBancariasDto? bankAccountSourceDto = new();
             CuentasBancariasDto? bankAccountTargetDto = new();
             TransaccionResponse? transaResponse = new();
@@ -3560,7 +3527,7 @@ public class QuotationController : Controller
             ModulosDto? moduloDto = new();
             ModulosDocumentosDto? moduloDocumentoDto = new();
 
-            resultResponse = await fnGetBank(detail.BankSourceTrx.Code);
+            resultResponse = await fnGetBank(objHeader.BankAccountSourceTrx.ParentTrx.Code);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
@@ -3568,10 +3535,20 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
-            bankDto = (BancosDto)resultResponse.Data;
+            bankSourceDto = (BancosDto)resultResponse.Data;
+
+            resultResponse = await fnGetBank(objHeader.BankAccountTargetTrx.ParentTrx.Code);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
+            {
+                resultResponse.IsSuccess = false;
+                return resultResponse;
+            }
+
+            bankTargetDto = (BancosDto)resultResponse.Data;
 
             resultResponse = await fnGetBankAccountTransfer(
-                bankDto.Codigo,
+                bankSourceDto.Codigo,
                 objHeader.BankAccountSourceTrx!.Code,
                 (short)objHeader.BankAccountSourceTrx!.CurrencyType);
 
@@ -3664,12 +3641,12 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"TRASLADO DE FONDOS A {bankAccountTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"TRASLADO DE FONDOS DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CurrencyTransaTrx.Code}{objHeader.AmountTransaction.ToString(AC.DecimalTransaFormat)} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
                 YearMonthFiscal = $"{objHeader.DateTransa.Year}{objHeader.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}",
-                UidBanco = bankDto.UidRegist,
+                UidBanco = bankSourceDto.UidRegist,
                 UidCuentaBancaria = bankAccountSourceDto.UidRegist,
                 UidCuentaBancariaRef = bankAccountTargetDto.UidRegist,
                 UidTipo = transaResponse.TipoId,
@@ -3890,7 +3867,8 @@ public class QuotationController : Controller
         ResultResponse? resultResponse = new() { IsSuccess = true };
         try
         {
-            BancosDto? bankDto = new();
+            BancosDto? bankSourceDto = new();
+            BancosDto? bankTargetDto = new();
             CuentasBancariasDto? bankAccountSourceDto = new();
             TransaccionResponse? transaResponse = new();
             TransaccionesBcoDto? transaBcoDto = new();
@@ -3900,7 +3878,7 @@ public class QuotationController : Controller
             ModulosDto? moduloDto = new();
             ModulosDocumentosDto? moduloDocumentoDto = new();
 
-            resultResponse = await fnGetBank(detail.BankSourceTrx.Code);
+            resultResponse = await fnGetBank(objHeader.BankAccountSourceTrx.ParentTrx.Code);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
@@ -3908,10 +3886,20 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
-            bankDto = (BancosDto)resultResponse.Data;
+            bankSourceDto = (BancosDto)resultResponse.Data;
+
+            resultResponse = await fnGetBank(objHeader.BankAccountTargetTrx.ParentTrx.Code);
+
+            if (!resultResponse.IsSuccess || resultResponse.Data == null)
+            {
+                resultResponse.IsSuccess = false;
+                return resultResponse;
+            }
+
+            bankTargetDto = (BancosDto)resultResponse.Data;
 
             resultResponse = await fnGetBankAccountTransfer(
-                bankDto.Codigo,
+                bankSourceDto.Codigo,
                 objHeader.BankAccountSourceTrx!.Code,
                 (short)objHeader.BankAccountSourceTrx!.CurrencyType);
 
@@ -3990,12 +3978,12 @@ public class QuotationController : Controller
                 IndFlotante = false,
                 IndOkay = true,
                 IndTransaccionInicial = false,
-                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA DESDE {objHeader.BankAccountTargetTrx.Code} - {numberTransaFull} - {objHeader.CustomerTrx.CommercialName}",
+                Comentarios = $"COMISION BANCARIA POR TRANSFERENCIA DESDE {bankSourceDto.Codigo.Trim()} A {bankTargetDto.Codigo.Trim()} - {numberTransaFull} - {objHeader.CustomerTrx.CommercialName}",
                 FechaTransa = objHeader.DateTransa.ToDateTimeConvert(),
                 MesFiscal = (short)objHeader.DateTransa.Month,
                 YearFiscal = (short)objHeader.DateTransa.Year,
                 YearMonthFiscal = $"{objHeader.DateTransa.Year}{objHeader.DateTransa.Month.ToString().PadLeft(2, AC.CharDefaultEmpty)}",
-                UidBanco = bankDto.UidRegist,
+                UidBanco = bankSourceDto.UidRegist,
                 UidCuentaBancaria = bankAccountSourceDto.UidRegist,
                 UidTipo = transaResponse.TipoId,
                 UidSubtipo = transaResponse.SubtipoId,
@@ -4217,6 +4205,38 @@ public class QuotationController : Controller
         try
         {
             var srvResponse = await _srvTransaBco.UpdateAsync<APIResponse>(_sessionToken, transaBco);
+            if (srvResponse is null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                return resultResponse;
+            }
+            else if (srvResponse is { isSuccess: false })
+            {
+                errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                return resultResponse;
+            }
+
+            resultResponse.IsSuccess = true;
+            return resultResponse;
+        }
+        catch (Exception ex)
+        {
+            resultResponse.IsSuccess = false;
+            resultResponse.ErrorMessages = ex.Message;
+            return resultResponse;
+        }
+    }
+
+    private async Task<ResultResponse> fnCreateTransactionBcoRel(Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId)
+    {
+        ResultResponse? resultResponse = new() { IsSuccess = true };
+        StringBuilder errorsMessagesBuilder = new();
+        try
+        {
+            var srvResponse = await _srvTransaBco.CreateRelationAsync<APIResponse>(_sessionToken, transaBcoDebitId, transaBcoCreditId, transaBcoCommisionId);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;

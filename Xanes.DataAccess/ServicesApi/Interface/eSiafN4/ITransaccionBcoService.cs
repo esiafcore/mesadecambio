@@ -12,6 +12,7 @@ public interface ITransaccionBcoService
         int fiscalMonth, short tipo, short subtipo,
         ConsecutivoTipo consecutivo, bool isSave);
     Task<T> CreateAsync<T>(string token, TransaccionesBcoDtoCreate model);
+    Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId);
     Task<T> UpdateAsync<T>(string token, TransaccionesBcoDtoUpdate model);
     Task<T> DeleteAsync<T>(string token, Guid id);
 }

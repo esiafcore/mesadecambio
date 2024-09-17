@@ -66,6 +66,16 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
+    public Task<T> CreateRelationAsync<T>(string token, Guid transaBcoDebitId, Guid transaBcoCreditId, Guid transaBcoCommisionId)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Post,
+            Url = string.Format("{0}/relation?transaBcoDebitId={1}&transaBcoCreditId={2}&transaBcoCommisionId={3}", _actionUrl, transaBcoDebitId.ToString(), transaBcoCreditId.ToString(), transaBcoCommisionId.ToString()),
+            Token = token
+        });
+    }
+
     public Task<T> CreateAsync<T>(string token, TransaccionesBcoDtoCreate body)
     {
         body.UidCia = Guid.Parse(_companyId);
