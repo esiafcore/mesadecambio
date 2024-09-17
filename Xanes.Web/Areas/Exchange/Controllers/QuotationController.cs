@@ -1955,7 +1955,8 @@ public class QuotationController : Controller
             var transactionList = _uow.Quotation
                 .GetAll(filter: x => (x.CompanyId == _companyId)
                                          && (quotationIds.Contains(x.Id))
-                                         && (x.IsClosed))
+                                         && (x.IsClosed) 
+                                         && (!x.IsPayment) && (!x.IsLoan) && (!x.IsPosted))
                                         .ToList();
 
             if (transactionList is null || transactionList.Count() == 0)
@@ -2090,16 +2091,6 @@ public class QuotationController : Controller
                 return resultResponse;
             }
 
-            var objDetailList = _uow.QuotationDetail
-                .GetAll(filter: x => x.ParentId == objHeader.Id,
-                    includeProperties: "CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
-
-            if (objDetailList == null || objDetailList.Count == 0)
-            {
-                resultResponse.IsSuccess = false;
-                resultResponse.ErrorMessages = $"Detalles de Cotización no encontrados";
-                return resultResponse;
-            }
 
             resultResponse = await fnGetConfigurations();
 
@@ -2118,6 +2109,17 @@ public class QuotationController : Controller
 
             if (!objHeader.IsLoan && objHeader is { IsPayment: false, IsPosted: false })
             {
+                var objDetailList = _uow.QuotationDetail
+                    .GetAll(filter: x => x.ParentId == objHeader.Id,
+                        includeProperties: "CurrencyDetailTrx,BankSourceTrx,BankTargetTrx").ToList();
+
+                if (objDetailList == null || objDetailList.Count == 0)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Detalles de Cotización no encontrados";
+                    return resultResponse;
+                }
+
                 resultResponse = await
                     fnCheckChildrenPosted(objHeader, objDetailList);
 
