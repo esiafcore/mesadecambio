@@ -21,6 +21,7 @@ using Stimulsoft.Report.Export;
 using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
+using Xanes.Models.Dtos.XanesN8;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -1600,8 +1601,9 @@ public class QuotationController : Controller
         }
     }
 
-    public JsonResult GetAllByParent(int parentId = 0, QuotationDetailType type = QuotationDetailType.Deposit)
+    public async Task<JsonResult> GetAllByParent(int parentId = 0, QuotationDetailType type = QuotationDetailType.Deposit)
     {
+        StringBuilder errorsMessagesBuilder = new();
         JsonResultResponse? jsonResponse = new();
         try
         {
@@ -1617,8 +1619,46 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
+            var objListMapped = _mapper.Map<List<QuotationDetailDto>>(objList);
+
+            foreach (var item in objListMapped)
+            {
+                if (item.BankTransactionId.HasValue)
+                {
+
+                    var srvResponse = await _srvTransaBco.GetStatusAsync<APIResponse>(_sessionToken, item.BankTransactionId.Value);
+                    if (srvResponse is null)
+                    {
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = "No se pudo obtener la respuesta";
+                        return Json(jsonResponse);
+                    }
+
+                    if (srvResponse is { isSuccess: true })
+                    {
+                        var transaDtoStatus = JsonConvert.DeserializeObject<TransaccionesBcoDtoStatus>(Convert.ToString(srvResponse.result));
+
+                        if (transaDtoStatus != null)
+                        {
+                            item.TransactionBcoFullName = $"Trx: {transaDtoStatus.TransaBcoFullName} [{transaDtoStatus.TransaBcoEstado.Trim()}]";
+                            item.JournalEntryFullName = $"Asi: {transaDtoStatus.TransaAsiFullName} [{transaDtoStatus.TransaAsiEstado.Trim()}]";
+                            if (item.JournalEntryVoidId.HasValue)
+                                item.JournalEntryVoidFullName = $"Asi Anu: {transaDtoStatus.TransaAsiAnuladoFullName} [{transaDtoStatus.TransaAsiAnuladoEstado.Trim()}]";
+                        }
+
+                    }
+                    else if (srvResponse is { isSuccess: false })
+                    {
+                        errorsMessagesBuilder.AppendJoin("", srvResponse.errorMessages);
+                        jsonResponse.IsSuccess = false;
+                        jsonResponse.ErrorMessages = errorsMessagesBuilder.ToString();
+                        return Json(jsonResponse);
+                    }
+                }
+            }
+
             jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objList;
+            jsonResponse.Data = objListMapped;
             return Json(jsonResponse);
 
         }

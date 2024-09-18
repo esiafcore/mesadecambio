@@ -43,6 +43,16 @@ public class TransaccionBcoService : BaseService, ITransaccionBcoService
         });
     }
 
+    public Task<T> GetStatusAsync<T>(string token, Guid id)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = HttpMethod.Get,
+            Url = string.Format("{0}/status?id={1}", _actionUrl, id.ToString()),
+            Token = token
+        });
+    }
+
     public Task<T> GetIsAprovalAsync<T>(string token, Guid id)
     {
         return SendAsync<T>(new APIRequest()

@@ -122,9 +122,9 @@ function fnLoadDatatableDeposit() {
                 "render": (data) => {
                     let dataCode;
                     if (typeNumeral != QuotationType.Transport) {
-                        dataCode = data.bankSourceTrx.code;
+                        dataCode = data.bankSourceCode;
                     } else {
-                        dataCode = data.bankTargetTrx.code;
+                        dataCode = data.bankTargetCode;
                     }
                     return dataCode;
                 }
@@ -232,10 +232,10 @@ function fnLoadDatatableTransfer() {
                 data: 'lineNumber', "width": "2%", orderable: true
             },
             {
-                data: 'bankSourceTrx.code', "width": "20%", orderable: false
+                data: 'bankSourceCode', "width": "20%", orderable: false
             },
             {
-                data: 'bankTargetTrx.code', "width": "20%", orderable: false
+                data: 'bankTargetCode', "width": "20%", orderable: false
             },
             {
                 data: 'amountDetail', "width": "15%"
