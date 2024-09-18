@@ -496,6 +496,219 @@ const fnSetSearchValue = (value) => {
     dataTable.search(value).draw();
 }
 
+const fngetIdsDatatable = async () => {
+    const result = await getfilteredDataFromDatatable(false);
+    if (result.isSuccess) {
+        await fnRegenerateTransaction(result.data);
+    }
+}
+
+const fnRegenerateTransaction = async (quotationIds) => {
+    try {
+
+        fntoggleLoading('Generando...');
+
+        const url = `/exchange/quotation/Regenerate`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        fntoggleLoading();
+
+        if (!jsonResponse.isSuccess) {
+            if (jsonResponse.titleMessages == "") {
+                titulo = "Error";
+            }
+            await fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
+        } else {
+            await fnSweetAlertOkay({
+                title: jsonResponse.successMessages,
+                text: `Desde ${dateInitial} hasta ${dateFinal}`,
+                icon: 'success',
+                time: jsonResponse.durationTime
+            });
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en la conexión',
+            text: e.message
+        });
+    } 
+};
+
+const fnvalidContent = async () => {
+    const result = await getfilteredDataFromDatatable(false);
+    // si se imprime
+    if (result.isSuccess) {
+        await fnexportToExcel(result.data);
+    }
+};
+
+// Obtener los datos filtrados disponibles en el datatable
+const getfilteredDataFromDatatable = async (valid = true) => {
+    const reponseIsPrint = {
+        isSuccess: true
+    };
+
+    const data = dataTable.rows({ search: "applied" }).data().toArray();
+    const countData = data.length;
+
+    if (countData <= 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: "No hay registros",
+            text: "No se encontraron registros para exportar"
+        });
+        reponseIsPrint.isSuccess = false;
+        return reponseIsPrint;
+    }
+
+    if (valid) {
+        if (countData > limitBatchCreditNote) {
+            const result = await Swal.fire({
+                title: `&#191;Está seguro de imprimir las transacciones?`,
+                html: `Se van a imprimir ${countData} registros. <br>Esto supera el limite permitido de ${limitBatchCreditNote}`,
+                icon: "warning",
+                showCancelButton: true,
+                reverseButtons: true,
+                focusConfirm: false,
+                confirmButtonText: ButtonsText.Confirm,
+                cancelButtonText: ButtonsText.Cancel,
+                customClass: {
+                    confirmButton: "btn btn-success px-3 mx-2",
+                    cancelButton: "btn btn-primary px-3 mx-2"
+                },
+                buttonsStyling: false
+            });
+
+            if (!result.isConfirmed) {
+                reponseIsPrint.isSuccess = false;
+                return reponseIsPrint;
+            }
+        }
+    }
+
+
+    // Obtener solo las propiedades 'id' de cada objeto en 'data'
+    const ids = data.map(item => item.id);
+    reponseIsPrint.isSuccess = true;
+    reponseIsPrint.data = ids;
+    return reponseIsPrint;
+};
+
+// Exportar datos del datatable a Excel
+const fnexportToExcel = async (quotationIds) => {
+    try {
+
+        fntoggleLoading('Generando Excel...');
+
+        const url = `/exchange/quotation/ExportOperationToExcel`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quotationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            const linkDownload = document.createElement('a');
+            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
+            linkDownload.download = jsonResponse.data.filename;
+            linkDownload.click();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en la conexión',
+            text: e.message
+        });
+    } finally {
+        fntoggleLoading();
+    }
+};
+
+// Exportar datos del datatable a PDF
+const fnexportCreditNoteToPDF = async (quoatationIds) => {
+    try {
+        let isPrintSeparatedFiles = false;
+
+        // Preguntar si los quiere separados
+        const result = await Swal.fire({
+            title: `&#191;Desea exportar las Notas de Crédito en archivos separados?`,
+            html: `Las transacciones se van a imprimir por separados comprimidas`,
+            icon: "warning",
+            showCancelButton: true,
+            reverseButtons: true,
+            focusConfirm: false,
+            confirmButtonText: ButtonsText.Yes,
+            cancelButtonText: ButtonsText.No,
+            customClass: {
+                confirmButton: "btn btn-success px-3 mx-2",
+                cancelButton: "btn btn-primary px-3 mx-2"
+            },
+            buttonsStyling: false
+        });
+
+        isPrintSeparatedFiles = result.isConfirmed;
+
+        fntoggleLoading(ToggleLoadingText.GeneratePdf);
+
+        const url = `/exchange/quotation/ExportCreditNoteToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
+
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify(quoatationIds)
+        });
+
+        const jsonResponse = await response.json();
+
+        if (!jsonResponse.isSuccess) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: jsonResponse.errorMessages
+            });
+        } else {
+            const linkDownload = document.createElement('a');
+            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
+            linkDownload.download = jsonResponse.data.filename;
+            linkDownload.click();
+        }
+
+    } catch (e) {
+        Swal.fire({
+            icon: 'error',
+            title: "Error en la conexión",
+            text: e
+        });
+    } finally {
+        fntoggleLoading();
+    }
+};
+
 const fnLoadDatatable = () => {
     let tooltipInstanceFilter = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
     if (tooltipInstanceFilter) {
@@ -839,212 +1052,3 @@ const fnLoadDatatable = () => {
         }
     });
 }
-
-const fngetIdsDatatable = async () => {
-    const result = await getfilteredDataFromDatatable(false);
-    if (result.isSuccess) {
-        await fnRegenerateTransaction(result.data);
-    }
-}
-
-const fnRegenerateTransaction = async (quotationIds) => {
-    try {
-
-        fntoggleLoading('Generando...');
-
-        const url = `/exchange/quotation/Regenerate`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(quotationIds)
-        });
-
-        const jsonResponse = await response.json();
-
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            toastr.success(jsonResponse.successMessages);
-        }
-
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error en la conexión',
-            text: e.message
-        });
-    } finally {
-        fntoggleLoading();
-    }
-};
-
-const fnvalidContent = async () => {
-    const result = await getfilteredDataFromDatatable(false);
-    // si se imprime
-    if (result.isSuccess) {
-        await fnexportToExcel(result.data);
-    }
-};
-
-// Obtener los datos filtrados disponibles en el datatable
-const getfilteredDataFromDatatable = async (valid = true) => {
-    const reponseIsPrint = {
-        isSuccess: true
-    };
-
-    const data = dataTable.rows({ search: "applied" }).data().toArray();
-    const countData = data.length;
-
-    if (countData <= 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: "No hay registros",
-            text: "No se encontraron registros para exportar"
-        });
-        reponseIsPrint.isSuccess = false;
-        return reponseIsPrint;
-    }
-
-    if (valid) {
-        if (countData > limitBatchCreditNote) {
-            const result = await Swal.fire({
-                title: `&#191;Está seguro de imprimir las transacciones?`,
-                html: `Se van a imprimir ${countData} registros. <br>Esto supera el limite permitido de ${limitBatchCreditNote}`,
-                icon: "warning",
-                showCancelButton: true,
-                reverseButtons: true,
-                focusConfirm: false,
-                confirmButtonText: ButtonsText.Confirm,
-                cancelButtonText: ButtonsText.Cancel,
-                customClass: {
-                    confirmButton: "btn btn-success px-3 mx-2",
-                    cancelButton: "btn btn-primary px-3 mx-2"
-                },
-                buttonsStyling: false
-            });
-
-            if (!result.isConfirmed) {
-                reponseIsPrint.isSuccess = false;
-                return reponseIsPrint;
-            }
-        }
-    }
-
-
-    // Obtener solo las propiedades 'id' de cada objeto en 'data'
-    const ids = data.map(item => item.id);
-    reponseIsPrint.isSuccess = true;
-    reponseIsPrint.data = ids;
-    return reponseIsPrint;
-};
-
-// Exportar datos del datatable a Excel
-const fnexportToExcel = async (quotationIds) => {
-    try {
-
-        fntoggleLoading('Generando Excel...');
-
-        const url = `/exchange/quotation/ExportOperationToExcel`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(quotationIds)
-        });
-
-        const jsonResponse = await response.json();
-
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            const linkDownload = document.createElement('a');
-            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
-            linkDownload.download = jsonResponse.data.filename;
-            linkDownload.click();
-        }
-
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error en la conexión',
-            text: e.message
-        });
-    } finally {
-        fntoggleLoading();
-    }
-};
-
-// Exportar datos del datatable a PDF
-const fnexportCreditNoteToPDF = async (quoatationIds) => {
-    try {
-        let isPrintSeparatedFiles = false;
-
-        // Preguntar si los quiere separados
-        const result = await Swal.fire({
-            title: `&#191;Desea exportar las Notas de Crédito en archivos separados?`,
-            html: `Las transacciones se van a imprimir por separados comprimidas`,
-            icon: "warning",
-            showCancelButton: true,
-            reverseButtons: true,
-            focusConfirm: false,
-            confirmButtonText: ButtonsText.Yes,
-            cancelButtonText: ButtonsText.No,
-            customClass: {
-                confirmButton: "btn btn-success px-3 mx-2",
-                cancelButton: "btn btn-primary px-3 mx-2"
-            },
-            buttonsStyling: false
-        });
-
-        isPrintSeparatedFiles = result.isConfirmed;
-
-        fntoggleLoading(ToggleLoadingText.GeneratePdf);
-
-        const url = `/exchange/quotation/ExportCreditNoteToPDF?isFileSeparated=${isPrintSeparatedFiles}`;
-
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                'Content-Type': "application/json"
-            },
-            body: JSON.stringify(quoatationIds)
-        });
-
-        const jsonResponse = await response.json();
-
-        if (!jsonResponse.isSuccess) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: jsonResponse.errorMessages
-            });
-        } else {
-            const linkDownload = document.createElement('a');
-            linkDownload.href = "data:" + jsonResponse.data.contentType + ";base64," + jsonResponse.data.contentFile;
-            linkDownload.download = jsonResponse.data.filename;
-            linkDownload.click();
-        }
-
-    } catch (e) {
-        Swal.fire({
-            icon: 'error',
-            title: "Error en la conexión",
-            text: e
-        });
-    } finally {
-        fntoggleLoading();
-    }
-};

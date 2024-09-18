@@ -140,6 +140,29 @@ html {
     color: white;
 }
 
+.app-bg-success {
+    background-color: #28a745;
+    color: white;
+    margin-right: 10px;
+}
+
+.app-bg-danger {
+    background-color: #d9534f;
+    color: white;
+    margin-right: 10px;
+}
+
+.app-bg-primary {
+    background-color: #1a1a1a;
+    color: white;
+    margin-right: 10px;
+}
+
+.custom-footer-bg {
+    background: linear-gradient(180deg, #ced4da, #adb5bd); /* Color de fondo personalizado */
+    padding: 10px; /* Opcional: agregar padding */
+}
+
 .text-warning {
     color: #BD7418 !important;
 }

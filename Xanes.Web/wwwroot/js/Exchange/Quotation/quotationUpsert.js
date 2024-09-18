@@ -370,7 +370,7 @@ const fnReClosed = async (id) => {
             if (jsonResponse.titleMessages == "") {
                 titulo = "Error";
             }
-            fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
+            await fnShowModalMessages(jsonResponse, jsonResponse.titleMessages);
         } else {
             if (jsonResponse.urlRedirect) {
                 window.location.href = jsonResponse.urlRedirect;

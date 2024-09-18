@@ -65,7 +65,55 @@ const fnredirectBtnIndex = async (event) => {
     }
 }
 
-const fnShowModalMessages = (data, titulo = "") => {
+const ButtonsText = {
+    Confirm: "Confirmar",
+    Cancel: "Cancelar",
+    Closed: "Cerrar",
+    Delete: "Eliminar",
+    Create: "Crear",
+    Link: "Relacionar",
+    Add: "Agregar",
+    Adjustment: "Ajustar",
+    CreateVersion: "Crear Nueva Versión",
+    Update: "Actualizar",
+    Save: "Guardar",
+    View: "Visualizar",
+    Approved: "Aprobar",
+    DisAccount: "Descontabilizar",
+    Bill: "Facturar",
+    Void: "Anular",
+    Print: "Imprimir",
+    Balance: "Saldos",
+    Active: "Activar",
+    Inactive: "Inactivar",
+    Accept: "Aceptar",
+    Authorize: "Autorizar",
+    Auxiliary: "Auxiliar",
+    Yes: "Si",
+    No: "No",
+}
+
+const fnSweetAlertOkay = async ({ title, text, icon, time, html }) => {
+    return new Promise(resolve => {
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            html: html,
+            showCancelButton: false,
+            showDenyButton: false,
+            confirmButtonText: ButtonsText.Accept,
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'app-bg-primary',
+                footer: 'custom-footer-bg'
+            },
+            footer: `<label class="fs-labelform text-primary">${time}</label>`
+        }).then(() => resolve());
+    });
+};
+
+const fnShowModalMessages = async (data, titulo = "" ) => {
     let icono = "error";
 
     if (data.isInfo) {
@@ -74,10 +122,19 @@ const fnShowModalMessages = (data, titulo = "") => {
         icono = "warning";
     }
 
-    Swal.fire({
-        icon: icono,
-        title: titulo,
-        text: data.errorMessages
+    return new Promise(resolve => {
+        Swal.fire({
+            title: titulo,
+            text: data.errorMessages,
+            icon: icono,
+            showCancelButton: false,
+            showDenyButton: false,
+            confirmButtonText: ButtonsText.Accept,
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'app-bg-primary'
+            }
+        }).then(() => resolve());
     });
 };
 
@@ -144,33 +201,6 @@ const ToggleLoadingText = {
     GenerateExcel: "Generado Excel..."
 
 
-}
-const ButtonsText = {
-    Confirm: "Confirmar",
-    Cancel: "Cancelar",
-    Closed: "Cerrar",
-    Delete: "Eliminar",
-    Create: "Crear",
-    Link: "Relacionar",
-    Add: "Agregar",
-    Adjustment: "Ajustar",
-    CreateVersion: "Crear Nueva Versión",
-    Update: "Actualizar",
-    Save: "Guardar",
-    View: "Visualizar",
-    Approved: "Aprobar",
-    DisAccount: "Descontabilizar",
-    Bill: "Facturar",
-    Void: "Anular",
-    Print: "Imprimir",
-    Balance: "Saldos",
-    Active: "Activar",
-    Inactive: "Inactivar",
-    Accept: "Aceptar",
-    Authorize: "Autorizar",
-    Auxiliary: "Auxiliar",
-    Yes: "Si",
-    No: "No",
 }
 
 const ButtonsColor = {

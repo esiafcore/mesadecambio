@@ -1949,6 +1949,8 @@ public class QuotationController : Controller
     {
         JsonResultResponse? jsonResponse = new();
         StringBuilder errorsMessagesBuilder = new();
+        DateTime beginProcess = DateTime.Now;
+
         //ToDo : 
         try
         {
@@ -1962,8 +1964,9 @@ public class QuotationController : Controller
             if (transactionList is null || transactionList.Count() == 0)
             {
                 jsonResponse.IsSuccess = false;
-                jsonResponse.IsInfo = true;
-                jsonResponse.ErrorMessages = $"No hay operaciones";
+                jsonResponse.IsWarning = true;
+                jsonResponse.TitleMessages = "Lo Sentimos";
+                jsonResponse.ErrorMessages = $"No hay operaciones disponibles";
                 return Json(jsonResponse);
             }
 
@@ -2008,8 +2011,12 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
+            DateTime endProcess = DateTime.Now;
+            TimeSpan durationProcess = new TimeSpan(endProcess.Ticks - beginProcess.Ticks);
+            var time = durationProcess.TotalSeconds;
+            jsonResponse.DurationTime = $"Tiempo Transcurrido: {time} segundos";
             jsonResponse.IsSuccess = true;
-            jsonResponse.SuccessMessages = "Se Regeneraron correctamente";
+            jsonResponse.SuccessMessages = "Regeneración completada exitosamente";
             return Json(jsonResponse);
         }
         catch (Exception ex)
