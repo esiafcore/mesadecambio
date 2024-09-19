@@ -22,6 +22,7 @@ using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
 using Xanes.Models.Dtos.XanesN8;
+using Microsoft.Identity.Client;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -3258,14 +3259,14 @@ public class QuotationController : Controller
             {
                 //Si no hay ingreso y costo ejemplo falta
 
-
-
                 bool isIngreso = objHeader.AmountRevenueReal != 0;
                 decimal amountContraPart = (isIngreso ? detail.AmountRevenue : detail.AmountCost);
 
                 Guid accountId = (isIngreso
                 ? configCntDto.CuentaContableGananciaDiferencial!.Value
                     : configCntDto.CuentaContablePerdidaDiferencial!.Value);
+
+                var tipoMov = (isIngreso ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
 
                 //Creamos el tercer detalle
                 transaBcoDetalle = new()
@@ -3276,7 +3277,7 @@ public class QuotationController : Controller
                     UidRegistPad = transaBcoDto.UidRegist,
                     UidCuentaContable = accountId,
                     NumeroLinea = 3,
-                    TipoMovimiento = (short)mexAccountMovementType.Credit,
+                    TipoMovimiento = tipoMov,
                     MontoMonbas = amountContraPart,
                     IndDiferencial = false,
                     InddeCuadratura = false,
@@ -3301,6 +3302,77 @@ public class QuotationController : Controller
 
                 //Actualizamos el numero de lineas del padre
                 transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
+            }
+
+            if (objHeader.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                {
+                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+                        var amountDebit = transaBcoDetalleDtoList
+                            .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
+                            .Sum(x => x.MontoMonbas);
+
+                        var amountCredit = transaBcoDetalleDtoList
+                            .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
+                            .Sum(x => x.MontoMonbas);
+
+                        var amountDiferential = amountDebit - amountCredit;
+
+                        if (amountDiferential != 0)
+                        {
+                            Guid accountId = (amountDiferential > 0
+                                ? configBcoDto.CuentaContableDifPositivaConciliacion!.Value
+                                : configBcoDto.CuentaContableDifNegativaConciliacion!.Value);
+
+                            var tipoMov = (amountDiferential > 0 ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
+
+                            transaBcoDetalle = new()
+                            {
+                                UidRegist = Guid.Empty,
+                                UidDocumento = moduloDocumentoDto.UidRegist,
+                                CodigoDocumento = moduloDocumentoDto.Codigo,
+                                UidRegistPad = transaBcoDto.UidRegist,
+                                UidCuentaContable = accountId,
+                                NumeroLinea = 4,
+                                TipoMovimiento = tipoMov,
+                                MontoMonbas = Math.Abs(amountDiferential),
+                                IndDiferencial = false,
+                                InddeCuadratura = false,
+                                TipoRegistro = (short)mexBankDetailType.Differential,
+                                UidBeneficiario = transaBcoDto.UidBeneficiario,
+                                UidEntidad = transaBcoDto.UidEntidad
+                            };
+
+                            resultResponse = await
+                                fnCreateTransactionBcoDetail(transaBcoDetalle);
+
+                            if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                            {
+                                resultResponse.IsSuccess = false;
+                                return resultResponse;
+                            }
+
+                            transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
+
+                            //Agg al listado
+                            transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
+
+                            //Actualizamos el numero de lineas del padre
+                            transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
+                        }
+                    }
+                }
+                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    {
+                    }
+                    else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    {
+                    }
+                }
             }
 
             //Creamos el comprobante
@@ -4978,14 +5050,28 @@ public class QuotationController : Controller
                 if (configBcoDto.CuentacontableInterfaz == null || configBcoDto.CuentacontableInterfaz == Guid.Empty)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
+                    resultResponse.ErrorMessages = $"Configuración bancaria cuenta contable de interfaz es requerida";
                     return resultResponse;
                 }
 
                 if (configBcoDto.CuentaContableComisionTransferencia == null || configBcoDto.CuentaContableComisionTransferencia == Guid.Empty)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Configuración bancaria cuentas contable de interfaz es requerida";
+                    resultResponse.ErrorMessages = $"Configuración bancaria cuenta contable de comisión por transferencia es requerida";
+                    return resultResponse;
+                }
+
+                if (configBcoDto.CuentaContableDifPositivaConciliacion == null || configBcoDto.CuentaContableDifPositivaConciliacion == Guid.Empty)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración bancaria cuenta contable de diferencia positiva conciliación es requerida";
+                    return resultResponse;
+                }
+
+                if (configBcoDto.CuentaContableDifNegativaConciliacion == null || configBcoDto.CuentaContableDifNegativaConciliacion == Guid.Empty)
+                {
+                    resultResponse.IsSuccess = false;
+                    resultResponse.ErrorMessages = $"Configuración bancaria cuenta contable de diferencia negativa conciliación es requerida";
                     return resultResponse;
                 }
             }

@@ -681,6 +681,8 @@ const fnClosed = async (id, isReclosed = false) => {
         });
 
         const jsonResponse = await response.json();
+        fntoggleLoading();
+
         if (!jsonResponse.isSuccess) {
 
             if (jsonResponse.titleMessages == "") {
@@ -700,9 +702,7 @@ const fnClosed = async (id, isReclosed = false) => {
             title: "Error en la conexión",
             text: e
         });
-    } finally {
-        fntoggleLoading();
-    }
+    } 
 };
 
 const fnupdateRow = async (id, amount, bankSource, bankTarget, quotationDetailType) => {
