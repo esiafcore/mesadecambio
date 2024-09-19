@@ -1692,10 +1692,13 @@ public class QuotationController : Controller
 
                         if (transaDtoStatus != null)
                         {
-                            item.TransactionBcoFullName = $"Trx: {transaDtoStatus.TransaBcoFullName} [{transaDtoStatus.TransaBcoEstado.Trim()}]";
-                            item.JournalEntryFullName = $"Asi: {transaDtoStatus.TransaAsiFullName} [{transaDtoStatus.TransaAsiEstado.Trim()}]";
-                            if (item.JournalEntryVoidId.HasValue)
-                                item.JournalEntryVoidFullName = $"Asi Anu: {transaDtoStatus.TransaAsiAnuladoFullName} [{transaDtoStatus.TransaAsiAnuladoEstado.Trim()}]";
+                            if (transaDtoStatus.TransaBcoFullName != null && transaDtoStatus.TransaAsiFullName != null)
+                            {
+                                item.TransactionBcoFullName = $"Trx: {transaDtoStatus.TransaBcoFullName} [{transaDtoStatus.TransaBcoEstado.Trim()}]";
+                                item.JournalEntryFullName = $"Asi: {transaDtoStatus.TransaAsiFullName} [{transaDtoStatus.TransaAsiEstado.Trim()}]";
+                                if (item.JournalEntryVoidId.HasValue && transaDtoStatus.TransaAsiAnuladoFullName != null)
+                                    item.JournalEntryVoidFullName = $"Asi Anu: {transaDtoStatus.TransaAsiAnuladoFullName} [{transaDtoStatus.TransaAsiAnuladoEstado.Trim()}]";
+                            }
                         }
 
                     }
