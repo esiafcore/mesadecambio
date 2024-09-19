@@ -1361,7 +1361,7 @@ public class QuotationController : Controller
 
             //Actualizamos los totales del padre
             objHeader.TotalDeposit = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit || 
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit ||
                             x.QuotationDetailType == QuotationDetailType.CreditTransfer)
                 .Sum(x => x.AmountDetail);
 
@@ -5229,7 +5229,7 @@ public class QuotationController : Controller
                 jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
                 return Json(jsonResponse);
             }
-            
+
             int parentId = objDetail.ParentId;
 
             _uow.QuotationDetail.Remove(objDetail);
@@ -5247,7 +5247,7 @@ public class QuotationController : Controller
 
             //Obtenemos los hijos
             var objDetails = _uow.QuotationDetail
-                .GetAll(filter: x => x.CompanyId == _companyId && 
+                .GetAll(filter: x => x.CompanyId == _companyId &&
                                      x.ParentId == parentId).ToList();
 
             if (objDetails == null)
