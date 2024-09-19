@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Xanes.Utility;
 using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
@@ -7,80 +8,80 @@ namespace Xanes.Models;
 [Table("companies", Schema = "cnf")]
 public class Company : ICloneable
 {
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Id")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
-    [MaxLength(25, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [MaxLength(25, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Número Identificación")]
     public string IdentificationNumber { get; set; } = null!;
 
-    [MaxLength(250, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Nombre Comercial")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string CommercialName { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Razon Social")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string BusinessName { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
-    [MaxLength(25, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [MaxLength(25, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Codigo Pais")]
     public string CountryCode { get; set; } = null!;
 
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Numero Pais")]
     public CountryAlpha03 CountryNumber { get; set; } = CountryAlpha03.NIC;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Número Telefónico")]
-    [MaxLength(25, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(25, ErrorMessage = MC.StringLengthMessage)]
     public string PhoneNumber { get; set; } = null!;
 
     [Display(Name = "Número de Autorización Facturación")]
-    [MaxLength(50, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(50, ErrorMessage = MC.StringLengthMessage)]
     public string? BillingAuthorizationNumber { get; set; }
 
     [Display(Name = "Número de Autorización Contabilidad")]
-    [MaxLength(50, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(50, ErrorMessage = MC.StringLengthMessage)]
     public string? JournalAuthorizationNumber { get; set; }
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
-    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [MaxLength(500, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Dirección Principal")]
     public string AddressPrimary { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Sitio Web")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string Website { get; set; } = null!;
 
-    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(500, ErrorMessage = MC.StringLengthMessage)]
     public string? ImageSplashUrl { get; set; }
 
-    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(500, ErrorMessage = MC.StringLengthMessage)]
     public string? ImageSplashLocalPath { get; set; }
 
-    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(500, ErrorMessage = MC.StringLengthMessage)]
     public string? ImageLogoUrl { get; set; }
 
-    [MaxLength(500, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(500, ErrorMessage = MC.StringLengthMessage)]
     public string? ImageLogoLocalPath { get; set; }
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Usa Sucursal")]
     public bool UseBranch { get; set; } = true;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Está Activo")]
     public bool IsActive { get; set; } = true;
 
@@ -90,15 +91,15 @@ public class Company : ICloneable
     public DateTime CreatedDate { get; set; } = new DateTime(2024, 4, 23, 0, 19, 19, 837, DateTimeKind.Utc).AddTicks(4015);
 
     [Display(Name = "Creado Por")]
-    [StringLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [StringLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string CreatedBy { get; set; } = string.Empty;
 
     [Display(Name = "IPv4 Creador")]
-    [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(75, ErrorMessage = MC.StringLengthMessage)]
     public string CreatedIpv4 { get; set; } = string.Empty;
 
     [Display(Name = "HostName Creador")]
-    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string CreatedHostName { get; set; } = string.Empty;
 
     [DataType(DataType.DateTime)]
@@ -107,15 +108,15 @@ public class Company : ICloneable
     public DateTime? UpdatedDate { get; set; } = null;
 
     [Display(Name = "Actualizado Por")]
-    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string? UpdatedBy { get; set; } = null;
 
     [Display(Name = "IPv4 Actualizador")]
-    [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(75, ErrorMessage = MC.StringLengthMessage)]
     public string? UpdatedIpv4 { get; set; } = null;
 
     [Display(Name = "HostName Actualizador")]
-    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string? UpdatedHostName { get; set; } = null;
 
     [DataType(DataType.DateTime)]
@@ -124,15 +125,15 @@ public class Company : ICloneable
     public DateTime? InactivatedDate { get; set; } = null;
 
     [Display(Name = "Inactivado Por")]
-    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string? InactivatedBy { get; set; } = null;
 
     [Display(Name = "IPv4 Inactivador")]
-    [MaxLength(75, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(75, ErrorMessage = MC.StringLengthMessage)]
     public string? InactivatedIpv4 { get; set; } = null;
 
     [Display(Name = "HostName Inactivador")]
-    [MaxLength(100, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     public string? InactivatedHostName { get; set; } = null;
 
     public object Clone()

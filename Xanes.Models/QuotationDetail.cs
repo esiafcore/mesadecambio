@@ -8,9 +8,9 @@ using Xanes.Utility;
 namespace Xanes.Models;
 
 [Table("quotationsdetails", Schema = "fac")]
-public class QuotationDetail: Entity, ICloneable
+public class QuotationDetail : Entity, ICloneable
 {
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Parent Id")]
     [ForeignKey(nameof(ParentTrx))]
     public int ParentId { get; set; }
@@ -18,23 +18,23 @@ public class QuotationDetail: Entity, ICloneable
     [ValidateNever]
     public virtual Quotation ParentTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Tipo de Detalle")]
     public SD.QuotationDetailType QuotationDetailType { get; set; }
 
-    [DisplayName(displayName: "Número Línea")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Display(Name = "Número Línea")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     public int LineNumber { get; set; }
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Id Currency")]
     [ForeignKey(nameof(CurrencyDetailTrx))]
     public int CurrencyDetailId { get; set; }
 
     [ValidateNever]
     public virtual Currency CurrencyDetailTrx { get; set; } = null!;
-    
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Banco Origen")]
     [ForeignKey(nameof(BankSourceTrx))]
     public int BankSourceId { get; set; }
@@ -42,7 +42,7 @@ public class QuotationDetail: Entity, ICloneable
     [ValidateNever]
     public virtual Bank BankSourceTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Banco Destino")]
     [ForeignKey(nameof(BankTargetTrx))]
     public int BankTargetId { get; set; }
@@ -50,22 +50,22 @@ public class QuotationDetail: Entity, ICloneable
     [ValidateNever]
     public virtual Bank BankTargetTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Monto Detalle")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal AmountDetail { get; set; } = 0M;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Porcentaje Costo Ingreso")]
     [DisplayFormat(DataFormatString = "{0:n6}", ApplyFormatInEditMode = true)]
     public decimal PercentageCostRevenue { get; set; } = 0M;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Ingreso Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountRevenue { get; set; } = 0M;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Costo Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountCost { get; set; } = 0M;

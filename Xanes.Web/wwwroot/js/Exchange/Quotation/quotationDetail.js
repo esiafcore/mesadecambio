@@ -1138,7 +1138,7 @@ function fnLoadDatatableDeposit() {
             },
             {
                 data: null, "width": "5%", orderable: false
-                , "render": (data, type, row) => {
+                , render: (data, type, row) => {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
                          onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId}, '${QuotationDetailType.Deposit}')"
@@ -1303,7 +1303,7 @@ function fnLoadDatatableTransfer() {
             },
             {
                 data: null, "width": "5%", orderable: false
-                , "render": (data, type, row) => {
+                , render: (data, type, row) => {
                     return `<div class="btn-group" role="group">        
                         <a class="btn btn-primary py-1 px-3 my-0 mx-1"
                             onclick="fnupdateRow(${data.id}, ${data.amountDetail}, ${data.bankSourceId}, ${data.bankTargetId},'${QuotationDetailType.Transfer}')"

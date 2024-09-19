@@ -89,14 +89,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <UpToDateCheckInput Remove="Areas\Exchange\Views\Quotation\CreateDetail.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Detail.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Upsert.cshtml" />
-    <_ContentIncludedByDefault Remove="Areas\Exchange\Views\Quotation\CreateDetail.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

@@ -879,7 +879,7 @@ const fnLoadDatatable = () => {
                 data: null, "width": "10%", orderable: false
                 , "render": (data, type, row) => {
 
-                    let urlUpdate = `/exchange/quotation/CreateDetail?id=${row.id}`;
+                    let urlUpdate = `/exchange/quotation/UpsertDetail?id=${row.id}`;
                     let urlReClosed = urlUpdate;
 
                     if (row.isLoan || row.isPayment) {

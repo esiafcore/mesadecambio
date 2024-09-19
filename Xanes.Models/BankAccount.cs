@@ -8,7 +8,7 @@ namespace Xanes.Models;
 [Table("banksaccounts", Schema = "bco")]
 public class BankAccount : EntityInactivated, ICloneable
 {
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Parent Id")]
     [ForeignKey(nameof(ParentTrx))]
     public int ParentId { get; set; }
@@ -16,33 +16,33 @@ public class BankAccount : EntityInactivated, ICloneable
     [ValidateNever]
     public virtual Bank ParentTrx { get; set; } = null!;
 
-    [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [Display(Name ="Número de Cuenta Bancaria")]
+    [MaxLength(25, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [Display(Name = "Número de Cuenta Bancaria")]
     public string Code { get; set; } = null!;
 
-    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [MaxLength(150, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Es Local")]
     public bool IsLocal { get; set; } = true;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Id Moneda")]
     [ForeignKey(nameof(CurrencyTrx))]
     public int CurrencyId { get; set; }
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Tipo Moneda")]
     public SD.CurrencyType CurrencyType { get; set; }
 
     [ValidateNever]
     public virtual Currency CurrencyTrx { get; set; } = null!;
 
-    [MaxLength(5, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(5, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Literal de País")]
     public string? LiteralPrefix { get; set; }
 

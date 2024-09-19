@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
+using Xanes.Utility;
 using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
@@ -9,25 +10,25 @@ namespace Xanes.Models;
 [Table("customerssectors", Schema = "cxc")]
 public class CustomerSector : EntityInactivated, ICloneable
 {
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [MaxLength(15, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
-    [MaxLength(75, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
+    [MaxLength(75, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
     [Display(Name = "Código Ruta")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string CodePath { get; set; } = string.Empty;
 
     [Display(Name = "Id Ruta")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string IdPath { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Profundidad")]
     public short Depthnumber { get; set; }
 
@@ -37,7 +38,7 @@ public class CustomerSector : EntityInactivated, ICloneable
     [ValidateNever]
     public virtual CustomerSector ParentTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Nivel del Registro")]
     public TypeLevel TypeLevel { get; set; } = TypeLevel.Root;
 

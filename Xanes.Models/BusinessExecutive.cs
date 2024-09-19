@@ -2,38 +2,39 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 using Xanes.Models.Abstractions;
+using Xanes.Utility;
 
 namespace Xanes.Models;
 
 [Table("businessexecutives", Schema = "cxc")]
 public class BusinessExecutive : EntityInactivated, ICloneable
 {
-    [MaxLength(15, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [MaxLength(15, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
-    [MaxLength(250, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Primer Nombre")]
     public string FirstName { get; set; } = null!;
 
-    [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Segundo Nombre")]
     public string? SecondName { get; set; } = null!;
 
-    [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Primero Apellido")]
     public string LastName { get; set; } = null!;
 
-    [MaxLength(100, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
+    [MaxLength(100, ErrorMessage = MC.StringLengthMessage)]
     [Display(Name = "Segundo Apellido")]
     public string? SecondSurname { get; set; } = null!;
-    
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Cobranza")]
     public bool IsPayment { get; set; }
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Desembolso")]
     public bool IsLoan { get; set; }
 

@@ -2,39 +2,40 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Xanes.Models.Abstractions;
+using Xanes.Utility;
 using static Xanes.Utility.SD;
 
 namespace Xanes.Models;
 [Table("currenciesexchangerates", Schema = "cnf")]
 public class CurrencyExchangeRate : Entity, ICloneable
 {
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Tipo de Registro")]
     public CurrencyType CurrencyType { get; set; } = CurrencyType.Base;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Id Moneda")]
     [ForeignKey(nameof(CurrencyTrx))]
     public int CurrencyId { get; set; }
     [ValidateNever]
     public virtual Currency CurrencyTrx { get; set; } = null!;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [DataType(DataType.Date)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
     public DateOnly DateTransa { get; set; }
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Venta")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal SellRate { get; set; } = 0M;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Compra")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal BuyRate { get; set; } = 0M;
 
-    [Required(ErrorMessage = "{0} es un campo requerido.")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Oficial")]
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal OfficialRate { get; set; } = 0M;

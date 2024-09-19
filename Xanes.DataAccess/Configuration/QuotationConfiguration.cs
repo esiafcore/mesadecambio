@@ -33,7 +33,10 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(b => b.TotalDeposit).HasPrecision(18, 4).HasDefaultValue(0m);
         builder.Property(b => b.TotalTransfer).HasPrecision(18, 4).HasDefaultValue(0m);
 
-
+        builder.Property(b => b.TotalLines).HasDefaultValue(0);
+        builder.Property(b => b.TotalDepositLines).HasDefaultValue(0);
+        builder.Property(b => b.TotalTransferLines).HasDefaultValue(0);
+        
         builder.Property(b => b.IsPosted).HasDefaultValue(false);
         builder.Property(b => b.IsLoan).HasDefaultValue(false);
         builder.Property(b => b.IsBank).HasDefaultValue(false);

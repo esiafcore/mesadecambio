@@ -1,6 +1,6 @@
 ﻿@model QuotationDetailVM
 
-<form id="formDetailDeposit" method="post" asp-action="CreateDetail">
+<form id="formDetailDeposit" method="post" asp-action="UpsertDetail">
     <input asp-for="DataModel.Id" value="@Model.DataModel.Id" name="Id" id="idDetailDeposit" hidden />
     <input asp-for="DataModel.ParentId" value="@Model.ModelCreateVM.DataModel.Id" name="ParentId" hidden />
     <input asp-for="DataModel.CompanyId" value="@Model.ModelCreateVM.DataModel.CompanyId" name="CompanyId" hidden />

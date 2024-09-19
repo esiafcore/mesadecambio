@@ -1,47 +1,48 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using Xanes.Models.Abstractions;
+using Xanes.Utility;
 
 namespace Xanes.Models;
 [Table("identificationstypes", Schema = "cnf")]
 public class IdentificationType : EntityInactivated, ICloneable
 {
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Numeral Identificación")]
     public int Numeral { get; set; }
 
-    [MaxLength(25, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [MaxLength(25, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Código")]
     public string Code { get; set; } = null!;
 
-    [MaxLength(150, ErrorMessage = "Longitud máxima del campo {0} es {1}")]
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [MaxLength(150, ErrorMessage = MC.StringLengthMessage)]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Nombre")]
     public string Name { get; set; } = null!;
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Es Juridico")]
-    public bool IsLegal{ get; set; }
+    public bool IsLegal { get; set; }
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Es Foraneo")]
     public bool IsForeign { get; set; }
 
     [Display(Name = "Expresión Regular")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string? RegularExpressionNumber { get; set; }
 
     [Display(Name = "Regex Formateo")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string? FormatExpressionNumber { get; set; }
 
     [Display(Name = "Regex Sustitución")]
-    [MaxLength(250, ErrorMessage = "Maxima longitud para el campo {0} es {1} caracteres")]
+    [MaxLength(250, ErrorMessage = MC.StringLengthMessage)]
     public string? SubstitutionExpressionNumber { get; set; }
 
-    [Required(ErrorMessage = "El campo {0} es requerido")]
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Máxima Longitud Identificación")]
     public short IdentificationMaxLength { get; set; }
 
