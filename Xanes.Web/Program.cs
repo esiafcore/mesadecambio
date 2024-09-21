@@ -78,8 +78,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseMiddleware<ContentSecurityPolicyMiddleware>();
-
+    //app.UseMiddleware<ContentSecurityPolicyMiddleware>();
     //app.Environment.IsProduction()
     //app.Environment.IsStaging()
 
@@ -89,7 +88,7 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseMiddleware<ContentSecurityPolicyMiddlewareDevelopment>();
+    //app.UseMiddleware<ContentSecurityPolicyMiddlewareDevelopment>();
     using var scope = app.Services.CreateScope();
     await using var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
     //if (context != null)

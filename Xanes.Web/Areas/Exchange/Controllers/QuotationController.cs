@@ -23,6 +23,7 @@ using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
 using Xanes.Models.Dtos.XanesN8;
 using Microsoft.Identity.Client;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -1471,14 +1472,15 @@ public class QuotationController : Controller
 
             QuotationDetailVM model = new();
             ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
-            //ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
             var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
+
             if (objHeader == null)
             {
-                TempData[AC.Error] = $"Cotización no encontrada";
-                return RedirectToAction(nameof(Index));
+                ViewData["TransactionMessageNotFound"] = $"Operación de Mesa de cambio {id} no encontrada";
+                ViewData["UrlReturn"] = Url.Action(action: "Index", controller: "Quotation");
+                return View("TransactionNotFound");
             }
 
             if (objHeader.IsAdjustment)
