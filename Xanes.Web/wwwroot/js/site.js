@@ -4,12 +4,16 @@
 // Write your JavaScript code.
 // Enable tooltip
 const fnEnableTooltip = () => {
-    let buttons = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+};
 
-    // Inicializa el tooltip para cada botón
-    buttons.forEach(function (button) {
-        new bootstrap.Tooltip(button); // Se usa 'new bootstrap.Tooltip' para inicializar el tooltip
-    });
+// Función para destruir el tooltip
+const fnDisabledTooltip = (element) => {
+    const tooltip = bootstrap.Tooltip.getInstance(element);
+    if (tooltip) {
+        tooltip.dispose();
+    }
 };
 
 // Funcion para mover modales

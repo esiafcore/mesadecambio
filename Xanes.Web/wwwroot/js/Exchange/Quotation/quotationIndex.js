@@ -236,13 +236,13 @@ const fnAdjustmentFilterDataTable = () => {
                 <div class="col-1 ps-0 ms-lg-2">
                     <input type="checkbox" id="includeVoid" ${includeVoidValue}>
                 </div>
-                <button onclick="fnLoadDatatable()" data-bs-toggle="tooltip" data-bs-trigger="hover"
+                <button onclick="fnLoadDatatable();fnDisabledTooltip(this)" data-bs-toggle="tooltip" data-bs-trigger="hover"
                     data-bs-placement="top" data-bs-title="Filtrar"
                     class="btn btn-outline-success boder-outline col-2 col-md-1 col-xl-2 ms-3" id="btnFilter">
                     <i class="bi bi-funnel-fill"></i>
                 </button>
                 <a class="btn btn-outline-danger border-outline col-2 col-md-1 col-xl-2 ms-2" id="btnClean" data-bs-toggle="tooltip"
-                       data-bs-trigger="hover" onclick="fnCleanFilter()"
+                       data-bs-trigger="hover" onclick="fnCleanFilter();fnDisabledTooltip(this)"
                        data-bs-placement="top" data-bs-title="Limpiar Filtro">
                         <i class="bi bi-eraser-fill"></i>
                     </a>
@@ -710,18 +710,7 @@ const fnexportCreditNoteToPDF = async (quoatationIds) => {
 };
 
 const fnLoadDatatable = () => {
-    let tooltipInstanceFilter = bootstrap.Tooltip.getInstance(document.getElementById('btnFilter'));
-    if (tooltipInstanceFilter) {
-        tooltipInstanceFilter.hide();
-        tooltipInstanceFilter.dispose();
-    }
-
-    let tooltipInstanceClean = bootstrap.Tooltip.getInstance(document.getElementById('btnClean'));
-    if (tooltipInstanceClean) {
-        tooltipInstanceClean.hide();
-        tooltipInstanceClean.dispose();
-    }
-
+ 
     let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));
 
     if (isNewEntry) {
