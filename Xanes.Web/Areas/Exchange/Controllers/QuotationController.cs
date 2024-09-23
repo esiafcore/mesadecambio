@@ -5277,10 +5277,6 @@ public class QuotationController : Controller
             objHeader.UpdatedDate = DateTime.UtcNow;
             objHeader.UpdatedHostName = AC.LOCALHOSTPC;
             objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            //objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-            //objHeader.ClosedDate = DateTime.UtcNow;
-            //objHeader.ClosedHostName = AC.LOCALHOSTPC;
-            //objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             _uow.Quotation.Update(objHeader);
             _uow.Save();
             jsonResponse.IsSuccess = true;

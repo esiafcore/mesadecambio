@@ -886,9 +886,10 @@ const fnLoadDatatable = () => {
                                          <i class="bi bi-check2-square fs-5"></i>
                                      </a>`;
 
-                    //onclick = "fnVoid(${row.id})"
+                    
                     let btnVoid = `<a class="btn btn-outline-info py-1 px-3 my-0 mx-1" 
-                                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Anular">
+                                        data-bs-toggle="tooltip" data-bs-trigger="hover" onclick="fnVoid(${row.id})"
+                                        data-bs-placement="top" data-bs-title="Anular">
                                          <i class="bi bi-x-square-fill fs-5"></i>
                                      </a>`;
 
@@ -917,11 +918,12 @@ const fnLoadDatatable = () => {
                             buttons += `
                             ${btnView}
                             ${btnVoid}
-                        `;
+                                    `;
                         } else if (row.isClosed && !row.isPosted && !row.isVoid) {
                             buttons += `
                             ${btnView}
                             ${btnReClosed}
+                            ${btnVoid}
                                        `;
                         }
                         else {
@@ -947,8 +949,8 @@ const fnLoadDatatable = () => {
                             buttons += `
                             ${btnView}
                             ${btnPrint}
-                            ${btnReClosed}
-                           
+                            ${btnReClosed}     
+                            ${btnVoid}                            
                                        `;
                         }
                         else {
