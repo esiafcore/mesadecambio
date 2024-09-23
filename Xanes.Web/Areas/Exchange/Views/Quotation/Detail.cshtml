@@ -18,6 +18,31 @@
                         <i class="bi bi-arrow-return-left"></i> Regresar
                     </a>
                 </div>
+
+                @if (Model.ModelCreateVM.DataModel.IsClosed && !Model.ModelCreateVM.DataModel.IsPosted)
+                {
+                    if (Model.ModelCreateVM.DataModel.IsPayment || Model.ModelCreateVM.DataModel.IsLoan)
+                    {
+                        <div class="col-6 col-md-5 col-xl-4">
+                            <a asp-action="Upsert" asp-controller="Quotation" asp-route-id="@Model.ModelCreateVM.DataModel.Id"
+                               class="btn btn-info form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
+                                <i class="bi bi-check-square-fill"></i> Re-Cerrar
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-6 col-md-5 col-xl-4">
+                            <a asp-action="UpsertDetail" asp-controller="Quotation" asp-route-id="@Model.ModelCreateVM.DataModel.Id"
+                               class="btn btn-info form-control btn-sm border"
+                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
+                                <i class="bi bi-check-square-fill"></i> Re-Cerrar
+                            </a>
+                        </div>
+                    }
+                }
+
             </div>
         </div>
     </div>
