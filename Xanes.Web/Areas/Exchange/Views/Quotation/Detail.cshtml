@@ -12,6 +12,18 @@
                 <h2 class="text-white text-center text-md-start py-1">Visualizar - Cotización</h2>
             </div>
             <div class="row col mt-1 d-flex justify-content-end">
+
+                @if (ViewBag.IsClosedNotPosted)
+                {
+                    <div class="col-6 col-md-5 col-xl-4">
+                        <a href="@ViewBag.UrlGoToUpsert"
+                           class="btn btn-outline-warning form-control btn-sm border"
+                           data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Ir a Re-Cerrar..">
+                            <i class="bi bi-check-square-fill"></i> Ir a Re-Cerrar ...
+                        </a>
+                    </div>
+                }
+
                 <div class="col-6 col-md-5 col-xl-4">
                     <a asp-action="Index" class="btn btn-secondary form-control btn-sm border"
                        data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Regresar">
@@ -19,29 +31,6 @@
                     </a>
                 </div>
 
-                @if (Model.ModelCreateVM.DataModel.IsClosed && !Model.ModelCreateVM.DataModel.IsPosted)
-                {
-                    if (Model.ModelCreateVM.DataModel.IsPayment || Model.ModelCreateVM.DataModel.IsLoan)
-                    {
-                        <div class="col-6 col-md-5 col-xl-4">
-                            <a asp-action="Upsert" asp-controller="Quotation" asp-route-id="@Model.ModelCreateVM.DataModel.Id"
-                               class="btn btn-info form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
-                                <i class="bi bi-check-square-fill"></i> Re-Cerrar
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="col-6 col-md-5 col-xl-4">
-                            <a asp-action="UpsertDetail" asp-controller="Quotation" asp-route-id="@Model.ModelCreateVM.DataModel.Id"
-                               class="btn btn-info form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar">
-                                <i class="bi bi-check-square-fill"></i> Re-Cerrar
-                            </a>
-                        </div>
-                    }
-                }
 
             </div>
         </div>

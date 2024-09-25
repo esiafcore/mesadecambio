@@ -24,6 +24,8 @@ using Xanes.Models.Dtos.eSiafN4;
 using Xanes.Models.Dtos.XanesN8;
 using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Stimulsoft.Svg;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -1544,6 +1546,21 @@ public class QuotationController : Controller
             ViewBag.TotalTransfer = JsonConvert.SerializeObject(objHeader.TotalTransfer);
             ViewBag.TotalDeposit = JsonConvert.SerializeObject(objHeader.TotalDeposit);
 
+            ViewBag.IsClosedNotPosted = false;
+
+            if (objHeader.IsClosed && !objHeader.IsPosted)
+            {
+                ViewBag.IsClosedNotPosted = true;
+                if (objHeader.IsPayment || objHeader.IsLoan)
+                {
+                    ViewBag.UrlGoToUpsert = Url.Action(action: "Upsert", controller: "Quotation", new { id = objHeader.Id });
+                }
+                else
+                {
+                    ViewBag.UrlGoToUpsert = Url.Action(action: "UpsertDetail", controller: "Quotation", new { id = objHeader.Id });
+                }
+            }
+
             return View(model);
         }
         catch (Exception ex)
@@ -2312,7 +2329,7 @@ public class QuotationController : Controller
                         }
                     }
 
-                    //Compra o Venta
+                    //*:*Compra o Venta
                     if (objHeader.TypeNumeral != SD.QuotationType.Transport)
                     {
                         if (detail.QuotationDetailType == QuotationDetailType.Deposit)
@@ -2638,7 +2655,8 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnLogicDeposit(Quotation objHeader, QuotationDetail detail, ConfigBcoDto configBcoDto)
+    private async Task<ResultResponse> fnLogicDeposit(Quotation objHeader, QuotationDetail detail
+        , ConfigBcoDto configBcoDto)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         //Comentariar todo wey
@@ -2667,7 +2685,8 @@ public class QuotationController : Controller
             resultResponse = await fnGetBankAccount(
                 bankDto.Codigo,
                 detail.BankSourceTrx.BankAccountExcludeUId,
-                (short)detail.CurrencyDetailTrx.Numeral);
+                (short)detail.CurrencyDetailTrx.Numeral,
+                detail.CurrencyDetailTrx.Abbreviation);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
@@ -2969,7 +2988,8 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnLogicTransfer(Quotation objHeader, QuotationDetail detail, ConfigBcoDto configBcoDto, ConfigCntDto configCntDto)
+    private async Task<ResultResponse> fnLogicTransfer(Quotation objHeader, QuotationDetail detail
+        , ConfigBcoDto configBcoDto, ConfigCntDto configCntDto)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
 
@@ -2998,7 +3018,8 @@ public class QuotationController : Controller
             resultResponse = await fnGetBankAccount(
                 bankDto.Codigo,
                 detail.BankSourceTrx.BankAccountExcludeUId,
-                (short)detail.CurrencyDetailTrx.Numeral);
+                (short)detail.CurrencyDetailTrx.Numeral,
+                detail.CurrencyDetailTrx.Abbreviation);
 
             if (!resultResponse.IsSuccess || resultResponse.Data == null)
             {
@@ -4849,7 +4870,8 @@ public class QuotationController : Controller
         }
     }
 
-    private async Task<ResultResponse> fnGetBankAccount(string bankCode, Guid? bankAccountExcludeId, short currencyType)
+    private async Task<ResultResponse> fnGetBankAccount(string bankCode, Guid? bankAccountExcludeId, short currencyType
+        ,string currencyAbbreviation)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
@@ -4888,7 +4910,7 @@ public class QuotationController : Controller
                 if (bankAccountDto is null)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  "Cuenta bancaria no encontrada";
+                    resultResponse.ErrorMessages =  $"No se encontró la Cuenta bancaria en moneda {currencyAbbreviation} del Banco {bankCode}";
                     return resultResponse;
                 }
             }

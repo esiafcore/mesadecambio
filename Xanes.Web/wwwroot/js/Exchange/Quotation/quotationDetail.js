@@ -669,12 +669,12 @@ const fndeleteRow = async (id) => {
 };
 
 //Funcion para cerrar la cotizacion
-const fnClosed = async (id, isReclosed = false) => {
+const fnClosed = async (id) => {
 
     try {
         fntoggleLoading();
 
-        let url = `/exchange/quotation/Closed?id=${id}&isReclosed=${isReclosed}`;
+        let url = `/exchange/quotation/Closed?id=${id}`;
 
         const response = await fetch(url, {
             method: 'POST'
