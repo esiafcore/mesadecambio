@@ -26,6 +26,7 @@ using Microsoft.Identity.Client;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Stimulsoft.Svg;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -3358,75 +3359,76 @@ public class QuotationController : Controller
                 transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
             }
 
-            if (objHeader.TypeNumeral == SD.QuotationType.Buy)
+            bool isbalanceDifference = false;
+
+            if ((objHeader.TypeNumeral == SD.QuotationType.Buy)
+                && (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                && (objHeader.CurrencyTransferType == SD.CurrencyType.Base))
             {
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                isbalanceDifference = true;
+            }
+            else if ((objHeader.TypeNumeral == SD.QuotationType.Sell)
+                     && (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                     && (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign))
+            {
+                isbalanceDifference = true;
+            }
+
+            if (isbalanceDifference)
+            {
+                   var amountDebit = transaBcoDetalleDtoList
+                    .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
+                    .Sum(x => x.MontoMonbas);
+
+                var amountCredit = transaBcoDetalleDtoList
+                    .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
+                    .Sum(x => x.MontoMonbas);
+
+                var amountDiferential = amountDebit - amountCredit;
+
+                if (amountDiferential != 0)
                 {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    Guid accountId = (amountDiferential > 0
+                        ? configBcoDto.CuentaContableDifPositivaConciliacion!.Value
+                        : configBcoDto.CuentaContableDifNegativaConciliacion!.Value);
+
+                    var tipoMov = (amountDiferential > 0 ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
+
+                    transaBcoDetalle = new()
                     {
-                        var amountDebit = transaBcoDetalleDtoList
-                            .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
-                            .Sum(x => x.MontoMonbas);
+                        UidRegist = Guid.Empty,
+                        UidDocumento = moduloDocumentoDto.UidRegist,
+                        CodigoDocumento = moduloDocumentoDto.Codigo,
+                        UidRegistPad = transaBcoDto.UidRegist,
+                        UidCuentaContable = accountId,
+                        NumeroLinea = 4,
+                        TipoMovimiento = tipoMov,
+                        MontoMonbas = Math.Abs(amountDiferential),
+                        IndDiferencial = false,
+                        InddeCuadratura = false,
+                        TipoRegistro = (short)mexBankDetailType.Differential,
+                        UidBeneficiario = transaBcoDto.UidBeneficiario,
+                        UidEntidad = transaBcoDto.UidEntidad
+                    };
 
-                        var amountCredit = transaBcoDetalleDtoList
-                            .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
-                            .Sum(x => x.MontoMonbas);
+                    resultResponse = await
+                        fnCreateTransactionBcoDetail(transaBcoDetalle);
 
-                        var amountDiferential = amountDebit - amountCredit;
-
-                        if (amountDiferential != 0)
-                        {
-                            Guid accountId = (amountDiferential > 0
-                                ? configBcoDto.CuentaContableDifPositivaConciliacion!.Value
-                                : configBcoDto.CuentaContableDifNegativaConciliacion!.Value);
-
-                            var tipoMov = (amountDiferential > 0 ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
-
-                            transaBcoDetalle = new()
-                            {
-                                UidRegist = Guid.Empty,
-                                UidDocumento = moduloDocumentoDto.UidRegist,
-                                CodigoDocumento = moduloDocumentoDto.Codigo,
-                                UidRegistPad = transaBcoDto.UidRegist,
-                                UidCuentaContable = accountId,
-                                NumeroLinea = 4,
-                                TipoMovimiento = tipoMov,
-                                MontoMonbas = Math.Abs(amountDiferential),
-                                IndDiferencial = false,
-                                InddeCuadratura = false,
-                                TipoRegistro = (short)mexBankDetailType.Differential,
-                                UidBeneficiario = transaBcoDto.UidBeneficiario,
-                                UidEntidad = transaBcoDto.UidEntidad
-                            };
-
-                            resultResponse = await
-                                fnCreateTransactionBcoDetail(transaBcoDetalle);
-
-                            if (!resultResponse.IsSuccess || resultResponse.Data == null)
-                            {
-                                resultResponse.IsSuccess = false;
-                                return resultResponse;
-                            }
-
-                            transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
-
-                            //Agg al listado
-                            transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
-
-                            //Actualizamos el numero de lineas del padre
-                            transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
-                        }
+                    if (!resultResponse.IsSuccess || resultResponse.Data == null)
+                    {
+                        resultResponse.IsSuccess = false;
+                        return resultResponse;
                     }
+
+                    transaBcoDetalleDto = (TransaccionesBcoDetalleDto)resultResponse.Data!;
+
+                    //Agg al listado
+                    transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
+
+                    //Actualizamos el numero de lineas del padre
+                    transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
                 }
-                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
-                {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
-                    {
-                    }
-                    else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
-                    {
-                    }
-                }
+
             }
 
             //Creamos el comprobante
