@@ -22,11 +22,6 @@ using Xanes.DataAccess.ServicesApi.Interface.eSiafN4;
 using Xanes.LoggerService;
 using Xanes.Models.Dtos.eSiafN4;
 using Xanes.Models.Dtos.XanesN8;
-using Microsoft.Identity.Client;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
-using Stimulsoft.Svg;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Xanes.Web.Areas.Exchange.Controllers;
 
@@ -364,7 +359,7 @@ public class QuotationController : Controller
             //Obtener valor oficial del tipo de cambio foraneo
             var currencyForeignValue = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))
-                    ?.OfficialRate 
+                    ?.OfficialRate
                     ?? AC.ExchangeRateDefaultValue;
 
             //Setear Id tipo de operación de mesa de cambio
@@ -2085,6 +2080,257 @@ public class QuotationController : Controller
         }
     }
 
+    [HttpPost, ActionName("Void")]
+    public JsonResult VoidPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+
+        try
+        {
+            var objHeader = _uow.Quotation
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización no encontrada";
+                return Json(jsonResponse);
+            }
+
+            objHeader.IsVoid = true;
+            //Seteamos campos de auditoria
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+            jsonResponse.IsSuccess = true;
+            TempData["success"] = $"Cotización anulada correctamente";
+            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
+
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost, ActionName("DeleteDetail")]
+    public JsonResult DeleteDetailPost(int id)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        if (id == 0)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = $"El id es requerido";
+            return Json(jsonResponse);
+        }
+
+        try
+        {
+            var objDetail = _uow.QuotationDetail
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == id, isTracking: false);
+
+            if (objDetail == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
+                return Json(jsonResponse);
+            }
+
+            int parentId = objDetail.ParentId;
+
+            _uow.QuotationDetail.Remove(objDetail);
+            _uow.Save();
+
+            //Obtenemos el padre
+            var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == parentId);
+
+            if (objHeader == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cotización invalida";
+                return Json(jsonResponse);
+            }
+
+            //Obtenemos los hijos
+            var objDetails = _uow.QuotationDetail
+                .GetAll(filter: x => x.CompanyId == _companyId &&
+                                     x.ParentId == parentId).ToList();
+
+            if (objDetails == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Detalle de cotización invalido";
+                return Json(jsonResponse);
+            }
+
+            objHeader.TotalDeposit = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit ||
+                            x.QuotationDetailType == QuotationDetailType.CreditTransfer)
+                .Sum(x => x.AmountDetail);
+
+            objHeader.TotalTransfer = objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer ||
+                            x.QuotationDetailType == QuotationDetailType.DebitTransfer)
+                .Sum(x => x.AmountDetail);
+
+            objHeader.TotalLines = (short)objDetails.Count;
+
+            objHeader.TotalDepositLines = (short)objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit ||
+                            x.QuotationDetailType == QuotationDetailType.CreditTransfer).ToList()
+                .Count;
+
+            objHeader.TotalTransferLines = (short)objDetails
+                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer ||
+                            x.QuotationDetailType == QuotationDetailType.DebitTransfer).ToList()
+                .Count;
+
+            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.UpdatedDate = DateTime.UtcNow;
+            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
+            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+            _uow.Quotation.Update(objHeader);
+            _uow.Save();
+
+            jsonResponse.IsSuccess = true;
+            //jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost]
+    public JsonResult GetCustomers(bool onlyCompanies = false)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+
+        try
+        {
+            var objCustomerList = _uow.Customer
+                .GetAll(filter: x => x.CompanyId == _companyId && x.IsSystemRow == onlyCompanies).ToList();
+            if (objCustomerList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cliente invalido";
+                return Json(jsonResponse);
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objCustomerList;
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost]
+    public JsonResult GetCustomerByContain(string search, bool onlyCompanies = false)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+        var objCustomerList = new List<Models.Customer>();
+        try
+        {
+            if (search == "." || search == null || search == string.Empty)
+            {
+                objCustomerList = _uow.Customer
+                    .GetAll(filter: x => x.CompanyId == _companyId &&
+                                         x.IsSystemRow == onlyCompanies).ToList();
+            }
+            else
+            {
+                objCustomerList = _uow.Customer
+                    .GetAll(filter: x => x.CompanyId == _companyId &&
+                                         x.IsSystemRow == onlyCompanies &&
+                                         (x.BusinessName.Contains(search) ||
+                                          x.IdentificationNumber.Contains(search) ||
+                                          x.Code.Contains(search) ||
+                                          x.AddressPrimary.Contains(search))).ToList();
+            }
+
+
+            if (objCustomerList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cliente invalido";
+                return Json(jsonResponse);
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objCustomerList;
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    [HttpPost]
+    public JsonResult GetBankAccountTarget(int idSource)
+    {
+        JsonResultResponse? jsonResponse = new();
+        StringBuilder errorsMessagesBuilder = new();
+
+        try
+        {
+            var objBankAccountSource = _uow.BankAccount
+                .Get(filter: x => x.CompanyId == _companyId && x.Id == idSource);
+            if (objBankAccountSource == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cuenta bancaria origen invalida";
+                return Json(jsonResponse);
+            }
+
+
+            var objBankAccountTargetList = _uow.BankAccount
+                .GetAll(filter: x => x.CompanyId == _companyId && x.CurrencyId == objBankAccountSource.CurrencyId).ToList();
+            if (objBankAccountTargetList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = $"Cuenta bancaria destino invalida";
+                return Json(jsonResponse);
+            }
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objBankAccountTargetList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+            return Json(jsonResponse);
+        }
+        catch (Exception ex)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = ex.Message.ToString();
+            return Json(jsonResponse);
+        }
+    }
+
+    #endregion
+
     #region Contabilización
 
     [HttpPost, ActionName("Regenerate")]
@@ -2741,11 +2987,20 @@ public class QuotationController : Controller
 
             numberTransaCnt = (string)resultResponse.Data;
 
+            decimal exchangeRateOficial = objHeader.ExchangeRateOfficialReal;
+
+            decimal exchangeRateTransa = objHeader.TypeNumeral switch
+            {
+                SD.QuotationType.Sell => objHeader.ExchangeRateSellReal,
+                SD.QuotationType.Buy => objHeader.ExchangeRateBuyReal,
+                _ => objHeader.ExchangeRateOfficialReal
+            };
+
             decimal exchangeRate = objHeader.TypeNumeral switch
             {
-                SD.QuotationType.Sell => objHeader.ExchangeRateSellTransa,
-                SD.QuotationType.Buy => objHeader.ExchangeRateOfficialTransa,
-                _ => objHeader.ExchangeRateOfficialTransa
+                SD.QuotationType.Sell => exchangeRateTransa,
+                SD.QuotationType.Buy => exchangeRateOficial,
+                _ => objHeader.ExchangeRateOfficialReal
             };
 
             ConverterExchange cvtExc = new();
@@ -2784,11 +3039,11 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{numberTransaFull}",
+                NumeroTransaccionRef = numberTransaFull,
                 TipoCambioMonfor = exchangeRate,
-                TipoCambioMonxtr = exchangeRate,
+                TipoCambioMonxtr = exchangeRateTransa,
                 TipoCambioParaMonfor = exchangeRate,
-                TipoCambioParaMonxtr = exchangeRate,
+                TipoCambioParaMonxtr = exchangeRateTransa,
                 MontoMonbas = mtosExc.AmountBase,
                 MontoMonfor = mtosExc.AmountForeign,
                 MontoMonxtr = mtosExc.AmountAdditional,
@@ -3076,20 +3331,20 @@ public class QuotationController : Controller
 
             numberTransaCnt = (string)resultResponse.Data;
 
-            decimal exchangeRateOficial = objHeader.ExchangeRateOfficialTransa;
+            decimal exchangeRateOficial = objHeader.ExchangeRateOfficialReal;
 
             decimal exchangeRateTransa = objHeader.TypeNumeral switch
             {
-                SD.QuotationType.Sell => objHeader.ExchangeRateSellTransa,
-                SD.QuotationType.Buy => objHeader.ExchangeRateBuyTransa,
-                _ => objHeader.ExchangeRateOfficialTransa
+                SD.QuotationType.Sell => objHeader.ExchangeRateSellReal,
+                SD.QuotationType.Buy => objHeader.ExchangeRateBuyReal,
+                _ => objHeader.ExchangeRateOfficialReal
             };
 
             decimal exchangeRate = objHeader.TypeNumeral switch
             {
                 SD.QuotationType.Sell => exchangeRateOficial,
                 SD.QuotationType.Buy => exchangeRateTransa,
-                _ => objHeader.ExchangeRateOfficialTransa
+                _ => objHeader.ExchangeRateOfficialReal
             };
 
             ConverterExchange cvtExc = new();
@@ -3128,7 +3383,7 @@ public class QuotationController : Controller
                 NumeroMoneda = (short)detail.CurrencyDetailTrx.Numeral,
                 NumeroObjeto = (int)mexBankObjects.Transaction,
                 NumeroEstado = (int)mexBankTransactionStages.Draft,
-                NumeroTransaccionRef = $"{numberTransaFull}",
+                NumeroTransaccionRef = numberTransaFull,
                 TipoCambioMonfor = exchangeRateOficial,
                 TipoCambioMonxtr = exchangeRateOficial,
                 TipoCambioParaMonfor = exchangeRate,
@@ -3179,7 +3434,6 @@ public class QuotationController : Controller
             mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
-
 
             //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
@@ -3238,11 +3492,19 @@ public class QuotationController : Controller
                     //Cliente paga en Cordobas
                     if (objHeader.CurrencyDepositType == SD.CurrencyType.Base)
                     {
+                        exchangeRate = exchangeRateTransa;
 
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
                     }//Cliente paga en Dolares
                     else if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
                     {
+                        exchangeRate = exchangeRateTransa;
 
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
                     }
                 }
             }
@@ -3252,7 +3514,6 @@ public class QuotationController : Controller
                 {
                     if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
                     {
-
                         exchangeRate = exchangeRateOficial;
 
                         mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Foreign, transaBcoDetalleDto.MontoMonfor,
@@ -3264,7 +3525,11 @@ public class QuotationController : Controller
                 {
                     if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
                     {
+                        exchangeRate = exchangeRateOficial;
 
+                        mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Foreign, transaBcoDetalleDto.MontoMonfor,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
                     }
                     else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
                     {
@@ -3376,9 +3641,9 @@ public class QuotationController : Controller
 
             if (isbalanceDifference)
             {
-                   var amountDebit = transaBcoDetalleDtoList
-                    .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
-                    .Sum(x => x.MontoMonbas);
+                var amountDebit = transaBcoDetalleDtoList
+                 .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
+                 .Sum(x => x.MontoMonbas);
 
                 var amountCredit = transaBcoDetalleDtoList
                     .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
@@ -4873,7 +5138,7 @@ public class QuotationController : Controller
     }
 
     private async Task<ResultResponse> fnGetBankAccount(string bankCode, Guid? bankAccountExcludeId, short currencyType
-        ,string currencyAbbreviation)
+        , string currencyAbbreviation)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
@@ -5295,257 +5560,6 @@ public class QuotationController : Controller
             resultResponse.IsSuccess = false;
             resultResponse.ErrorMessages = ex.Message;
             return resultResponse;
-        }
-    }
-
-    #endregion
-
-    [HttpPost, ActionName("Void")]
-    public JsonResult VoidPost(int id)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-        if (id == 0)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"El id es requerido";
-            return Json(jsonResponse);
-        }
-
-        try
-        {
-            var objHeader = _uow.Quotation
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
-            if (objHeader == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cotización no encontrada";
-                return Json(jsonResponse);
-            }
-
-            objHeader.IsVoid = true;
-            //Seteamos campos de auditoria
-            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.UpdatedDate = DateTime.UtcNow;
-            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            _uow.Quotation.Update(objHeader);
-            _uow.Save();
-            jsonResponse.IsSuccess = true;
-            TempData["success"] = $"Cotización anulada correctamente";
-            jsonResponse.UrlRedirect = Url.Action(action: "Index", controller: "Quotation");
-
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
-        }
-    }
-
-    [HttpPost, ActionName("DeleteDetail")]
-    public JsonResult DeleteDetailPost(int id)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-        if (id == 0)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = $"El id es requerido";
-            return Json(jsonResponse);
-        }
-
-        try
-        {
-            var objDetail = _uow.QuotationDetail
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == id, isTracking: false);
-
-            if (objDetail == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización no encontrado";
-                return Json(jsonResponse);
-            }
-
-            int parentId = objDetail.ParentId;
-
-            _uow.QuotationDetail.Remove(objDetail);
-            _uow.Save();
-
-            //Obtenemos el padre
-            var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == parentId);
-
-            if (objHeader == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cotización invalida";
-                return Json(jsonResponse);
-            }
-
-            //Obtenemos los hijos
-            var objDetails = _uow.QuotationDetail
-                .GetAll(filter: x => x.CompanyId == _companyId &&
-                                     x.ParentId == parentId).ToList();
-
-            if (objDetails == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Detalle de cotización invalido";
-                return Json(jsonResponse);
-            }
-
-            objHeader.TotalDeposit = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit ||
-                            x.QuotationDetailType == QuotationDetailType.CreditTransfer)
-                .Sum(x => x.AmountDetail);
-
-            objHeader.TotalTransfer = objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer ||
-                            x.QuotationDetailType == QuotationDetailType.DebitTransfer)
-                .Sum(x => x.AmountDetail);
-
-            objHeader.TotalLines = (short)objDetails.Count;
-
-            objHeader.TotalDepositLines = (short)objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Deposit ||
-                            x.QuotationDetailType == QuotationDetailType.CreditTransfer).ToList()
-                .Count;
-
-            objHeader.TotalTransferLines = (short)objDetails
-                .Where(x => x.QuotationDetailType == QuotationDetailType.Transfer ||
-                            x.QuotationDetailType == QuotationDetailType.DebitTransfer).ToList()
-                .Count;
-
-            objHeader.UpdatedBy = _userName ?? AC.LOCALHOSTME;
-            objHeader.UpdatedDate = DateTime.UtcNow;
-            objHeader.UpdatedHostName = AC.LOCALHOSTPC;
-            objHeader.UpdatedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-            _uow.Quotation.Update(objHeader);
-            _uow.Save();
-
-            jsonResponse.IsSuccess = true;
-            //jsonResponse.SuccessMessages = $"Detalle eliminado correctamente";
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
-        }
-    }
-
-    [HttpPost]
-    public JsonResult GetCustomers(bool onlyCompanies = false)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-
-        try
-        {
-            var objCustomerList = _uow.Customer
-                .GetAll(filter: x => x.CompanyId == _companyId && x.IsSystemRow == onlyCompanies).ToList();
-            if (objCustomerList == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cliente invalido";
-                return Json(jsonResponse);
-            }
-
-            jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList;
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
-        }
-    }
-
-    [HttpPost]
-    public JsonResult GetCustomerByContain(string search, bool onlyCompanies = false)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-        var objCustomerList = new List<Models.Customer>();
-        try
-        {
-            if (search == "." || search == null || search == string.Empty)
-            {
-                objCustomerList = _uow.Customer
-                    .GetAll(filter: x => x.CompanyId == _companyId &&
-                                         x.IsSystemRow == onlyCompanies).ToList();
-            }
-            else
-            {
-                objCustomerList = _uow.Customer
-                    .GetAll(filter: x => x.CompanyId == _companyId &&
-                                         x.IsSystemRow == onlyCompanies &&
-                                         (x.BusinessName.Contains(search) ||
-                                          x.IdentificationNumber.Contains(search) ||
-                                          x.Code.Contains(search) ||
-                                          x.AddressPrimary.Contains(search))).ToList();
-            }
-
-
-            if (objCustomerList == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cliente invalido";
-                return Json(jsonResponse);
-            }
-
-            jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objCustomerList;
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
-        }
-    }
-
-    [HttpPost]
-    public JsonResult GetBankAccountTarget(int idSource)
-    {
-        JsonResultResponse? jsonResponse = new();
-        StringBuilder errorsMessagesBuilder = new();
-
-        try
-        {
-            var objBankAccountSource = _uow.BankAccount
-                .Get(filter: x => x.CompanyId == _companyId && x.Id == idSource);
-            if (objBankAccountSource == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cuenta bancaria origen invalida";
-                return Json(jsonResponse);
-            }
-
-
-            var objBankAccountTargetList = _uow.BankAccount
-                .GetAll(filter: x => x.CompanyId == _companyId && x.CurrencyId == objBankAccountSource.CurrencyId).ToList();
-            if (objBankAccountTargetList == null)
-            {
-                jsonResponse.IsSuccess = false;
-                jsonResponse.ErrorMessages = $"Cuenta bancaria destino invalida";
-                return Json(jsonResponse);
-            }
-            jsonResponse.IsSuccess = true;
-            jsonResponse.Data = objBankAccountTargetList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
-            return Json(jsonResponse);
-        }
-        catch (Exception ex)
-        {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = ex.Message.ToString();
-            return Json(jsonResponse);
         }
     }
 
