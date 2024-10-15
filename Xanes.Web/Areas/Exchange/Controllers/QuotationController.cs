@@ -3003,6 +3003,17 @@ public class QuotationController : Controller
                 _ => objHeader.ExchangeRateOfficialReal
             };
 
+            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    {
+                        exchangeRate = exchangeRateOficial;
+                    }
+                }
+            }
+
             ConverterExchange cvtExc = new();
 
             var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
@@ -3386,8 +3397,8 @@ public class QuotationController : Controller
                 NumeroTransaccionRef = numberTransaFull,
                 TipoCambioMonfor = exchangeRateOficial,
                 TipoCambioMonxtr = exchangeRateOficial,
-                TipoCambioParaMonfor = exchangeRate,
-                TipoCambioParaMonxtr = exchangeRate,
+                TipoCambioParaMonfor = exchangeRateTransa,
+                TipoCambioParaMonxtr = exchangeRateTransa,
                 MontoMonbas = mtosExc.AmountBase,
                 MontoMonfor = mtosExc.AmountForeign,
                 MontoMonxtr = mtosExc.AmountAdditional,
@@ -3434,6 +3445,21 @@ public class QuotationController : Controller
             mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
+
+            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    {
+                        exchangeRate = exchangeRateTransa;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRate,
+                            decimalTrx: AC.DecimalTransa);
+                    }
+                }
+            }
 
             //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
@@ -3500,7 +3526,7 @@ public class QuotationController : Controller
                     }//Cliente paga en Dolares
                     else if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
                     {
-                        exchangeRate = exchangeRateTransa;
+                        exchangeRate = exchangeRateOficial;
 
                         mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                             exchangeRate, exchangeRate,
@@ -3587,6 +3613,17 @@ public class QuotationController : Controller
                     : configCntDto.CuentaContablePerdidaDiferencial!.Value);
 
                 var tipoMov = (isIngreso ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
+                
+                if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+                {
+                    if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                    {
+                        if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
+                        {
+                            tipoMov = (short)mexAccountMovementType.Debit;
+                        }
+                    }
+                }
 
                 //Creamos el tercer detalle
                 transaBcoDetalle = new()
