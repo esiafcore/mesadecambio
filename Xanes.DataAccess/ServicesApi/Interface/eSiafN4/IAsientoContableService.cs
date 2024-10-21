@@ -7,7 +7,7 @@ public interface IAsientoContableService
     Task<T> GetAllAsync<T>(string token, int pageSize, int pageNumber, int fiscalYear, int fiscalMonth);
     Task<T> GetAsync<T>(string token, Guid id);
     Task<T> GetNextSecuentialNumberAsync<T>(
-        string token, Guid bankAccountId, int fiscalYear,
+        string token, int fiscalYear,
         int fiscalMonth, short tipo, short subtipo,
         ConsecutivoTipo consecutivo, bool isSave);
     Task<T> CreateAsync<T>(string token, AsientosContablesDtoCreate model);

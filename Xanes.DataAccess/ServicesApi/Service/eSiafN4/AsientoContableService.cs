@@ -44,14 +44,14 @@ public class AsientoContableService : BaseService, IAsientoContableService
     }
 
     public Task<T> GetNextSecuentialNumberAsync<T>(
-        string token, Guid bankAccountId, int fiscalYear, int fiscalMonth,
+        string token, int fiscalYear, int fiscalMonth,
         short tipo, short subtipo, Enumeradores.ConsecutivoTipo consecutivo, bool isSave)
     {
         return SendAsync<T>(new APIRequest()
         {
             ApiType = HttpMethod.Get,
-            Url = string.Format("{0}/getnextsecuentialnumber?companyId={1}&bankAccountId={2}&fiscalYear={3}&fiscalMonth={4}&tipo={5}&subtipo={6}&consecutivo={7}&isSave={8}",
-                _actionUrl, _companyId, bankAccountId.ToString(), fiscalYear, fiscalMonth, tipo, subtipo, consecutivo, isSave),
+            Url = string.Format("{0}/getnextsecuentialnumber?companyId={1}&fiscalYear={2}&fiscalMonth={3}&tipo={4}&subtipo={5}&consecutivo={6}&isSave={7}",
+                _actionUrl, _companyId, fiscalYear, fiscalMonth, tipo, subtipo, consecutivo, isSave),
             Token = token
         });
     }

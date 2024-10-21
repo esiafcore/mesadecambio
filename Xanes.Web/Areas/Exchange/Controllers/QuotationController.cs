@@ -364,7 +364,7 @@ public class QuotationController : Controller
             //Obtener valor oficial del tipo de cambio foraneo
             var currencyForeignValue = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))
-                    ?.OfficialRate 
+                    ?.OfficialRate
                     ?? AC.ExchangeRateDefaultValue;
 
             //Setear Id tipo de operación de mesa de cambio
@@ -3376,9 +3376,9 @@ public class QuotationController : Controller
 
             if (isbalanceDifference)
             {
-                   var amountDebit = transaBcoDetalleDtoList
-                    .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
-                    .Sum(x => x.MontoMonbas);
+                var amountDebit = transaBcoDetalleDtoList
+                 .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
+                 .Sum(x => x.MontoMonbas);
 
                 var amountCredit = transaBcoDetalleDtoList
                     .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
@@ -4873,7 +4873,7 @@ public class QuotationController : Controller
     }
 
     private async Task<ResultResponse> fnGetBankAccount(string bankCode, Guid? bankAccountExcludeId, short currencyType
-        ,string currencyAbbreviation)
+        , string currencyAbbreviation)
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
@@ -4912,7 +4912,7 @@ public class QuotationController : Controller
                 if (bankAccountDto is null)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  $"No se encontró la Cuenta bancaria en moneda {currencyAbbreviation} del Banco {bankCode}";
+                    resultResponse.ErrorMessages = $"No se encontró la Cuenta bancaria en moneda {currencyAbbreviation} del Banco {bankCode}";
                     return resultResponse;
                 }
             }
@@ -4971,7 +4971,7 @@ public class QuotationController : Controller
                 if (bankAccountDto is null)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  "Cuenta bancaria no encontrada";
+                    resultResponse.ErrorMessages = "Cuenta bancaria no encontrada";
                     return resultResponse;
                 }
             }
@@ -5100,7 +5100,7 @@ public class QuotationController : Controller
                 if (configBcoDto is null)
                 {
                     resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages =  $"Configuración bancaria no encontrada";
+                    resultResponse.ErrorMessages = $"Configuración bancaria no encontrada";
                     return resultResponse;
                 }
 
@@ -5254,8 +5254,7 @@ public class QuotationController : Controller
                 string numberTransaCnt = string.Empty;
 
                 srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
-                    _sessionToken, bankAccountId,
-                    fiscalYear, fiscalMonth,
+                    _sessionToken, fiscalYear, fiscalMonth,
                     tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
 
                 if (srvResponse is null)
