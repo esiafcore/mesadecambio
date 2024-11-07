@@ -910,7 +910,7 @@ const fnTCByDate = async () => {
                             inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
                         }
                     } else {
-                        inputExchangeRateOfficialTransa.value = 1;
+                        inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRateOrigin ?? 1;
                     }
                 }
             } else if (inputTypeNumeral.value == QuotationType.Sell) {
@@ -924,7 +924,7 @@ const fnTCByDate = async () => {
                             inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyForeign?.officialRate ?? 1;
                         }
                     } else {
-                        inputExchangeRateOfficialTransa.value = 1;
+                        inputExchangeRateOfficialTransa.value = jsonResponse.data.currencyAdditional?.officialRateOrigin ?? 1;
                     }
                 }
             } else {

@@ -225,9 +225,9 @@ public class QuotationController : Controller
                 {
                     DateTransa = processingDateString != null ? model.ProcessingDate : DateOnly.FromDateTime(DateTime.Now),
                     TypeNumeral = SD.QuotationType.Buy,
-                    CurrencyTransaType = SD.CurrencyType.Foreign,
-                    CurrencyTransferType = SD.CurrencyType.Base,
-                    CurrencyDepositType = SD.CurrencyType.Base,
+                    CurrencyTransaType = CurrencyType.Foreign,
+                    CurrencyTransferType = CurrencyType.Base,
+                    CurrencyDepositType = CurrencyType.Base,
                     CompanyId = _companyId,
                     BusinessExecutiveCode = new string(AC.CharDefaultEmpty, AC.RepeatCharTimes),
                     CustomerId = 0,
@@ -258,7 +258,7 @@ public class QuotationController : Controller
             }
 
             model.CurrencyTransaList = objCurrencyList
-                .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+                .Where(x => (x.IsActive && (x.Numeral != (int)CurrencyType.Base)))
                 .ToList();
             model.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
             model.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
@@ -358,9 +358,11 @@ public class QuotationController : Controller
 
             //Obtener valor oficial del tipo de cambio foraneo
             var currencyForeignValue = objCurrencyRateList
-                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))
+                .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))
                     ?.OfficialRate
                     ?? AC.ExchangeRateDefaultValue;
+
+            obj.ExchangeRateOfficialBase = currencyForeignValue;
 
             //Setear Id tipo de operación de mesa de cambio
             obj.TypeId = objQuotationType.Id;
@@ -386,7 +388,7 @@ public class QuotationController : Controller
                 if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
                 {
                     //Cuando se compra U$ ó €, la moneda de la transacción es la misma moneda en el depósito
-                    obj.CurrencyDepositType = (SD.CurrencyType)objCurrencyTransa.Numeral;
+                    obj.CurrencyDepositType = (CurrencyType)objCurrencyTransa.Numeral;
                     obj.CurrencyDepositId = objCurrencyTransa.Id;
 
                     //Tipo de cambio de la compra debe ser distinto de cero
@@ -429,11 +431,11 @@ public class QuotationController : Controller
                     }
 
                     //Compra de dolares 
-                    if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
+                    if (obj.CurrencyTransaType == CurrencyType.Foreign)
                     {
                         //Factoring paga en Cordobas
                         //Si COM U$ => Transferencia C$
-                        if (obj.CurrencyTransferType == SD.CurrencyType.Base)
+                        if (obj.CurrencyTransferType == CurrencyType.Base)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
                             obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
@@ -445,11 +447,11 @@ public class QuotationController : Controller
                         }
                     }
                     //Compra de Euros
-                    else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
+                    else if (obj.CurrencyTransaType == CurrencyType.Additional)
                     {
                         //Factoring paga en Cordobas
                         //Si COM € => Transferencia C$
-                        if (obj.CurrencyTransferType == SD.CurrencyType.Base)
+                        if (obj.CurrencyTransferType == CurrencyType.Base)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
                             obj.AmountExchange = obj.AmountExchange.RoundTo(AC.DecimalTransa);
@@ -462,7 +464,7 @@ public class QuotationController : Controller
                         }
                         //Factoring paga en Dolares
                         //Si COM € => Transferencia U$  
-                        else if (obj.CurrencyTransferType == SD.CurrencyType.Foreign)
+                        else if (obj.CurrencyTransferType == CurrencyType.Foreign)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
                             obj.AmountExchange = obj.AmountExchange.RoundTo(AC.DecimalTransa);
@@ -484,7 +486,7 @@ public class QuotationController : Controller
                 {
                     //Cuando se vende U$ ó €, la moneda de la transacción es la misma moneda de la transferencia
 
-                    obj.CurrencyTransferType = (SD.CurrencyType)objCurrencyTransa.Numeral;
+                    obj.CurrencyTransferType = (CurrencyType)objCurrencyTransa.Numeral;
                     obj.CurrencyTransferId = objCurrencyTransa.Id;
 
                     if (obj.ExchangeRateSellTransa == 0)
@@ -526,10 +528,10 @@ public class QuotationController : Controller
                     }
 
                     //Venta de dolares 
-                    if (obj.CurrencyTransaType == SD.CurrencyType.Foreign)
+                    if (obj.CurrencyTransaType == CurrencyType.Foreign)
                     {
                         //Cliente paga en Cordobas
-                        if (obj.CurrencyDepositType == SD.CurrencyType.Base)
+                        if (obj.CurrencyDepositType == CurrencyType.Base)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
                             obj.AmountExchange = obj.AmountExchange.RoundTo(AC.DecimalTransa);
@@ -541,10 +543,10 @@ public class QuotationController : Controller
                         }
                     }
                     //Venta de Euros
-                    else if (obj.CurrencyTransaType == SD.CurrencyType.Additional)
+                    else if (obj.CurrencyTransaType == CurrencyType.Additional)
                     {
                         //Cliente paga en Cordobas
-                        if (obj.CurrencyDepositType == SD.CurrencyType.Base)
+                        if (obj.CurrencyDepositType == CurrencyType.Base)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
                             obj.AmountExchange = obj.AmountExchange.RoundTo(AC.DecimalTransa);
@@ -555,7 +557,7 @@ public class QuotationController : Controller
                             obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                         }
                         //Cliente paga en Dolares
-                        else if (obj.CurrencyDepositType == SD.CurrencyType.Foreign)
+                        else if (obj.CurrencyDepositType == CurrencyType.Foreign)
                         {
                             obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
                             obj.AmountExchange = obj.AmountExchange.RoundTo(AC.DecimalTransa);
@@ -848,7 +850,7 @@ public class QuotationController : Controller
             }
 
             var currencyForeign = objCurrencyRateList
-                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
+                .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
             obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
             if (objQt.TypeNumeral == SD.QuotationType.Buy)
@@ -856,64 +858,57 @@ public class QuotationController : Controller
                 //TC COMPRA MENOR AL TC OFICIAL
                 if (obj.ExchangeRateBuyTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
-                    obj.AmountCost = 0;
-                    obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+                    objQt.AmountRevenue = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateBuyTransa) * obj.AmountTransaction;
+                    objQt.AmountCost = 0;
+                    objQt.AmountRevenue = objQt.AmountRevenue.RoundTo(AC.DecimalTransa);
 
                 }
                 //TC COMPRA MAYOR AL TC OFICIAL
                 else
                 {
-                    obj.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
-                    obj.AmountRevenue = 0;
-                    obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
+                    objQt.AmountCost = (obj.ExchangeRateBuyTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
+                    objQt.AmountRevenue = 0;
+                    objQt.AmountCost = objQt.AmountCost.RoundTo(AC.DecimalTransa);
                 }
 
                 //Compra de dolares 
-                if (objQt.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objQt.CurrencyTransaType == CurrencyType.Foreign)
                 {
                     //Factoring paga en Cordobas
-                    if (objQt.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objQt.CurrencyTransferType == CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
-
-                        obj.AmountCostReal = obj.AmountCost;
-                        obj.AmountRevenueReal = obj.AmountRevenue;
-
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+                        objQt.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
+                        objQt.AmountCostReal = objQt.AmountCost;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue;
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Compra de Euros
-                else if (objQt.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objQt.CurrencyTransaType == CurrencyType.Additional)
                 {
                     //Factoring paga en Cordobas
-                    if (objQt.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objQt.CurrencyTransferType == CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
-
-                        obj.AmountCostReal = obj.AmountCost;
-                        obj.AmountRevenueReal = obj.AmountRevenue;
-
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+                        objQt.ExchangeRateBuyReal = obj.ExchangeRateBuyTransa;
+                        objQt.AmountCostReal = objQt.AmountCost;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue;
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Factoring paga en Dolares
-                    else if (objQt.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    else if (objQt.CurrencyTransferType == CurrencyType.Foreign)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
-                        obj.ExchangeRateBuyReal = (obj.ExchangeRateBuyTransa * obj.ExchangeRateOfficialTransa);
-
-                        obj.AmountCostReal = obj.AmountCost * currencyForeign;
-                        obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
-
-                        obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
-                        obj.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
-
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateBuyTransa);
+                        objQt.ExchangeRateBuyReal = (obj.ExchangeRateBuyTransa * obj.ExchangeRateOfficialTransa);
+                        objQt.AmountCostReal = objQt.AmountCost * currencyForeign;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue * currencyForeign;
+                        objQt.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                        objQt.ExchangeRateBuyReal = currencyForeign * obj.ExchangeRateBuyTransa;
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -922,65 +917,61 @@ public class QuotationController : Controller
                 //TC VENTA MENOR AL TC OFICIAL
                 if (obj.ExchangeRateSellTransa < obj.ExchangeRateOfficialTransa)
                 {
-                    obj.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
-                    obj.AmountRevenue = 0;
-                    obj.AmountCost = obj.AmountCost.RoundTo(AC.DecimalTransa);
+                    objQt.AmountCost = (obj.ExchangeRateOfficialTransa - obj.ExchangeRateSellTransa) * obj.AmountTransaction;
+                    objQt.AmountRevenue = 0;
+                    objQt.AmountCost = objQt.AmountCost.RoundTo(AC.DecimalTransa);
                 }
                 //TC VENTA MAYOR AL TC OFICIAL
                 else
                 {
-                    obj.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
-                    obj.AmountCost = 0;
-                    obj.AmountRevenue = obj.AmountRevenue.RoundTo(AC.DecimalTransa);
+                    objQt.AmountRevenue = (obj.ExchangeRateSellTransa - obj.ExchangeRateOfficialTransa) * obj.AmountTransaction;
+                    objQt.AmountCost = 0;
+                    objQt.AmountRevenue = objQt.AmountRevenue.RoundTo(AC.DecimalTransa);
 
                 }
 
                 //Venta de dolares 
-                if (objQt.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objQt.CurrencyTransaType == CurrencyType.Foreign)
                 {
                     //Cliente paga en Cordobas
-                    if (objQt.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objQt.CurrencyDepositType == CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
-
-                        obj.AmountCostReal = obj.AmountCost;
-                        obj.AmountRevenueReal = obj.AmountRevenue;
-
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+                        objQt.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
+                        objQt.AmountCostReal = objQt.AmountCost;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue;
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
                 //Venta de Euros
-                else if (objQt.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objQt.CurrencyTransaType == CurrencyType.Additional)
                 {
                     //Cliente paga en Cordobas
-                    if (objQt.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objQt.CurrencyDepositType == CurrencyType.Base)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
-
-                        obj.AmountCostReal = obj.AmountCost;
-                        obj.AmountRevenueReal = obj.AmountRevenue;
-
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+                        objQt.ExchangeRateSellReal = obj.ExchangeRateSellTransa;
+                        objQt.AmountCostReal = objQt.AmountCost;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue;
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
 
                     }
                     //Cliente paga en Dolares
-                    else if (objQt.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    else if (objQt.CurrencyDepositType == CurrencyType.Foreign)
                     {
-                        obj.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
-                        obj.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
+                        objQt.AmountExchange = (obj.AmountTransaction * obj.ExchangeRateSellTransa);
+                        objQt.ExchangeRateSellReal = (obj.ExchangeRateSellTransa * obj.ExchangeRateOfficialTransa);
 
-                        obj.AmountCostReal = obj.AmountCost * currencyForeign;
-                        obj.AmountRevenueReal = obj.AmountRevenue * currencyForeign;
+                        objQt.AmountCostReal = objQt.AmountCost * currencyForeign;
+                        objQt.AmountRevenueReal = objQt.AmountRevenue * currencyForeign;
 
-                        obj.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
-                        obj.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
+                        objQt.ExchangeRateOfficialReal = currencyForeign * obj.ExchangeRateOfficialTransa;
+                        objQt.ExchangeRateSellReal = currencyForeign * obj.ExchangeRateSellTransa;
 
-                        obj.AmountCostReal = obj.AmountCostReal.RoundTo(AC.DecimalTransa);
-                        obj.AmountRevenueReal = obj.AmountRevenueReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountCostReal = objQt.AmountCostReal.RoundTo(AC.DecimalTransa);
+                        objQt.AmountRevenueReal = objQt.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                 }
             }
@@ -989,10 +980,10 @@ public class QuotationController : Controller
                 obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
             }
 
-            objQt.AmountRevenue = obj.AmountRevenue;
-            objQt.AmountCommission = obj.AmountCommission;
-            objQt.AmountCost = obj.AmountCost;
-            objQt.AmountExchange = obj.AmountExchange;
+            //objQt.AmountRevenue = obj.AmountRevenue;
+            //objQt.AmountCommission = obj.AmountCommission;
+            //objQt.AmountCost = obj.AmountCost;
+            //objQt.AmountExchange = obj.AmountExchange;
             objQt.AmountTransaction = obj.AmountTransaction;
             objQt.DateTransa = obj.DateTransa;
             objQt.ExchangeRateBuyTransa = obj.ExchangeRateBuyTransa;
@@ -1135,7 +1126,7 @@ public class QuotationController : Controller
             model.ModelCreateVM.BankAccountSourceList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
             model.ModelCreateVM.BankAccountTargetList = objBankAccountList.Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
             model.ModelCreateVM.CurrencyTransaList = objCurrencyList
-                .Where(x => (x.IsActive && (x.Numeral != (int)SD.CurrencyType.Base)))
+                .Where(x => (x.IsActive && (x.Numeral != (int)CurrencyType.Base)))
                 .ToList();
             model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
             model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
@@ -1225,20 +1216,20 @@ public class QuotationController : Controller
 
             if (objHeader.TypeNumeral == SD.QuotationType.Buy)
             {
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
                 {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
                         obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountExchange);
                     }
                 }
-                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objHeader.CurrencyTransaType == CurrencyType.Additional)
                 {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
 
                     }
-                    else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    else if (objHeader.CurrencyTransferType == CurrencyType.Foreign)
                     {
 
                     }
@@ -1658,7 +1649,7 @@ public class QuotationController : Controller
 
     }
 
-    public async Task<JsonResult> GetAllByCustomer(int customerId, SD.QuotationType type, SD.CurrencyType currency)
+    public async Task<JsonResult> GetAllByCustomer(int customerId, SD.QuotationType type, CurrencyType currency)
     {
         JsonResultResponse? jsonResponse = new();
         try
@@ -1768,7 +1759,7 @@ public class QuotationController : Controller
         }
     }
 
-    public async Task<JsonResult> GetAverageExchangeRate(int customerId, SD.QuotationType type, SD.CurrencyType currency)
+    public async Task<JsonResult> GetAverageExchangeRate(int customerId, SD.QuotationType type, CurrencyType currency)
     {
         JsonResultResponse? jsonResponse = new();
 
@@ -1876,7 +1867,7 @@ public class QuotationController : Controller
             }
 
             var currencyForeign = objCurrencyRateList
-                .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
+                .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
 
             if (objQuotation.TypeNumeral == SD.QuotationType.Buy)
@@ -1900,10 +1891,10 @@ public class QuotationController : Controller
                 }
 
                 //Compra de dolares 
-                if (objQuotation.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objQuotation.CurrencyTransaType == CurrencyType.Foreign)
                 {
                     //Factoring paga en Cordobas
-                    if (objQuotation.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objQuotation.CurrencyTransferType == CurrencyType.Base)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
                         objQuotation.ExchangeRateBuyReal = objQuotation.ExchangeRateBuyTransa;
@@ -1916,10 +1907,10 @@ public class QuotationController : Controller
                     }
                 }
                 //Compra de Euros
-                else if (objQuotation.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objQuotation.CurrencyTransaType == CurrencyType.Additional)
                 {
                     //Factoring paga en Cordobas
-                    if (objQuotation.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objQuotation.CurrencyTransferType == CurrencyType.Base)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
                         objQuotation.ExchangeRateBuyReal = objQuotation.ExchangeRateBuyTransa;
@@ -1931,7 +1922,7 @@ public class QuotationController : Controller
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Factoring paga en Dolares
-                    else if (objQuotation.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    else if (objQuotation.CurrencyTransferType == CurrencyType.Foreign)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateBuyTransa);
                         objQuotation.ExchangeRateBuyReal = (objQuotation.ExchangeRateBuyTransa * objQuotation.ExchangeRateOfficialTransa);
@@ -1968,10 +1959,10 @@ public class QuotationController : Controller
                 }
 
                 //Venta de dolares 
-                if (objQuotation.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objQuotation.CurrencyTransaType == CurrencyType.Foreign)
                 {
                     //Cliente paga en Cordobas
-                    if (objQuotation.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objQuotation.CurrencyDepositType == CurrencyType.Base)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
                         objQuotation.ExchangeRateSellReal = objQuotation.ExchangeRateSellTransa;
@@ -1984,10 +1975,10 @@ public class QuotationController : Controller
                     }
                 }
                 //Venta de Euros
-                else if (objQuotation.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objQuotation.CurrencyTransaType == CurrencyType.Additional)
                 {
                     //Cliente paga en Cordobas
-                    if (objQuotation.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objQuotation.CurrencyDepositType == CurrencyType.Base)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
                         objQuotation.ExchangeRateSellReal = objQuotation.ExchangeRateSellTransa;
@@ -1999,7 +1990,7 @@ public class QuotationController : Controller
                         objQuotation.AmountRevenueReal = objQuotation.AmountRevenueReal.RoundTo(AC.DecimalTransa);
                     }
                     //Cliente paga en Dolares
-                    else if (objQuotation.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    else if (objQuotation.CurrencyDepositType == CurrencyType.Foreign)
                     {
                         objQuotation.AmountExchange = (objQuotation.AmountTransaction * objQuotation.ExchangeRateSellTransa);
                         objQuotation.ExchangeRateSellReal = (objQuotation.ExchangeRateSellTransa * objQuotation.ExchangeRateOfficialTransa);
@@ -3002,22 +2993,35 @@ public class QuotationController : Controller
                 _ => objHeader.ExchangeRateOfficialReal
             };
 
-            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
-            {
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
-                {
-                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
-                    {
-                        exchangeRate = exchangeRateOficial;
-                    }
-                }
-            }
-
             ConverterExchange cvtExc = new();
 
             var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
+
+            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    {
+                        exchangeRate = objHeader.ExchangeRateOfficialBase;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRateTransa,
+                            decimalTrx: AC.DecimalTransa);
+                    }
+                }
+            }
+            else if (objHeader.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    {
+                    }
+                }
+            }
 
             var numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
@@ -3363,6 +3367,31 @@ public class QuotationController : Controller
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
+            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+            {
+                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    {
+                        exchangeRateOficial = objHeader.ExchangeRateOfficialBase;
+                        exchangeRateTransa = objHeader.ExchangeRateOfficialReal;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            objHeader.ExchangeRateOfficialBase, exchangeRateTransa,
+                            decimalTrx: AC.DecimalTransa);
+                    }
+                }
+            }
+            else if (objHeader.TypeNumeral == SD.QuotationType.Buy)
+            {
+                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                {
+                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    {
+                    }
+                }
+            }
+
             var numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
@@ -3423,8 +3452,6 @@ public class QuotationController : Controller
                 NumeroIdentificacion = _eSiafN4CustomerIdentificationNumber
             };
 
-            mtosExc.SetInit(); // Limpiar
-
             //Crear cabecera
             resultResponse = await
                 fnCreateTransactionBcoHeader(transaBco);
@@ -3440,25 +3467,6 @@ public class QuotationController : Controller
             //Agg referencia al detalle de la cotización
             detail.BankTransactionId = transaBcoDto.UidRegist;
             detail.IsBankTransactionPosted = false;
-
-            mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                exchangeRate, exchangeRate,
-                decimalTrx: AC.DecimalTransa);
-
-            if (objHeader.TypeNumeral == SD.QuotationType.Sell)
-            {
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
-                {
-                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
-                    {
-                        exchangeRate = exchangeRateTransa;
-
-                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                            exchangeRate, exchangeRate,
-                            decimalTrx: AC.DecimalTransa);
-                    }
-                }
-            }
 
             //Creamos el primer detalle
             TransaccionesBcoDetalleDtoCreate transaBcoDetalle = new()
@@ -3500,10 +3508,10 @@ public class QuotationController : Controller
             if (objHeader.TypeNumeral == SD.QuotationType.Sell)
             {
                 //Venta de dolares 
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
                 {
                     //Cliente paga en Cordobas
-                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyDepositType == CurrencyType.Base)
                     {
                         exchangeRate = exchangeRateTransa;
 
@@ -3512,10 +3520,10 @@ public class QuotationController : Controller
                             decimalTrx: AC.DecimalTransa);
                     }
                 }//Venta de Euros
-                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objHeader.CurrencyTransaType == CurrencyType.Additional)
                 {
                     //Cliente paga en Cordobas
-                    if (objHeader.CurrencyDepositType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyDepositType == CurrencyType.Base)
                     {
                         exchangeRate = exchangeRateTransa;
 
@@ -3523,21 +3531,19 @@ public class QuotationController : Controller
                             exchangeRate, exchangeRate,
                             decimalTrx: AC.DecimalTransa);
                     }//Cliente paga en Dolares
-                    else if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
+                    else if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
                     {
-                        exchangeRate = exchangeRateOficial;
-
                         mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
-                            exchangeRate, exchangeRate,
+                            objHeader.ExchangeRateOfficialBase, objHeader.ExchangeRateSellReal,
                             decimalTrx: AC.DecimalTransa);
                     }
                 }
             }
-            else
+            else if (objHeader.TypeNumeral == SD.QuotationType.Buy)
             {
-                if (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
+                if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
                 {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
                         exchangeRate = exchangeRateOficial;
 
@@ -3546,9 +3552,9 @@ public class QuotationController : Controller
                             decimalTrx: AC.DecimalTransa);
                     }
                 }
-                else if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
+                else if (objHeader.CurrencyTransaType == CurrencyType.Additional)
                 {
-                    if (objHeader.CurrencyTransferType == SD.CurrencyType.Base)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
                         exchangeRate = exchangeRateOficial;
 
@@ -3556,7 +3562,7 @@ public class QuotationController : Controller
                             exchangeRate, exchangeRate,
                             decimalTrx: AC.DecimalTransa);
                     }
-                    else if (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign)
+                    else if (objHeader.CurrencyTransferType == CurrencyType.Foreign)
                     {
 
                     }
@@ -3612,17 +3618,6 @@ public class QuotationController : Controller
                     : configCntDto.CuentaContablePerdidaDiferencial!.Value);
 
                 var tipoMov = (isIngreso ? (short)mexAccountMovementType.Credit : (short)mexAccountMovementType.Debit);
-                
-                if (objHeader.TypeNumeral == SD.QuotationType.Sell)
-                {
-                    if (objHeader.CurrencyTransaType == SD.CurrencyType.Additional)
-                    {
-                        if (objHeader.CurrencyDepositType == SD.CurrencyType.Foreign)
-                        {
-                            tipoMov = (short)mexAccountMovementType.Debit;
-                        }
-                    }
-                }
 
                 //Creamos el tercer detalle
                 transaBcoDetalle = new()
@@ -3663,14 +3658,14 @@ public class QuotationController : Controller
             bool isbalanceDifference = false;
 
             if ((objHeader.TypeNumeral == SD.QuotationType.Buy)
-                && (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
-                && (objHeader.CurrencyTransferType == SD.CurrencyType.Base))
+                && (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                && (objHeader.CurrencyTransferType == CurrencyType.Base))
             {
                 isbalanceDifference = true;
             }
             else if ((objHeader.TypeNumeral == SD.QuotationType.Sell)
-                     && (objHeader.CurrencyTransaType == SD.CurrencyType.Foreign)
-                     && (objHeader.CurrencyTransferType == SD.CurrencyType.Foreign))
+                     && (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                     && (objHeader.CurrencyTransferType == CurrencyType.Foreign))
             {
                 isbalanceDifference = true;
             }
@@ -6377,8 +6372,9 @@ public class QuotationController : Controller
                 }
 
                 var currencyForeign = objCurrencyRateList
-                    .FirstOrDefault(t => (t.CurrencyType == SD.CurrencyType.Foreign))?.OfficialRate ?? 1;
+                    .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
+                header.ExchangeRateOfficialBase = currencyForeign;
 
                 if (header.TypeNumeral != SD.QuotationType.Transport)
                 {
@@ -6401,10 +6397,10 @@ public class QuotationController : Controller
                         }
 
                         //Compra de dolares 
-                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        if (header.CurrencyTransaType == CurrencyType.Foreign)
                         {
                             //Factoring paga en Cordobas
-                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            if (header.CurrencyTransferType == CurrencyType.Base)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
                                 header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
@@ -6417,10 +6413,10 @@ public class QuotationController : Controller
                             }
                         }
                         //Compra de Euros
-                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        else if (header.CurrencyTransaType == CurrencyType.Additional)
                         {
                             //Factoring paga en Cordobas
-                            if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                            if (header.CurrencyTransferType == CurrencyType.Base)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
                                 header.ExchangeRateBuyReal = header.ExchangeRateBuyTransa;
@@ -6433,7 +6429,7 @@ public class QuotationController : Controller
 
                             }
                             //Factoring paga en Dolares
-                            else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
+                            else if (header.CurrencyTransferType == CurrencyType.Foreign)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateBuyTransa);
                                 header.ExchangeRateBuyReal = (header.ExchangeRateBuyTransa * header.ExchangeRateOfficialTransa);
@@ -6467,10 +6463,10 @@ public class QuotationController : Controller
                         }
 
                         //Venta de dolares 
-                        if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                        if (header.CurrencyTransaType == CurrencyType.Foreign)
                         {
                             //Cliente paga en Cordobas
-                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            if (header.CurrencyDepositType == CurrencyType.Base)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
                                 header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
@@ -6483,10 +6479,10 @@ public class QuotationController : Controller
                             }
                         }
                         //Venta de Euros
-                        else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                        else if (header.CurrencyTransaType == CurrencyType.Additional)
                         {
                             //Cliente paga en Cordobas
-                            if (header.CurrencyDepositType == SD.CurrencyType.Base)
+                            if (header.CurrencyDepositType == CurrencyType.Base)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
                                 header.ExchangeRateSellReal = header.ExchangeRateSellTransa;
@@ -6499,7 +6495,7 @@ public class QuotationController : Controller
 
                             }
                             //Cliente paga en Dolares
-                            else if (header.CurrencyDepositType == SD.CurrencyType.Foreign)
+                            else if (header.CurrencyDepositType == CurrencyType.Foreign)
                             {
                                 header.AmountExchange = (header.AmountTransaction * header.ExchangeRateSellTransa);
                                 header.ExchangeRateSellReal = (header.ExchangeRateSellTransa * header.ExchangeRateOfficialTransa);
@@ -6653,19 +6649,19 @@ public class QuotationController : Controller
 
                         if (header.TypeNumeral == SD.QuotationType.Buy)
                         {
-                            if (header.CurrencyTransaType == SD.CurrencyType.Foreign)
+                            if (header.CurrencyTransaType == CurrencyType.Foreign)
                             {
-                                if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                                if (header.CurrencyTransferType == CurrencyType.Base)
                                 {
                                     detail.PercentageCostRevenue = (detail.AmountDetail / header.AmountExchange);
                                 }
                             }
-                            else if (header.CurrencyTransaType == SD.CurrencyType.Additional)
+                            else if (header.CurrencyTransaType == CurrencyType.Additional)
                             {
-                                if (header.CurrencyTransferType == SD.CurrencyType.Base)
+                                if (header.CurrencyTransferType == CurrencyType.Base)
                                 {
                                 }
-                                else if (header.CurrencyTransferType == SD.CurrencyType.Foreign)
+                                else if (header.CurrencyTransferType == CurrencyType.Foreign)
                                 {
                                 }
                             }

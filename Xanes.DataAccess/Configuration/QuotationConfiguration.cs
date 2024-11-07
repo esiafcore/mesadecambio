@@ -17,6 +17,7 @@ public class QuotationConfiguration : IEntityTypeConfiguration<Quotation>
         builder.Property(x => x.InternalSerial).ValueGeneratedOnAdd().HasDefaultValue(AC.InternalSerialOfficial);
 
         builder.Property(b => b.ExchangeRateOfficialTransa).HasPrecision(18, 8);
+        builder.Property(b => b.ExchangeRateOfficialBase).HasPrecision(18, 8);
         builder.Property(b => b.ExchangeRateBuyTransa).HasPrecision(18, 8);
         builder.Property(b => b.ExchangeRateSellTransa).HasPrecision(18, 8);
         builder.Property(b => b.ExchangeRateOfficialReal).HasPrecision(18, 8);

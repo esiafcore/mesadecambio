@@ -131,9 +131,14 @@ public class Quotation : Entity, ICloneable
     public decimal ExchangeRateSellReal { get; set; } = 0M;
 
     [Required(ErrorMessage = MC.RequiredMessage)]
+    [Display(Name = "TC Oficial Dólar")]
+    public decimal ExchangeRateOfficialBase { get; set; } = 0M;
+
+    [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Monto Transacción")]
     [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
     public decimal AmountTransaction { get; set; } = 0M;
+
     [NotMapped]
     public decimal AmountTransactionRpt
     {
