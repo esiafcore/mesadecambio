@@ -40,6 +40,18 @@ public class CurrencyExchangeRate : Entity, ICloneable
     [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
     public decimal OfficialRate { get; set; } = 0M;
 
+    [Display(Name = "Venta Origen")]
+    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    public decimal SellRateOrigin { get; set; } = 0M;
+
+    [Display(Name = "Compra Origen")]
+    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    public decimal BuyRateOrigin { get; set; } = 0M;
+
+    [Display(Name = "Oficial Origen")]
+    [DisplayFormat(DataFormatString = "{0:n4}", ApplyFormatInEditMode = true)]
+    public decimal OfficialRateOrigin { get; set; } = 0M;
+
     public object Clone()
     {
         var obj = new CurrencyExchangeRate()
@@ -50,9 +62,11 @@ public class CurrencyExchangeRate : Entity, ICloneable
             SellRate = SellRate,
             OfficialRate = OfficialRate,
             BuyRate = BuyRate,
+            SellRateOrigin = SellRateOrigin,
+            BuyRateOrigin = BuyRateOrigin,
+            OfficialRateOrigin = OfficialRateOrigin,
             CurrencyId = CurrencyId,
             CurrencyType = CurrencyType,
-
             CreatedDate = CreatedDate,
             CreatedBy = CreatedBy,
             CreatedIpv4 = CreatedIpv4,

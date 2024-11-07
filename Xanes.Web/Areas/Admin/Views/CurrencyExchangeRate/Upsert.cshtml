@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- ROW 2 -->
-                <div class="row">
+                <div class="row mb-1">
                     <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
                         <input asp-for="DataModel.OfficialRate" id="officialRate" type="number" class="form-control border-0 shadow text-end" step="any" />
                         <label asp-for="DataModel.OfficialRate" class="ms-2"></label>
@@ -81,6 +81,28 @@
                     </div>
                 </div>
 
+                @if (Model.DataModel.CurrencyType == SD.CurrencyType.Additional)
+                {
+                    <div class="row">
+                        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                            <input asp-for="DataModel.OfficialRateOrigin" id="officialRateOrigin" type="number" class="form-control border-0 shadow text-end" step="any" />
+                            <label asp-for="DataModel.OfficialRateOrigin" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.OfficialRateOrigin" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                            <input asp-for="DataModel.BuyRateOrigin" type="number" class="form-control border-0 shadow text-end" step="any" />
+                            <label asp-for="DataModel.BuyRateOrigin" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.BuyRateOrigin" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mt-1 pb-1 pt-1 col-12 col-md-4">
+                            <input asp-for="DataModel.SellRateOrigin" type="number" class="form-control border-0 shadow text-end" step="any" />
+                            <label asp-for="DataModel.SellRateOrigin" class="ms-2"></label>
+                            <span asp-validation-for="DataModel.SellRateOrigin" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>

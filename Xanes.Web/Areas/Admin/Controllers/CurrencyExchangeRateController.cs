@@ -30,147 +30,186 @@ public class CurrencyExchangeRateController : Controller
 
     public IActionResult Index(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
     {
-        ViewData[AC.Title] = "Tipos de Cambios";
-
-        ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
-        ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
-
-        var currencyList = _uow.Currency
-            .GetAll(filter: x => (x.CompanyId == _companyId)
-                && (x.Numeral != (short)SD.CurrencyType.Base)
-                && (x.IsActive))
-            .OrderBy(x => x.Numeral)
-            .Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString()
-                ,
-                Text = x.Abbreviation
-                ,
-                Selected = (x.Numeral == (short)currencyType)
-            });
-
-        var objViewModel = new CurrencyExchangeRateIndexVM()
+        try
         {
-            CurrencyList = currencyList,
-            CurrencySelected = currencyType
-        };
 
-        return View(objViewModel);
+
+            ViewData[AC.Title] = "Tipos de Cambios";
+
+            ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
+            ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
+
+            var currencyList = _uow.Currency
+                .GetAll(filter: x => (x.CompanyId == _companyId)
+                    && (x.Numeral != (short)SD.CurrencyType.Base)
+                    && (x.IsActive))
+                .OrderBy(x => x.Numeral)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString()
+                    ,
+                    Text = x.Abbreviation
+                    ,
+                    Selected = (x.Numeral == (short)currencyType)
+                });
+
+            var objViewModel = new CurrencyExchangeRateIndexVM()
+            {
+                CurrencyList = currencyList,
+                CurrencySelected = currencyType
+            };
+
+            return View(objViewModel);
+        }
+        catch (Exception ex)
+        {
+            TempData[AC.Error] = ex.Message;
+            return RedirectToAction("Index", "Home");
+        }
     }
 
     public JsonResult GetAll(SD.CurrencyType currencyType = SD.CurrencyType.Foreign)
     {
         JsonResultResponse? jsonResponse = new();
-        var objList = _uow.CurrencyExchangeRate
-            .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
-                includeProperties: "CurrencyTrx")
-            .OrderByDescending(x => x.DateTransa)
-            .ToList();
-
-        if (objList == null)
+        try
         {
-            jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = "Error al cargar los datos";
+
+            var objList = _uow.CurrencyExchangeRate
+                .GetAll(filter: x => (x.CompanyId == _companyId) && (x.CurrencyType == currencyType),
+                    includeProperties: "CurrencyTrx")
+                .OrderByDescending(x => x.DateTransa)
+                .ToList();
+
+            if (objList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Error al cargar los datos";
+                return Json(jsonResponse);
+            }
+
+            if (objList.Count <= 0)
+            {
+                jsonResponse.IsInfo = true;
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "No hay registros que mostrar";
+                return Json(jsonResponse);
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objList;
             return Json(jsonResponse);
         }
-
-        if (objList.Count <= 0)
+        catch (Exception e)
         {
-            jsonResponse.IsInfo = true;
             jsonResponse.IsSuccess = false;
-            jsonResponse.ErrorMessages = "No hay registros que mostrar";
+            jsonResponse.ErrorMessages = e.Message;
             return Json(jsonResponse);
         }
-
-        jsonResponse.IsSuccess = true;
-        jsonResponse.Data = objList;
-        return Json(jsonResponse);
     }
 
     // DETALLE
     public IActionResult Detail(int? id)
     {
-        ViewData[AC.Title] = "Visualizar - Tipo de Cambio";
-
-        if (id == null || id == 0)
+        try
         {
-            TempData[AC.Error] = $"El id es invalido";
-            return RedirectToAction(nameof(Index));
+            ViewData[AC.Title] = "Visualizar - Tipo de Cambio";
+
+            if (id == null || id == 0)
+            {
+                TempData[AC.Error] = $"El id es invalido";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var obj = _uow.CurrencyExchangeRate
+                .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
+
+            if (obj == null)
+            {
+                TempData[AC.Error] = $"El tipo de cambio no fue encontrado";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(obj);
+        }
+        catch (Exception ex)
+        {
+            TempData[AC.Error] = ex.Message;
+            return RedirectToAction("Index");
         }
 
-        var obj = _uow.CurrencyExchangeRate
-            .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
-
-        if (obj == null)
-        {
-            TempData[AC.Error] = $"El tipo de cambio no fue encontrado";
-            return RedirectToAction(nameof(Index));
-        }
-
-        return View(obj);
     }
 
     // UPSERT
     public IActionResult Upsert(int? id, SD.CurrencyType currencyType)
     {
-        CurrencyExchangeRate obj;
-
-        if (id == null || id == 0)
+        try
         {
-            ViewData[AC.Title] = "Crear - Tipo de Cambio";
+            CurrencyExchangeRate obj;
 
-            //Obtener moneda
-            var currencyCurrent = _uow.Currency
-                .Get(filter: x => (x.CompanyId == _companyId) && (x.Numeral == (short)currencyType));
-            if (currencyCurrent == null)
+            if (id == null || id == 0)
             {
-                return NotFound();
+                ViewData[AC.Title] = "Crear - Tipo de Cambio";
+
+                //Obtener moneda
+                var currencyCurrent = _uow.Currency
+                    .Get(filter: x => (x.CompanyId == _companyId) && (x.Numeral == (short)currencyType));
+                if (currencyCurrent == null)
+                {
+                    return NotFound();
+                }
+
+                //Setear valor por defecto
+                obj = new CurrencyExchangeRate()
+                {
+                    CompanyId = _companyId,
+                    DateTransa = DateOnly.FromDateTime(DateTime.Now),
+                    CurrencyType = currencyType,
+                    CurrencyTrx = currencyCurrent
+                };
+            }
+            else
+            {
+                ViewData[AC.Title] = "Actualizar - Tipo de Cambio";
+
+                obj = _uow.CurrencyExchangeRate
+                    .Get(x => (x.Id == id)
+                        , includeProperties: "CurrencyTrx", isTracking: false);
+
+                if (obj == null)
+                {
+                    return NotFound();
+                }
+
             }
 
-            //Setear valor por defecto
-            obj = new CurrencyExchangeRate()
+            var currencyList = _uow.Currency
+                .GetAll(filter: x => (x.CompanyId == _companyId)
+                                     && (x.Numeral != (short)SD.CurrencyType.Base))
+                .OrderBy(x => x.Numeral)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString()
+                    ,
+                    Text = x.Abbreviation
+                    ,
+                    Selected = (x.Numeral == (short)obj.CurrencyType)
+                });
+
+            var dataVM = new CurrencyExchangeRateVM()
             {
-                CompanyId = _companyId,
-                DateTransa = DateOnly.FromDateTime(DateTime.Now),
-                CurrencyType = currencyType,
-                CurrencyTrx = currencyCurrent
+                DataModel = obj,
+                CurrencyList = currencyList
             };
+
+            return View(dataVM);
         }
-        else
+        catch (Exception ex)
         {
-            ViewData[AC.Title] = "Actualizar - Tipo de Cambio";
-
-            obj = _uow.CurrencyExchangeRate
-                .Get(x => (x.Id == id)
-                    , includeProperties: "CurrencyTrx", isTracking: false);
-
-            if (obj == null)
-            {
-                return NotFound();
-            }
-
+            TempData[AC.Error] = ex.Message;
+            return RedirectToAction("Index");
         }
 
-        var currencyList = _uow.Currency
-            .GetAll(filter: x => (x.CompanyId == _companyId)
-                && (x.Numeral != (short)SD.CurrencyType.Base))
-            .OrderBy(x => x.Numeral)
-            .Select(x => new SelectListItem
-            {
-                Value = x.Id.ToString()
-                ,
-                Text = x.Abbreviation
-                ,
-                Selected = (x.Numeral == (short)obj.CurrencyType)
-            });
 
-        var dataVM = new CurrencyExchangeRateVM()
-        {
-            DataModel = obj,
-            CurrencyList = currencyList
-        };
-
-        return View(dataVM);
     }
 
     [HttpPost]
@@ -297,22 +336,31 @@ public class CurrencyExchangeRateController : Controller
     // DELETE
     public IActionResult Delete(int? id)
     {
-        ViewData[AC.Title] = "Eliminar - Tipo de Cambio";
-
-        if ((id == null) || (id == 0))
+        try
         {
-            return NotFound();
+
+            ViewData[AC.Title] = "Eliminar - Tipo de Cambio";
+
+            if ((id == null) || (id == 0))
+            {
+                return NotFound();
+            }
+
+            var obj = _uow.CurrencyExchangeRate
+                .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
+
+            if (obj == null)
+            {
+                return NotFound();
+            }
+
+            return View(obj);
         }
-
-        var obj = _uow.CurrencyExchangeRate
-            .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
-
-        if (obj == null)
+        catch (Exception ex)
         {
-            return NotFound();
+            TempData[AC.Error] = ex.Message;
+            return RedirectToAction("Index");
         }
-
-        return View(obj);
     }
 
     [HttpPost]
@@ -359,28 +407,37 @@ public class CurrencyExchangeRateController : Controller
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePost(int? id)
     {
-        if (id == null || id == 0)
+        try
         {
-            return NotFound();
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+
+            var objCurrency = _uow.CurrencyExchangeRate
+                .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
+
+            if (objCurrency == null)
+            {
+                return NotFound();
+            }
+
+            var currencyType = objCurrency.CurrencyType;
+
+            if (!_uow.CurrencyExchangeRate
+                    .RemoveByFilter(filter: x => (x.Id == id)))
+            {
+                return NotFound();
+            }
+            TempData["success"] = "Exchange Rate deleted successfully";
+            return RedirectToAction("Index", "CurrencyExchangeRate", new { currencyType = currencyType });
+        }
+        catch (Exception ex)
+        {
+            TempData[AC.Error] = ex.Message;
+            return RedirectToAction("Index");
         }
 
-        var objCurrency = _uow.CurrencyExchangeRate
-            .Get(filter: x => (x.Id == id), includeProperties: "CurrencyTrx", isTracking: false);
-
-        if (objCurrency == null)
-        {
-            return NotFound();
-        }
-
-        var currencyType = objCurrency.CurrencyType;
-
-        if (!_uow.CurrencyExchangeRate
-                .RemoveByFilter(filter: x => (x.Id == id)))
-        {
-            return NotFound();
-        }
-        TempData["success"] = "Exchange Rate deleted successfully";
-        return RedirectToAction("Index", "CurrencyExchangeRate", new { currencyType = currencyType });
     }
 
     #region EXPORT - IMPORT
