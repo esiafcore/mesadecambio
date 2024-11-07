@@ -527,6 +527,12 @@ const fnGetCustomer = async () => {
                                             $(selectBusinessExecutive).val(executiveIdByDefault).trigger('change');
                                         }
 
+                                        let selectedOptionActive = $(selectBusinessExecutive).find(':selected');
+                                        if (selectedOptionActive[0].dataset.loan === "True" || selectedOptionActive[0].dataset.payment === "True") {
+                                            fnHiddenButton(true);
+                                        } else {
+                                            fnHiddenButton(false);
+                                        }
                                     }
 
                                     fnLoadDatatable(e.params.data.id);

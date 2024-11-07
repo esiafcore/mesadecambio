@@ -2507,6 +2507,43 @@ public class QuotationController : Controller
             return resultResponse;
         }
 
+        //Si esta cerrado entonces recerramos wey
+        isReclosed = (objHeader.IsClosed);
+
+        if (isReclosed)
+        {
+            TempData["success"] = $"Cotización re-cerrada correctamente";
+            objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.ReClosedDate = DateTime.UtcNow;
+            objHeader.ReClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+
+        }
+        else
+        {
+            TempData["success"] = $"Cotización cerrada correctamente";
+
+            var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
+                x.TypeNumeral == objHeader.TypeNumeral &&
+                x.DateTransa == objHeader.DateTransa &&
+                x.InternalSerial == AC.InternalSerialOfficial);
+
+            if (nextSeq == null)
+            {
+                resultResponse.IsSuccess = false;
+                resultResponse.ErrorMessages = $"Consecutivo de cotización: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral} no encontrado";
+                return resultResponse;
+            }
+
+            objHeader.IsClosed = true;
+            objHeader.Numeral = nextSeq;
+            objHeader.InternalSerial = AC.InternalSerialOfficial;
+            objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
+            objHeader.ClosedDate = DateTime.UtcNow;
+            objHeader.ClosedHostName = AC.LOCALHOSTPC;
+            objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
+        }
+
         try
         {
             resultResponse = await fnGetConfigurations();
@@ -2519,10 +2556,6 @@ public class QuotationController : Controller
 
             configBcoDto = (ConfigBcoDto)resultResponse.Data;
             configCntDto = (ConfigCntDto)resultResponse.DataChildren;
-
-            //Si esta cerrado entonces recerramos wey
-            isReclosed = (objHeader.IsClosed);
-
 
             if (!objHeader.IsLoan && objHeader is { IsPayment: false })
             {
@@ -2689,40 +2722,6 @@ public class QuotationController : Controller
                         }
                     }
                 }
-            }
-
-            if (isReclosed)
-            {
-                TempData["success"] = $"Cotización re-cerrada correctamente";
-                objHeader.ReClosedBy = _userName ?? AC.LOCALHOSTME;
-                objHeader.ReClosedDate = DateTime.UtcNow;
-                objHeader.ReClosedHostName = AC.LOCALHOSTPC;
-                objHeader.ReClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
-
-            }
-            else
-            {
-                TempData["success"] = $"Cotización cerrada correctamente";
-
-                var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
-                    x.TypeNumeral == objHeader.TypeNumeral &&
-                    x.DateTransa == objHeader.DateTransa &&
-                    x.InternalSerial == AC.InternalSerialOfficial);
-
-                if (nextSeq == null)
-                {
-                    resultResponse.IsSuccess = false;
-                    resultResponse.ErrorMessages = $"Consecutivo de cotización: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral} no encontrado";
-                    return resultResponse;
-                }
-
-                objHeader.IsClosed = true;
-                objHeader.Numeral = nextSeq;
-                objHeader.InternalSerial = AC.InternalSerialOfficial;
-                objHeader.ClosedBy = _userName ?? AC.LOCALHOSTME;
-                objHeader.ClosedDate = DateTime.UtcNow;
-                objHeader.ClosedHostName = AC.LOCALHOSTPC;
-                objHeader.ClosedIpv4 = _ipAddress?.ToString() ?? AC.Ipv4Default;
             }
 
             //Seteamos campos de auditoria
