@@ -5555,7 +5555,7 @@ public class QuotationController : Controller
             {
                 string numberTransaCnt = string.Empty;
 
-                srvResponse = await _srvAsiento.GetNextSecuentialNumberAsync<APIResponse>(
+                srvResponse = await _srvAsiento.GetNextSequentialNumberAsync<APIResponse>(
                     _sessionToken, fiscalYear, fiscalMonth,
                     tipo, subtipo, ConsecutivoTipo.Temporal, isSave: true);
 
