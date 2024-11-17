@@ -19,12 +19,12 @@ public class CurrencyExchangeRateConfiguration : IEntityTypeConfiguration<Curren
                 , "currenciesexchangerates_idx_2020")
             .IsUnique();
 
-        builder.Property(b => b.OfficialRate).HasPrecision(18, 8);
-        builder.Property(b => b.BuyRate).HasPrecision(18, 8);
-        builder.Property(b => b.SellRate).HasPrecision(18, 8);
-        builder.Property(b => b.OfficialRateOrigin).HasPrecision(18, 8);
-        builder.Property(b => b.BuyRateOrigin).HasPrecision(18, 8);
-        builder.Property(b => b.SellRateOrigin).HasPrecision(18, 8);
+        builder.Property(b => b.OfficialRate).HasPrecision(18, 8).HasDefaultValue(0);
+        builder.Property(b => b.BuyRate).HasPrecision(18, 8).HasDefaultValue(0);
+        builder.Property(b => b.SellRate).HasPrecision(18, 8).HasDefaultValue(0);
+        builder.Property(b => b.OfficialRateOrigin).HasPrecision(18, 8).HasDefaultValue(0);
+        builder.Property(b => b.BuyRateOrigin).HasPrecision(18, 8).HasDefaultValue(0);
+        builder.Property(b => b.SellRateOrigin).HasPrecision(18, 8).HasDefaultValue(0);
 
         builder.HasOne(x => x.CurrencyTrx)
             .WithMany()

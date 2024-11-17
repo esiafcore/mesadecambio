@@ -1171,7 +1171,6 @@ public class QuotationController : Controller
 
         try
         {
-
             if (!ModelState.IsValid)
             {
                 var listErrorMessages = ModelState.Values
@@ -3607,9 +3606,7 @@ public class QuotationController : Controller
 
             //Si tiene ingreso o costo agg el tercer detalle
             if (objHeader.AmountCostReal != 0 || objHeader.AmountRevenueReal != 0)
-            {
-                //Si no hay ingreso y costo ejemplo falta
-
+            {             
                 bool isIngreso = objHeader.AmountRevenueReal != 0;
                 decimal amountContraPart = (isIngreso ? detail.AmountRevenue : detail.AmountCost);
 
@@ -3724,7 +3721,6 @@ public class QuotationController : Controller
                     //Actualizamos el numero de lineas del padre
                     transaBcoDto.NumeroLineas = (short)transaBcoDetalleDtoList.Count;
                 }
-
             }
 
             //Creamos el comprobante
