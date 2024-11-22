@@ -839,7 +839,7 @@ public class QuotationController : Controller
 
 
             var objCurrencyRateList = _uow.CurrencyExchangeRate.GetAll
-            (x => (x.CompanyId == _companyId) && (x.DateTransa == obj.DateTransa)
+            (x => (x.CompanyId == _companyId) && (x.DateTransa == objQt.DateTransa)
                 , includeProperties: "CurrencyTrx").ToList();
 
             if (objCurrencyRateList is null || objCurrencyRateList.Count == 0)
@@ -1234,7 +1234,7 @@ public class QuotationController : Controller
                 {
                     if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
-
+                        obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountExchange);
                     }
                     else if (objHeader.CurrencyTransferType == CurrencyType.Foreign)
                     {
@@ -3038,8 +3038,15 @@ public class QuotationController : Controller
             {
                 if (objHeader.CurrencyTransaType == CurrencyType.Additional)
                 {
-                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
+                        exchangeRate = objHeader.ExchangeRateOfficialBase;
+
+                        exchangeRateTransa = objHeader.ExchangeRateOfficialReal;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            exchangeRate, exchangeRateTransa,
+                            decimalTrx: AC.DecimalTransa);
                     }
                 }
             }
@@ -3407,8 +3414,14 @@ public class QuotationController : Controller
             {
                 if (objHeader.CurrencyTransaType == CurrencyType.Additional)
                 {
-                    if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                    if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
+                        exchangeRateOficial = objHeader.ExchangeRateOfficialBase;
+                        exchangeRateTransa = objHeader.ExchangeRateBuyReal;
+
+                        mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+                            objHeader.ExchangeRateOfficialBase, exchangeRateTransa,
+                            decimalTrx: AC.DecimalTransa);
                     }
                 }
             }
@@ -3577,10 +3590,11 @@ public class QuotationController : Controller
                 {
                     if (objHeader.CurrencyTransferType == CurrencyType.Base)
                     {
-                        exchangeRate = exchangeRateOficial;
+                        exchangeRateOficial = objHeader.ExchangeRateOfficialBase;
+                        exchangeRateTransa = objHeader.ExchangeRateOfficialReal;
 
-                        mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Foreign, transaBcoDetalleDto.MontoMonfor,
-                            exchangeRate, exchangeRate,
+                        mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Additional, transaBcoDetalleDto.MontoMonxtr,
+                            exchangeRateOficial, exchangeRateTransa,
                             decimalTrx: AC.DecimalTransa);
                     }
                     else if (objHeader.CurrencyTransferType == CurrencyType.Foreign)
@@ -3660,18 +3674,60 @@ public class QuotationController : Controller
                     UidEntidad = transaBcoDto.UidEntidad
                 };
 
-                decimal amountContraPartForeign = (isIngreso
-                    ? (detail.PercentageCostRevenue * objHeader.AmountRevenue)
-                    : (detail.PercentageCostRevenue * objHeader.AmountCost));
+                if (objHeader.TypeNumeral == SD.QuotationType.Sell)
+                {
+                    if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                    {
+                        if (objHeader.CurrencyDepositType == CurrencyType.Base)
+                        {
+                        }
+                        else if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                        {
+                            if (objHeader.CurrencyDepositType == CurrencyType.Base)
+                            {
+                            }
+                            else if (objHeader.CurrencyDepositType == CurrencyType.Foreign)
+                            {
+                                decimal amountContraPartForeign = (isIngreso
+                                    ? (detail.PercentageCostRevenue * objHeader.AmountRevenue)
+                                    : (detail.PercentageCostRevenue * objHeader.AmountCost));
 
-                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
-                {
-                    transaBcoDetalle.MontoMonfor = amountContraPartForeign.RoundTo(AC.DecimalTransa);
+                                if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                                {
+                                    transaBcoDetalle.MontoMonfor = amountContraPartForeign.RoundTo(AC.DecimalTransa);
+                                }
+                                else if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                                {
+                                    transaBcoDetalle.MontoMonxtr = amountContraPartForeign.RoundTo(AC.DecimalTransa);
+                                }
+                            }
+                        }
+                    }
                 }
-                else if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                else if (objHeader.TypeNumeral == SD.QuotationType.Buy)
                 {
-                    transaBcoDetalle.MontoMonxtr = amountContraPartForeign.RoundTo(AC.DecimalTransa);
+                    if (objHeader.CurrencyTransaType == CurrencyType.Foreign)
+                    {
+                        if (objHeader.CurrencyTransferType == CurrencyType.Base)
+                        {
+                        }
+                    }
+                    else if (objHeader.CurrencyTransaType == CurrencyType.Additional)
+                    {
+                        if (objHeader.CurrencyTransferType == CurrencyType.Base)
+                        {
+                            mtosExc = cvtExc.ConverterExchangeTo(CurrencyType.Base, amountContraPart,
+                                objHeader.ExchangeRateOfficialBase, objHeader.ExchangeRateOfficialReal,
+                                decimalTrx: AC.DecimalTransa);
+
+                            transaBcoDetalle.MontoMonfor = mtosExc.AmountForeign.RoundTo(AC.DecimalTransa);
+                        }
+                        else if (objHeader.CurrencyTransferType == CurrencyType.Foreign)
+                        {
+                        }
+                    }
                 }
+
 
                 resultResponse = await
                     fnCreateTransactionBcoDetail(transaBcoDetalle);
