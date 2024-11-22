@@ -1211,7 +1211,15 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountTransaction);
+            if ((objHeader.TypeNumeral == SD.QuotationType.Sell)
+                && ((obj.QuotationDetailType == QuotationDetailType.Deposit)
+                || (obj.QuotationDetailType == QuotationDetailType.CreditTransfer))
+                )
+            {
+                obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountExchange);
+            }
+            else
+                obj.PercentageCostRevenue = (obj.AmountDetail / objHeader.AmountTransaction);
 
             if (objHeader.TypeNumeral == SD.QuotationType.Buy)
             {
