@@ -851,16 +851,9 @@ const fnLoadDatatable = () => {
                 , orderable: false
             },
             {
-                data: 'isClosed', "width": "5%"
+                data: 'stateTransa', "width": "5%"
                 , render: function (data, type, row) {
-                    return data ? YesNo.Yes : YesNo.No;
-                }
-                , orderable: false
-            },
-            {
-                data: 'isPosted', "width": "5%"
-                , render: function (data, type, row) {
-                    return data ? YesNo.Yes : YesNo.No;
+                    return `${data}`;
                 }
                 , orderable: false
             },
@@ -961,6 +954,8 @@ const fnLoadDatatable = () => {
                                        `;
                         }
                     }
+
+                    buttons += fncreateBtnCopyToClipboard(row.id);
                     buttons += `</div>`;
 
                     return buttons;

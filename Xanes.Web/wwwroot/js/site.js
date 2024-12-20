@@ -95,6 +95,8 @@ const ButtonsText = {
     Auxiliary: "Auxiliar",
     Yes: "Si",
     No: "No",
+    Copy: "Copiar",
+    CopiedAlert: "Copiado!!"
 }
 
 const fnSweetAlertOkay = async ({ title, text, icon, time, html }) => {
@@ -117,7 +119,7 @@ const fnSweetAlertOkay = async ({ title, text, icon, time, html }) => {
     });
 };
 
-const fnShowModalMessages = async (data, titulo = "" ) => {
+const fnShowModalMessages = async (data, titulo = "") => {
     let icono = "error";
 
     if (data.isInfo) {
@@ -303,4 +305,37 @@ const select2Floating = () => {
 
 const fnremoveClassBtnExporDataTable = (dt, node, config) => {
     $(node).removeClass("btn-secondary"); // Remueve la clase 'btn-secondary'
+};
+
+const fncreateBtnCopyToClipboard = (text) => {
+    const btnCopyToClipBoard =
+        `<a onclick="copyToClipboard('${text}', this)"
+            data-bs-toggle="tooltip" data-bs-placement="top" title="${ButtonsText.Copy}"
+            class="btn btn-warning border border-outline text-white py-1 px-3 my-0 mx-1">
+            <i class="bi bi-copy"></i>
+        </a>`;
+
+    return btnCopyToClipBoard;
+};
+
+// Copiar UID al clipboard
+const copyToClipboard = async (text, btnElement) => {
+    try {
+        await navigator.clipboard.writeText(text);
+
+        // Cambiar el título del tooltip a "Copiado!"
+        const tooltip = bootstrap.Tooltip.getInstance(btnElement);
+        btnElement.setAttribute("data-bs-original-title", ButtonsText.CopiedAlert);
+        tooltip.show();
+
+        // Desactivar tooltip y restaurar el texto del tooltip original
+        btnElement.setAttribute("data-bs-original-title", ButtonsText.Copy);
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: ACJS.NoStatus,
+            text: error
+        });
+    }
 };

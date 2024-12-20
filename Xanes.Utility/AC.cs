@@ -9,6 +9,10 @@ public static class AC
     public const string SecreteSiafN4EntityUid = "eSiafN4EntityUid";
     public const string SecreteSiafN4CustomerName = "eSiafN4CustomerName";
     public const string SecreteSiafN4CustomerIdentificationNumber = "eSiafN4CustomerIdentificationNumber";
+
+    public static string Closed = "Cerrado";
+    public static string Posted = "Contabilizado";
+    public static string Void = "Anulado";
     
     public static string Si = "Si";
     public static string No = "No";
