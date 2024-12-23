@@ -320,6 +320,23 @@ public class Quotation : Entity, ICloneable
     [Display(Name = "Está Anulado?")]
     public bool IsVoid { get; set; }
 
+    [NotMapped]
+    public string StateTransa
+    {
+        get
+        {
+            string value = string.Empty;
+
+            if (this.IsVoid)
+                value = AC.Void;
+            else if (this.IsPosted)
+                value = AC.Posted;
+            else if (this.IsClosed)
+                value = AC.Closed;
+            return value;
+        }
+    }
+
     [Required]
     [Display(Name = "Es Pago?")]
     public bool IsPayment { get; set; }
