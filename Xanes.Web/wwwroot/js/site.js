@@ -311,7 +311,7 @@ const fncreateBtnCopyToClipboard = (text) => {
     const btnCopyToClipBoard =
         `<a onclick="copyToClipboard('${text}', this)"
             data-bs-toggle="tooltip" data-bs-placement="top" title="${ButtonsText.Copy}"
-            class="btn btn-warning border border-outline text-white py-1 px-3 my-0 mx-1">
+            class="btn btn-warning-outline border text-info py-1 px-3 my-0 mx-1">
             <i class="bi bi-copy"></i>
         </a>`;
 
