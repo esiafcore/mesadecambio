@@ -13,7 +13,8 @@ public static class AC
     public static string Closed = "Cerrado";
     public static string Posted = "Contabilizado";
     public static string Void = "Anulado";
-    
+    public static string Draft = "Borrador";
+
     public static string Si = "Si";
     public static string No = "No";
     public static string Error = "error";

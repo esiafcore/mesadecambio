@@ -333,6 +333,8 @@ public class Quotation : Entity, ICloneable
                 value = AC.Posted;
             else if (this.IsClosed)
                 value = AC.Closed;
+            else
+                value = AC.Draft;
             return value;
         }
     }
