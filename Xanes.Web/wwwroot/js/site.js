@@ -28,7 +28,7 @@ function fnmakeModalDraggable(modalId) {
 const LocalTimeDefault = "T00:00:00";
 
 const defaultDecimalTransa = 2;
-const defaultDecimalExchange = 4;
+const defaultDecimalExchange = 6;
 const localLanguage = "es-NI";
 const formatterAmount = (fractionDigits = defaultDecimalTransa) => {
     return new Intl.NumberFormat(localLanguage, {

@@ -21,8 +21,8 @@ public static class AC
     public static string Success = "success";
     public const string CodeEmpty = "00000";
     public const int DecimalTransa = 2;
-    public const int DecimalExchange = 4;
-    public const int ParDecimalExchange = 4;
+    public const int DecimalExchange = 6;
+    //public const int ParDecimalExchange = 4;
     public const int DecimalExchangeDouble = 8;
     public const decimal ExchangeRateDefaultValue = 1m;
 
