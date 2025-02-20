@@ -5,12 +5,12 @@ namespace Xanes.Models.ViewModels;
 
 public class QuotationReportVM
 {
-    public string CustomerFullName { get; set; }
-    public string BankTargetFullName { get; set; }
-    public string CurrencyTransferCode { get; set; }
-    public string ConceptGeneral { get; set; }
-    public string DescriptionGeneral { get; set; }
-    public string NumberReferen { get; set; }
+    public string CustomerFullName { get; set; } = null!;
+    public string BankTargetFullName { get; set; } = null!;
+    public string CurrencyTransferCode { get; set; } = null!;
+    public string ConceptGeneral { get; set; } = null!;
+    public string DescriptionGeneral { get; set; } = null!;
+    public string NumberReferen { get; set; } = null!;  
     public decimal AmountTransaction { get; set; } = 0M;
     public bool IsClosed { get; set; }
     // Campos de agrupacion

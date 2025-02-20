@@ -571,8 +571,8 @@ public class CurrencyExchangeRateController : Controller
 
             var hoja = workbook.Worksheet(1);
 
-            var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
-            var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+            var primerFilaUsada = hoja.FirstRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
+            var ultimaFilaUsada = hoja.LastRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
 
 
             for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)

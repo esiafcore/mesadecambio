@@ -13,7 +13,7 @@ public class TransaccionesBcoDetalleDtoCreate
     public Guid? UidAuxiliarPresupuesto { get; set; }
     public Guid? ProyectoActividadUid { get; set; }
     public Guid? UidDocumento { get; set; }
-    public string CodigoDocumento { get; set; }
+    public string CodigoDocumento { get; set; } = null!;    
     public int NumeroLinea { get; set; }
     public short TipoMovimiento { get; set; }
     public decimal TipoCambioMonfor { get; set; }
@@ -27,7 +27,7 @@ public class TransaccionesBcoDetalleDtoCreate
     public Guid? UidEntidad { get; set; }
     public short? TipoBeneficiario { get; set; }
     public bool IndDiferencial { get; set; }
-    public string Comentarios { get; set; }
+    public string Comentarios { get; set; } = null!;    
     public short? TipoRegistro { get; set; }
     public bool InddeCuadratura { get; set; }
     public short NumeroTipoCambio { get; set; }

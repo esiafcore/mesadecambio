@@ -32,7 +32,7 @@ public class BaseService : IBaseService
             client.Timeout = TimeSpan.FromSeconds(timeoutClient);
             HttpRequestMessage message = new HttpRequestMessage();
 
-            //Agregado para funcionalidad de Upload File P01
+            //Agregado para funcionalidad de Upload File P01  
             if (apiRequest.ContentType == SD.ContentType.MultipartFormData)
             {
                 message.Headers.Add("Accept", "*/*");
@@ -42,10 +42,9 @@ public class BaseService : IBaseService
                 message.Headers.Add("Accept", "application/json");
             }
 
-
             message.RequestUri = new Uri(apiRequest.Url);
 
-            //Agregado para funcionalidad de Upload File P01
+            //Agregado para funcionalidad de Upload File P01  
             if (apiRequest.ContentType == SD.ContentType.MultipartFormData)
             {
                 var content = new MultipartFormDataContent();
@@ -62,7 +61,7 @@ public class BaseService : IBaseService
                     }
                     else
                     {
-                        content.Add(new StringContent(value != null ? value.ToString() : string.Empty), prop.Name);
+                        content.Add(new StringContent(value?.ToString() ?? string.Empty), prop.Name);
                     }
                 }
 
@@ -77,8 +76,8 @@ public class BaseService : IBaseService
                 }
             }
 
-            //Si hay token, pasarlo
-            //====================
+            //Si hay token, pasarlo  
+            //====================  
             if (!string.IsNullOrEmpty(apiRequest.Token))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiRequest.Token);
@@ -86,8 +85,7 @@ public class BaseService : IBaseService
 
             message.Method = apiRequest.ApiType;
 
-            HttpResponseMessage apiResponse = null;
-            apiResponse = await client.SendAsync(message);
+            HttpResponseMessage apiResponse = await client.SendAsync(message);
             if (pagination != null)
             {
                 var paginationHeader = JsonConvert.DeserializeObject<Pagination>(apiResponse.Headers.GetValues(AC.PaginationHeaderName).First());

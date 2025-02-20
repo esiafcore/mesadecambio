@@ -36,31 +36,31 @@ public class ConfigCntDtoUpdate
 
     public short CuentaContableDigitosSegmento10 { get; set; }
 
-    public string CuentaContablePatronSegmento01 { get; set; }
+    public string CuentaContablePatronSegmento01 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento02 { get; set; }
+    public string CuentaContablePatronSegmento02 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento03 { get; set; }
+    public string CuentaContablePatronSegmento03 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento04 { get; set; }
+    public string CuentaContablePatronSegmento04 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento05 { get; set; }
+    public string CuentaContablePatronSegmento05 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento06 { get; set; }
+    public string CuentaContablePatronSegmento06 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento07 { get; set; }
+    public string CuentaContablePatronSegmento07 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento08 { get; set; }
+    public string CuentaContablePatronSegmento08 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento09 { get; set; }
+    public string CuentaContablePatronSegmento09 { get; set; } = null!;
 
-    public string CuentaContablePatronSegmento10 { get; set; }
+    public string CuentaContablePatronSegmento10 { get; set; } = null!;
 
-    public string CuentaContableExpresionRegular { get; set; }
+    public string CuentaContableExpresionRegular { get; set; } = null!;
 
-    public string CuentaContableExpresionFormateo { get; set; }
+    public string CuentaContableExpresionFormateo { get; set; } = null!;
 
-    public string CuentaContableExpresionMascara { get; set; }
+    public string CuentaContableExpresionMascara { get; set; } = null!;
 
     public short CentroCostoSegmentos { get; set; }
 
@@ -76,21 +76,21 @@ public class ConfigCntDtoUpdate
 
     public short CentroCostoDigitosSegmento05 { get; set; }
 
-    public string CentroCostoPatronSegmento01 { get; set; }
+    public string CentroCostoPatronSegmento01 { get; set; } = null!;
 
-    public string CentroCostoPatronSegmento02 { get; set; }
+    public string CentroCostoPatronSegmento02 { get; set; } = null!;
 
-    public string CentroCostoPatronSegmento03 { get; set; }
+    public string CentroCostoPatronSegmento03 { get; set; } = null!;
 
-    public string CentroCostoPatronSegmento04 { get; set; }
+    public string CentroCostoPatronSegmento04 { get; set; } = null!;
 
-    public string CentroCostoPatronSegmento05 { get; set; }
+    public string CentroCostoPatronSegmento05 { get; set; } = null!;
 
-    public string CentroCostoExpresionRegular { get; set; }
+    public string CentroCostoExpresionRegular { get; set; } = null!;
 
-    public string CentroCostoExpresionFormateo { get; set; }
+    public string CentroCostoExpresionFormateo { get; set; } = null!;
 
-    public string CentroCostoExpresionMascara { get; set; }
+    public string CentroCostoExpresionMascara { get; set; } = null!;
 
     public bool IndCalcularImpuestoRenta { get; set; }
 
@@ -120,7 +120,7 @@ public class ConfigCntDtoUpdate
 
     public Guid? CentroCostoGananciaDiferencialUid { get; set; }
 
-    public string SeparadorNivel { get; set; }
+    public string SeparadorNivel { get; set; } = null!;
 
     public short NumeroFormatoImpresionComprobante { get; set; }
 

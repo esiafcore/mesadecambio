@@ -15,9 +15,9 @@ public class JsonResultResponse
     public bool IsSuccess { get; set; }
     public bool IsInfo { get; set; }
     public bool IsWarning { get; set; }
-    public string TitleMessages { get; set; }
-    public string ErrorMessages { get; set; }
-    public string SuccessMessages { get; set; }
+    public string TitleMessages { get; set; } = null!;
+    public string ErrorMessages { get; set; } = null!;
+    public string SuccessMessages { get; set; } = null!;
     public string DurationTime { get; set; } = null!;
     public string? UrlRedirect { get; set; }
 

@@ -24,7 +24,7 @@ public class AsientosContablesDetalleDtoCreate
 
     public Guid? UidDocumento { get; set; }
 
-    public string CodigoDocumento { get; set; }
+    public string CodigoDocumento { get; set; } = null!;
 
     public int NumeroLinea { get; set; }
 
@@ -62,7 +62,7 @@ public class AsientosContablesDetalleDtoCreate
 
     public bool IndDiferencial { get; set; }
 
-    public string Comentarios { get; set; }
+    public string Comentarios { get; set; } = null!;
 
     public bool InddeCuadratura { get; set; }
 }

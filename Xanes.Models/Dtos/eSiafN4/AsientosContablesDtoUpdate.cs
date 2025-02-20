@@ -12,9 +12,9 @@ public class AsientosContablesDtoUpdate
     public short YearFiscal { get; set; }
     public short MesFiscal { get; set; }
     public DateTime FechaTransa { get; set; }
-    public string NumeroTransaccion { get; set; }
-    public string SerieInterna { get; set; }
-    public string NumeroTransaccionRef { get; set; }
+    public string NumeroTransaccion { get; set; } = null!;
+    public string SerieInterna { get; set; } = null!;
+    public string NumeroTransaccionRef { get; set; } = null!;
     public decimal TipoCambioMonfor { get; set; }
     public decimal TipoCambioMonxtr { get; set; }
     public decimal TipoCambioParaMonfor { get; set; }
@@ -28,13 +28,13 @@ public class AsientosContablesDtoUpdate
     public decimal MontoCreditoMonxtr { get; set; }
     public Guid? UidProyecto { get; set; }
     public Guid? UidSucursal { get; set; }
-    public string Comentarios { get; set; }
+    public string Comentarios { get; set; } = null!;
     public DateTime? FechaTransaAnula { get; set; }
-    public string NumeroTransaccionAnula { get; set; }
-    public string SerieInternaAnula { get; set; }
+    public string NumeroTransaccionAnula { get; set; } = null!;
+    public string SerieInternaAnula { get; set; } = null!;
     public short? YearFiscalAnula { get; set; }
     public short? MesFiscalAnula { get; set; }
     public Guid? UidRegistref { get; set; }
     public bool IndOkay { get; set; }
-    public string ComentariosSistema { get; set; }
+    public string ComentariosSistema { get; set; } = null!;
 }

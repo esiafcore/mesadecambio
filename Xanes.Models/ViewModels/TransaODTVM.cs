@@ -5,14 +5,14 @@ namespace Xanes.Models.ViewModels;
 public class TransaODTVM : Quotation
 {
     public SD.QuotationDetailType QuotationDetailType { get; set; }
-    public string CustomerFullName { get; set; }
-    public string NumberTransa { get; set; }
-    public string CurrencySourceTarget { get; set; }
-    public string BankSourceCode { get; set; }
-    public string BankTargetCode { get; set; }
-    public string BankAccountSourceName { get; set; }
-    public string BankAccountTargetName { get; set; }
-    public string ExecutiveCode { get; set; }
+    public string CustomerFullName { get; set; } = null!;
+    public string NumberTransa { get; set; } = null!;
+    public string CurrencySourceTarget { get; set; } = null!;
+    public string BankSourceCode { get; set; } = null!;
+    public string BankTargetCode { get; set; } = null!;
+    public string BankAccountSourceName { get; set; } = null!;
+    public string BankAccountTargetName { get; set; } = null!;
+    public string ExecutiveCode { get; set; } = null!;  
     public int IdDetail { get; set; }
     public decimal ExchangeRateTransa { get; set; } = 0M;
     public decimal AmountTransactionBase { get; set; } = 0M;

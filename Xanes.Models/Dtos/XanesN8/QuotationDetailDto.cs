@@ -29,7 +29,7 @@ public class QuotationDetailDto : Entity
 
     [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Banco Origen Codigo")]
-    public string BankSourceCode { get; set; }
+    public string BankSourceCode { get; set; } = null!;
 
     [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Banco Destino")]
@@ -37,7 +37,7 @@ public class QuotationDetailDto : Entity
 
     [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Banco Destino Codigo")]
-    public string BankTargetCode { get; set; }
+    public string BankTargetCode { get; set; } = null!;
 
     [Required(ErrorMessage = MC.RequiredMessage)]
     [Display(Name = "Monto Detalle")]

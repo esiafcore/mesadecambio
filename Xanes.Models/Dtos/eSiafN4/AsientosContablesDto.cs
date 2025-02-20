@@ -12,9 +12,9 @@ public class AsientosContablesDto
     public short YearFiscal { get; set; }
     public short MesFiscal { get; set; }
     public DateTime FechaTransa { get; set; }
-    public string NumeroTransaccion { get; set; }
-    public string SerieInterna { get; set; }
-    public string NumeroTransaccionRef { get; set; }
+    public string NumeroTransaccion { get; set; } = null!;
+    public string SerieInterna { get; set; } = null!;
+    public string NumeroTransaccionRef { get; set; } = null!;
     public decimal TipoCambioMonfor { get; set; }
     public decimal TipoCambioMonxtr { get; set; }
     public decimal TipoCambioParaMonfor { get; set; }
@@ -28,23 +28,23 @@ public class AsientosContablesDto
     public decimal MontoCreditoMonxtr { get; set; }
     public Guid? UidProyecto { get; set; }
     public Guid? UidSucursal { get; set; }
-    public string Comentarios { get; set; }
+    public string Comentarios { get; set; } = null!;
     public DateTime? FechaTransaAnula { get; set; }
-    public string NumeroTransaccionAnula { get; set; }
-    public string SerieInternaAnula { get; set; }
+    public string NumeroTransaccionAnula { get; set; } = null!;
+    public string SerieInternaAnula { get; set; } = null!;
     public short? YearFiscalAnula { get; set; }
     public short? MesFiscalAnula { get; set; }
     public Guid? UidRegistRef { get; set; }
     public bool IndOkay { get; set; }
-    public string ComentariosSistema { get; set; }
+    public string ComentariosSistema { get; set; } = null!;
     public DateTime CreFch { get; set; }
-    public string CreUsr { get; set; }
-    public string CreHsn { get; set; }
-    public string CreHid { get; set; }
-    public string CreIps { get; set; }
+    public string CreUsr { get; set; } = null!;
+    public string CreHsn { get; set; } = null!;
+    public string CreHid { get; set; } = null!;
+    public string CreIps { get; set; } = null!;
     public DateTime ModFch { get; set; }
-    public string ModUsr { get; set; }
-    public string ModHsn { get; set; }
-    public string ModHid { get; set; }
-    public string ModIps { get; set; }
+    public string ModUsr { get; set; } = null!;
+    public string ModHsn { get; set; } = null!;
+    public string ModHid { get; set; } = null!;
+    public string ModIps { get; set; } = null!;
 }

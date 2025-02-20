@@ -15,7 +15,7 @@ public class ContentSecurityPolicyMiddleware
 
         if (!context.Response.Headers.ContainsKey(nameSecurityPolicy))
         {
-            context.Response.Headers.Add(nameSecurityPolicy,
+            context.Response.Headers.Append(nameSecurityPolicy,
                 "default-src 'self' 'unsafe-inline';" +
                 "connect-src 'self' 'unsafe-inline' https://209.145.54.249:7201 https://vmi531999.contaboserver.net:7201 ;" +
                 "font-src 'self' https://fonts.gstatic.com/ ;" +
@@ -25,10 +25,10 @@ public class ContentSecurityPolicyMiddleware
                 "img-src 'self' 'unsafe-inline' data: https://209.145.54.249:7201 https://vmi531999.contaboserver.net:7201 http://www.w3.org ;");
         }
 
-        context.Response.Headers.Add("X-Frame-Options", "DENY");
-        context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-        context.Response.Headers.Add("Referrer-Policy", "no-referrer");
+        context.Response.Headers.Append("X-Frame-Options", "DENY");
+        context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+        context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+        context.Response.Headers.Append("Referrer-Policy", "no-referrer");
         context.Response.Headers.Remove("X-Powered-By");
         context.Response.Headers.Remove("Server");
 

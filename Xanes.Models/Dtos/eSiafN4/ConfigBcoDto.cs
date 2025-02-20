@@ -27,14 +27,14 @@ public class ConfigBcoDto
     public bool IndUsaSolicituddePago { get; set; }
     public bool IndConsecutivoSolicitudPagoIncluyeMes { get; set; }
     public DateTime CreFch { get; set; }
-    public string CreUsr { get; set; }
-    public string CreHsn { get; set; }
-    public string CreHid { get; set; }
-    public string CreIps { get; set; }
+    public string CreUsr { get; set; } = null!;
+    public string CreHsn { get; set; } = null!;
+    public string CreHid { get; set; } = null!;
+    public string CreIps { get; set; } = null!;
     public DateTime ModFch { get; set; }
-    public string ModUsr { get; set; }
-    public string ModHsn { get; set; }
-    public string ModHid { get; set; }
-    public string ModIps { get; set; }
+    public string ModUsr { get; set; } = null!;
+    public string ModHsn { get; set; } = null!;
+    public string ModHid { get; set; } = null!;
+    public string ModIps { get; set; } = null!;
     public short? VersionFormatoImpresion { get; set; }
 }

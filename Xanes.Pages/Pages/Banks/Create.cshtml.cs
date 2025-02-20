@@ -11,7 +11,8 @@ public class CreateModel : PageModel
     private readonly ApplicationDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly int _companyId;
-    public Bank Bank { get; set; }
+    public Bank Bank { get; set; } = new Bank(); // Initialize Bank property
+
     public CreateModel(ApplicationDbContext db, IConfiguration configuration)
     {
         _db = db;

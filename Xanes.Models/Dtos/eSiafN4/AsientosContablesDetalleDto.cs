@@ -26,7 +26,7 @@ public class AsientosContablesDetalleDto
 
     public Guid? UidDocumento { get; set; }
 
-    public string CodigoDocumento { get; set; }
+    public string CodigoDocumento { get; set; } = null!;
 
     public int NumeroLinea { get; set; }
 
@@ -64,27 +64,27 @@ public class AsientosContablesDetalleDto
 
     public bool IndDiferencial { get; set; }
 
-    public string Comentarios { get; set; }
+    public string Comentarios { get; set; } = null!;
 
     public bool InddeCuadratura { get; set; }
 
     public DateTime CreFch { get; set; }
 
-    public string CreUsr { get; set; }
+    public string CreUsr { get; set; } = null!;
 
-    public string CreHsn { get; set; }
+    public string CreHsn { get; set; } = null!;
 
-    public string CreHid { get; set; }
+    public string CreHid { get; set; } = null!;
 
-    public string CreIps { get; set; }
+    public string CreIps { get; set; } = null!;
 
     public DateTime ModFch { get; set; }
 
-    public string ModUsr { get; set; }
+    public string ModUsr { get; set; } = null!;
 
-    public string ModHsn { get; set; }
+    public string ModHsn { get; set; } = null!;
 
-    public string ModHid { get; set; }
+    public string ModHid { get; set; } = null!;
 
-    public string ModIps { get; set; }
+    public string ModIps { get; set; } = null!;
 }
