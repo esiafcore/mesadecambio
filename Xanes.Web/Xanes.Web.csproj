@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>1e4f7e1c-b5a5-4a88-9145-b719416b83e3</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Areas\Customer\Data\**" />
     <Compile Remove="Areas\Customer\Models\**" />
@@ -21,7 +19,6 @@
     <None Remove="Areas\Customer\Models\**" />
     <None Remove="Controllers\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Remove="wwwroot\images\banks\02551a1f-910f-4090-81fe-7a9138bf831c.svg" />
     <Content Remove="wwwroot\images\banks\1b35d28d-1367-4325-93c0-1ed5fe5d86b5.svg" />
@@ -29,7 +26,6 @@
     <Content Remove="wwwroot\images\banks\4a9822a3-4805-46a6-b660-88f7306b0656.png" />
     <Content Remove="wwwroot\images\banks\fb0ba6f7-f05b-4dab-ae99-02067595a45b.svg" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="Areas\Exchange\Controllers\QuotationController.cs~RF348c202.TMP" />
     <None Remove="Areas\Exchange\Reports\DepositList.mrt" />
@@ -38,40 +34,36 @@
     <None Remove="Areas\Exchange\Reports\TransferList.mrt" />
     <None Remove="Areas\Exchange\Reports\TransportList.mrt" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="ClosedXML" Version="0.102.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
     <PackageReference Include="Stimulsoft.Reports.Web.NetCore" Version="2024.3.5" />
-    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="8.0.1" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.2" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Xanes.DataAccess\Xanes.DataAccess.csproj" />
     <ProjectReference Include="..\Xanes.LoggerService\Xanes.LoggerService.csproj" />
     <ProjectReference Include="..\Xanes.Models\Xanes.Models.csproj" />
     <ProjectReference Include="..\Xanes.Utility\Xanes.Utility.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Areas\Auth\Data\" />
     <Folder Include="Areas\Auth\Models\" />
     <Folder Include="Localization\" />
     <Folder Include="wwwroot\images\banks\" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Update="wwwroot\images\companies\Dummy.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -87,19 +79,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Detail.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Exchange\Views\BusinessExecutive\Upsert.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="Areas\Exchange\Reports\TransferList.mrt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="Areas\Exchange\Reports\DepositList.mrt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -114,17 +103,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Index.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Upsert.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Areas\Exchange\Views\BusinessExecutive\Detail.cshtml" />
   </ItemGroup>
-
 </Project>
