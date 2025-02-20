@@ -5,8 +5,6 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Web", "Xanes.Web\Xanes.Web.csproj", "{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Pages", "Xanes.Pages\Xanes.Pages.csproj", "{2C93CBB9-EF1F-4737-9753-40DB875145AD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.DataAccess", "Xanes.DataAccess\Xanes.DataAccess.csproj", "{DD5DF5BB-4A85-4388-93C9-C17144A21B4F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xanes.Models", "Xanes.Models\Xanes.Models.csproj", "{B87D174E-347F-4956-9503-8E40F093795E}"
@@ -25,10 +23,6 @@ Global
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44E51DB2-D348-42FB-8ECD-7E9BACDD41B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C93CBB9-EF1F-4737-9753-40DB875145AD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DD5DF5BB-4A85-4388-93C9-C17144A21B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DD5DF5BB-4A85-4388-93C9-C17144A21B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD5DF5BB-4A85-4388-93C9-C17144A21B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
