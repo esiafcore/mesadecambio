@@ -116,13 +116,13 @@ public class QuotationController : Controller
         _mapper = mapper;
         _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
         _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
-        _sessionToken = _contextAccessor.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
+        _sessionToken = _contextAccessor.HttpContext?.Session.GetString(SD.SessionToken) ?? string.Empty;
     }
 
     public IActionResult Index()
     {
-        string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
-        string changeProcessingDateString = HttpContext.Session.GetString(AC.ChangeProcessingDate);
+        string? processingDateString = _contextAccessor.HttpContext?.Session.GetString(AC.ProcessingDate);
+        string? changeProcessingDateString = _contextAccessor.HttpContext?.Session.GetString(AC.ChangeProcessingDate);
 
         if (processingDateString is null)
         {
@@ -157,7 +157,7 @@ public class QuotationController : Controller
         {
             ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
             ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
-            string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate);
+            string? processingDateString = _contextAccessor.HttpContext?.Session.GetString(AC.ProcessingDate);
             QuotationCreateVM model = new();
             Quotation objData = new();
             List<Models.Customer>? listCustomer = new();
@@ -1751,7 +1751,7 @@ public class QuotationController : Controller
                             {
                                 item.TransactionBcoFullName = $"Trx: {transaDtoStatus.TransaBcoFullName} [{transaDtoStatus.TransaBcoEstado.Trim()}]";
                                 item.JournalEntryFullName = $"Asi: {transaDtoStatus.TransaAsiFullName} [{transaDtoStatus.TransaAsiEstado.Trim()}]";
-                                if (item.JournalEntryVoidId.HasValue && transaDtoStatus.TransaAsiAnuladoFullName != null)
+                                if (item.JournalEntryVoidId.HasValue && (transaDtoStatus.TransaAsiAnuladoFullName != null) && (transaDtoStatus.TransaAsiAnuladoEstado != null))
                                     item.JournalEntryVoidFullName = $"Asi Anu: {transaDtoStatus.TransaAsiAnuladoFullName} [{transaDtoStatus.TransaAsiAnuladoEstado.Trim()}]";
                             }
                         }

@@ -11,19 +11,20 @@
     <title>@ViewData[AC.Title] - Xanes.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/Xanes.Web.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
-    <link href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.5.2/css/dataTables.dateTime.min.css">
-    <link href="https://cdn.datatables.net/responsive/3.0.2/css/responsive.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/searchbuilder/1.7.1/css/searchBuilder.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/searchpanes/2.3.1/css/searchPanes.bootstrap5.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/select/2.0.3/css/select.bootstrap5.min.css">
+    <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" rel="stylesheet" integrity="sha384-fXYHeSNHACNh+Ql0Psy1BGpQQ48YxrV496tFDs/TbEpAPWdxIEynp8q+H3CQ/Mih" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/buttons/3.2.2/css/buttons.bootstrap5.css" rel="stylesheet" integrity="sha384-aXrixFlY9n6jLh55LkPxdYZAYmWDgBhw5KSCf+G8llA4+zVwFJmsm16d38/HTn5v" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/datetime/1.5.5/css/dataTables.dateTime.css" rel="stylesheet" integrity="sha384-L3cnoQJO0GDYK/4XoEEAZQwZheigM84gbNA6jjQKo5CB91h5k3VQ9epOwlhb1NJN" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css" rel="stylesheet" integrity="sha384-8CzwKBlyc4q7v55PtHaeeqODP+kaouVbxp350gHt/UhVlPlaVFEnDxSFYo2HU1SQ" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/searchbuilder/1.8.2/css/searchBuilder.bootstrap5.css" rel="stylesheet" integrity="sha384-nvSTVdzurEGuuJaXeZ0TA5D+opMMg1hDl7oGnDd8mOrxcUWJME67iPwYfC8u/bls" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/searchpanes/2.3.3/css/searchPanes.bootstrap5.css" rel="stylesheet" integrity="sha384-1cES/Voy1DiflD7JxLgKBmFj/On6W7C4FVXQWn2LyrDI4jFeqdksdgNSVHXNZ3kG" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/select/3.0.0/css/select.bootstrap5.css" rel="stylesheet" integrity="sha384-5pFEAq0JsAHHpH5eRir7BZ9HgIwUdH8w7lDADZWSSqzXvd8colMpy0eK/HuYIHTg" crossorigin="anonymous">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <!-- Toastr CSS -->
@@ -45,8 +46,8 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
 
-                        @if (Accessor.HttpContext.Session.GetString(SD.SessionToken) != null &&
-                        Accessor.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
+                        @if ((Accessor.HttpContext != null) &&
+                              (Accessor.HttpContext.Session.GetString(SD.SessionToken) != null))
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="Exchange" asp-controller="Quotation" asp-action="ProcessingDate">Fecha de Procesamiento</a>
@@ -145,26 +146,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.colVis.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/datetime/1.5.2/js/dataTables.dateTime.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.2/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.2/js/responsive.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/searchbuilder/1.7.1/js/dataTables.searchBuilder.min.js"></script>
-    <script src="https://cdn.datatables.net/searchbuilder/1.7.1/js/searchBuilder.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/dataTables.searchPanes.min.js"></script>
-    <script src="https://cdn.datatables.net/searchpanes/2.3.1/js/searchPanes.bootstrap5.min.js"></script>
-    <script src="https://cdn.datatables.net/select/2.0.3/js/dataTables.select.min.js"></script>
 
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js" integrity="sha384-gGekiWQ/bm8p71RTsvhPShoIBxcf8BsVjRTi0WY8FvxuQa2nKS0PKHiSXV9nfW/A" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.bootstrap5.js" integrity="sha384-2IrcDZstSOMFTMxGhnJHQtNpSfUopdFXCOaDviGVHw/kuF34fSSaVqL20jnkJctu" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.2/js/dataTables.buttons.js" integrity="sha384-wCLG3FbyFPnMZM65D+pam9KW+2joK88dh4jfSMK0OuMQ2cBQHV0t55OqmQduaQ1S" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.bootstrap5.js" integrity="sha384-yLTXNuasglzZXWjgn0gac6fzvHP2KJ8n49mkOhmzp6rGhK41By8gXi3+/Ms+KOli" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.colVis.js" integrity="sha384-i6Z7TESDTMWWMiPn4glNtpuvZKnfRC8IRXtzYgtiFgpuLgRPoUyRO4uJJ8H22IyH" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/buttons/3.2.2/js/buttons.html5.js" integrity="sha384-r5RumiuQhALaYWd8i8v0DxCjEXRayyj6nl1wP379+GexLAvE4yuLNoyPEvE6hzDu" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/datetime/1.5.5/js/dataTables.dateTime.js" integrity="sha384-+toGOBi9xpY0BNP80IbcSPp3RgexLr3TjV/obfApBTe1kn49KzkFBEuIoEhZ8f47" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js" integrity="sha384-zAVoatBLtEAzOhdX4Xkli8AOOsRiPj+iFEsCh/BBYnKNHJCM/G8PNGupst4xx3Ft" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.4/js/responsive.bootstrap5.js" integrity="sha384-hyp/YDWGBMFqg7pJuS+y+2VWJkwnOyX+oMN9fWcxINo2flqjC/SdNaHj8LIV4zKJ" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/searchbuilder/1.8.2/js/dataTables.searchBuilder.js" integrity="sha384-6LuXV+ZF5yIfkqLfrQx+kWRn0m94ydo2L8S47+sw9oqS0dQ7EGZLi1q6rB9iDoiu" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/searchbuilder/1.8.2/js/searchBuilder.bootstrap5.js" integrity="sha384-gN0JqqeksS791yjmwR5Es8rZtR+3rDVUo42jAKAy1V9XBq/K0ZrqFQzODwMrb85m" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/dataTables.searchPanes.js" integrity="sha384-5tx/IiZ6/jaS5Dia4N2xitpFvzlsr1TB6qOD+aB1vKSxA2PunZz1Bc/QkNqDJhn1" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.3.3/js/searchPanes.bootstrap5.js" integrity="sha384-wzSP+ZST/MzlFNaZ7z8/c+ZkNVUU1B5zWZeshPiPZiIifoel8zDhYn1iEqXxNofl" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/select/3.0.0/js/dataTables.select.js" integrity="sha384-hJjpz/IhFX8FAfkNB7zZrVouwlDrs/fzYxtAlUH5Ks1daudIQpG5hRjFp4xIphDb" crossorigin="anonymous"></script>
 
     <!-- Librerias externas del DataTable-->
-    <script asp-subresource-integrity type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js"></script>
-    <script asp-subresource-integrity type="text/javascript" src="https://cdn.datatables.net/plug-ins/2.0.3/dataRender/ellipsis.js"></script>
-    <script asp-subresource-integrity type="text/javascript" src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/2.2.2/dataRender/ellipsis.js" asp-subresource-integrity type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/2.3.1/luxon.min.js" asp-subresource-integrity type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" asp-subresource-integrity type="text/javascript"></script>
 
     <script asp-subresource-integrity type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"
             integrity="sha512-57oZ/vW8ANMjR/KQ6Be9v/+/h6bq9/l3f0Oc7vn6qMqyhvPd1cvKBRWWpzu0QoneImqr2SkmO4MSqU+RpHom3Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>

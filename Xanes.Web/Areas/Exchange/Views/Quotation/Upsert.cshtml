@@ -13,20 +13,20 @@
                     <div class="row col mt-1 d-flex justify-content-end">
                         <div class="col-6 col-md-5 col-xl-4" id="btnSaveClosed" onclick="fnSaveClosed()" hidden>
                             <a class="btn btn-info form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Cerrar y Guardar">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Cerrar y Guardar">
                                 <i class="bi bi-check-square-fill"></i> Cerrar
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnSaveReClosed" onclick="fnSaveReClosed()" hidden>
                             <a class="btn btn-info form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar y Guardar">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Re-Cerrar y Guardar">
                                 <i class="bi bi-check-square-fill"></i> Re-Cerrar
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnNext">
                             <a class="btn btn-primary form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Siguiente"
-                               onclick="fnSaveNext()">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Siguiente"
+                            onclick="fnSaveNext()">
                                 <i class="bi bi-arrow-right-circle"></i> Siguiente
                             </a>
                             <button type="submit" id="btnSaveNext" hidden>
@@ -34,13 +34,13 @@
                         </div>
                         <div class="col-6 col-md-5 col-xl-4" id="btnSaveReturn" hidden>
                             <a class="btn btn-success form-control btn-sm border"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Guardar y Regresar" onclick="fnSaveReturn()">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Guardar y Regresar" onclick="fnSaveReturn()">
                                 <i class="bi bi-disc"></i> Guardar
                             </a>
                         </div>
                         <div class="col-6 col-md-5 col-xl-4">
                             <a asp-action="Index" class="btn btn-secondary form-control btn-sm border" onclick="fnredirectBtnIndex(event)"
-                               data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Regresar">
+                            data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Regresar">
                                 <i class="bi bi-arrow-return-left"></i> Regresar
                             </a>
                         </div>
@@ -103,10 +103,10 @@
 
                                         <div class="form-check mt-1 mx-0 mb-0 form-check-inline" id="@("quotationType_divradio_" + quotationType.Numeral)">
                                             <input name="QuotationTypes"
-                                                   checked="@isChecked"
-                                                   class="form-check-input border border-dark-subtle typeNumerals" type="radio"
-                                                   id="@("quotationType_radio_" + quotationType.Numeral)"
-                                                   value="@quotationType.Numeral" required />
+                                            checked="@isChecked"
+                                            class="form-check-input border border-dark-subtle typeNumerals" type="radio"
+                                            id="@("quotationType_radio_" + quotationType.Numeral)"
+                                            value="@quotationType.Numeral" required />
                                             <label class="form-check-label label-radio" for="@("quotationType_label_" + quotationType.Numeral)">@quotationType.Code</label>
                                         </div>
                                     }
@@ -126,8 +126,8 @@
                                 <div class="col-sm-5 col-4">Fecha</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
                                     <input asp-for="DataModel.DateTransa" type="date" min="@minimo" 
-                                           id="dateTransa" class="form-control border p-1 shadow" name="DateTransa"
-                                           disabled="@(Model.DataModel.IsClosed)" />
+                                    id="dateTransa" class="form-control border p-1 shadow" name="DateTransa"
+                                    disabled="@(Model.DataModel.IsClosed)" />
                                     <span asp-validation-for="DataModel.DateTransa" class="text-danger"></span>
                                 </div>
                             </div>
@@ -138,12 +138,12 @@
                                 <div class="col-4 col-sm-5 col-lg-2 me-lg-3 me-xl-3 ps-3">Cliente</div>
                                 <div class="col-8 col-sm-7 col-lg-8 ms-lg-3 ps-xl-3 ps-xxl-4">
                                     <select asp-for="DataModel.CustomerId" name="CustomerId"
-                                            class="form-control border p-1 shadow" id="selectCustomer">
+                                    class="form-control border p-1 shadow" id="selectCustomer">
                                         <option selected disabled>-- Seleccionar --</option>
                                         @foreach (var customer in Model.CustomerList)
                                         {
                                             <option value="@customer.Id"
-                                                    data-executive="@(customer.BusinessExecutiveId)">
+                                            data-executive="@(customer.BusinessExecutiveId)">
                                                 @customer.BusinessName
                                             </option>
                                         }
@@ -161,12 +161,12 @@
                                         var isChecked = (currency.Numeral == (int)Model.DataModel.CurrencyTransaType);
 
                                         <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyTransaType_divradio_" + currency.Numeral)">
+                                        id="@("currencyTransaType_divradio_" + currency.Numeral)">
                                             <input name="CurrenciesTransa"
-                                                   checked="@isChecked"
-                                                   class="form-check-input border border-dark-subtle currenciesTransa" type="radio"
-                                                   onclick="return currencyTransaType_onClick(this)"
-                                                   id="@("currencyTransaType_radio_" + currency.Numeral)" value="@currency.Numeral" />
+                                            checked="@isChecked"
+                                            class="form-check-input border border-dark-subtle currenciesTransa" type="radio"
+                                            onclick="return currencyTransaType_onClick(this)"
+                                            id="@("currencyTransaType_radio_" + currency.Numeral)" value="@currency.Numeral" />
                                             <label class="form-check-label" for="@("currencyTransaType_label_" + currency.Numeral)">@currency.Abbreviation</label>
                                         </div>
                                     }
@@ -180,12 +180,12 @@
                                         var isChecked = (currency.Numeral == (int)Model.DataModel.CurrencyTransferType);
 
                                         <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyTransferType_divradio_" + currency.Numeral)">
+                                        id="@("currencyTransferType_divradio_" + currency.Numeral)">
                                             <input name="CurrenciesTransfer"
-                                                   checked="@isChecked"
-                                                   class="form-check-input border border-dark-subtle currenciesTransfer" type="radio"
-                                                   id="@("currencyTransferType_radio_" + currency.Numeral)"
-                                                   value="@currency.Numeral" />
+                                            checked="@isChecked"
+                                            class="form-check-input border border-dark-subtle currenciesTransfer" type="radio"
+                                            id="@("currencyTransferType_radio_" + currency.Numeral)"
+                                            value="@currency.Numeral" />
                                             <label class="form-check-label" for="@("currencyTransferType_label_" + currency.Numeral)">@currency.Abbreviation</label>
                                         </div>
                                     }
@@ -199,12 +199,12 @@
                                         var isChecked = (currency.Numeral == (int)Model.DataModel.CurrencyDepositType);
 
                                         <div class="form-check mt-2 mx-1 form-check-inline"
-                                             id="@("currencyDepositType_divradio_" + currency.Numeral)">
+                                        id="@("currencyDepositType_divradio_" + currency.Numeral)">
                                             <input name="CurrenciesDeposit"
-                                                   checked="@isChecked"
-                                                   class="form-check-input border border-dark-subtle currenciesDeposit" type="radio"
-                                                   id="@("currencyDepositType_radio_" + currency.Numeral)"
-                                                   value="@currency.Numeral" />
+                                            checked="@isChecked"
+                                            class="form-check-input border border-dark-subtle currenciesDeposit" type="radio"
+                                            id="@("currencyDepositType_radio_" + currency.Numeral)"
+                                            value="@currency.Numeral" />
                                             <label class="form-check-label" for="@("currencyDepositType_label_" + currency.Numeral)">@currency.Abbreviation</label>
                                         </div>
                                     }
@@ -282,7 +282,7 @@
                                 <div class="col-sm-5 col-4">Ejecutivo</div>
                                 <div class="col-xl-6 col-sm-7 col-8">
                                     <select asp-for="DataModel.BusinessExecutiveId"
-                                            class="form-select border p-1 shadow" name="BusinessExecutiveId" id="selectBusinessExecutive">
+                                    class="form-select border p-1 shadow" name="BusinessExecutiveId" id="selectBusinessExecutive">
                                         @foreach (var executive in Model.BusinessExecutiveList)
                                         {
                                             <option value="@executive.Id" data-loan="@executive.IsLoan" data-payment="@executive.IsPayment">@executive.Code</option>
@@ -297,10 +297,13 @@
                                 <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Orig.</div>
                                 <div class="col-8 col-sm-7 col-lg-8 col-xl-12 ms-lg-3 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountSourceId" name="BankAccountSourceId" size="12"
-                                            class="form-select border p-1 shadow" id="selectBankAccountSource">
-                                        @foreach (var bank in Model.BankAccountSourceList)
+                                    class="form-select border p-1 shadow" id="selectBankAccountSource">
+                                        @if (Model.BankAccountSourceList != null)
                                         {
-                                            <option value="@bank.Value">@bank.Text</option>
+                                            foreach (var bank in Model.BankAccountSourceList)
+                                            {
+                                                <option value="@bank.Value">@bank.Text</option>
+                                            }
                                         }
                                     </select>
                                     <span asp-validation-for="DataModel.BankAccountSourceId" class="text-danger"></span>
@@ -310,10 +313,13 @@
                                 <div class="col-4 col-sm-5 col-lg-2 col-xl-5 me-lg-3 me-xl-0">Cta/Ban Dest.</div>
                                 <div class="col-8 col-sm-7 col-lg-8 col-xl-12 ms-lg-3 ms-xl-0">
                                     <select asp-for="DataModel.BankAccountTargetId" size="12"
-                                            class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
-                                        @foreach (var bank in Model.BankAccountTargetList)
+                                    class="form-select border p-1 shadow" name="BankAccountTargetId" id="selectBankAccountTarget">
+                                        @if (Model.BankAccountTargetList != null)
                                         {
-                                            <option value="@bank.Value">@bank.Text</option>
+                                            @foreach (var bank in Model.BankAccountTargetList)
+                                            {
+                                                <option value="@bank.Value">@bank.Text</option>
+                                            }
                                         }
                                     </select>
                                     <span asp-validation-for="DataModel.BankAccountTargetId" class="text-danger"></span>

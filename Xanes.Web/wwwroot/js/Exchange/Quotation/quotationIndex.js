@@ -785,7 +785,7 @@ const fnLoadDatatable = () => {
         "columns": [
             {
                 data: 'dateTransa', "width": "5%"
-                , render: DataTable.render.date(defaultFormatDate, defaultFormatDate)
+                , render: DataTable.render.datetime(defaultFormatDate)
                 , orderable: true
             },
             {

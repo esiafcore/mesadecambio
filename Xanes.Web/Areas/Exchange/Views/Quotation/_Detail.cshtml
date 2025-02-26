@@ -149,7 +149,7 @@
                         <h5 class="text-white fs-6">Cta Ban Origen</h5>
                     </div>
                     <div class="col-xl-8 col-lg-7 col-sm-7 col-8 ms-lg-5 ms-xl-3 ms-xxl-5">
-                        <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountSourceTrx.Name" readonly />
+                        <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountSourceTrx?.Name" readonly />
                     </div>
                 </div>
                 <div class="row col-md-6 col-12 mb-1">
@@ -157,7 +157,7 @@
                         <h5 class="text-white fs-6">Cta Ban Destino</h5>
                     </div>
                     <div class="col-xl-8 col-lg-6 col-sm-7 col-8 ms-lg-5">
-                        <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountTargetTrx.Name" readonly />
+                        <input class="form-control text-start border p-1 shadow" value="@Model.ModelCreateVM.DataModel.BankAccountTargetTrx?.Name" readonly />
                     </div>
                 </div>
             </div>

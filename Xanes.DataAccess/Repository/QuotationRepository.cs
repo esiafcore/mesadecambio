@@ -33,7 +33,6 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
                 .ExecuteDeleteAsync();
 
             await transaction.CommitAsync();
-            return await Task.FromResult(true);
         }
         catch (DbUpdateException ex)
         {
@@ -46,7 +45,7 @@ public class QuotationRepository : Repository<Quotation>, IQuotationRepository
             throw new Exception(ex.Message);
         }
 
-        return await Task.FromResult(false);
+        return await Task.FromResult(true);
     }
 
     public async Task ImportRangeAsync(List<Quotation> entityList, List<QuotationDetail> entityDetailList)
