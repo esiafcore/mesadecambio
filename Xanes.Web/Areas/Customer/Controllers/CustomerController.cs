@@ -263,9 +263,9 @@ public class CustomerController : Controller
             obj.IdentificationTypeNumber = objIdentificationType.Numeral;
 
             string identificationNumber = obj.IdentificationNumber;
-            string regularExpressionNumber = objIdentificationType.RegularExpressionNumber;
-            string formatExpressionNumber = objIdentificationType.FormatExpressionNumber;
-            string substitutionExpressionNumber = objIdentificationType.SubstitutionExpressionNumber;
+            string? regularExpressionNumber = objIdentificationType.RegularExpressionNumber;
+            string? formatExpressionNumber = objIdentificationType.FormatExpressionNumber;
+            string? substitutionExpressionNumber = objIdentificationType.SubstitutionExpressionNumber;
 
             // Asegurarse de que regularExpressionNumber y identificationNumber no sean nulos
             if (!string.IsNullOrEmpty(regularExpressionNumber) && !string.IsNullOrEmpty(identificationNumber))
@@ -628,8 +628,8 @@ public class CustomerController : Controller
 
             var hoja = workbook.Worksheet(1);
 
-            var primerFilaUsada = hoja.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
-            var ultimaFilaUsada = hoja.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+            int primerFilaUsada = hoja.FirstRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
+            var ultimaFilaUsada = hoja.LastRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
 
             for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
             {
@@ -852,9 +852,9 @@ public class CustomerController : Controller
             // Ciclo para validar el número de identificación
             foreach (var customer in objCustomerVMList)
             {
-                string regularExpressionNumber = "";
-                string formatExpressionNumber = "";
-                string substitutionExpressionNumber = "";
+                string? regularExpressionNumber;
+                string? formatExpressionNumber;
+                string? substitutionExpressionNumber;
                 string identificationNumber = customer.DataModel.IdentificationNumber;
 
                 if (customer.DataModel.IdentificationTypeTrx != null)

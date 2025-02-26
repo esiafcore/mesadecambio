@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Xanes.Models.Shared;
 using Xanes.Utility;
 
-
 namespace Xanes.DataAccess.ServicesApi;
 public class BaseService : IBaseService
 {
@@ -88,11 +87,18 @@ public class BaseService : IBaseService
             HttpResponseMessage apiResponse = await client.SendAsync(message);
             if (pagination != null)
             {
-                var paginationHeader = JsonConvert.DeserializeObject<Pagination>(apiResponse.Headers.GetValues(AC.PaginationHeaderName).First());
-                pagination.pageNumber = paginationHeader.pageNumber;
-                pagination.totalPages = paginationHeader.totalPages;
-                pagination.totalCount = paginationHeader.totalCount;
-                pagination.pageSize = paginationHeader.pageSize;
+                var paginationHeaderValues = apiResponse.Headers.GetValues(AC.PaginationHeaderName).FirstOrDefault();
+                if (paginationHeaderValues != null)
+                {
+                    var paginationHeader = JsonConvert.DeserializeObject<Pagination>(paginationHeaderValues);
+                    if (paginationHeader != null)
+                    {
+                        pagination.pageNumber = paginationHeader.pageNumber;
+                        pagination.totalPages = paginationHeader.totalPages;
+                        pagination.totalCount = paginationHeader.totalCount;
+                        pagination.pageSize = paginationHeader.pageSize;
+                    }
+                }
             }
 
             var apiContent = await apiResponse.Content.ReadAsStringAsync();
@@ -116,7 +122,7 @@ public class BaseService : IBaseService
 
                 var res = JsonConvert.SerializeObject(ApiResponse);
                 var APIResponse = JsonConvert.DeserializeObject<T>(res);
-                return APIResponse;
+                return APIResponse!;
 
             }
             catch (Exception e)
@@ -129,7 +135,7 @@ public class BaseService : IBaseService
 
                 var res = JsonConvert.SerializeObject(dto);
                 var APIResponse = JsonConvert.DeserializeObject<T>(res);
-                return APIResponse;
+                return APIResponse!;
             }
 
         }
@@ -142,7 +148,7 @@ public class BaseService : IBaseService
             };
             var res = JsonConvert.SerializeObject(dto);
             var APIResponse = JsonConvert.DeserializeObject<T>(res);
-            return APIResponse;
+            return APIResponse!;
         }
         catch (Exception e)
         {
@@ -153,7 +159,7 @@ public class BaseService : IBaseService
             };
             var res = JsonConvert.SerializeObject(dto);
             var APIResponse = JsonConvert.DeserializeObject<T>(res);
-            return APIResponse;
+            return APIResponse!;
         }
     }
 }

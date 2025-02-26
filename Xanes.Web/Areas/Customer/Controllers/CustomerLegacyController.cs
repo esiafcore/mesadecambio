@@ -36,7 +36,7 @@ public class CustomerLegacyController : Controller
         _cfg = cfg;
         _uow = uow;
         _companyId = _cfg.GetValue<int>("ApplicationSettings:CompanyId");
-        _sessionToken = httpCtxAcc.HttpContext.Session.GetString(SD.SessionToken) ?? string.Empty;
+        _sessionToken = httpCtxAcc.HttpContext?.Session.GetString(SD.SessionToken) ?? string.Empty;
     }
 
     [HttpGet]
