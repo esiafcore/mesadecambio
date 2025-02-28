@@ -7483,11 +7483,13 @@ public class QuotationController : Controller
 
             // Exportar reporte a Excel y guardar en memoria
             byte[] excelData;
-            var excelSettings = new StiExcel2007ExportSettings
+            //StiExcel2007ExportSettings
+            var excelSettings = new StiExcelExportSettings
             {
                 // Exportar solo los datos, sin incluir encabezados de página o pies de página
-                ExportDataOnly = true,
+                DataExportMode = StiDataExportMode.Data,
 
+                //ExportDataOnly = true,
                 // Exportar formatos de objetos activos
                 ExportObjectFormatting = true,
 

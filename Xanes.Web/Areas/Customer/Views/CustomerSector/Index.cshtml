@@ -1,4 +1,4 @@
-﻿@model List<CustomerSector>
+﻿@* @model List<CustomerSector> *@
 
 <div class="card shadow border-0 mt-1">
     <div class="card-header bg-secondary bg-gradient ml-0 py-1">
@@ -14,19 +14,19 @@
         </div>
     </div>
 
-    <div class="card-body px-3 py-1">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead>
+    <div class="card-body px-0 py-0">
+            <table id="tblData" class="table table-hover table-bordered display responsive nowrap compact w-100" style="width: 100%">
+                <thead class="table-dark bg-dark text-center">
                     <tr>
-                        <th>Código</th>
-                        <th>Descripcion</th>
-                        <th>Está Activo</th>
-                        <th>Creado</th>
-                        <th></th>
+                        <th class="text-center align-middle my-0 py-0">Código</th>
+                        <th class="text-center align-middle my-0 py-0">Descripcion</th>
+                        <th class="text-center align-middle my-0 py-0">Está Activo</th>
+                        <th class="text-center align-middle my-0 py-0">Nivel</th>
+                        <th class="text-center align-middle my-0 py-0">Creado</th>
+                        <th class="text-center align-middle my-0 py-0" data-priority="1"></th>
                     </tr>
                 </thead>
-                <tbody>
+                @*                 <tbody>
                     @foreach (var item in Model)
                     {
                         <tr>
@@ -56,8 +56,11 @@
 
                     }
 
-                </tbody>
-            </table>
-        </div>
+                </tbody> *@            
+                </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/Customer/CustomerSector/index.js"></script>
+}

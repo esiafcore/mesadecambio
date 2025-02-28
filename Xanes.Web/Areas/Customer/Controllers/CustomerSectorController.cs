@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Xanes.DataAccess.Repository.IRepository;
 using Xanes.Models;
+using Xanes.Models.Shared;
 using Xanes.Utility;
 
 namespace Xanes.Web.Areas.Customer.Controllers;
@@ -26,10 +27,7 @@ public class CustomerSectorController : Controller
     {
         ViewData[AC.Title] = "Sectores";
 
-        var objList = _uow.CustomerSector
-            .GetAll(filter: x => (x.CompanyId == _companyId)).OrderBy(x => x.Code)
-            .ToList();
-        return View(objList);
+        return View();
     }
 
     // Detalle
@@ -283,4 +281,41 @@ public class CustomerSectorController : Controller
         return RedirectToAction("Index", "CustomerSector");
     }
 
+    #region API_CALL
+    public JsonResult GetAll()
+    {
+        JsonResultResponse? jsonResponse = new();
+        try
+        {
+            var objList = _uow.CustomerSector
+                .GetAll(filter: x => (x.CompanyId == _companyId))
+                .ToList();
+
+            if (objList == null)
+            {
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "Error al cargar los datos";
+                return Json(jsonResponse);
+            }
+
+            if (objList.Count <= 0)
+            {
+                jsonResponse.IsInfo = true;
+                jsonResponse.IsSuccess = false;
+                jsonResponse.ErrorMessages = "No hay registros que mostrar";
+                return Json(jsonResponse);
+            }
+
+            jsonResponse.IsSuccess = true;
+            jsonResponse.Data = objList.OrderBy(x => x.CodePath);
+            return Json(jsonResponse);
+        }
+        catch (Exception e)
+        {
+            jsonResponse.IsSuccess = false;
+            jsonResponse.ErrorMessages = e.Message;
+            return Json(jsonResponse);
+        }
+    }
+    #endregion
 }
