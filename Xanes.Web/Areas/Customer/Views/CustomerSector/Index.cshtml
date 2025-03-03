@@ -14,49 +14,18 @@
         </div>
     </div>
 
-    <div class="card-body px-0 py-0">
+    <div class="card-body px-1 py-1">
             <table id="tblData" class="table table-hover table-bordered display responsive nowrap compact w-100" style="width: 100%">
                 <thead class="table-dark bg-dark text-center">
                     <tr>
                         <th class="text-center align-middle my-0 py-0">Código</th>
                         <th class="text-center align-middle my-0 py-0">Descripcion</th>
-                        <th class="text-center align-middle my-0 py-0">Está Activo</th>
+                        <th class="text-center align-middle my-0 py-0">Estado</th>
                         <th class="text-center align-middle my-0 py-0">Nivel</th>
                         <th class="text-center align-middle my-0 py-0">Creado</th>
                         <th class="text-center align-middle my-0 py-0" data-priority="1"></th>
                     </tr>
                 </thead>
-                @*                 <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Code</td>
-                            <td style="padding-left: @(item.Depthnumber)rem">@item.Name</td>
-                            <td class="text-center">@(item.IsActive ? AC.Si : AC.No)</td>
-                            <td>@item.CreatedDate.ToLocalTime()</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a asp-controller="CustomerSector" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-success py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-eye"></i> Ver
-                                    </a>
-                                </div>
-                                <div class="btn-group" role="group">
-                                    <a asp-controller="CustomerSector" asp-action="Upsert" asp-route-parentId="@item.Id" class="btn btn-warning py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-node-plus"></i> Sub
-                                    </a>
-                                    <a asp-controller="CustomerSector" asp-action="Upsert" asp-route-id="@item.Id" class="btn btn-primary py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-pencil-square"></i> Editar
-                                    </a>
-                                    <a asp-controller="CustomerSector" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger py-1 px-2 my-0 mx-2">
-                                        <i class="bi bi-trash-fill"></i> Eliminar
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-
-                    }
-
-                </tbody> *@            
                 </table>
     </div>
 </div>

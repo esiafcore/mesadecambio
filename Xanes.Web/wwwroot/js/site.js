@@ -339,3 +339,59 @@ const copyToClipboard = async (text, btnElement) => {
         });
     }
 };
+
+const LengthMenuDatatable = [15, 25, 50];
+const SearchInputDatatableId = "dt-search-0";
+const LenghtSelectDatatableId = "dt-length-0";
+const SearchInputContainerDatatableId = "dt-search";
+const LenghtSelectContainerDatatableId = "dt-length";
+// Funcion para remarcar borde de input search y el lenght en el datatable
+const fninputDatatableMarkBorder = () => {
+    const searchInputContainerDatatableAll = document.querySelectorAll(`.${SearchInputContainerDatatableId}`);
+    if (searchInputContainerDatatableAll) {
+        searchInputContainerDatatableAll.forEach((searchInputContainerDatatable) => {
+            const searchInput = searchInputContainerDatatable.querySelector("input");
+            if (searchInput) {
+                searchInput.classList.add(
+                    "border",
+                    "border-primary",
+                    "border-opacity-25"
+                );
+            }
+        });
+    }
+
+    const lengthSelectContainerDatatableAll = document.querySelectorAll(`.${LenghtSelectContainerDatatableId}`);
+    if (lengthSelectContainerDatatableAll) {
+        lengthSelectContainerDatatableAll.forEach((lengthSelectContainerDatatable) => {
+            const lengthSelect = lengthSelectContainerDatatable.querySelector("select");
+            if (lengthSelect) {
+                lengthSelect.classList.add(
+                    "border",
+                    "border-primary",
+                    "border-opacity-25",
+                    "py-1"
+                );
+            }
+        });
+    }
+};
+
+const fnadjustDataTableResposive = (e, datatable, row, showHide, update) => {
+    const childNode = row.child();
+    if (childNode && childNode.length > 0) {
+        // Busca todos los elementos UL con la clase "dtr-details" dentro del primer hijo
+        const hiddenList = $(row.child()[0]).find("ul.dtr-details");
+        const hiddenListChild = hiddenList.children();
+
+        for (let i = 0; i < hiddenListChild.length; i++) {
+            hiddenListChild[i].classList.remove(
+                "text-center",
+                "text-end",
+                "text-start"
+            );
+            // Agrega la clase "text-start" para alinear el texto a la izquierda
+            hiddenListChild[i].classList.add("text-start");
+        }
+    }
+};

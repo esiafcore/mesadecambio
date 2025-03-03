@@ -80,52 +80,6 @@ const fnDeleteRow = async (url, rowFullName) => {
 }
 
 const fnLoadDatatable = () => {
-    //let sessionObjFilter = JSON.parse(sessionStorage.getItem('objFilter'));
-
-    //if (isNewEntry) {
-    //    isNewEntry = false;
-    //    if (sessionObjFilter) {
-    //        if (changeProcessingDate) {
-    //            dateInitial = processingDate;
-    //            dateFinal = processingDate;
-    //            includeVoid = false;
-    //        } else {
-    //            dateInitial = sessionObjFilter.dateInitial;
-    //            dateFinal = sessionObjFilter.dateFinal;
-    //            includeVoid = sessionObjFilter.includeVoid;
-    //        }
-    //    } else {
-    //        if (inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) {
-    //            dateInitial = inputDateInitial.value;
-    //            dateFinal = inputDateFinal.value;
-    //            includeVoid = inputIncludeVoid.checked;
-    //        } else {
-    //            dateInitial = processingDate;
-    //            dateFinal = processingDate;
-    //            includeVoid = false;
-    //        }
-    //    }
-    //} else {
-    //    if ((inputDateInitial != undefined && inputDateFinal != undefined && inputIncludeVoid != undefined) && clean == false) {
-    //        dateInitial = inputDateInitial.value;
-    //        dateFinal = inputDateFinal.value;
-    //        includeVoid = inputIncludeVoid.checked;
-    //    } else {
-    //        dateInitial = processingDate;
-    //        dateFinal = processingDate;
-    //        includeVoid = false;
-    //        clean = false;
-    //    }
-    //}
-
-    //const objFilter = {
-    //    dateInitial,
-    //    dateFinal,
-    //    includeVoid
-    //}
-
-    //sessionStorage.setItem('objFilter', JSON.stringify(objFilter));
-
     dataTable = new DataTable("#tblData", {
         "layout": {
             topEnd: {
@@ -173,7 +127,7 @@ const fnLoadDatatable = () => {
             {
                 data: 'isActive', "width": "10%"
                 , render: function (data, type, row) {
-                    return `${data ? "Si" : "No"}`;
+                    return `${data ? "ACT" : "INA"}`;
                 }
                 , orderable: false
             },
@@ -226,67 +180,17 @@ const fnLoadDatatable = () => {
                 }
             }
         ],
-        //"layout": {
-        //    topRight: {
-        //        buttons: [
-        //            {
-        //                extend: 'excel',
-        //                text: '<i class="bi bi-file-earmark-excel fs-4"></i>',
-        //                titleAttr: 'Exportar a Excel',
-        //                className: 'btn btn-success me-2',
-        //                exportOptions: {
-        //                    columns: ':not(:last-child)' // Exclude the last column (buttons) from export
-        //                }
-        //            },
-        //            {
-        //                text: '<i class="bi bi-file-earmark-pdf fs-4"></i>',
-        //                titleAttr: 'Exportar Nota Crédito en Lote a PDF',
-        //                className: 'btn btn-danger me-2',
-        //                init: fnremoveClassBtnExporDataTable,
-        //                action: async function () {
-        //                    const result = await getfilteredDataFromDatatable();
-        //                    // si se imprime
-        //                    if (result.isSuccess) {
-        //                        await fnexportCreditNoteToPDF(result.data);
-        //                    }
-        //                }
-        //            },
-        //        ]
-        //    }
-        //},
-        //"createdRow": function (row, data) {
-        //    if (data.isVoid) {
-        //        $(row).addClass('table-danger bg-danger bg-opacity-50');
-        //    }
-        //},
         "searching": true,
         "select": selectOptions,
         "autoWidth": false,
-        "language": {
-            info: "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-            infoFiltered: "(Filtrado de _MAX_ total de entradas)",
-            infoEmpty: "No hay datos para mostrar",
-            lengthMenu: "",
-            zeroRecords: "No se encontraron coincidencias",
-            processing: "Procesando...",
-            loadingRecords: "Cargando...",
-            emptyTable: "No hay datos disponibles en la tabla",
-            search: "Buscar",
-            select: {
-                cells: {
-                    "1": "1 celda seleccionada",
-                    "_": "%d celdas seleccionadas"
-                },
-                columns: {
-                    "1": "1 columna seleccionada",
-                    "_": "%d columnas seleccionadas"
-                },
-                rows: {
-                    "1": "1 fila seleccionada",
-                    "_": "%d filas seleccionadas"
-                }
-            }
-        }
+        "pageLength": 15
     });
+
+    dataTable.on("responsive-display", fnadjustDataTableResposive);
+    dataTable.on('draw', function () {
+        fnEnableTooltip(); // Reactivar tooltips tras cada redibujado
+    });
+
+    fninputDatatableMarkBorder();
 
 }

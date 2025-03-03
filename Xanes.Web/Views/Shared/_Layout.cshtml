@@ -177,7 +177,7 @@
             ordering: true,
             paging: true,
             select: true,
-            lengthMenu: [10, 15, 20, 40, 50],
+            lengthMenu: [15, 20, 40, 50],
             serverSide: false,
             processing: true,
             language: {
@@ -204,8 +204,32 @@
                         "_": "%d filas seleccionadas"
                     }
                 }
+            },
+            // Aquí agregamos la función global para todos los DataTables
+            initComplete: function () {
+                // MARK BORDER
+                fninputDatatableMarkBorder();
+
+                const divContainerBtns = document.querySelector(".dt-buttons");
+                if (divContainerBtns) {
+                    const divContainer = divContainerBtns.parentNode;
+                    if (divContainer)
+                        divContainer.classList.add("d-md-flex");
+                }
             }
         });
+
+        $.fn.dataTable.ext.buttons.reload = {
+            text: '<i class="bi bi-bootstrap-reboot"></i>',
+            className: "btn btn-primary",
+            action: function ( e, dt, node, config ) {
+                dt.ajax.reload(null, false);
+            },
+            init: function (dt, node, config) {
+                // Remover todas las clases
+                $(node).removeClass().addClass("btn btn-primary form-control ms-1 mt-1 mt-md-0 rounded-2");
+            }
+        };
 
         $.datepicker.setDefaults({
             showOn: "focus",
