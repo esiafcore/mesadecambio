@@ -55,7 +55,7 @@ public class QuotationController : Controller
     private readonly int _decimalExchangeFull;
     private readonly decimal _variationMaxDeposit;
     private readonly int _limitBatchCreditNote;
-    private Dictionary<ParametersReport, object?> _parametersReport;
+    private readonly Dictionary<ParametersReport, object?> _parametersReport;
     private readonly IWebHostEnvironment _hostEnvironment;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly ILoggerManager _logger;
@@ -87,15 +87,14 @@ public class QuotationController : Controller
         _variationMaxDeposit = _cfg.GetValue<decimal>("ApplicationSettings:VariationMaxDeposit");
         _limitBatchCreditNote = _cfg.GetValue<int>("ApplicationSettings:LimitBatchCreditNote");
         _hostEnvironment = hostEnvironment;
-        _parametersReport = new();
 
         _eSiafN4BeneficiaryUid = _cfg.GetValue<string>(AC.SecreteSiafN4BeneficiaryUid) ?? string.Empty;
         _eSiafN4EntityUid = _cfg.GetValue<string>(AC.SecreteSiafN4EntityUid) ?? string.Empty;
         _eSiafN4CustomerName = _cfg.GetValue<string>(AC.SecreteSiafN4CustomerName) ?? string.Empty;
         _eSiafN4CustomerIdentificationNumber = _cfg.GetValue<string>(AC.SecreteSiafN4CustomerIdentificationNumber) ?? string.Empty;
 
-        var path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
-        FileInfo file = new FileInfo(path);
+        string path = Path.Combine(hostEnvironment.ContentRootPath, "License\\license.key");
+        var file = new FileInfo(path);
         if (file.Exists)
         {
             Stimulsoft.Base.StiLicense.LoadFromFile(path);
@@ -117,6 +116,7 @@ public class QuotationController : Controller
         _userName = _contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
         _ipAddress = _contextAccessor.HttpContext?.Connection.RemoteIpAddress?.MapToIPv4();
         _sessionToken = _contextAccessor.HttpContext?.Session.GetString(SD.SessionToken) ?? string.Empty;
+        _parametersReport = new();
     }
 
     public IActionResult Index()
@@ -124,10 +124,7 @@ public class QuotationController : Controller
         string? processingDateString = _contextAccessor.HttpContext?.Session.GetString(AC.ProcessingDate);
         string? changeProcessingDateString = _contextAccessor.HttpContext?.Session.GetString(AC.ChangeProcessingDate);
 
-        if (processingDateString is null)
-        {
-            processingDateString = DateOnly.FromDateTime(DateTime.Now).ToString();
-        }
+        processingDateString ??= DateOnly.FromDateTime(DateTime.Now).ToString();
 
         if (changeProcessingDateString is not null)
         {
@@ -139,7 +136,7 @@ public class QuotationController : Controller
             ViewBag.ChangeProcessingDate = JsonConvert.SerializeObject(false);
         }
 
-        DateOnly dateFilter = DateOnly.Parse(processingDateString);
+        var dateFilter = DateOnly.Parse(processingDateString);
         ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
         ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
         ViewBag.ProcessingDate = JsonConvert.SerializeObject(dateFilter.ToString(AC.DefaultDateFormatWeb));
@@ -164,7 +161,7 @@ public class QuotationController : Controller
 
             if (processingDateString != null)
             {
-                DateOnly processingDate = DateOnly.Parse(processingDateString);
+                var processingDate = DateOnly.Parse(processingDateString);
                 model.ProcessingDate = processingDate;
             }
             else
@@ -270,7 +267,7 @@ public class QuotationController : Controller
 
             if (model.DataModel.CustomerId != 0)
             {
-                var objCustomer =
+                Models.Customer objCustomer =
                      _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.DataModel.CustomerId));
 
                 objCustomer.BusinessExecutiveId =
@@ -310,7 +307,7 @@ public class QuotationController : Controller
                     .SelectMany(v => v.Errors)
                     .Select(x => x.ErrorMessage)
                     .ToList();
-                foreach (var item in listErrorMessages)
+                foreach (string? item in listErrorMessages)
                 {
                     errorsMessagesBuilder.Append(item);
                 }
@@ -334,7 +331,7 @@ public class QuotationController : Controller
             }
 
             //Obtener reg del tipo de operacion de MC
-            var objQuotationType = _uow.QuotationType.Get(filter: x =>
+            Models.QuotationType objQuotationType = _uow.QuotationType.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Numeral == (int)obj.TypeNumeral);
 
             if (objQuotationType == null)
@@ -357,7 +354,7 @@ public class QuotationController : Controller
             }
 
             //Obtener valor oficial del tipo de cambio foraneo
-            var currencyForeignValue = objCurrencyRateList
+            decimal currencyForeignValue = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))
                     ?.OfficialRate
                     ?? AC.ExchangeRateDefaultValue;
@@ -634,7 +631,7 @@ public class QuotationController : Controller
             }
 
             //Verificamos si existe el cliente
-            var objCustomer = _uow.Customer.Get(filter: x => (x.CompanyId == obj.CompanyId) && (x.Id == obj.CustomerId));
+            Models.Customer objCustomer = _uow.Customer.Get(filter: x => (x.CompanyId == obj.CompanyId) && (x.Id == obj.CustomerId));
             if (objCustomer == null)
             {
                 jsonResponse.IsSuccess = false;
@@ -646,7 +643,7 @@ public class QuotationController : Controller
             if (obj.Id == 0)
             {
                 //Obtenemos el secuencial en borrador
-                var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
+                Task<long> numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == obj.CompanyId,
                     SD.TypeSequential.Draft, true);
                 obj.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
                 obj.InternalSerial = AC.InternalSerialDraft;
@@ -731,7 +728,9 @@ public class QuotationController : Controller
                 _uow.Quotation.Update(obj);
                 _uow.Save();
                 if (showMessages)
+                {
                     TempData["success"] = "Cotización actualizada exitosamente";
+                }
 
                 if (obj.TypeNumeral == SD.QuotationType.Transport)
                 {
@@ -743,7 +742,7 @@ public class QuotationController : Controller
                     obj.TotalDepositLines = 0;
                     obj.TotalTransferLines = 0;
 
-                    foreach (var detail in objDetails)
+                    foreach (QuotationDetail? detail in objDetails)
                     {
                         detail.AmountDetail = obj.AmountTransaction;
                         //Seteamos campos de auditoria
@@ -805,7 +804,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var objQt = _uow.Quotation.Get(filter: x => x.Id == obj.Id);
+            Quotation objQt = _uow.Quotation.Get(filter: x => x.Id == obj.Id);
             if (objQt == null)
             {
                 jsonResponse.IsSuccess = false;
@@ -814,7 +813,7 @@ public class QuotationController : Controller
             }
 
             //Verificamos si existe el cliente
-            var objCustomer = _uow.Customer.Get(filter: x =>
+            Models.Customer objCustomer = _uow.Customer.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Id == obj.CustomerId, isTracking: false);
             if (objCustomer == null)
             {
@@ -826,7 +825,7 @@ public class QuotationController : Controller
             objQt.CustomerId = obj.CustomerId;
 
             //Verificamos si existe el ejecutivo
-            var objBusinessExecutive = _uow.BusinessExecutive
+            BusinessExecutive objBusinessExecutive = _uow.BusinessExecutive
                 .Get(filter: x =>
                     x.CompanyId == obj.CompanyId &&
                     x.Id == obj.BusinessExecutiveId, isTracking: false);
@@ -851,7 +850,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var currencyForeign = objCurrencyRateList
+            decimal currencyForeign = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
             obj.ExchangeRateOfficialReal = obj.ExchangeRateOfficialTransa;
@@ -1005,7 +1004,7 @@ public class QuotationController : Controller
                     .GetAll(filter: x => x.CompanyId == _companyId &&
                                          x.ParentId == objQt.Id).ToList();
 
-                foreach (var detail in objDetails)
+                foreach (QuotationDetail? detail in objDetails)
                 {
                     detail.AmountDetail = objQt.AmountTransaction;
                     //Seteamos campos de auditoria
@@ -1128,7 +1127,7 @@ public class QuotationController : Controller
             model.ModelCreateVM.CurrencyDepositList = objCurrencyList.Where(x => x.IsActive).ToList();
             model.ModelCreateVM.CurrencyTransferList = objCurrencyList.Where(x => x.IsActive).ToList();
             model.ModelCreateVM.QuotationTypeList = objTypeList;
-            var currencyTarget =
+            string currencyTarget =
                 objHeader.TypeNumeral != SD.QuotationType.Sell ?
                     objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
 
@@ -1138,12 +1137,14 @@ public class QuotationController : Controller
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
             model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
-            model.DataModel = new();
-            model.DataModel.CompanyId = _companyId;
+            model.DataModel = new()
+            {
+                CompanyId = _companyId
+            };
 
             if (model.ModelCreateVM.DataModel.CustomerId != 0)
             {
-                var objCustomer =
+                Models.Customer objCustomer =
                     _uow.Customer.Get(filter: x => (x.CompanyId == _companyId && x.Id == model.ModelCreateVM.DataModel.CustomerId));
 
                 listCustomer.Add(objCustomer);
@@ -1174,7 +1175,7 @@ public class QuotationController : Controller
                     .SelectMany(v => v.Errors)
                     .Select(x => x.ErrorMessage)
                     .ToList();
-                foreach (var item in listErrorMessages)
+                foreach (string? item in listErrorMessages)
                 {
                     errorsMessagesBuilder.Append(item);
                 }
@@ -1198,7 +1199,7 @@ public class QuotationController : Controller
             }
 
             //Verificamos si existe el padre
-            var objHeader = _uow.Quotation.Get(filter: x =>
+            Quotation objHeader = _uow.Quotation.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Id == obj.ParentId);
 
             if (objHeader == null)
@@ -1289,7 +1290,7 @@ public class QuotationController : Controller
             }
 
             //Verificamos si existe la moneda
-            var objCurrency = _uow.Currency.Get(filter: x =>
+            Currency objCurrency = _uow.Currency.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Numeral == obj.CurrencyDetailId, isTracking: false);
 
             if (objCurrency == null)
@@ -1300,7 +1301,7 @@ public class QuotationController : Controller
             }
 
             //Verificamos si existe el banco origen
-            var objBankSource = _uow.Bank.Get(filter: x =>
+            Bank objBankSource = _uow.Bank.Get(filter: x =>
                 x.CompanyId == obj.CompanyId && x.Id == obj.BankSourceId, isTracking: false);
 
             if (objBankSource == null)
@@ -1313,7 +1314,7 @@ public class QuotationController : Controller
             //Verificamos si tiene banco destino y verificamos si existe
             if (obj.BankTargetId != 0)
             {
-                var objBankTarget = _uow.Bank.Get(filter: x =>
+                Bank objBankTarget = _uow.Bank.Get(filter: x =>
                     x.CompanyId == obj.CompanyId && x.Id == obj.BankTargetId, isTracking: false);
 
                 if (objBankTarget == null)
@@ -1347,7 +1348,7 @@ public class QuotationController : Controller
             }
             else
             {
-                var objDetail = _uow.QuotationDetail
+                QuotationDetail objDetail = _uow.QuotationDetail
                     .Get(filter: x =>
                     x.CompanyId == obj.CompanyId &&
                     x.ParentId == objHeader.Id &&
@@ -1446,7 +1447,7 @@ public class QuotationController : Controller
             ViewBag.DecimalTransa = JsonConvert.SerializeObject(_decimalTransa);
             //ViewBag.DecimalExchange = JsonConvert.SerializeObject(_decimalExchange);
 
-            var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
+            Quotation objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == id,
                 includeProperties: "TypeTrx,CustomerTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx,BankAccountSourceTrx,BankAccountTargetTrx", isTracking: false);
             if (objHeader == null)
             {
@@ -1470,7 +1471,7 @@ public class QuotationController : Controller
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
             model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
-            var currencyTarget =
+            string currencyTarget =
                 objHeader.TypeNumeral != SD.QuotationType.Sell ?
                     objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
 
@@ -1525,7 +1526,7 @@ public class QuotationController : Controller
             model.ModelCreateVM.DataModel = objHeader;
             model.CustomerFullName = $"{objHeader.CustomerTrx.BusinessName}";
             model.NumberTransa = $"COT-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
-            var currencyTarget =
+            string currencyTarget =
                 objHeader.TypeNumeral != SD.QuotationType.Sell ?
                     objHeader.CurrencyTransferTrx.Code : objHeader.CurrencyDepositTrx.Code;
 
@@ -1612,8 +1613,8 @@ public class QuotationController : Controller
         try
         {
 
-            DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
-            DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+            var dateTransaInitial = DateOnly.Parse(dateInitial);
+            var dateTransaFinal = DateOnly.Parse(dateFinal);
             var objList = _uow.Quotation
                 .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
                 , includeProperties: "TypeTrx,CustomerTrx,CurrencyTransaTrx,CurrencyTransferTrx,CurrencyDepositTrx,BusinessExecutiveTrx").ToList();
@@ -1651,7 +1652,7 @@ public class QuotationController : Controller
         JsonResultResponse? jsonResponse = new();
         try
         {
-            var objPages = await _uow.Quotation
+            DataAccess.Helpers.PagedList<Quotation> objPages = await _uow.Quotation
                 .GetAllAsync(x => (x.CompanyId == _companyId &&
                 x.CustomerId == customerId &&
                 x.CurrencyTransaType == currency &&
@@ -1702,14 +1703,14 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var objListMapped = _mapper.Map<List<QuotationDetailDto>>(objList);
+            List<QuotationDetailDto> objListMapped = _mapper.Map<List<QuotationDetailDto>>(objList);
 
-            foreach (var item in objListMapped)
+            foreach (QuotationDetailDto item in objListMapped)
             {
                 if (item.BankTransactionId.HasValue)
                 {
 
-                    var srvResponse = await _srvTransaBco.GetStatusAsync<APIResponse>(_sessionToken, item.BankTransactionId.Value);
+                    APIResponse? srvResponse = await _srvTransaBco.GetStatusAsync<APIResponse>(_sessionToken, item.BankTransactionId.Value);
                     if (srvResponse is null)
                     {
                         jsonResponse.IsSuccess = false;
@@ -1719,7 +1720,7 @@ public class QuotationController : Controller
 
                     if (srvResponse is { isSuccess: true })
                     {
-                        var transaDtoStatus = JsonConvert.DeserializeObject<TransaccionesBcoDtoStatus>(Convert.ToString(srvResponse.result));
+                        TransaccionesBcoDtoStatus? transaDtoStatus = JsonConvert.DeserializeObject<TransaccionesBcoDtoStatus>(Convert.ToString(srvResponse.result));
 
                         if (transaDtoStatus != null)
                         {
@@ -1766,21 +1767,21 @@ public class QuotationController : Controller
         {
 
             string processingDateString = HttpContext.Session.GetString(AC.ProcessingDate) ?? DateOnly.FromDateTime(DateTime.Now).ToString();
-            DateOnly dateFilter = DateOnly.Parse(processingDateString);
+            var dateFilter = DateOnly.Parse(processingDateString);
 
             // Obtener la fecha un mes antes
-            DateOnly dateOneMonthBefore = DateOnly.FromDateTime(dateFilter.ToDateTime(TimeOnly.MinValue).AddMonths(-1));
+            var dateOneMonthBefore = DateOnly.FromDateTime(dateFilter.ToDateTime(TimeOnly.MinValue).AddMonths(-1));
 
             // Obtener la fecha del primer día del mes anterior
-            DateOnly dateInitial = new DateOnly(dateOneMonthBefore.Year, dateOneMonthBefore.Month, 1);
+            var dateInitial = new DateOnly(dateOneMonthBefore.Year, dateOneMonthBefore.Month, 1);
 
             // Obtener la fecha del último día del mes anterior
-            DateTime lastDay = new DateTime(dateOneMonthBefore.Year, dateOneMonthBefore.Month, DateTime.DaysInMonth(dateOneMonthBefore.Year, dateOneMonthBefore.Month));
+            var lastDay = new DateTime(dateOneMonthBefore.Year, dateOneMonthBefore.Month, DateTime.DaysInMonth(dateOneMonthBefore.Year, dateOneMonthBefore.Month));
 
-            DateOnly dateFinal = new DateOnly(lastDay.Year, lastDay.Month, lastDay.Day);
+            var dateFinal = new DateOnly(lastDay.Year, lastDay.Month, lastDay.Day);
 
 
-            var objPages = await _uow.Quotation
+            DataAccess.Helpers.PagedList<Quotation> objPages = await _uow.Quotation
             .GetAllAsync(x => (x.CompanyId == _companyId &&
             x.CustomerId == customerId &&
             x.CurrencyTransaType == currency &&
@@ -1801,7 +1802,7 @@ public class QuotationController : Controller
             decimal average = 0;
             decimal weightedAverage = 0;
 
-            foreach (var item in objPages.ToList())
+            foreach (Quotation? item in objPages.ToList())
             {
                 average += type == SD.QuotationType.Buy ? item.ExchangeRateBuyTransa : item.ExchangeRateSellTransa;
                 weightedAverage += type == SD.QuotationType.Buy ?
@@ -1811,8 +1812,8 @@ public class QuotationController : Controller
 
             if (objPages.Count() != 0)
             {
-                average = (average / objPages.Count());
-                weightedAverage = (weightedAverage / objPages.Sum(x => x.AmountTransaction));
+                average /= objPages.Count();
+                weightedAverage /= objPages.Sum(x => x.AmountTransaction);
             }
 
             jsonResponse.IsSuccess = true;
@@ -1843,8 +1844,7 @@ public class QuotationController : Controller
 
         try
         {
-            decimal exchange = 0M;
-            var objQuotation = _uow.Quotation
+            Quotation? objQuotation = _uow.Quotation
                 .Get(filter: x => (x.CompanyId == _companyId && x.Id == parentId));
 
             if (objQuotation is null)
@@ -1865,7 +1865,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var currencyForeign = objCurrencyRateList
+            decimal currencyForeign = objCurrencyRateList
                 .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
 
@@ -2040,7 +2040,7 @@ public class QuotationController : Controller
         }
         try
         {
-            var objHeader = _uow.Quotation
+            Quotation objHeader = _uow.Quotation
                 .Get(filter: x => x.CompanyId == _companyId && x.Id == id, isTracking: false);
             if (objHeader == null)
             {
@@ -2084,7 +2084,7 @@ public class QuotationController : Controller
 
         try
         {
-            var objHeader = _uow.Quotation
+            Quotation objHeader = _uow.Quotation
                 .Get(filter: x => x.CompanyId == _companyId && x.Id == id);
             if (objHeader == null)
             {
@@ -2129,7 +2129,7 @@ public class QuotationController : Controller
 
         try
         {
-            var objDetail = _uow.QuotationDetail
+            QuotationDetail objDetail = _uow.QuotationDetail
                 .Get(filter: x => x.CompanyId == _companyId && x.Id == id, isTracking: false);
 
             if (objDetail == null)
@@ -2145,7 +2145,7 @@ public class QuotationController : Controller
             _uow.Save();
 
             //Obtenemos el padre
-            var objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == parentId);
+            Quotation objHeader = _uow.Quotation.Get(filter: x => x.CompanyId == _companyId && x.Id == parentId);
 
             if (objHeader == null)
             {
@@ -2284,7 +2284,7 @@ public class QuotationController : Controller
 
         try
         {
-            var objBankAccountSource = _uow.BankAccount
+            BankAccount objBankAccountSource = _uow.BankAccount
                 .Get(filter: x => x.CompanyId == _companyId && x.Id == idSource);
             if (objBankAccountSource == null)
             {
@@ -2346,9 +2346,9 @@ public class QuotationController : Controller
 
             quotationIds = transactionList.Select(x => x.Id).ToList();
 
-            foreach (var id in quotationIds)
+            foreach (int id in quotationIds)
             {
-                var resultResponse = await
+                ResultResponse resultResponse = await
                     fnLogicGenerateTransactions(id);
 
                 if (resultResponse.IsInfo)
@@ -2356,7 +2356,7 @@ public class QuotationController : Controller
                     if (resultResponse.Data != null)
                     {
                         var errorList = (List<string>)resultResponse.Data;
-                        foreach (var error in errorList)
+                        foreach (string error in errorList)
                         {
                             jsonResponse.ErrorMessages += error + Environment.NewLine;
                         }
@@ -2386,8 +2386,8 @@ public class QuotationController : Controller
             }
 
             DateTime endProcess = DateTime.Now;
-            TimeSpan durationProcess = new TimeSpan(endProcess.Ticks - beginProcess.Ticks);
-            var time = durationProcess.TotalSeconds;
+            var durationProcess = new TimeSpan(endProcess.Ticks - beginProcess.Ticks);
+            double time = durationProcess.TotalSeconds;
             jsonResponse.DurationTime = $"Tiempo Transcurrido: {time} segundos";
             jsonResponse.IsSuccess = true;
             jsonResponse.SuccessMessages = "Regeneración completada exitosamente";
@@ -2409,7 +2409,7 @@ public class QuotationController : Controller
 
         try
         {
-            var resultResponse = await
+            ResultResponse resultResponse = await
                  fnLogicGenerateTransactions(id);
 
             if (resultResponse.IsInfo)
@@ -2418,7 +2418,7 @@ public class QuotationController : Controller
                 if (resultResponse.Data != null)
                 {
                     var errorList = (List<string>)resultResponse.Data;
-                    foreach (var error in errorList)
+                    foreach (string error in errorList)
                     {
                         jsonResponse.ErrorMessages += error + Environment.NewLine;
                     }
@@ -2473,7 +2473,7 @@ public class QuotationController : Controller
             return resultResponse;
         }
 
-        var objHeader = _uow.Quotation
+        Quotation objHeader = _uow.Quotation
             .Get(filter: x => x.CompanyId == _companyId && x.Id == id,
                 includeProperties: "TypeTrx,CustomerTrx,BankAccountSourceTrx,BankAccountTargetTrx,CurrencyTransferTrx,CurrencyDepositTrx,CurrencyTransaTrx");
 
@@ -2508,7 +2508,7 @@ public class QuotationController : Controller
         {
             TempData["success"] = $"Cotización cerrada correctamente";
 
-            var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
+            int nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == objHeader.CompanyId &&
                 x.TypeNumeral == objHeader.TypeNumeral &&
                 x.DateTransa == objHeader.DateTransa &&
                 x.InternalSerial == AC.InternalSerialOfficial);
@@ -2567,7 +2567,7 @@ public class QuotationController : Controller
                 objHeader = (Quotation)resultResponse.Data!;
                 objDetailList = (List<QuotationDetail>)resultResponse.DataList!;
 
-                foreach (var detail in objDetailList.OrderBy(x => x.QuotationDetailType))
+                foreach (QuotationDetail? detail in objDetailList.OrderBy(x => x.QuotationDetailType))
                 {
                     if (isReclosed)
                     {
@@ -2695,9 +2695,8 @@ public class QuotationController : Controller
 
                             objDebitId = detailUpdate.BankTransactionId;
                             objCommisionId = detailUpdate.BankTransactionTransferFeeId;
-
-                            resultResponse = await
-                                fnCreateTransactionBcoRel(objDebitId.Value, objCreditId.Value, objCommisionId);
+                            
+                            resultResponse = await fnCreateTransactionBcoRel(objDebitId.Value, objCreditId.Value, objCommisionId);
 
                             if (!resultResponse.IsSuccess)
                             {
@@ -2733,13 +2732,13 @@ public class QuotationController : Controller
     {
         ResultResponse? resultResponse = new() { IsSuccess = true };
         StringBuilder errorsMessagesBuilder = new();
-        var isPosted = true;
+        bool isPosted = true;
         List<string> errorsMessages = new();
 
         try
         {
             //Actualizar en rango los detalles
-            foreach (var detail in objDetailList)
+            foreach (QuotationDetail detail in objDetailList)
             {
                 string typeName = string.Empty;
 
@@ -2761,7 +2760,7 @@ public class QuotationController : Controller
 
                 if (detail.BankTransactionId.HasValue)
                 {
-                    var srvResponse = await _srvTransaBco.GetIsAprovalAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
+                    APIResponse? srvResponse = await _srvTransaBco.GetIsAprovalAsync<APIResponse>(_sessionToken, detail.BankTransactionId!.Value);
                     if (srvResponse is null)
                     {
                         resultResponse.IsSuccess = false;
@@ -2771,12 +2770,12 @@ public class QuotationController : Controller
 
                     if (srvResponse is { isSuccess: true })
                     {
-                        var isaproval = JsonConvert.DeserializeObject<bool>(Convert.ToString(srvResponse.result));
+                        bool isaproval = JsonConvert.DeserializeObject<bool>(Convert.ToString(srvResponse.result));
 
                         if (isaproval)
                         {
                             detail.IsBankTransactionPosted = true;
-                            var informationMessage = $" {typeName} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} - COT: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral}.";
+                            string informationMessage = $" {typeName} {detail.BankSourceTrx.Code} {detail.AmountDetail.ToString(AC.DecimalTransaFormat)} - COT: {objHeader.Id} {objHeader.TypeTrx.Code}-#{objHeader.Numeral}.";
                             if (errorsMessages.Count == 0)
                             {
                                 errorsMessages.Add($"{informationMessage}");
@@ -2860,7 +2859,7 @@ public class QuotationController : Controller
 
         try
         {
-            var srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, transaId);
+            APIResponse? srvResponse = await _srvTransaBco.DeleteAsync<APIResponse>(_sessionToken, transaId);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -2989,7 +2988,7 @@ public class QuotationController : Controller
 
             ConverterExchange cvtExc = new();
 
-            var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+            ExchangeAmounts mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
@@ -3024,7 +3023,7 @@ public class QuotationController : Controller
                 }
             }
 
-            var numberTransaFull =
+            string numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
 
@@ -3203,7 +3202,7 @@ public class QuotationController : Controller
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
-            foreach (var detailTransa in transaBcoDetalleDtoList)
+            foreach (TransaccionesBcoDetalleDto detailTransa in transaBcoDetalleDtoList)
             {
                 //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
@@ -3236,7 +3235,7 @@ public class QuotationController : Controller
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
 
-            var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
+            TransaccionesBcoDtoUpdate transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
 
@@ -3364,7 +3363,7 @@ public class QuotationController : Controller
 
             ConverterExchange cvtExc = new();
 
-            var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+            ExchangeAmounts mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
@@ -3399,7 +3398,7 @@ public class QuotationController : Controller
                 }
             }
 
-            var numberTransaFull =
+            string numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
             //Creamos transaccion bancaria
@@ -3613,7 +3612,7 @@ public class QuotationController : Controller
             //Agg al listado
             transaBcoDetalleDtoList.Add(transaBcoDetalleDto);
 
-            Guid accountId = new Guid();
+            var accountId = new Guid();
 
             short tipoMov = 0;
 
@@ -3740,15 +3739,15 @@ public class QuotationController : Controller
 
             //}
 
-            var amountDebit = transaBcoDetalleDtoList
+            decimal amountDebit = transaBcoDetalleDtoList
                  .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Debit)
                  .Sum(x => x.MontoMonbas);
 
-            var amountCredit = transaBcoDetalleDtoList
+            decimal amountCredit = transaBcoDetalleDtoList
                 .Where(x => x.TipoMovimiento == (short)mexAccountMovementType.Credit)
                 .Sum(x => x.MontoMonbas);
 
-            var amountDiferential = amountDebit - amountCredit;
+            decimal amountDiferential = amountDebit - amountCredit;
 
             if (amountDiferential != 0)
             {
@@ -3948,7 +3947,7 @@ public class QuotationController : Controller
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
-            foreach (var detailTransa in transaBcoDetalleDtoList)
+            foreach (TransaccionesBcoDetalleDto detailTransa in transaBcoDetalleDtoList)
             {
                 //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
@@ -3981,7 +3980,7 @@ public class QuotationController : Controller
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
 
-            var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
+            TransaccionesBcoDtoUpdate transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
 
@@ -4115,11 +4114,11 @@ public class QuotationController : Controller
 
             ConverterExchange cvtExc = new();
 
-            var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+            ExchangeAmounts mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
-            var numberTransaFull =
+            string numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
 
@@ -4300,7 +4299,7 @@ public class QuotationController : Controller
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
-            foreach (var detailTransa in transaBcoDetalleDtoList)
+            foreach (TransaccionesBcoDetalleDto detailTransa in transaBcoDetalleDtoList)
             {
                 //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
@@ -4333,7 +4332,7 @@ public class QuotationController : Controller
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
 
-            var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
+            TransaccionesBcoDtoUpdate transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
 
@@ -4467,11 +4466,11 @@ public class QuotationController : Controller
 
             ConverterExchange cvtExc = new();
 
-            var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
+            ExchangeAmounts mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, detail.AmountDetail,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
-            var numberTransaFull =
+            string numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
 
@@ -4652,7 +4651,7 @@ public class QuotationController : Controller
             detail.JournalEntryId = asientoDto.UidRegist;
             detail.IsJournalEntryPosted = false;
 
-            foreach (var detailTransa in transaBcoDetalleDtoList)
+            foreach (TransaccionesBcoDetalleDto detailTransa in transaBcoDetalleDtoList)
             {
                 //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
@@ -4685,7 +4684,7 @@ public class QuotationController : Controller
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
 
-            var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
+            TransaccionesBcoDtoUpdate transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
 
@@ -4805,11 +4804,11 @@ public class QuotationController : Controller
 
             ConverterExchange cvtExc = new();
 
-            var mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, objHeader.AmountCommission,
+            ExchangeAmounts mtosExc = cvtExc.ConverterExchangeTo((CurrencyType)detail.CurrencyDetailTrx.Numeral, objHeader.AmountCommission,
                 exchangeRate, exchangeRate,
                 decimalTrx: AC.DecimalTransa);
 
-            var numberTransaFull =
+            string numberTransaFull =
                 $"MC-{objHeader.TypeTrx.Code}-{objHeader.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty)}";
 
             TransaccionesBcoDtoCreate transaBco = new()
@@ -4987,7 +4986,7 @@ public class QuotationController : Controller
             detail.JournalEntryTransferFeeId = asientoDto.UidRegist;
             detail.IsJournalEntryTransferFeePosted = false;
 
-            foreach (var detailTransa in transaBcoDetalleDtoList)
+            foreach (TransaccionesBcoDetalleDto detailTransa in transaBcoDetalleDtoList)
             {
                 //Creamos los detalles del comprobante en base a los detalles de la transaBco
                 AsientosContablesDetalleDtoCreate asientoDetalle = new()
@@ -5020,7 +5019,7 @@ public class QuotationController : Controller
             //Actualizar la transaccion bancaria con la referencia del comprobante
             transaBcoDto.UidAsientoContable = asientoDto.UidRegist;
 
-            var transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
+            TransaccionesBcoDtoUpdate transaBcoDtoUpdate = _mapper.Map<TransaccionesBcoDtoUpdate>(transaBcoDto);
             resultResponse = await
                 fnUpdateTransactionBcoHeader(transaBcoDtoUpdate);
 
@@ -5050,7 +5049,7 @@ public class QuotationController : Controller
         TransaccionesBcoDto? transaBcoDto = new();
         try
         {
-            var srvResponse = await _srvTransaBco.UpdateAsync<APIResponse>(_sessionToken, transaBco);
+            APIResponse? srvResponse = await _srvTransaBco.UpdateAsync<APIResponse>(_sessionToken, transaBco);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5082,7 +5081,7 @@ public class QuotationController : Controller
         StringBuilder errorsMessagesBuilder = new();
         try
         {
-            var srvResponse = await _srvTransaBco.CreateRelationAsync<APIResponse>(_sessionToken, transaBcoDebitId, transaBcoCreditId, transaBcoCommisionId);
+            APIResponse? srvResponse = await _srvTransaBco.CreateRelationAsync<APIResponse>(_sessionToken, transaBcoDebitId, transaBcoCreditId, transaBcoCommisionId);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5115,7 +5114,7 @@ public class QuotationController : Controller
         TransaccionesBcoDto? transaBcoDto = new();
         try
         {
-            var srvResponse = await _srvTransaBco.CreateAsync<APIResponse>(_sessionToken, transaBco);
+            APIResponse? srvResponse = await _srvTransaBco.CreateAsync<APIResponse>(_sessionToken, transaBco);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5162,7 +5161,7 @@ public class QuotationController : Controller
         TransaccionesBcoDetalleDto? transaBcoDetalleDto = new();
         try
         {
-            var srvResponse = await _srvTransaBcoDetalle.CreateAsync<APIResponse>(_sessionToken, transaBcoDetalle);
+            APIResponse? srvResponse = await _srvTransaBcoDetalle.CreateAsync<APIResponse>(_sessionToken, transaBcoDetalle);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5209,7 +5208,7 @@ public class QuotationController : Controller
         AsientosContablesDto? asientoDto = new();
         try
         {
-            var srvResponse = await _srvAsiento.CreateAsync<APIResponse>(_sessionToken, asientoCnt);
+            APIResponse? srvResponse = await _srvAsiento.CreateAsync<APIResponse>(_sessionToken, asientoCnt);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5257,7 +5256,7 @@ public class QuotationController : Controller
         AsientosContablesDetalleDto? asientoDetalleDto = new();
         try
         {
-            var srvResponse = await _srvAsientoDetalle.CreateAsync<APIResponse>(_sessionToken, asientoDetalle);
+            APIResponse? srvResponse = await _srvAsientoDetalle.CreateAsync<APIResponse>(_sessionToken, asientoDetalle);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5303,7 +5302,7 @@ public class QuotationController : Controller
         BancosDto? bankDto = new();
         try
         {
-            var srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, bankCode);
+            APIResponse? srvResponse = await _srvBanco.GetByCodeAsync<APIResponse>(_sessionToken, bankCode);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5352,7 +5351,7 @@ public class QuotationController : Controller
         CuentasBancariasDto? bankAccountDto = new();
         try
         {
-            var srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankCode);
+            APIResponse? srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankCode);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5416,7 +5415,7 @@ public class QuotationController : Controller
         CuentasBancariasDto? bankAccountDto = new();
         try
         {
-            var srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankCode);
+            APIResponse? srvResponse = await _srvCuentaBancaria.GetAllByBankAsync<APIResponse>(_sessionToken, bankCode);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5475,7 +5474,7 @@ public class QuotationController : Controller
         ModulosDocumentosDto? moduloDocumentoDto = new();
         try
         {
-            var srvResponse = await _srvModulo
+            APIResponse? srvResponse = await _srvModulo
                 .GetByNumberAsync<APIResponse>(_sessionToken, numberModule);
             if (srvResponse is null)
             {
@@ -5556,7 +5555,7 @@ public class QuotationController : Controller
         ConfigCntDto? configCntDto = new();
         try
         {
-            var srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
+            APIResponse? srvResponse = await _srvConfigBco.GetAsync<APIResponse>(_sessionToken);
             if (srvResponse is null)
             {
                 resultResponse.IsSuccess = false;
@@ -5775,8 +5774,8 @@ public class QuotationController : Controller
     [HttpGet]
     public IActionResult ExportExcel(string dateInitial, string dateFinal, bool includeVoid = true)
     {
-        DateOnly dateTransaInitial = DateOnly.Parse(dateInitial);
-        DateOnly dateTransaFinal = DateOnly.Parse(dateFinal);
+        var dateTransaInitial = DateOnly.Parse(dateInitial);
+        var dateTransaFinal = DateOnly.Parse(dateFinal);
 
         var objQuotationList = _uow.Quotation
             .GetAll(x => (x.CompanyId == _companyId && x.DateTransa >= dateTransaInitial && x.DateTransa <= dateTransaFinal && (x.IsVoid == includeVoid || !x.IsVoid))
@@ -5897,7 +5896,7 @@ public class QuotationController : Controller
 
             int rowNum = 8;
 
-            foreach (var detail in children)
+            foreach (QuotationDetail? detail in children)
             {
                 worksheet.Cell(rowNum, 1).Value = detail.LineNumber;
                 worksheet.Cell(rowNum, 2).Value = detail.BankSourceTrx.Code;
@@ -5929,13 +5928,11 @@ public class QuotationController : Controller
             worksheet.Column(12).AdjustToContents();
         }
 
-        using (MemoryStream stream = new MemoryStream())
-        {
-            wb.SaveAs(stream);
-            return File(stream.ToArray(),
-                AC.ContentTypeExcel,
-                nombreArchivo);
-        }
+        using var stream = new MemoryStream();
+        wb.SaveAs(stream);
+        return File(stream.ToArray(),
+            AC.ContentTypeExcel,
+            nombreArchivo);
     }
 
     [HttpGet]
@@ -5952,16 +5949,18 @@ public class QuotationController : Controller
     {
         // Titulo de la pagina
         ViewData[AC.Title] = $"Cotizaciones - Exportar";
-        TransactionReportVM modelVm = new();
-        modelVm.DateTransaFinal = DateOnly.FromDateTime(DateTime.Now);
-        modelVm.DateTransaInitial = DateOnly.FromDateTime(DateTime.Now);
+        TransactionReportVM modelVm = new()
+        {
+            DateTransaFinal = DateOnly.FromDateTime(DateTime.Now),
+            DateTransaInitial = DateOnly.FromDateTime(DateTime.Now)
+        };
         return View(modelVm);
     }
 
     [HttpPost]
     public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
     {
-        List<string> ErrorListMessages = new List<string>();
+        var ErrorListMessages = new List<string>();
         var errorsMessagesBuilder = new StringBuilder();
         JsonResultResponse? jsonResponse = new();
         List<Models.Customer> objCustomerList = new();
@@ -5997,522 +5996,522 @@ public class QuotationController : Controller
 
 
 
-            using (var stream = objImportViewModel.FileExcel.OpenReadStream())
+            using (Stream stream = objImportViewModel.FileExcel.OpenReadStream())
             {
-                using (var workbook = new XLWorkbook(stream))
+                using var workbook = new XLWorkbook(stream);
+                foreach (IXLWorksheet worksheet in workbook.Worksheets)
                 {
-                    foreach (var worksheet in workbook.Worksheets)
+                    string sheetName = worksheet.Name;
+                    int firstRowNumber = 4;
+                    int secondRowNumber = 6;
+                    bool isPreserverNumber = false;
+                    var header = new Quotation();
+                    int countMaxIdDataBase = await _uow.Quotation.NextId();
+                    if (countMaxIdDataBase > countMaxId)
                     {
-                        string sheetName = worksheet.Name;
-                        int firstRowNumber = 4;
-                        int secondRowNumber = 6;
-                        var isPreserverNumber = false;
-                        var header = new Quotation();
-                        var countMaxIdDataBase = await _uow.Quotation.NextId();
-                        if (countMaxIdDataBase > countMaxId)
+                        countMaxId = countMaxIdDataBase;
+                    }
+                    else
+                    {
+                        countMaxId++;
+                    }
+
+                    header.Id = countMaxId;
+                    header.CompanyId = _companyId;
+                    string type = worksheet.Cell(4, 1).GetString().Trim();
+                    if (string.IsNullOrWhiteSpace(type))
+                    {
+                        ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                    }
+                    else
+                    {
+                        //En dependencia del tipo validamos los demas campos
+
+                        objQuotationType = _uow.QuotationType.Get(filter: x =>
+                            (x.CompanyId == _companyId && x.Code.ToUpper() == type.ToUpper()));
+
+                        if (objQuotationType == null)
                         {
-                            countMaxId = countMaxIdDataBase;
+                            ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
                         }
                         else
                         {
-                            countMaxId++;
-                        }
+                            header.TypeId = objQuotationType.Id;
+                            header.TypeNumeral = (SD.QuotationType)objQuotationType.Numeral;
 
-                        header.Id = countMaxId;
-                        header.CompanyId = _companyId;
-                        var type = worksheet.Cell(4, 1).GetString().Trim();
-                        if (string.IsNullOrWhiteSpace(type))
-                        {
-                            ErrorListMessages.Add($"El tipo está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                        }
-                        else
-                        {
-                            //En dependencia del tipo validamos los demas campos
-
-                            objQuotationType = _uow.QuotationType.Get(filter: x =>
-                                (x.CompanyId == _companyId && x.Code.ToUpper() == type.ToUpper()));
-
-                            if (objQuotationType == null)
+                            string numeral = worksheet.Cell(4, 2).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(numeral))
                             {
-                                ErrorListMessages.Add($"El tipo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                ErrorListMessages.Add($"El número de transacción está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                            }
+
+                            string date = worksheet.Cell(4, 3).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(date))
+                            {
+                                ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
                             }
                             else
                             {
-                                header.TypeId = objQuotationType.Id;
-                                header.TypeNumeral = (SD.QuotationType)objQuotationType.Numeral;
-
-                                var numeral = worksheet.Cell(4, 2).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(numeral))
-                                {
-                                    ErrorListMessages.Add($"El número de transacción está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                }
-
-                                var date = worksheet.Cell(4, 3).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(date))
-                                {
-                                    ErrorListMessages.Add($"La fecha está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                }
-                                else
-                                {
-                                    DateOnly dateTransa = DateOnly.Parse(date.Split(" ")[0]);
-                                    header.DateTransa = dateTransa;
-                                }
-
-                                var customerCode = worksheet.Cell(4, 4).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(customerCode))
-                                {
-                                    ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                }
-                                else
-                                {
-                                    objCustomer = _uow.Customer.Get(filter: x =>
-                                        (x.CompanyId == _companyId && x.Code == customerCode));
-
-                                    if (objCustomer == null)
-                                    {
-                                        ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        header.CustomerId = objCustomer.Id;
-                                    }
-                                }
-
-                                var amountTransa = worksheet.Cell(6, 1).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(amountTransa))
-                                {
-                                    ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                }
-                                else
-                                {
-                                    header.AmountTransaction = decimal.Parse(amountTransa);
-                                    if (header.AmountTransaction <= 0)
-                                    {
-                                        ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                }
-
-                                var businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(businessExecutive))
-                                {
-                                    ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                }
-                                else
-                                {
-                                    objBusiness = _uow.BusinessExecutive.Get(filter: x =>
-                                        (x.CompanyId == _companyId && x.Code == businessExecutive));
-
-                                    if (objBusiness == null)
-                                    {
-                                        ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        header.BusinessExecutiveCode = objBusiness.Code;
-                                        header.BusinessExecutiveId = objBusiness.Id;
-                                    }
-                                }
-
-                                var isClosed = worksheet.Cell(6, 9).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(isClosed))
-                                {
-                                    ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                }
-                                else
-                                {
-                                    if (isClosed == "S")
-                                    {
-                                        header.IsClosed = true;
-                                    }
-                                    else if (isClosed == "N")
-                                    {
-                                        header.IsClosed = false;
-                                    }
-                                    else
-                                    {
-                                        ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                }
-
-                                var isPosted = worksheet.Cell(6, 10).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(isPosted))
-                                {
-                                    ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                }
-                                else
-                                {
-                                    if (isPosted == "S")
-                                    {
-                                        header.IsPosted = true;
-                                    }
-                                    else if (isPosted == "N")
-                                    {
-                                        header.IsPosted = false;
-                                    }
-                                    else
-                                    {
-                                        ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                }
-
-                                var isVoid = worksheet.Cell(6, 11).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(isVoid))
-                                {
-                                    ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                }
-                                else
-                                {
-                                    if (isVoid == "S")
-                                    {
-                                        header.IsVoid = true;
-                                    }
-                                    else if (isVoid == "N")
-                                    {
-                                        header.IsVoid = false;
-                                    }
-                                    else
-                                    {
-                                        ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                }
-
-                                var exchangeOfficial = worksheet.Cell(4, 9).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(exchangeOfficial))
-                                {
-                                    ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                }
-                                else
-                                {
-                                    header.ExchangeRateOfficialTransa = decimal.Parse(exchangeOfficial);
-                                    if (header.ExchangeRateOfficialTransa <= 0)
-                                    {
-                                        ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                    }
-                                }
-
-                                if (objQuotationType.Numeral != (int)SD.QuotationType.Transport)
-                                {
-                                    var monTransa = worksheet.Cell(4, 6).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(monTransa))
-                                    {
-                                        ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        int currencyTypeTransa = int.Parse(monTransa);
-
-                                        if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransa))
-                                        {
-                                            header.CurrencyTransaId = objCurrencyList
-                                                .First(x => x.Numeral == currencyTypeTransa).Id;
-
-                                            header.CurrencyTransaType = (CurrencyType)currencyTypeTransa;
-                                        }
-                                        else
-                                        {
-                                            ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                    }
-
-                                    if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
-                                    {
-                                        var monTransfer = worksheet.Cell(4, 8).GetString().Trim();
-                                        if (string.IsNullOrWhiteSpace(monTransfer))
-                                        {
-                                            ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            int currencyTypeTransfer = int.Parse(monTransfer);
-
-                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransfer))
-                                            {
-                                                header.CurrencyTransferId = objCurrencyList
-                                                    .First(x => x.Numeral == currencyTypeTransfer).Id;
-
-                                                header.CurrencyTransferType = (CurrencyType)currencyTypeTransfer;
-                                                header.CurrencyDepositType = header.CurrencyTransaType;
-                                                header.CurrencyDepositId = header.CurrencyTransaId;
-                                            }
-                                            else
-                                            {
-                                                ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                            }
-                                        }
-
-                                        var exchangeBuy = worksheet.Cell(4, 10).GetString().Trim();
-                                        if (string.IsNullOrWhiteSpace(exchangeBuy))
-                                        {
-                                            ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
-                                            if (header.ExchangeRateBuyTransa <= 0)
-                                            {
-                                                ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        var monDeposit = worksheet.Cell(4, 7).GetString().Trim();
-                                        if (string.IsNullOrWhiteSpace(monDeposit))
-                                        {
-                                            ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            int currencyTypeDeposit = int.Parse(monDeposit);
-
-                                            if (Enum.IsDefined(typeof(CurrencyType), currencyTypeDeposit))
-                                            {
-                                                header.CurrencyDepositId = objCurrencyList
-                                                    .First(x => x.Numeral == currencyTypeDeposit).Id;
-
-                                                header.CurrencyDepositType = (CurrencyType)currencyTypeDeposit;
-                                                header.CurrencyTransferType = header.CurrencyTransaType;
-                                                header.CurrencyTransferId = header.CurrencyTransaId;
-                                            }
-                                            else
-                                            {
-                                                ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                            }
-                                        }
-
-                                        var exchangeSell = worksheet.Cell(4, 11).GetString().Trim();
-                                        if (string.IsNullOrWhiteSpace(exchangeSell))
-                                        {
-                                            ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
-                                            if (header.ExchangeRateSellTransa <= 0)
-                                            {
-                                                ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    var commission = worksheet.Cell(6, 5).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(commission))
-                                    {
-                                        ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        header.AmountCommission = decimal.Parse(commission);
-                                        if (header.AmountCommission < 0)
-                                        {
-                                            ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                        }
-                                    }
-
-                                    var bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(bankAccountSource))
-                                    {
-                                        ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        objBankAccountSource = _uow.BankAccount.Get(filter: x =>
-                                            (x.CompanyId == _companyId && x.Code == bankAccountSource));
-
-                                        if (objBankAccountSource == null)
-                                        {
-                                            ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            header.BankAccountSourceId = objBankAccountSource.Id;
-                                        }
-                                    }
-
-                                    var bankAccountTarget = worksheet.Cell(6, 7).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(bankAccountTarget))
-                                    {
-                                        ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        objBankAccountTarget = _uow.BankAccount.Get(filter: x =>
-                                            (x.CompanyId == _companyId && x.Code == bankAccountTarget));
-
-                                        if (objBankAccountTarget == null)
-                                        {
-                                            ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            header.BankAccountTargetId = objBankAccountTarget.Id;
-                                        }
-                                    }
-                                }
-
-                                var preserverNumber = worksheet.Cell(4, 12).GetString().Trim();
-                                if (string.IsNullOrWhiteSpace(isVoid))
-                                {
-                                    ErrorListMessages.Add($"Preservar numeración está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                }
-                                else
-                                {
-                                    if (preserverNumber == "S")
-                                    {
-                                        header.Numeral = int.Parse(numeral);
-                                    }
-                                    else if (preserverNumber == "N")
-                                    {
-                                        header.Numeral = 0;
-                                    }
-                                    else
-                                    {
-                                        ErrorListMessages.Add($"Preservar numeración es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
-                                    }
-                                }
-
-                                header.CreatedBy = worksheet.Cell(4, 13).GetString().Trim();
-
-                                var createdDate = worksheet.Cell(4, 14).GetString().Trim();
-
-                                if (!string.IsNullOrEmpty(createdDate))
-                                {
-                                    header.CreatedDate = DateTime.Parse(createdDate);
-                                }
-
-                                header.UpdatedBy = worksheet.Cell(4, 15).GetString().Trim();
-
-                                var updatedDate = worksheet.Cell(4, 16).GetString().Trim();
-
-                                if (!string.IsNullOrEmpty(updatedDate))
-                                {
-                                    header.UpdatedDate = DateTime.Parse(updatedDate);
-                                }
-
-                                header.ClosedBy = worksheet.Cell(6, 13).GetString().Trim();
-
-                                var closedDate = worksheet.Cell(6, 14).GetString().Trim();
-
-                                if (!string.IsNullOrEmpty(closedDate))
-                                {
-                                    header.ClosedDate = DateTime.Parse(closedDate);
-                                }
-
-                                header.ReClosedBy = worksheet.Cell(6, 15).GetString().Trim();
-
-                                var reClosedDate = worksheet.Cell(6, 16).GetString().Trim();
-
-                                if (!string.IsNullOrEmpty(reClosedDate))
-                                {
-                                    header.ReClosedDate = DateTime.Parse(reClosedDate);
-                                }
-
-                                objQuotationList.Add(header);
-
-                                var firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
-                                var lastUsedRow = worksheet.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
-                                for (int i = firstRowUsed + 7; i <= lastUsedRow; i++)
-                                {
-                                    var detail = new QuotationDetail();
-                                    detail.CompanyId = _companyId;
-                                    detail.ParentId = header.Id;
-                                    detail.CurrencyDetailId = header.CurrencyTransaId;
-                                    var bankSource = worksheet.Cell(i, 2).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(bankSource))
-                                    {
-                                        ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. |");
-                                    }
-                                    else
-                                    {
-                                        objBankSource = _uow.Bank.Get(filter: x =>
-                                            (x.CompanyId == _companyId && x.Code == bankSource));
-
-                                        if (objBankSource == null)
-                                        {
-                                            ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            detail.BankSourceId = objBankSource.Id;
-                                        }
-                                    }
-
-                                    var bankTarget = worksheet.Cell(i, 4).GetString().Trim();
-                                    if (!string.IsNullOrWhiteSpace(bankTarget))
-                                    {
-                                        objBankTarget = _uow.Bank.Get(filter: x =>
-                                            (x.CompanyId == _companyId && x.Code == bankTarget));
-
-                                        if (objBankTarget == null)
-                                        {
-                                            ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                        else
-                                        {
-                                            detail.BankTargetId = objBankTarget.Id;
-                                        }
-                                    }
-
-                                    var amountDetail = worksheet.Cell(i, 6).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(amountDetail))
-                                    {
-                                        ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. |");
-                                    }
-                                    else
-                                    {
-                                        detail.AmountDetail = decimal.Parse(amountDetail);
-                                        if (detail.AmountDetail <= 0)
-                                        {
-                                            ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. |");
-                                        }
-                                    }
-
-                                    var typeDetail = worksheet.Cell(i, 7).GetString().Trim();
-                                    if (string.IsNullOrWhiteSpace(typeDetail))
-                                    {
-                                        ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                    }
-                                    else
-                                    {
-                                        short quotationDetailType = short.Parse(typeDetail);
-
-                                        if (Enum.IsDefined(typeof(QuotationDetailType), quotationDetailType))
-                                        {
-                                            detail.QuotationDetailType = (QuotationDetailType)quotationDetailType;
-                                        }
-                                        else
-                                        {
-                                            ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
-                                        }
-                                    }
-
-                                    var journalEntryId = worksheet.Cell(i, 8).GetString().Trim();
-                                    var bankTransactionId = worksheet.Cell(i, 9).GetString().Trim();
-                                    var journalEntryTransferFeeId = worksheet.Cell(i, 10).GetString().Trim();
-                                    var bankTransactionTransferFeeId = worksheet.Cell(i, 11).GetString().Trim();
-
-                                    detail.JournalEntryId = (journalEntryId != string.Empty && journalEntryId != null)
-                                        ? Guid.Parse(journalEntryId)
-                                        : null;
-
-                                    detail.BankTransactionId = (bankTransactionId != string.Empty && bankTransactionId != null)
-                                        ? Guid.Parse(bankTransactionId)
-                                        : null;
-
-                                    detail.JournalEntryTransferFeeId = (journalEntryTransferFeeId != string.Empty && journalEntryTransferFeeId != null)
-                                        ? Guid.Parse(journalEntryTransferFeeId)
-                                        : null;
-
-                                    detail.BankTransactionTransferFeeId = (bankTransactionTransferFeeId != string.Empty && bankTransactionTransferFeeId != null)
-                                        ? Guid.Parse(bankTransactionTransferFeeId)
-                                        : null;
-
-                                    objQuotationDetailList.Add(detail);
-                                }
-
+                                var dateTransa = DateOnly.Parse(date.Split(" ")[0]);
+                                header.DateTransa = dateTransa;
                             }
+
+                            string customerCode = worksheet.Cell(4, 4).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(customerCode))
+                            {
+                                ErrorListMessages.Add($"El código del cliente está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                            }
+                            else
+                            {
+                                objCustomer = _uow.Customer.Get(filter: x =>
+                                    (x.CompanyId == _companyId && x.Code == customerCode));
+
+                                if (objCustomer == null)
+                                {
+                                    ErrorListMessages.Add($"El código del cliente no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    header.CustomerId = objCustomer.Id;
+                                }
+                            }
+
+                            string amountTransa = worksheet.Cell(6, 1).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(amountTransa))
+                            {
+                                ErrorListMessages.Add($"El monto está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                            }
+                            else
+                            {
+                                header.AmountTransaction = decimal.Parse(amountTransa);
+                                if (header.AmountTransaction <= 0)
+                                {
+                                    ErrorListMessages.Add($"El monto no puede ser menor o igual a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                            }
+
+                            string businessExecutive = worksheet.Cell(6, 8).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(businessExecutive))
+                            {
+                                ErrorListMessages.Add($"El ejecutivo está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                            }
+                            else
+                            {
+                                objBusiness = _uow.BusinessExecutive.Get(filter: x =>
+                                    (x.CompanyId == _companyId && x.Code == businessExecutive));
+
+                                if (objBusiness == null)
+                                {
+                                    ErrorListMessages.Add($"El ejecutivo no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    header.BusinessExecutiveCode = objBusiness.Code;
+                                    header.BusinessExecutiveId = objBusiness.Id;
+                                }
+                            }
+
+                            string isClosed = worksheet.Cell(6, 9).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(isClosed))
+                            {
+                                ErrorListMessages.Add($"Estado de cerrado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                            }
+                            else
+                            {
+                                if (isClosed == "S")
+                                {
+                                    header.IsClosed = true;
+                                }
+                                else if (isClosed == "N")
+                                {
+                                    header.IsClosed = false;
+                                }
+                                else
+                                {
+                                    ErrorListMessages.Add($"Estado de cerrado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                            }
+
+                            string isPosted = worksheet.Cell(6, 10).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(isPosted))
+                            {
+                                ErrorListMessages.Add($"Estado de contabilizado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                            }
+                            else
+                            {
+                                if (isPosted == "S")
+                                {
+                                    header.IsPosted = true;
+                                }
+                                else if (isPosted == "N")
+                                {
+                                    header.IsPosted = false;
+                                }
+                                else
+                                {
+                                    ErrorListMessages.Add($"Estado de contabilizado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                            }
+
+                            string isVoid = worksheet.Cell(6, 11).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(isVoid))
+                            {
+                                ErrorListMessages.Add($"Estado de anulado está vacio - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                            }
+                            else
+                            {
+                                if (isVoid == "S")
+                                {
+                                    header.IsVoid = true;
+                                }
+                                else if (isVoid == "N")
+                                {
+                                    header.IsVoid = false;
+                                }
+                                else
+                                {
+                                    ErrorListMessages.Add($"Estado de anulado es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                            }
+
+                            string exchangeOfficial = worksheet.Cell(4, 9).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(exchangeOfficial))
+                            {
+                                ErrorListMessages.Add($"El tipo de cambio oficial está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                            }
+                            else
+                            {
+                                header.ExchangeRateOfficialTransa = decimal.Parse(exchangeOfficial);
+                                if (header.ExchangeRateOfficialTransa <= 0)
+                                {
+                                    ErrorListMessages.Add($"El tipo de cambio oficial no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                            }
+
+                            if (objQuotationType.Numeral != (int)SD.QuotationType.Transport)
+                            {
+                                string monTransa = worksheet.Cell(4, 6).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(monTransa))
+                                {
+                                    ErrorListMessages.Add($"La moneda de la transacción está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    int currencyTypeTransa = int.Parse(monTransa);
+
+                                    if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransa))
+                                    {
+                                        header.CurrencyTransaId = objCurrencyList
+                                            .First(x => x.Numeral == currencyTypeTransa).Id;
+
+                                        header.CurrencyTransaType = (CurrencyType)currencyTypeTransa;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"La moneda de la transacción es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                }
+
+                                if (objQuotationType.Numeral == (int)SD.QuotationType.Buy)
+                                {
+                                    string monTransfer = worksheet.Cell(4, 8).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(monTransfer))
+                                    {
+                                        ErrorListMessages.Add($"La moneda de la transferencia está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        int currencyTypeTransfer = int.Parse(monTransfer);
+
+                                        if (Enum.IsDefined(typeof(CurrencyType), currencyTypeTransfer))
+                                        {
+                                            header.CurrencyTransferId = objCurrencyList
+                                                .First(x => x.Numeral == currencyTypeTransfer).Id;
+
+                                            header.CurrencyTransferType = (CurrencyType)currencyTypeTransfer;
+                                            header.CurrencyDepositType = header.CurrencyTransaType;
+                                            header.CurrencyDepositId = header.CurrencyTransaId;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"La moneda de la transferencia es invalida - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+
+                                    string exchangeBuy = worksheet.Cell(4, 10).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(exchangeBuy))
+                                    {
+                                        ErrorListMessages.Add($"El tipo de cambio de compra está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.ExchangeRateBuyTransa = decimal.Parse(exchangeBuy);
+                                        if (header.ExchangeRateBuyTransa <= 0)
+                                        {
+                                            ErrorListMessages.Add($"El tipo de cambio de compra no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    string monDeposit = worksheet.Cell(4, 7).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(monDeposit))
+                                    {
+                                        ErrorListMessages.Add($"La moneda del deposito está vacia - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        int currencyTypeDeposit = int.Parse(monDeposit);
+
+                                        if (Enum.IsDefined(typeof(CurrencyType), currencyTypeDeposit))
+                                        {
+                                            header.CurrencyDepositId = objCurrencyList
+                                                .First(x => x.Numeral == currencyTypeDeposit).Id;
+
+                                            header.CurrencyDepositType = (CurrencyType)currencyTypeDeposit;
+                                            header.CurrencyTransferType = header.CurrencyTransaType;
+                                            header.CurrencyTransferId = header.CurrencyTransaId;
+                                        }
+                                        else
+                                        {
+                                            ErrorListMessages.Add($"La moneda del deposito es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+
+                                    string exchangeSell = worksheet.Cell(4, 11).GetString().Trim();
+                                    if (string.IsNullOrWhiteSpace(exchangeSell))
+                                    {
+                                        ErrorListMessages.Add($"El tipo de cambio de venta está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.ExchangeRateSellTransa = decimal.Parse(exchangeSell);
+                                        if (header.ExchangeRateSellTransa <= 0)
+                                        {
+                                            ErrorListMessages.Add($"El típo de cambio de venta no puede ser menor o igual a cero - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                string commission = worksheet.Cell(6, 5).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(commission))
+                                {
+                                    ErrorListMessages.Add($"La comisión está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    header.AmountCommission = decimal.Parse(commission);
+                                    if (header.AmountCommission < 0)
+                                    {
+                                        ErrorListMessages.Add($"El monto no puede ser menor a cero - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                    }
+                                }
+
+                                string bankAccountSource = worksheet.Cell(6, 6).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(bankAccountSource))
+                                {
+                                    ErrorListMessages.Add($"La cuenta bancaria origen está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    objBankAccountSource = _uow.BankAccount.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == bankAccountSource));
+
+                                    if (objBankAccountSource == null)
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria origen no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.BankAccountSourceId = objBankAccountSource.Id;
+                                    }
+                                }
+
+                                string bankAccountTarget = worksheet.Cell(6, 7).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(bankAccountTarget))
+                                {
+                                    ErrorListMessages.Add($"La cuenta bancaria destino está vacia - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                                else
+                                {
+                                    objBankAccountTarget = _uow.BankAccount.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == bankAccountTarget));
+
+                                    if (objBankAccountTarget == null)
+                                    {
+                                        ErrorListMessages.Add($"La cuenta bancaria destino no fue encontrada - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        header.BankAccountTargetId = objBankAccountTarget.Id;
+                                    }
+                                }
+                            }
+
+                            string preserverNumber = worksheet.Cell(4, 12).GetString().Trim();
+                            if (string.IsNullOrWhiteSpace(isVoid))
+                            {
+                                ErrorListMessages.Add($"Preservar numeración está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                            }
+                            else
+                            {
+                                if (preserverNumber == "S")
+                                {
+                                    header.Numeral = int.Parse(numeral);
+                                }
+                                else if (preserverNumber == "N")
+                                {
+                                    header.Numeral = 0;
+                                }
+                                else
+                                {
+                                    ErrorListMessages.Add($"Preservar numeración es invalido - En la hoja {sheetName} fila:{secondRowNumber}. |");
+                                }
+                            }
+
+                            header.CreatedBy = worksheet.Cell(4, 13).GetString().Trim();
+
+                            string createdDate = worksheet.Cell(4, 14).GetString().Trim();
+
+                            if (!string.IsNullOrEmpty(createdDate))
+                            {
+                                header.CreatedDate = DateTime.Parse(createdDate);
+                            }
+
+                            header.UpdatedBy = worksheet.Cell(4, 15).GetString().Trim();
+
+                            string updatedDate = worksheet.Cell(4, 16).GetString().Trim();
+
+                            if (!string.IsNullOrEmpty(updatedDate))
+                            {
+                                header.UpdatedDate = DateTime.Parse(updatedDate);
+                            }
+
+                            header.ClosedBy = worksheet.Cell(6, 13).GetString().Trim();
+
+                            string closedDate = worksheet.Cell(6, 14).GetString().Trim();
+
+                            if (!string.IsNullOrEmpty(closedDate))
+                            {
+                                header.ClosedDate = DateTime.Parse(closedDate);
+                            }
+
+                            header.ReClosedBy = worksheet.Cell(6, 15).GetString().Trim();
+
+                            string reClosedDate = worksheet.Cell(6, 16).GetString().Trim();
+
+                            if (!string.IsNullOrEmpty(reClosedDate))
+                            {
+                                header.ReClosedDate = DateTime.Parse(reClosedDate);
+                            }
+
+                            objQuotationList.Add(header);
+
+                            int firstRowUsed = worksheet.FirstRowUsed().RangeAddress.FirstAddress.RowNumber;
+                            int lastUsedRow = worksheet.LastRowUsed().RangeAddress.FirstAddress.RowNumber;
+                            for (int i = firstRowUsed + 7; i <= lastUsedRow; i++)
+                            {
+                                var detail = new QuotationDetail
+                                {
+                                    CompanyId = _companyId,
+                                    ParentId = header.Id,
+                                    CurrencyDetailId = header.CurrencyTransaId
+                                };
+                                string bankSource = worksheet.Cell(i, 2).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(bankSource))
+                                {
+                                    ErrorListMessages.Add($"El banco origen está vacio - En la hoja {sheetName} fila:{i}. |");
+                                }
+                                else
+                                {
+                                    objBankSource = _uow.Bank.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == bankSource));
+
+                                    if (objBankSource == null)
+                                    {
+                                        ErrorListMessages.Add($"El banco origen no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        detail.BankSourceId = objBankSource.Id;
+                                    }
+                                }
+
+                                string bankTarget = worksheet.Cell(i, 4).GetString().Trim();
+                                if (!string.IsNullOrWhiteSpace(bankTarget))
+                                {
+                                    objBankTarget = _uow.Bank.Get(filter: x =>
+                                        (x.CompanyId == _companyId && x.Code == bankTarget));
+
+                                    if (objBankTarget == null)
+                                    {
+                                        ErrorListMessages.Add($"El banco destino no fue encontrado - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                    else
+                                    {
+                                        detail.BankTargetId = objBankTarget.Id;
+                                    }
+                                }
+
+                                string amountDetail = worksheet.Cell(i, 6).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(amountDetail))
+                                {
+                                    ErrorListMessages.Add($"El importe está vacio - En la hoja {sheetName} fila:{i}. |");
+                                }
+                                else
+                                {
+                                    detail.AmountDetail = decimal.Parse(amountDetail);
+                                    if (detail.AmountDetail <= 0)
+                                    {
+                                        ErrorListMessages.Add($"El importe no puede ser menor o igual a cero - En la hoja {sheetName} fila:{i}. |");
+                                    }
+                                }
+
+                                string typeDetail = worksheet.Cell(i, 7).GetString().Trim();
+                                if (string.IsNullOrWhiteSpace(typeDetail))
+                                {
+                                    ErrorListMessages.Add($"El tipo de detalle está vacio - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                }
+                                else
+                                {
+                                    short quotationDetailType = short.Parse(typeDetail);
+
+                                    if (Enum.IsDefined(typeof(QuotationDetailType), quotationDetailType))
+                                    {
+                                        detail.QuotationDetailType = (QuotationDetailType)quotationDetailType;
+                                    }
+                                    else
+                                    {
+                                        ErrorListMessages.Add($"El tipo de detalle es invalido - En la hoja {sheetName} fila:{firstRowNumber}. |");
+                                    }
+                                }
+
+                                string journalEntryId = worksheet.Cell(i, 8).GetString().Trim();
+                                string bankTransactionId = worksheet.Cell(i, 9).GetString().Trim();
+                                string journalEntryTransferFeeId = worksheet.Cell(i, 10).GetString().Trim();
+                                string bankTransactionTransferFeeId = worksheet.Cell(i, 11).GetString().Trim();
+
+                                detail.JournalEntryId = (journalEntryId != string.Empty && journalEntryId != null)
+                                    ? Guid.Parse(journalEntryId)
+                                    : null;
+
+                                detail.BankTransactionId = (bankTransactionId != string.Empty && bankTransactionId != null)
+                                    ? Guid.Parse(bankTransactionId)
+                                    : null;
+
+                                detail.JournalEntryTransferFeeId = (journalEntryTransferFeeId != string.Empty && journalEntryTransferFeeId != null)
+                                    ? Guid.Parse(journalEntryTransferFeeId)
+                                    : null;
+
+                                detail.BankTransactionTransferFeeId = (bankTransactionTransferFeeId != string.Empty && bankTransactionTransferFeeId != null)
+                                    ? Guid.Parse(bankTransactionTransferFeeId)
+                                    : null;
+
+                                objQuotationDetailList.Add(detail);
+                            }
+
                         }
                     }
                 }
@@ -6520,7 +6519,7 @@ public class QuotationController : Controller
 
             if (ErrorListMessages.Count > 0)
             {
-                foreach (var error in ErrorListMessages)
+                foreach (string error in ErrorListMessages)
                 {
                     errorsMessagesBuilder.Append(error);
                 }
@@ -6530,7 +6529,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            foreach (var header in objQuotationList)
+            foreach (Quotation header in objQuotationList)
             {
 
                 var objCurrencyRateList = _uow.CurrencyExchangeRate.GetAll
@@ -6544,7 +6543,7 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
-                var currencyForeign = objCurrencyRateList
+                decimal currencyForeign = objCurrencyRateList
                     .FirstOrDefault(t => (t.CurrencyType == CurrencyType.Foreign))?.OfficialRate ?? 1;
 
                 header.ExchangeRateOfficialBase = currencyForeign;
@@ -6695,9 +6694,9 @@ public class QuotationController : Controller
                     header.CurrencyTransferId = objBankAccountSource.CurrencyId;
                     header.ExchangeRateOfficialReal = header.ExchangeRateOfficialTransa;
 
-                    var objDetailCredit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
+                    QuotationDetail objDetailCredit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
                                                                             x.QuotationDetailType == QuotationDetailType.CreditTransfer);
-                    var objDetailDebit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
+                    QuotationDetail objDetailDebit = objQuotationDetailList.First(x => x.ParentId == header.Id &&
                                                                             x.QuotationDetailType == QuotationDetailType.DebitTransfer);
 
 
@@ -6762,7 +6761,7 @@ public class QuotationController : Controller
                     if (header.Numeral == 0)
                     {
                         //Obtenemos el secuencial en borrador
-                        var numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
+                        Task<long> numberTransa = _uow.ConfigFac.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId,
                             SD.TypeSequential.Draft, true);
 
                         header.Numeral = Convert.ToInt32(numberTransa.Result.ToString());
@@ -6777,7 +6776,7 @@ public class QuotationController : Controller
                 {
                     if (header.Numeral == 0)
                     {
-                        var nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
+                        int nextSeq = await _uow.Quotation.NextSequentialNumber(filter: x => x.CompanyId == header.CompanyId &&
                         x.TypeNumeral == header.TypeNumeral &&
                         x.DateTransa == header.DateTransa &&
                         x.InternalSerial == AC.InternalSerialOfficial);
@@ -6816,7 +6815,7 @@ public class QuotationController : Controller
 
                     int lineNumberDeposit = 1, lineNumberTransfer = 1;
 
-                    foreach (var detail in childrens)
+                    foreach (QuotationDetail? detail in childrens)
                     {
                         detail.PercentageCostRevenue = (detail.AmountDetail / header.AmountTransaction);
 
@@ -6923,18 +6922,20 @@ public class QuotationController : Controller
         {
             var report = new StiReport();
             // Veficar que hay datos del reporte guardados
-            var reportDataJson = HttpContext.Session.GetString(AC.ObjectReportData);
+            string? reportDataJson = HttpContext.Session.GetString(AC.ObjectReportData);
             if (reportDataJson is null)
             {
                 throw new Exception($"Error al cargar el informe");
             }
-            var datRepJson = HttpContext.Session.GetString(AC.DatRep);
+            string? datRepJson = HttpContext.Session.GetString(AC.DatRep);
             // cargar reporte
             report.LoadFromJson(reportDataJson);
 
             // Cargar objetos ya deserialiozados
             if (datRepJson != null)
+            {
                 report.RegBusinessObject(AC.DatRep, JsonConvert.DeserializeObject<List<QuotationReportVM>>(datRepJson));
+            }
 
             return StiNetCoreViewer.GetReportResult(this, report);
         }
@@ -7022,12 +7023,12 @@ public class QuotationController : Controller
             decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ? transaction.ExchangeRateBuyTransa
                 : transaction.ExchangeRateSellTransa;
 
-            var tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString()
+            string tcExchangeString = !transaction.IsAdjustment ? tcExchange.RoundTo(_decimalExchange).ToString()
                 : tcExchange.RoundTo(_decimalExchangeFull).ToString();
 
             // Crear listado de objetos basados en el detalle
             var dataDetails = new List<QuotationReportVM>();
-            foreach (var itemDetail in transaDetails)
+            foreach (QuotationDetail? itemDetail in transaDetails)
             {
                 dataDetails.Add(new QuotationReportVM()
                 {
@@ -7089,8 +7090,8 @@ public class QuotationController : Controller
 
         try
         {
-            var fileName = "Quotation.mrt";
-            var filePath = $"{Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName)}";
+            string fileName = "Quotation.mrt";
+            string filePath = $"{Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName)}";
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -7106,7 +7107,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            ConfigFac? configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
             if (configFac is null)
             {
                 jsonResponse.IsSuccess = false;
@@ -7114,7 +7115,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            Company? company = _uow.Company.Get(filter: x => x.Id == _companyId);
             if (company is null)
             {
                 jsonResponse.IsSuccess = false;
@@ -7137,9 +7138,9 @@ public class QuotationController : Controller
             var transaDetailsGroup = transaDetails.GroupBy(x => x.ParentId).ToList();
             var listPdfFiles = new List<(string FileName, byte[] FileContent)>();
 
-            foreach (var itemDetailList in transaDetailsGroup)
+            foreach (IGrouping<int, QuotationDetail>? itemDetailList in transaDetailsGroup)
             {
-                var transaction = _uow
+                Quotation? transaction = _uow
                     .Quotation.Get(filter: x =>
                         x.CompanyId == _companyId &&
                         x.Id == itemDetailList.Key,
@@ -7152,13 +7153,13 @@ public class QuotationController : Controller
                     return Json(jsonResponse);
                 }
 
-                var tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ?
+                decimal tcExchange = transaction.TypeNumeral == SD.QuotationType.Buy ?
                     transaction.ExchangeRateBuyTransa : transaction.ExchangeRateSellTransa;
-                var tcExchangeString = !transaction.IsAdjustment ?
+                string tcExchangeString = !transaction.IsAdjustment ?
                     tcExchange.RoundTo(_decimalExchange).ToString() :
                     tcExchange.RoundTo(_decimalExchangeFull).ToString();
 
-                foreach (var itemDetail in itemDetailList)
+                foreach (QuotationDetail itemDetail in itemDetailList)
                 {
                     dataDetails.Add(new QuotationReportVM()
                     {
@@ -7179,9 +7180,9 @@ public class QuotationController : Controller
 
                 if (isFileSeparated)
                 {
-                    var tipoTransa = Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral);
-                    var numberTransa = transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty);
-                    var pdfFileName = $"NotaCredito_{tipoTransa}_{numberTransa}.pdf";
+                    string? tipoTransa = Enum.GetName(typeof(SD.QuotationTypeNameAbrv), (int)transaction.TypeNumeral);
+                    string numberTransa = transaction.Numeral.ToString().PadLeft(3, AC.CharDefaultEmpty);
+                    string pdfFileName = $"NotaCredito_{tipoTransa}_{numberTransa}.pdf";
 
                     var individualReport = new StiReport();
                     individualReport.Load(StiNetCoreHelper.MapPath(this, filePath));
@@ -7217,17 +7218,17 @@ public class QuotationController : Controller
                 using var memoryStream = new MemoryStream();
                 using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
-                    foreach (var (pdfFileName, pdfData) in listPdfFiles)
+                    foreach ((string pdfFileName, byte[] pdfData) in listPdfFiles)
                     {
-                        var fileEntry = zip.CreateEntry(pdfFileName, CompressionLevel.Optimal);
-                        using var entryStream = fileEntry.Open();
+                        ZipArchiveEntry fileEntry = zip.CreateEntry(pdfFileName, CompressionLevel.Optimal);
+                        using Stream entryStream = fileEntry.Open();
                         using var fileStream = new MemoryStream(pdfData);
                         fileStream.CopyTo(entryStream);
                     }
                 }
 
-                var zipBytes = memoryStream.ToArray();
-                var exportReporteBase64 = Convert.ToBase64String(zipBytes);
+                byte[] zipBytes = memoryStream.ToArray();
+                string exportReporteBase64 = Convert.ToBase64String(zipBytes);
 
                 jsonResponse.IsSuccess = true;
                 DateTime dateReport = DateTime.Now;
@@ -7270,7 +7271,7 @@ public class QuotationController : Controller
                 }
 
                 // Convertir los bytes a base64
-                var exportReporteBase64 = Convert.ToBase64String(pdfData);
+                string exportReporteBase64 = Convert.ToBase64String(pdfData);
                 DateTime dateReport = DateTime.Now;
 
                 jsonResponse.IsSuccess = true;
@@ -7301,8 +7302,8 @@ public class QuotationController : Controller
         try
         {
             // Cargar y verificar el archivo del reporte
-            var fileName = "OperationList.mrt";
-            var filePath = Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName);
+            string fileName = "OperationList.mrt";
+            string filePath = Path.Combine(_hostEnvironment.ContentRootPath, "Areas", "Exchange", "Reports", fileName);
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -7320,7 +7321,7 @@ public class QuotationController : Controller
             }
 
             // Obtener configuraciones y validaciones adicionales
-            var configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
+            ConfigFac configFac = _uow.ConfigFac.Get(filter: x => x.CompanyId == _companyId);
             if (configFac == null)
             {
                 jsonResponse.IsSuccess = false;
@@ -7328,7 +7329,7 @@ public class QuotationController : Controller
                 return Json(jsonResponse);
             }
 
-            var company = _uow.Company.Get(filter: x => x.Id == _companyId);
+            Company company = _uow.Company.Get(filter: x => x.Id == _companyId);
             if (company == null)
             {
                 jsonResponse.IsSuccess = false;
@@ -7470,7 +7471,7 @@ public class QuotationController : Controller
             }
 
             // Convertir los bytes a base64
-            var exportReporteBase64 = Convert.ToBase64String(excelData);
+            string exportReporteBase64 = Convert.ToBase64String(excelData);
             DateTime dateReport = DateTime.Now;
 
             // Devolver el base64 como parte de la respuesta JSON

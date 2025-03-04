@@ -81,7 +81,10 @@ public class CurrencyController : Controller
                 ModelState.AddModelError("code", "Código no puede ser .");
             }
 
-            if (!ModelState.IsValid) return View(obj);
+            if (!ModelState.IsValid)
+            {
+                return View(obj);
+            }
 
             //Creando
             if (obj.Id == 0)
@@ -114,7 +117,10 @@ public class CurrencyController : Controller
                 }
 
                 //Datos son validos
-                if (!ModelState.IsValid) return View(obj);
+                if (!ModelState.IsValid)
+                {
+                    return View(obj);
+                }
 
                 _uow.Currency.Update(obj);
                 _uow.Save();

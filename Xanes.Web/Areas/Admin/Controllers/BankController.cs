@@ -53,7 +53,7 @@ public class BankController : Controller
             ViewData[AC.Title] = "Actualizar - Banco";
 
             //update
-            var obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
+            Bank obj = _uow.Bank.Get(x => (x.Id == id), isTracking: false);
 
             if (obj == null)
             {
@@ -83,7 +83,7 @@ public class BankController : Controller
                     if (!string.IsNullOrEmpty(obj.LogoUrl))
                     {
                         //delete the old image
-                        var oldImagePath =
+                        string oldImagePath =
                             Path.Combine(wwwRootPath, obj.LogoUrl.TrimStart('\\'));
 
                         if (System.IO.File.Exists(oldImagePath))
@@ -114,7 +114,10 @@ public class BankController : Controller
                     ModelState.AddModelError("code", "Código no puede ser .");
                 }
 
-                if (!ModelState.IsValid) return View(obj);
+                if (!ModelState.IsValid)
+                {
+                    return View(obj);
+                }
 
                 //Creando
                 if (obj.Id == 0)
@@ -127,7 +130,7 @@ public class BankController : Controller
                 else
                 {
                     //Validar que codigo no está repetido
-                    var objExists = _uow.Bank
+                    Bank objExists = _uow.Bank
                         .Get(filter: x => (x.CompanyId == _companyId)
                                           & (x.Code.Trim().ToLower() == obj.Code.Trim().ToLower()),
                                           isTracking: false);
@@ -201,7 +204,7 @@ public class BankController : Controller
     {
         ViewData[AC.Title] = "Eliminar - Banco";
 
-        var rowToBeDeleted = _uow.Bank.Get(filter:u => (u.Id == id)
+        Bank rowToBeDeleted = _uow.Bank.Get(filter:u => (u.Id == id)
         ,isTracking:false);
 
         if (rowToBeDeleted == null)
@@ -211,7 +214,7 @@ public class BankController : Controller
 
         if (!string.IsNullOrEmpty(rowToBeDeleted.LogoUrl))
         {
-            var imagePath = Path.Combine(_webHostEnvironment.WebRootPath,
+            string imagePath = Path.Combine(_webHostEnvironment.WebRootPath,
                 rowToBeDeleted.LogoUrl.TrimStart('\\'));
 
             if (System.IO.File.Exists(imagePath))

@@ -110,7 +110,10 @@ public class IdentificationTypeController : Controller
                 ModelState.AddModelError("numeral", "No está en los valores permitidos");
             }
 
-            if (!ModelState.IsValid) return View(obj);
+            if (!ModelState.IsValid)
+            {
+                return View(obj);
+            }
 
             //Creando
             if (obj.Id == 0)

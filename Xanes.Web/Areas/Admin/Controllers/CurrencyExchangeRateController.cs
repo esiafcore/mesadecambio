@@ -472,66 +472,62 @@ public class CurrencyExchangeRateController : Controller
 
     private FileResult GenerarExcel(string nombreArchivo, List<Models.CurrencyExchangeRate> listEntities, List<Models.Currency> listCurrencies)
     {
-        using (XLWorkbook wb = new XLWorkbook())
+        using var wb = new XLWorkbook();
+        IXLWorksheet worksheet = wb.Worksheets.Add("TiposDeCambio");
+
+        Company objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
+
+        // Escribir el nombre de la compañía en la primera fila
+        worksheet.Cell(1, 1).Value = objCompany.Name;
+        worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
+        worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+        worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+        // Escribir el título del excel en la segunda fila
+        worksheet.Cell(2, 1).Value = "Listado de Tipos de Cambio";
+        worksheet.Range(2, 1, 2, 7).Merge().Style.Font.Bold = true;
+        worksheet.Range(2, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+        worksheet.Range(2, 1, 2, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+
+        IXLRow headerRow = worksheet.Row(4);
+        headerRow.Style.Font.Bold = true;
+        headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+
+        worksheet.Cell(4, 1).Value = "Moneda";
+        worksheet.Cell(4, 2).Value = "Fecha";
+        worksheet.Cell(4, 3).Value = "T/C Oficial";
+        worksheet.Cell(4, 4).Value = "T/C Compra";
+        worksheet.Cell(4, 5).Value = "T/C Venta";
+
+        int rowNum = 5;
+        foreach (CurrencyExchangeRate item in listEntities)
         {
-            var worksheet = wb.Worksheets.Add("TiposDeCambio");
-
-            var objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
-
-            // Escribir el nombre de la compañía en la primera fila
-            worksheet.Cell(1, 1).Value = objCompany.Name;
-            worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
-            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            // Escribir el título del excel en la segunda fila
-            worksheet.Cell(2, 1).Value = "Listado de Tipos de Cambio";
-            worksheet.Range(2, 1, 2, 7).Merge().Style.Font.Bold = true;
-            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-
-
-            var headerRow = worksheet.Row(4);
-            headerRow.Style.Font.Bold = true;
-            headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
-
-            worksheet.Cell(4, 1).Value = "Moneda";
-            worksheet.Cell(4, 2).Value = "Fecha";
-            worksheet.Cell(4, 3).Value = "T/C Oficial";
-            worksheet.Cell(4, 4).Value = "T/C Compra";
-            worksheet.Cell(4, 5).Value = "T/C Venta";
-
-            int rowNum = 5;
-            foreach (var item in listEntities)
-            {
-                worksheet.Cell(rowNum, 1).Value = item.CurrencyTrx.CodeIso;
-                worksheet.Cell(rowNum, 2).SetValue(item.DateTransa.ToDateTimeConvert());
-                worksheet.Cell(rowNum, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
-                worksheet.Cell(rowNum, 3).Value = item.OfficialRate;
-                worksheet.Cell(rowNum, 3).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
-                worksheet.Cell(rowNum, 4).Value = item.BuyRate;
-                worksheet.Cell(rowNum, 4).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
-                worksheet.Cell(rowNum, 5).Value = item.SellRate;
-                worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
-                rowNum++;
-            }
-
-            worksheet.Column(1).AdjustToContents();
-            worksheet.Column(2).AdjustToContents();
-            worksheet.Column(3).AdjustToContents();
-            worksheet.Column(4).AdjustToContents();
-            worksheet.Column(5).AdjustToContents();
-
-
-            // Asignar un nombre a la página del excel
-            wb.Worksheet(1).Name = "Data";
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                wb.SaveAs(stream);
-                return File(stream.ToArray(), AC.ContentTypeExcel,
-                    nombreArchivo);
-            }
+            worksheet.Cell(rowNum, 1).Value = item.CurrencyTrx.CodeIso;
+            worksheet.Cell(rowNum, 2).SetValue(item.DateTransa.ToDateTimeConvert());
+            worksheet.Cell(rowNum, 2).Style.NumberFormat.SetFormat(AC.DefaultDateFormatView);
+            worksheet.Cell(rowNum, 3).Value = item.OfficialRate;
+            worksheet.Cell(rowNum, 3).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+            worksheet.Cell(rowNum, 4).Value = item.BuyRate;
+            worksheet.Cell(rowNum, 4).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+            worksheet.Cell(rowNum, 5).Value = item.SellRate;
+            worksheet.Cell(rowNum, 5).Style.NumberFormat.Format = AC.XlsFormatRateExchange;
+            rowNum++;
         }
+
+        worksheet.Column(1).AdjustToContents();
+        worksheet.Column(2).AdjustToContents();
+        worksheet.Column(3).AdjustToContents();
+        worksheet.Column(4).AdjustToContents();
+        worksheet.Column(5).AdjustToContents();
+
+
+        // Asignar un nombre a la página del excel
+        wb.Worksheet(1).Name = "Data";
+
+        using var stream = new MemoryStream();
+        wb.SaveAs(stream);
+        return File(stream.ToArray(), AC.ContentTypeExcel,
+            nombreArchivo);
     }
 
     [HttpGet]
@@ -546,7 +542,7 @@ public class CurrencyExchangeRateController : Controller
     [HttpPost]
     public async Task<JsonResult> Import([FromForm] ImportVM objImportViewModel)
     {
-        List<string> ErrorListMessages = new List<string>();
+        var ErrorListMessages = new List<string>();
         var errorsMessagesBuilder = new StringBuilder();
         JsonResultResponse? jsonResponse = new();
         List<CurrencyExchangeRate>? objList = new();

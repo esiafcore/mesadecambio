@@ -108,7 +108,10 @@ public class CustomerCategoryController : Controller
                 ModelState.AddModelError("numeral", "No puede ser cero o menor a cero");
             }
 
-            if (!ModelState.IsValid) return View(obj);
+            if (!ModelState.IsValid)
+            {
+                return View(obj);
+            }
 
             //Creando
             if (obj.Id == 0)

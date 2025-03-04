@@ -183,7 +183,9 @@ public class CustomerController : Controller
             }
 
             if (!jsonResponse.IsSuccess)
+            {
                 return Json(jsonResponse);
+            }
         }
 
         //Datos son validos
@@ -480,90 +482,86 @@ public class CustomerController : Controller
 
     private FileResult GenerarExcel(string nombreArchivo, List<Models.Customer> listEntities)
     {
-        using (XLWorkbook wb = new XLWorkbook())
+        using var wb = new XLWorkbook();
+        IXLWorksheet worksheet = wb.Worksheets.Add("Clientes");
+
+        Company objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
+
+        // Escribir el nombre de la compañía en la primera fila
+        worksheet.Cell(1, 1).Value = objCompany.Name;
+        worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
+        worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+        worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+        // Escribir el título del excel en la segunda fila
+        worksheet.Cell(2, 1).Value = "Listado de Clientes";
+        worksheet.Range(2, 1, 2, 7).Merge().Style.Font.Bold = true;
+        worksheet.Range(2, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+        worksheet.Range(2, 1, 2, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
+
+        IXLRow headerRow = worksheet.Row(4);
+        headerRow.Style.Font.Bold = true;
+        headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
+
+        worksheet.Cell(4, 1).Value = "Tipo";
+        worksheet.Cell(4, 2).Value = "Sector";
+        worksheet.Cell(4, 3).Value = "Código";
+        worksheet.Cell(4, 4).Value = "Código Tipo Ident.";
+        worksheet.Cell(4, 5).Value = "# Ident.";
+        worksheet.Cell(4, 6).Value = "Razón Social";
+        worksheet.Cell(4, 7).Value = "Nombre Comercial";
+        worksheet.Cell(4, 8).Value = "Primer Nombre";
+        worksheet.Cell(4, 9).Value = "Segundo Nombre";
+        worksheet.Cell(4, 10).Value = "Primer Apellido";
+        worksheet.Cell(4, 11).Value = "Segundo Apellido";
+        worksheet.Cell(4, 12).Value = "Dirección";
+        worksheet.Cell(4, 13).Value = "Es Banco";
+        worksheet.Cell(4, 14).Value = "Es del Sistema";
+        worksheet.Cell(4, 15).Value = "Id";
+
+        int rowNum = 5;
+        foreach (Models.Customer item in listEntities)
         {
-            var worksheet = wb.Worksheets.Add("Clientes");
+            worksheet.Cell(rowNum, 1).Value = item.TypeTrx.Code;
+            worksheet.Cell(rowNum, 2).Value = item.SectorTrx.Code;
+            worksheet.Cell(rowNum, 3).Value = item.Code;
+            worksheet.Cell(rowNum, 4).Value = item.IdentificationTypeCode;
+            worksheet.Cell(rowNum, 5).Value = item.IdentificationNumber;
+            worksheet.Cell(rowNum, 6).Value = item.BusinessName;
+            worksheet.Cell(rowNum, 7).Value = item.CommercialName;
+            worksheet.Cell(rowNum, 8).Value = item.FirstName;
+            worksheet.Cell(rowNum, 9).Value = item.SecondName;
+            worksheet.Cell(rowNum, 10).Value = item.LastName;
+            worksheet.Cell(rowNum, 11).Value = item.SecondSurname;
+            worksheet.Cell(rowNum, 12).Value = item.AddressPrimary;
+            worksheet.Cell(rowNum, 13).Value = item.IsBank ? "S" : "N";
+            worksheet.Cell(rowNum, 14).Value = item.IsSystemRow ? "S" : "N";
+            worksheet.Cell(rowNum, 15).Value = item.Id;
 
-            var objCompany = _uow.Company.Get(filter: x => x.Id == _companyId);
-
-            // Escribir el nombre de la compañía en la primera fila
-            worksheet.Cell(1, 1).Value = objCompany.Name;
-            worksheet.Range(1, 1, 1, 7).Merge().Style.Font.Bold = true;
-            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-            worksheet.Range(1, 1, 1, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-            // Escribir el título del excel en la segunda fila
-            worksheet.Cell(2, 1).Value = "Listado de Clientes";
-            worksheet.Range(2, 1, 2, 7).Merge().Style.Font.Bold = true;
-            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
-            worksheet.Range(2, 1, 2, 7).Style.Alignment.SetVertical(XLAlignmentVerticalValues.Center);
-
-            var headerRow = worksheet.Row(4);
-            headerRow.Style.Font.Bold = true;
-            headerRow.Style.Fill.BackgroundColor = XLColor.PastelGray;
-
-            worksheet.Cell(4, 1).Value = "Tipo";
-            worksheet.Cell(4, 2).Value = "Sector";
-            worksheet.Cell(4, 3).Value = "Código";
-            worksheet.Cell(4, 4).Value = "Código Tipo Ident.";
-            worksheet.Cell(4, 5).Value = "# Ident.";
-            worksheet.Cell(4, 6).Value = "Razón Social";
-            worksheet.Cell(4, 7).Value = "Nombre Comercial";
-            worksheet.Cell(4, 8).Value = "Primer Nombre";
-            worksheet.Cell(4, 9).Value = "Segundo Nombre";
-            worksheet.Cell(4, 10).Value = "Primer Apellido";
-            worksheet.Cell(4, 11).Value = "Segundo Apellido";
-            worksheet.Cell(4, 12).Value = "Dirección";
-            worksheet.Cell(4, 13).Value = "Es Banco";
-            worksheet.Cell(4, 14).Value = "Es del Sistema";
-            worksheet.Cell(4, 15).Value = "Id";
-
-            int rowNum = 5;
-            foreach (var item in listEntities)
-            {
-                worksheet.Cell(rowNum, 1).Value = item.TypeTrx.Code;
-                worksheet.Cell(rowNum, 2).Value = item.SectorTrx.Code;
-                worksheet.Cell(rowNum, 3).Value = item.Code;
-                worksheet.Cell(rowNum, 4).Value = item.IdentificationTypeCode;
-                worksheet.Cell(rowNum, 5).Value = item.IdentificationNumber;
-                worksheet.Cell(rowNum, 6).Value = item.BusinessName;
-                worksheet.Cell(rowNum, 7).Value = item.CommercialName;
-                worksheet.Cell(rowNum, 8).Value = item.FirstName;
-                worksheet.Cell(rowNum, 9).Value = item.SecondName;
-                worksheet.Cell(rowNum, 10).Value = item.LastName;
-                worksheet.Cell(rowNum, 11).Value = item.SecondSurname;
-                worksheet.Cell(rowNum, 12).Value = item.AddressPrimary;
-                worksheet.Cell(rowNum, 13).Value = item.IsBank ? "S" : "N";
-                worksheet.Cell(rowNum, 14).Value = item.IsSystemRow ? "S" : "N";
-                worksheet.Cell(rowNum, 15).Value = item.Id;
-
-                rowNum++;
-            }
-
-            worksheet.Column(1).AdjustToContents();
-            worksheet.Column(2).AdjustToContents();
-            worksheet.Column(3).AdjustToContents();
-            worksheet.Column(4).AdjustToContents();
-            worksheet.Column(5).AdjustToContents();
-            worksheet.Column(6).AdjustToContents();
-            worksheet.Column(7).AdjustToContents();
-            worksheet.Column(8).AdjustToContents();
-            worksheet.Column(9).AdjustToContents();
-            worksheet.Column(10).AdjustToContents();
-            worksheet.Column(11).AdjustToContents();
-            worksheet.Column(12).AdjustToContents();
-            worksheet.Column(13).AdjustToContents();
-            worksheet.Column(14).AdjustToContents();
-
-            // Asignar un nombre a la página del excel
-            wb.Worksheet(1).Name = "Data";
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                wb.SaveAs(stream);
-                return File(stream.ToArray(), AC.ContentTypeExcel,
-                    nombreArchivo);
-            }
+            rowNum++;
         }
+
+        worksheet.Column(1).AdjustToContents();
+        worksheet.Column(2).AdjustToContents();
+        worksheet.Column(3).AdjustToContents();
+        worksheet.Column(4).AdjustToContents();
+        worksheet.Column(5).AdjustToContents();
+        worksheet.Column(6).AdjustToContents();
+        worksheet.Column(7).AdjustToContents();
+        worksheet.Column(8).AdjustToContents();
+        worksheet.Column(9).AdjustToContents();
+        worksheet.Column(10).AdjustToContents();
+        worksheet.Column(11).AdjustToContents();
+        worksheet.Column(12).AdjustToContents();
+        worksheet.Column(13).AdjustToContents();
+        worksheet.Column(14).AdjustToContents();
+
+        // Asignar un nombre a la página del excel
+        wb.Worksheet(1).Name = "Data";
+
+        using var stream = new MemoryStream();
+        wb.SaveAs(stream);
+        return File(stream.ToArray(), AC.ContentTypeExcel,
+            nombreArchivo);
     }
 
     [HttpGet]
@@ -581,7 +579,7 @@ public class CustomerController : Controller
         JsonResultResponse? jsonResponse = new();
         try
         {
-            List<string> ErrorListMessages = new List<string>();
+            var ErrorListMessages = new List<string>();
             var errorsMessagesBuilder = new StringBuilder();
             List<Models.Customer> objCustomerList = new();
             List<Models.ViewModels.CustomerImportVM> objCustomerVMList = new();
@@ -626,19 +624,22 @@ public class CustomerController : Controller
 
             var workbook = new XLWorkbook(objImportViewModel.FileExcel.OpenReadStream());
 
-            var hoja = workbook.Worksheet(1);
+            IXLWorksheet hoja = workbook.Worksheet(1);
 
             int primerFilaUsada = hoja.FirstRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
-            var ultimaFilaUsada = hoja.LastRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
+            int ultimaFilaUsada = hoja.LastRowUsed()?.RangeAddress.FirstAddress.RowNumber ?? 0;
 
             for (int i = primerFilaUsada + 4; i <= ultimaFilaUsada; i++)
             {
 
-                var objCustomerVM = new Models.ViewModels.CustomerImportVM();
-                objCustomerVM.DataModel = new();
+                var objCustomerVM = new Models.ViewModels.CustomerImportVM
+                {
+                    DataModel = new()
+                };
+
                 objCustomerVM.DataModel.CompanyId = _companyId;
 
-                var fila = hoja.Row(i);
+                IXLRow fila = hoja.Row(i);
                 objCustomerVM.Fila = i;
 
                 string uid = fila.Cell(16).IsEmpty() ? "0" : fila.Cell(16).GetString();
@@ -737,7 +738,11 @@ public class CustomerController : Controller
                             }
                             else
                             {
-                                if (businessName != null) objCustomerVM.DataModel.BusinessName = businessName;
+                                if (businessName != null)
+                                {
+                                    objCustomerVM.DataModel.BusinessName = businessName;
+                                }
+
                                 objCustomerVM.DataModel.CommercialName = commercialName;
                             }
                         }
@@ -751,7 +756,7 @@ public class CustomerController : Controller
                 }
                 else
                 {
-                    var objSector = objSectorList.FirstOrDefault(x => x.Code == sector);
+                    CustomerSector? objSector = objSectorList.FirstOrDefault(x => x.Code == sector);
                     if (objSector == null)
                     {
                         ErrorListMessages.Add($"Id:{uid}. El sector no fue encontrado. Fila:{i}. |");

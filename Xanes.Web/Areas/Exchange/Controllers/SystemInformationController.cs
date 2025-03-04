@@ -224,20 +224,20 @@ public class SystemInformationController : Controller
 
         // Obtener datos
         // Veficar que hay datos del reporte guardados
-        var reportDataListJson = HttpContext.Session.GetString(AC.ReportListData);
+        string reportDataListJson = HttpContext.Session.GetString(AC.ReportListData);
         if (reportDataListJson is null)
         {
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
-        var reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
+        List<TransaODTVM>? reportDataList = JsonConvert.DeserializeObject<List<TransaODTVM>>(reportDataListJson);
 
 
-        var reportTotalListJson = HttpContext.Session.GetString(AC.ReportListTotal);
+        string? reportTotalListJson = HttpContext.Session.GetString(AC.ReportListTotal);
         if (reportTotalListJson is null)
         {
             throw new Exception($"{AC.ReportDataErrorLoad}");
         }
-        var reportTotalList = JsonConvert.DeserializeObject<List<TransportTotalVM>>(reportTotalListJson);
+        List<TransportTotalVM>? reportTotalList = JsonConvert.DeserializeObject<List<TransportTotalVM>>(reportTotalListJson);
 
         // Guardar los datos
         _parametersReport.Add(ParametersReport.ListData, reportDataList);
@@ -250,17 +250,17 @@ public class SystemInformationController : Controller
             throw new Exception($"Monedas no encontradas");
         }
 
-        var codeBase = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Base).Abbreviation;
-        var codeForeign = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Foreign).Abbreviation;
-        var codeAdditional = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Additional).Abbreviation;
+        string codeBase = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Base)?.Abbreviation ?? string.Empty;
+        string codeForeign = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Foreign)?.Abbreviation ?? string.Empty;
+        string codeAdditional = currencyList.FirstOrDefault(x => x.Numeral == (int)CurrencyType.Additional)?.Abbreviation ?? string.Empty;
 
-        var totalEntryBase = reportTotalList.Sum(x => x.TotalEntryBase);
-        var totalEntryForeign = reportTotalList.Sum(x => x.TotalEntryForeign);
-        var totalEntryAdditional = reportTotalList.Sum(x => x.TotalEntryAdditional);
+        decimal totalEntryBase = reportTotalList?.Sum(x => x.TotalEntryBase) ?? 0;
+        decimal totalEntryForeign = reportTotalList?.Sum(x => x.TotalEntryForeign) ?? 0;
+        decimal totalEntryAdditional = reportTotalList?.Sum(x => x.TotalEntryAdditional) ?? 0;
 
-        var totalOutputBase = reportTotalList.Sum(x => x.TotalOutputBase);
-        var totalOutputForeign = reportTotalList.Sum(x => x.TotalOutputForeign);
-        var totalOutputAdditional = reportTotalList.Sum(x => x.TotalOutputAdditional);
+        decimal totalOutputBase = reportTotalList?.Sum(x => x.TotalOutputBase) ?? 0;
+        decimal totalOutputForeign = reportTotalList?.Sum(x => x.TotalOutputForeign) ?? 0;
+        decimal totalOutputAdditional = reportTotalList?.Sum(x => x.TotalOutputAdditional) ?? 0;
 
         // Setear parametros
         reportResult.Dictionary.Variables["parCurrencyCodeBase"].ValueObject = codeBase;
@@ -802,21 +802,12 @@ public class SystemInformationController : Controller
 
             List<TransaODTVM> transaListVM = new();
 
-            foreach (var transaction in transactionList)
+            foreach (Quotation? transaction in transactionList)
             {
-                var currency = "";
-
-                if (transaction.TypeNumeral == SD.QuotationType.Buy ||
-                    transaction.TypeNumeral == SD.QuotationType.Transport)
-                {
-                    currency =
-                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}";
-                }
-                else
-                {
-                    currency =
-                        $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyDepositTrx.Code}";
-                }
+                string currency = transaction.TypeNumeral == SD.QuotationType.Buy ||
+                    transaction.TypeNumeral == SD.QuotationType.Transport
+                    ? $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyTransferTrx.Code}"
+                    : $"{transaction.CurrencyTransaTrx.Code}-{transaction.CurrencyDepositTrx.Code}";
 
 
                 var transa = new TransaODTVM

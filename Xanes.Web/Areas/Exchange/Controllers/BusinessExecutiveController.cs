@@ -91,7 +91,10 @@ public class BusinessExecutiveController : Controller
                 ModelState.AddModelError("code", "Código no puede ser .");
             }
 
-            if (!ModelState.IsValid) return View(objViewModel);
+            if (!ModelState.IsValid)
+            {
+                return View(objViewModel);
+            }
 
 
             //Creando
